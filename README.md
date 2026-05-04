@@ -353,15 +353,16 @@ tbody td:first-child { font-weight: 600; }
 
       <!-- TARGETS -->
       <div id="panel-targets" class="panel">
-        <div class="card">
-          <div class="card-title">Target Setup</div>
-          <div style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
-            <div class="form-group"><label>Number of Targets</label><input type="number" id="target-count" min="1" max="100" value="10" style="width:100px;"></div>
-            <button class="btn btn-primary" onclick="generateTargets()">GENERATE</button>
-            <button class="btn btn-success" onclick="autoAssign()">⚡ AUTO ASSIGN</button>
-            <button class="btn btn-secondary" onclick="clearAssignments()">CLEAR ALL</button>
-          </div>
-        </div>
+       <div class="card">
+  <div class="card-title">Target Setup</div>
+  <p style="font-size:13px;color:var(--muted2);margin-bottom:14px;">
+    Targets are calculated automatically from the entry list (4 slots per target, grouped by bow type). Click Auto-Generate to build them instantly.
+  </p>
+  <div style="display:flex; gap:8px; flex-wrap:wrap;">
+    <button class="btn btn-primary" onclick="generateTargets()">⚡ AUTO GENERATE FROM ENTRIES</button>
+    <button class="btn btn-secondary" onclick="clearAssignments()">CLEAR ALL</button>
+  </div>
+</div>
         <div id="target-grid" class="target-grid"></div>
       </div>
 
@@ -700,40 +701,66 @@ window.importCSV = async () => {
 /* ── TARGETS ── */
 window.generateTargets = async () => {
   if (!currentCompId) { toast('Select a competition first', 'error'); return; }
-  const n = parseInt(document.getElementById('target-count').value) || 10;
-  // preserve existing assignments
-  const existing = targets.slice(0, n);
-  targets = Array.from({length: n}, (_, i) => existing[i] || { num: i+1, A:null, B:null, C:null, D:null });
-  await saveTargets();
-  renderTargets();
-  toast(`${n} targets set ✓`, 'success');
-};
+  if (!archers.length) { toast('Add archers to the entry list first', 'error'); return; }
 
-window.autoAssign = async () => {
-  if (!currentCompId) { toast('Select a competition first', 'error'); return; }
-  if (!targets.length) { toast('Generate targets first', 'error'); return; }
-  // clear all
-  targets.forEach(t => { t.A=null; t.B=null; t.C=null; t.D=null; });
-  archers.forEach(a => { a.target=null; a.slot=null; });
-  // sort by bow then age then gender
-  const sorted = [...archers].sort((a,b) => a.bow.localeCompare(b.bow) || a.age.localeCompare(b.age));
-  const slots = ['A','B','C','D'];
-  let ti=0, si=0;
-  sorted.forEach(archer => {
-    if (ti >= targets.length) return;
-    const slot = slots[si];
-    targets[ti][slot] = { id: archer.id, name: archer.name, bow: archer.bow, age: archer.age };
-    const orig = archers.find(a => a.id === archer.id);
-    if (orig) { orig.target = targets[ti].num; orig.slot = slot; }
-    si++;
-    if (si >= 4) { si=0; ti++; }
+  // Group archers by bow type, sorted by age then gender within each group
+  const bowOrder = ['Recurve','Compound','Barebow','Traditional','Longbow'];
+  const groups = {};
+  archers.forEach(a => {
+    if (!groups[a.bow]) groups[a.bow] = [];
+    groups[a.bow].push(a);
   });
+
+  // Sort within each group: age order then gender
+  const ageOrder = ['U12','U14','U18','U21','Senior','Master 50+','Master 60+'];
+  Object.keys(groups).forEach(bow => {
+    groups[bow].sort((a, b) => {
+      const ai = ageOrder.indexOf(a.age), bi = ageOrder.indexOf(b.age);
+      if (ai !== bi) return ai - bi;
+      return a.gender.localeCompare(b.gender);
+    });
+  });
+
+  // Build targets — each bow group gets its own block of targets
+  targets = [];
+  archers.forEach(a => { a.target = null; a.slot = null; });
+  const slots = ['A','B','C','D'];
+  let targetNum = 1;
+
+  bowOrder.forEach(bow => {
+    const group = groups[bow];
+    if (!group || !group.length) return;
+
+    // Calculate how many targets this group needs
+    const numTargets = Math.ceil(group.length / 4);
+
+    // Add a separator target label for this bow group
+    let si = 0;
+    let currentTarget = null;
+
+    group.forEach(archer => {
+      if (si === 0) {
+        currentTarget = { num: targetNum++, bow, A: null, B: null, C: null, D: null };
+        targets.push(currentTarget);
+      }
+      const slot = slots[si];
+      currentTarget[slot] = { id: archer.id, name: archer.name, bow: archer.bow, age: archer.age };
+      const orig = archers.find(a => a.id === archer.id);
+      if (orig) { orig.target = currentTarget.num; orig.slot = slot; }
+      si++;
+      if (si >= 4) si = 0;
+    });
+  });
+
   await saveTargets();
   await saveArchers();
   renderTargets();
   renderEntries();
-  toast('Auto-assigned ✓', 'success');
+  renderDashboard();
+  toast(`${targets.length} targets generated ✓`, 'success');
 };
+
+window.autoAssign = window.generateTargets; // same thing now
 
 window.clearAssignments = async () => {
   if (!confirm('Clear all target assignments?')) return;
@@ -757,7 +784,8 @@ function renderTargets() {
         ${archer ? `<div class="slot-name">${archer.name}</div><div class="slot-cat">${archer.bow} · ${archer.age}</div>` : `<div class="slot-name">Tap to assign</div>`}
       </div>`;
     }).join('');
-    return `<div class="target-card"><div class="target-num">T${t.num}</div>${slots}</div>`;
+  const bowLabel = t.bow ? `<div style="font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:1px;margin-bottom:6px;">${t.bow.toUpperCase()}</div>` : '';
+    return `<div class="target-card"><div class="target-num">T${t.num}</div>${bowLabel}${slots}</div>`;
   }).join('');
 }
 
