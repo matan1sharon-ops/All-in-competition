@@ -275,10 +275,23 @@ window.loadTarget = async () => {
   const target = (compData.targets||[]).find(t=>t.num===targetNum);
   if (!target) { toast(`Target ${targetNum} not found`,'error'); return; }
 
-  // Get archers on this target
+  // Get archers on this target — cross reference with full archers list
+  const allArchers = compData.archers || [];
   targetArchers = ['A','B','C','D']
     .filter(s => target[s])
-    .map(s => ({ ...target[s], slot:s }));
+    .map(s => {
+      const slotData = target[s];
+      // Find the full archer record to get the correct ID
+      const fullArcher = allArchers.find(a =>
+        String(a.id) === String(slotData.id) ||
+        a.name === slotData.name
+      );
+      return {
+        ...(fullArcher || slotData),
+        slot: s,
+        id: fullArcher ? fullArcher.id : slotData.id
+      };
+    });
 
   if (!targetArchers.length) { toast('No archers assigned to this target','error'); return; }
 
