@@ -439,7 +439,8 @@ window.selectCompetition = async (id) => {
 };
 
 function getScore(archerId) {
-  return scores[String(archerId)] || scores[archerId] || scores[parseFloat(archerId)] || {};
+  const key = String(archerId).replace(/\./g, '_');
+  return scores[key] || scores[String(archerId)] || {};
 }
 
 function renderAll() { renderDashboard(); renderEntries(); renderTargets(); renderSessions(); renderResults(); }
