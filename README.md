@@ -66,7 +66,7 @@ thead tr { background: var(--surface2); }
 thead th { padding: 10px 12px; text-align: left; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted2); border-bottom: 1px solid var(--border2); }
 tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
 tbody tr:hover { background: var(--surface2); }
-tbody td { padding: 10px 12px; color: var(--text); }
+tbody td { padding: 10px 12px; color: var(--text) !important; }
 .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.5px; }
 .tag-recurve { background: #1565c0; color: #fff; }
 .tag-compound { background: #4a148c; color: #fff; }
@@ -551,58 +551,35 @@ window.generateTargets = async () => {
   if (!currentCompId) { toast('Select a competition first','error'); return; }
   if (!archers.length) { toast('Add archers to the entry list first','error'); return; }
 
-  // Get competition discipline
-  const snap = await getDoc(doc(db,'competitions',currentCompId));
-  const discipline = snap.data()?.discipline || 'Outdoor';
-  const is3DorField = discipline === '3D' || discipline === 'Field';
-
   targets = [];
   archers.forEach(a => { a.target=null; a.slot=null; });
 
   const slots = ['A','B','C','D'];
   let targetNum = 1;
 
-  if (is3DorField) {
-    // For 3D/Field: group by bow type only (no distance separation needed)
-    BOW_ORDER.forEach(bow => {
-      const group = archers
-        .filter(a => a.bow === bow)
-        .sort((a,b) => {
-          const ai=AGE_ORDER.indexOf(a.age), bi=AGE_ORDER.indexOf(b.age);
-          if (ai!==bi) return ai-bi;
-          return a.gender.localeCompare(b.gender);
-        });
-      if (!group.length) return;
-      let currentTarget = null, si = 0;
-      group.forEach(archer => {
-        if (si===0) { currentTarget={num:targetNum++,bow,discipline,A:null,B:null,C:null,D:null}; targets.push(currentTarget); }
-        currentTarget[slots[si]]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};
-        const orig=archers.find(a=>a.id===archer.id);
-        if(orig){orig.target=currentTarget.num;orig.slot=slots[si];}
-        si++; if(si>=4) si=0;
+  // Always group by bow type — each bow gets its own consecutive block of targets
+  // This works correctly for all disciplines (Outdoor, Indoor, 3D, Field)
+  BOW_ORDER.forEach(bow => {
+    const group = archers
+      .filter(a => a.bow === bow)
+      .sort((a,b) => {
+        const ai=AGE_ORDER.indexOf(a.age), bi=AGE_ORDER.indexOf(b.age);
+        if (ai!==bi) return ai-bi;
+        return a.gender.localeCompare(b.gender);
       });
+    if (!group.length) return;
+    let currentTarget=null, si=0;
+    group.forEach(archer => {
+      if (si===0) {
+        currentTarget={num:targetNum++, bow, A:null, B:null, C:null, D:null};
+        targets.push(currentTarget);
+      }
+      currentTarget[slots[si]]={id:archer.id, name:archer.name, bow:archer.bow, age:archer.age, gender:archer.gender};
+      const orig=archers.find(a=>a.id===archer.id);
+      if(orig){orig.target=currentTarget.num; orig.slot=slots[si];}
+      si++; if(si>=4) si=0;
     });
-  } else {
-    // For Outdoor/Indoor: group by bow type (each bow gets its own target block)
-    BOW_ORDER.forEach(bow => {
-      const group = archers
-        .filter(a => a.bow === bow)
-        .sort((a,b) => {
-          const ai=AGE_ORDER.indexOf(a.age), bi=AGE_ORDER.indexOf(b.age);
-          if (ai!==bi) return ai-bi;
-          return a.gender.localeCompare(b.gender);
-        });
-      if (!group.length) return;
-      let currentTarget = null, si = 0;
-      group.forEach(archer => {
-        if (si===0) { currentTarget={num:targetNum++,bow,A:null,B:null,C:null,D:null}; targets.push(currentTarget); }
-        currentTarget[slots[si]]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};
-        const orig=archers.find(a=>a.id===archer.id);
-        if(orig){orig.target=currentTarget.num;orig.slot=slots[si];}
-        si++; if(si>=4) si=0;
-      });
-    });
-  }
+  });
 
   await saveTargets(); await saveArchers();
   renderAll();
