@@ -754,16 +754,16 @@ window.renderResults = () => {
     .sort((a,b)=>b.total-a.total||b.tens-a.tens||b.xs-a.xs);
   document.getElementById('results-table').innerHTML = list.map((a,i)=>`
     <tr>
-      <td style="color:var(--accent);font-weight:900;">${a.total>0?i+1:'—'}</td>
-      <td style="color:var(--text);font-weight:600;">${a.name}</td>
-      <td style="color:var(--text);">${a.club||'—'}</td>
+      <td style="color:#FFD700;font-weight:900;">${a.total>0?i+1:'—'}</td>
+      <td style="color:#f0f0f0;font-weight:600;">${a.name}</td>
+      <td style="color:#f0f0f0;">${a.club||'—'}</td>
       <td><span class="tag tag-${a.bow.toLowerCase()}">${a.bow}</span></td>
-      <td style="color:var(--text);">${a.age}</td>
-      <td style="color:var(--accent);">${a.target?`T${a.target}${a.slot}`:'—'}</td>
-      <td style="font-weight:900;font-size:16px;color:var(--accent);">${a.total||'—'}</td>
-      <td style="color:var(--text);">${a.tens||'—'}</td>
-      <td style="color:var(--text);">${a.xs||'—'}</td>
-    </tr>`).join('')||'<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:24px">No results yet</td></tr>';
+      <td style="color:#f0f0f0;">${a.age}</td>
+      <td style="color:#FFD700;">${a.target?`T${a.target}${a.slot}`:'—'}</td>
+      <td style="font-weight:900;font-size:16px;color:#FFD700;">${a.total||'—'}</td>
+      <td style="color:#f0f0f0;">${a.tens||'—'}</td>
+      <td style="color:#f0f0f0;">${a.xs||'—'}</td>
+    </tr>`).join('')||'<tr><td colspan="9" style="text-align:center;color:#666;padding:24px">No results yet</td></tr>';
 };
 
 window.exportResultsPDF = () => {
