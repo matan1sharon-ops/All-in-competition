@@ -326,9 +326,10 @@ window.startScoring = () => {
   });
 
   // Load existing scores from Firebase
-  const existing = compData.scores || {};
-  targetArchers.forEach(a => {
-    if (existing[a.id]) scores[a.id] = existing[a.id];
+targetArchers.forEach(a => {
+    const key = String(a.id).replace(/\./g, '_');
+    if (existing[key]) scores[a.id] = existing[key];
+    else if (existing[a.id]) scores[a.id] = existing[a.id];
     else scores[a.id] = { ends: Array.from({length:cfg.ends},()=>[]), total:0, tens:0, xs:0 };
   });
 
@@ -590,8 +591,8 @@ async function saveScores() {
   if (!compId) return;
   const payload = { scores: {} };
   targetArchers.forEach(a => {
-    // Use string key to avoid floating point issues
-    const key = String(a.id);
+    // Remove dots — Firebase doesn't allow dots in field keys
+    const key = String(a.id).replace(/\./g, '_');
     payload.scores[key] = scores[a.id];
   });
   await setDoc(doc(db,'competitions',compId), payload, {merge:true});
