@@ -15,8 +15,6 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);height:100dvh;overflow:hidden;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);}
-
-/* LOGIN */
 #login-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
 .login-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 24px;width:100%;max-width:360px;}
 .login-logo{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;letter-spacing:4px;color:var(--accent);text-align:center;margin-bottom:4px;}
@@ -33,8 +31,6 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 .confirm-slot{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--accent);width:28px;}
 .confirm-name{flex:1;font-size:14px;font-weight:600;}
 .confirm-cat{font-size:11px;color:var(--muted);}
-
-/* MAIN SCORING */
 #scoring-screen{flex:1;display:none;flex-direction:column;overflow:hidden;}
 .score-header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;}
 .score-header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
@@ -42,15 +38,11 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 .target-label{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--accent);}
 .progress-bar-wrap{height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;}
 .progress-bar{height:100%;background:var(--accent);border-radius:2px;transition:width 0.3s ease;}
-
-/* ARCHER TABS */
 .archer-tabs{display:flex;gap:4px;padding:8px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;}
 .archer-tab{flex:1;min-width:0;padding:8px 6px;border:none;border-radius:6px;background:transparent;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:all 0.15s;position:relative;}
 .archer-tab.active{background:var(--blue);color:#fff;}
 .archer-tab.done{background:var(--green);color:#fff;}
 .archer-tab .tab-check{position:absolute;top:2px;right:4px;font-size:8px;}
-
-/* SCORE LIST */
 #score-list{flex:1;overflow-y:auto;padding:10px;}
 .end-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:border-color 0.15s;}
 .end-card:hover{border-color:var(--muted);}
@@ -68,15 +60,11 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 .chip-white{background:#f5f5f5;color:#111;border:1px solid #ccc;}
 .chip-miss{background:#424242;color:#aaa;}
 .chip-empty{background:var(--surface2);color:var(--muted);border:1px dashed var(--border);}
-
-/* FOOTER INPUT */
 .score-footer{background:var(--surface);border-top:1px solid var(--border);padding:10px;flex-shrink:0;}
 .current-archer-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--surface2);border-radius:8px;margin-bottom:8px;}
 .current-archer-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--text);}
 .current-archer-slot{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--accent);}
 .current-end-label{font-size:11px;color:var(--muted);}
-
-/* PAD */
 .pad{display:grid;gap:5px;}
 .pad-btn{height:52px;border:none;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,0.35);transition:transform 0.08s,box-shadow 0.08s;}
 .pad-btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,0.35);}
@@ -89,8 +77,6 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 .pad-back{background:#333;color:#aaa;font-size:16px;}
 .pad-next{background:var(--accent);color:#000;font-size:15px;}
 .pad-next:disabled{background:#333;color:#555;}
-
-/* SUMMARY */
 #summary-screen{flex:1;display:none;flex-direction:column;overflow:hidden;}
 .summary-header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
 .summary-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--accent);letter-spacing:1px;}
@@ -101,8 +87,6 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 .summary-score{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:var(--accent);}
 .summary-stats{display:flex;gap:12px;font-size:12px;color:var(--muted);}
 .summary-stats span{color:var(--text);font-weight:700;}
-
-/* TOAST */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 20px;font-size:13px;font-weight:600;z-index:999;transition:transform 0.3s ease;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.5);}
 #toast.show{transform:translateX(-50%) translateY(0);}
 #toast.success{border-color:var(--green);color:var(--green);}
@@ -111,7 +95,6 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo">ALL IN</div>
@@ -134,7 +117,6 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
   </div>
 </div>
 
-<!-- SCORING -->
 <div id="scoring-screen">
   <div class="score-header">
     <div class="score-header-top">
@@ -149,11 +131,8 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
     </div>
     <div class="progress-bar-wrap"><div class="progress-bar" id="s-progress"></div></div>
   </div>
-
   <div class="archer-tabs" id="archer-tabs"></div>
-
   <div id="score-list"></div>
-
   <div class="score-footer">
     <div class="current-archer-bar">
       <div>
@@ -166,7 +145,6 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
   </div>
 </div>
 
-<!-- SUMMARY -->
 <div id="summary-screen">
   <div class="summary-header">
     <div class="summary-title" id="sum-title">Session Complete</div>
@@ -179,7 +157,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, doc, getDoc, getDocs, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, doc, getDoc, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To",
@@ -193,17 +171,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
-/* ── STATE ── */
-let compId        = null;
-let compData      = null;
-let targetNum     = null;
-let targetArchers = []; // archers on this target [{id,name,slot,bow,age,gender}]
-let activeArcherIdx = 0;
-let editingEnd    = null; // {archerIdx, endIdx} or null
-let scores        = {};   // scores[archerId] = { ends:[[arr,arr,...],[...]], total, tens, xs }
-let discipline    = 'Outdoor';
+let compId = null, compData = null, targetNum = null;
+let targetArchers = [], activeArcherIdx = 0, editingEnd = null;
+let scores = {}, discipline = 'Outdoor';
 
-/* ── CONFIG BY DISCIPLINE ── */
 function getConfig() {
   switch(discipline) {
     case '3D':     return { arrows:2, ends:24, label:'Station' };
@@ -225,12 +196,11 @@ function getPadScores() {
 function getVal(s) { return s==='X'?10:(parseInt(s)||0); }
 
 function chipClass(s) {
-  if(s==='X'||s===10||s===9) return 'chip-gold';
+  if(s==='X'||s===10||s===9||s===11) return 'chip-gold';
   if(s===8||s===7) return 'chip-red';
   if(s===6||s===5) return 'chip-blue';
   if(s===4||s===3) return 'chip-black';
   if(s===2||s===1) return 'chip-white';
-  if(s===11) return 'chip-gold';
   if(s===0||s==='M') return 'chip-miss';
   return 'chip-empty';
 }
@@ -247,66 +217,70 @@ function padBtnClass(s) {
 
 /* ── LOAD COMPETITIONS ── */
 async function loadCompetitions() {
-  const snap = await getDocs(collection(db,'competitions'));
-  const sel  = document.getElementById('comp-select');
-  sel.innerHTML = '<option value="">— Select Competition —</option>';
-  snap.docs.forEach(d => {
-    const c = d.data();
-    const o = document.createElement('option');
-    o.value = d.id;
-    o.textContent = c.name + (c.date?` (${c.date})`:'');
-    sel.appendChild(o);
-  });
+  try {
+    const snap = await getDocs(collection(db,'competitions'));
+    const sel = document.getElementById('comp-select');
+    sel.innerHTML = '<option value="">— Select Competition —</option>';
+    snap.docs.forEach(d => {
+      const c = d.data();
+      const o = document.createElement('option');
+      o.value = d.id;
+      o.textContent = c.name + (c.date?` (${c.date})`:'');
+      sel.appendChild(o);
+    });
+    if (snap.docs.length === 0) {
+      sel.innerHTML = '<option value="">No competitions found</option>';
+    }
+  } catch(err) {
+    console.error('Load competitions error:', err);
+    document.getElementById('comp-select').innerHTML = '<option value="">Error loading — check connection</option>';
+    toast('Connection error: '+err.message, 'error');
+  }
 }
 
 /* ── LOAD TARGET ── */
 window.loadTarget = async () => {
-  compId     = document.getElementById('comp-select').value;
-  targetNum  = parseInt(document.getElementById('target-input').value);
+  compId    = document.getElementById('comp-select').value;
+  targetNum = parseInt(document.getElementById('target-input').value);
   if (!compId)    { toast('Select a competition','error'); return; }
   if (!targetNum) { toast('Enter target number','error'); return; }
 
-  const snap = await getDoc(doc(db,'competitions',compId));
-  if (!snap.exists()) { toast('Competition not found','error'); return; }
-  compData   = snap.data();
-  discipline = compData.discipline || 'Outdoor';
+  try {
+    const snap = await getDoc(doc(db,'competitions',compId));
+    if (!snap.exists()) { toast('Competition not found','error'); return; }
+    compData   = snap.data();
+    discipline = compData.discipline || 'Outdoor';
 
-  // Find target
-  const target = (compData.targets||[]).find(t=>t.num===targetNum);
-  if (!target) { toast(`Target ${targetNum} not found`,'error'); return; }
+    const target = (compData.targets||[]).find(t=>t.num===targetNum);
+    if (!target) { toast(`Target ${targetNum} not found`,'error'); return; }
 
-  // Get archers on this target — cross reference with full archers list
-  const allArchers = compData.archers || [];
-  targetArchers = ['A','B','C','D']
-    .filter(s => target[s])
-    .map(s => {
-      const slotData = target[s];
-      // Find the full archer record to get the correct ID
-      const fullArcher = allArchers.find(a =>
-        String(a.id) === String(slotData.id) ||
-        a.name === slotData.name
-      );
-      return {
-        ...(fullArcher || slotData),
-        slot: s,
-        id: fullArcher ? fullArcher.id : slotData.id
-      };
-    });
+    const allArchers = compData.archers || [];
+    targetArchers = ['A','B','C','D']
+      .filter(s => target[s])
+      .map(s => {
+        const slotData = target[s];
+        const fullArcher = allArchers.find(a =>
+          String(a.id) === String(slotData.id) || a.name === slotData.name
+        );
+        return { ...(fullArcher||slotData), slot:s, id: fullArcher ? fullArcher.id : slotData.id };
+      });
 
-  if (!targetArchers.length) { toast('No archers assigned to this target','error'); return; }
+    if (!targetArchers.length) { toast('No archers on this target','error'); return; }
 
-  // Show confirmation
-  document.getElementById('confirm-archers').innerHTML = targetArchers.map(a=>`
-    <div class="confirm-archer">
-      <div class="confirm-slot">${a.slot}</div>
-      <div style="flex:1;padding:0 10px;">
-        <div class="confirm-name">${a.name}</div>
-        <div class="confirm-cat">${a.bow} · ${a.age}</div>
-      </div>
-    </div>`).join('');
+    document.getElementById('confirm-archers').innerHTML = targetArchers.map(a=>`
+      <div class="confirm-archer">
+        <div class="confirm-slot">${a.slot}</div>
+        <div style="flex:1;padding:0 10px;">
+          <div class="confirm-name">${a.name}</div>
+          <div class="confirm-cat">${a.bow} · ${a.age}</div>
+        </div>
+      </div>`).join('');
 
-  document.getElementById('login-step-1').style.display='none';
-  document.getElementById('login-step-2').style.display='block';
+    document.getElementById('login-step-1').style.display='none';
+    document.getElementById('login-step-2').style.display='block';
+  } catch(err) {
+    toast('Error: '+err.message,'error');
+  }
 };
 
 window.backToStep1 = () => {
@@ -320,148 +294,105 @@ window.startScoring = () => {
   const existing = compData.scores || {};
 
   targetArchers.forEach(a => {
-    const key = String(a.id).replace(/\./g, '_');
+    const key = String(a.id).replace(/\./g,'_');
     if (existing[key]) scores[a.id] = existing[key];
     else if (existing[String(a.id)]) scores[a.id] = existing[String(a.id)];
-    else scores[a.id] = { ends: Array.from({length:cfg.ends},()=>[]), total:0, tens:0, xs:0 };
-  });
-
-  // Load existing scores from Firebase
-targetArchers.forEach(a => {
-    const key = String(a.id).replace(/\./g, '_');
-    if (existing[key]) scores[a.id] = existing[key];
-    else if (existing[a.id]) scores[a.id] = existing[a.id];
     else scores[a.id] = { ends: Array.from({length:cfg.ends},()=>[]), total:0, tens:0, xs:0 };
   });
 
   activeArcherIdx = 0;
   editingEnd = null;
 
-  document.getElementById('s-comp-name').textContent = compData.name || '';
+  document.getElementById('s-comp-name').textContent = compData.name||'';
   document.getElementById('s-target-label').textContent = `TARGET ${targetNum}`;
-
-  document.getElementById('login-screen').style.display   = 'none';
+  document.getElementById('login-screen').style.display  = 'none';
   document.getElementById('scoring-screen').style.display = 'flex';
 
-  renderTabs();
-  renderScoreList();
-  renderPad();
-  updateHeader();
+  renderTabs(); renderScoreList(); renderPad(); updateHeader();
 };
 
-/* ── CURRENT POSITION ── */
+/* ── HELPERS ── */
 function getCurrentEnd() {
   if (editingEnd !== null) return editingEnd.endIdx;
   const cfg = getConfig();
-  const archer = targetArchers[activeArcherIdx];
-  const ends   = scores[archer.id].ends;
-  for (let i=0; i<cfg.ends; i++) {
-    if (ends[i].length < cfg.arrows) return i;
-  }
+  const ends = scores[targetArchers[activeArcherIdx].id].ends;
+  for (let i=0; i<cfg.ends; i++) { if (ends[i].length < cfg.arrows) return i; }
   return cfg.ends - 1;
 }
-
 function getCurrentArcher() { return targetArchers[activeArcherIdx]; }
 
 /* ── RENDER TABS ── */
 function renderTabs() {
   const cfg = getConfig();
   document.getElementById('archer-tabs').innerHTML = targetArchers.map((a,i) => {
-    const endsDone = scores[a.id].ends.filter(e=>e.length===cfg.arrows).length;
-    const allDone  = endsDone === cfg.ends;
-    const cls      = allDone ? 'done' : (i===activeArcherIdx ? 'active' : '');
+    const done = scores[a.id].ends.filter(e=>e.length===cfg.arrows).length === cfg.ends;
+    const cls  = done ? 'done' : (i===activeArcherIdx ? 'active' : '');
     return `<button class="archer-tab ${cls}" onclick="switchArcher(${i})">
       ${a.slot} · ${a.name.split(' ')[0]}
-      ${allDone ? '<span class="tab-check">✓</span>' : ''}
+      ${done ? '<span class="tab-check">✓</span>' : ''}
     </button>`;
   }).join('');
 }
 
-/* ── SWITCH ARCHER ── */
 window.switchArcher = (idx) => {
-  activeArcherIdx = idx;
-  editingEnd = null;
-  renderTabs();
-  renderScoreList();
-  renderPad();
-  updateHeader();
+  activeArcherIdx=idx; editingEnd=null;
+  renderTabs(); renderScoreList(); renderPad(); updateHeader();
 };
 
 /* ── RENDER SCORE LIST ── */
 function renderScoreList() {
-  const cfg    = getConfig();
+  const cfg   = getConfig();
   const archer = getCurrentArcher();
-  const ends   = scores[archer.id].ends;
+  const ends  = scores[archer.id].ends;
   const curEnd = editingEnd !== null ? editingEnd.endIdx : getCurrentEnd();
-  const list   = document.getElementById('score-list');
-
   let html = '';
   for (let i=0; i<cfg.ends; i++) {
-    const endArrows = ends[i] || [];
-    const isActive  = i === curEnd && editingEnd === null;
-    const isEditing = editingEnd !== null && editingEnd.endIdx === i;
-    const endTotal  = endArrows.reduce((s,v)=>s+getVal(v),0);
-    const cls       = isEditing ? 'end-card editing' : isActive ? 'end-card active-end' : 'end-card';
-
-    const arrowChips = Array.from({length:cfg.arrows}, (_,ai) => {
-      const v = endArrows[ai];
+    const ea = ends[i]||[];
+    const isActive  = i===curEnd && editingEnd===null;
+    const isEditing = editingEnd!==null && editingEnd.endIdx===i;
+    const tot = ea.reduce((s,v)=>s+getVal(v),0);
+    const cls = isEditing?'end-card editing':isActive?'end-card active-end':'end-card';
+    const chips = Array.from({length:cfg.arrows},(_,ai)=>{
+      const v=ea[ai];
       return v!==undefined
         ? `<span class="arrow-chip ${chipClass(v)}">${v===0?'M':v}</span>`
         : `<span class="arrow-chip chip-empty">·</span>`;
     }).join('');
-
     html += `<div class="${cls}" onclick="editEnd(${i})">
       <div class="end-header">
         <div class="end-num">${cfg.label} ${i+1}${isEditing?' (EDITING)':isActive?' (ACTIVE)':''}</div>
-        <div class="end-total">${endArrows.length===cfg.arrows?endTotal:endArrows.length?endTotal:'—'}</div>
+        <div class="end-total">${ea.length===cfg.arrows?tot:ea.length?tot:'—'}</div>
       </div>
-      <div class="end-arrows">${arrowChips}</div>
+      <div class="end-arrows">${chips}</div>
     </div>`;
   }
-
+  const list = document.getElementById('score-list');
   list.innerHTML = html;
-  // scroll to active
-  setTimeout(()=>{
-    const active = list.querySelector('.active-end, .editing');
-    if(active) active.scrollIntoView({behavior:'smooth',block:'center'});
-  },50);
+  setTimeout(()=>{ const a=list.querySelector('.active-end,.editing'); if(a) a.scrollIntoView({behavior:'smooth',block:'center'}); },50);
 }
 
-/* ── EDIT END ── */
 window.editEnd = (endIdx) => {
-  const cfg    = getConfig();
   const archer = getCurrentArcher();
-  const endArrows = scores[archer.id].ends[endIdx] || [];
-  // only allow edit if end has been started
-  if (endArrows.length === 0 && endIdx !== getCurrentEnd()) return;
-  editingEnd = { endIdx, originalArrows:[...endArrows] };
-  scores[archer.id].ends[endIdx] = [...endArrows];
-  renderScoreList();
-  renderPad();
-  updateHeader();
+  const ea = scores[archer.id].ends[endIdx]||[];
+  if (ea.length===0 && endIdx!==getCurrentEnd()) return;
+  editingEnd = { endIdx, originalArrows:[...ea] };
+  scores[archer.id].ends[endIdx] = [...ea];
+  renderScoreList(); renderPad(); updateHeader();
 };
 
 /* ── UPDATE HEADER ── */
 function updateHeader() {
-  const cfg    = getConfig();
+  const cfg = getConfig();
   const archer = getCurrentArcher();
-  const endIdx = getCurrentEnd();
-  const isEditing = editingEnd !== null;
-  const eIdx   = isEditing ? editingEnd.endIdx : endIdx;
-
-  document.getElementById('s-end-label').textContent    = `${cfg.label.toUpperCase()} ${eIdx+1}${isEditing?' — EDITING':''}`;
-  document.getElementById('s-archer-name').textContent  = archer.name;
-  document.getElementById('s-archer-slot').textContent  = archer.slot;
-
-  // grand total for this target
-  const grand = targetArchers.reduce((sum,a)=>sum+scores[a.id].total,0);
-  document.getElementById('s-grand-total').textContent  = grand;
-
-  // progress
-  const totalEnds   = cfg.ends * targetArchers.length;
-  const doneEnds    = targetArchers.reduce((sum,a)=>sum+scores[a.id].ends.filter(e=>e.length===cfg.arrows).length,0);
-  const pct         = totalEnds>0?(doneEnds/totalEnds*100):0;
-  document.getElementById('s-progress').style.width = pct+'%';
+  const eIdx = editingEnd!==null ? editingEnd.endIdx : getCurrentEnd();
+  document.getElementById('s-end-label').textContent   = `${cfg.label.toUpperCase()} ${eIdx+1}${editingEnd?' — EDITING':''}`;
+  document.getElementById('s-archer-name').textContent = archer.name;
+  document.getElementById('s-archer-slot').textContent = archer.slot;
+  const grand = targetArchers.reduce((s,a)=>s+scores[a.id].total,0);
+  document.getElementById('s-grand-total').textContent = grand;
+  const total = cfg.ends*targetArchers.length;
+  const done  = targetArchers.reduce((s,a)=>s+scores[a.id].ends.filter(e=>e.length===cfg.arrows).length,0);
+  document.getElementById('s-progress').style.width = (total>0?done/total*100:0)+'%';
 }
 
 /* ── RENDER PAD ── */
@@ -469,56 +400,46 @@ function renderPad() {
   const cfg      = getConfig();
   const archer   = getCurrentArcher();
   const endIdx   = editingEnd!==null ? editingEnd.endIdx : getCurrentEnd();
-  const curArrows = scores[archer.id].ends[endIdx] || [];
+  const curArrows = scores[archer.id].ends[endIdx]||[];
   const padScores = getPadScores();
   const isFull    = curArrows.length >= cfg.arrows;
   const isEditing = editingEnd !== null;
-
-  // Determine columns
+  const allDone   = targetArchers.every(a=>scores[a.id].ends.filter(e=>e.length===cfg.arrows).length===cfg.ends);
   const cols = padScores.length <= 5 ? 'repeat(3,1fr)' : 'repeat(4,1fr)';
 
   let btns = padScores.map(s => {
     const label = s===0?'M':s;
-    const cls   = padBtnClass(s);
-    return `<button class="pad-btn ${cls}" onclick="handleScore(${JSON.stringify(s)})" ${isFull&&!isEditing?'disabled style="opacity:0.4"':''}>${label}</button>`;
+    return `<button class="pad-btn ${padBtnClass(s)}" onclick="handleScore(${JSON.stringify(s)})" ${isFull&&!isEditing?'disabled style="opacity:0.4"':''}>${label}</button>`;
   }).join('');
 
-  // Back button
   btns += `<button class="pad-btn pad-back" onclick="handleBack()" style="grid-column:span 2;">BACKSPACE ←</button>`;
 
-  // Next button
-  const allDone = targetArchers.every(a => scores[a.id].ends.filter(e=>e.length===cfg.arrows).length===cfg.ends);
+  // Determine next button label
   let nextLabel, nextDisabled;
   if (isEditing) {
-    nextLabel    = 'DONE EDITING ✓';
-    nextDisabled = false;
+    nextLabel = 'DONE EDITING ✓'; nextDisabled = false;
+  } else if (allDone) {
+    nextLabel = 'VIEW SUMMARY 🏆'; nextDisabled = false;
   } else if (isFull) {
-   // Find next archer who hasn't completed this end yet
-  const cfg2 = getConfig();
-  const currentEnd = getCurrentEnd();
-  let nextIdx = -1;
-
-  // Look for next archer after current who hasn't finished this end
-  for (let i = activeArcherIdx + 1; i < targetArchers.length; i++) {
-    if ((scores[targetArchers[i].id].ends[currentEnd]||[]).length < cfg2.arrows) {
-      nextIdx = i; break;
+    // Find next archer on same end who hasn't scored yet
+    const currentEnd = getCurrentEnd();
+    let nextIdx = -1;
+    for (let i=activeArcherIdx+1; i<targetArchers.length; i++) {
+      if ((scores[targetArchers[i].id].ends[currentEnd]||[]).length < cfg.arrows) { nextIdx=i; break; }
     }
-  }
-
-  // If none found after current, look from beginning
-  if (nextIdx === -1) {
-    for (let i = 0; i < activeArcherIdx; i++) {
-      if ((scores[targetArchers[i].id].ends[currentEnd]||[]).length < cfg2.arrows) {
-        nextIdx = i; break;
+    if (nextIdx===-1) {
+      for (let i=0; i<activeArcherIdx; i++) {
+        if ((scores[targetArchers[i].id].ends[currentEnd]||[]).length < cfg.arrows) { nextIdx=i; break; }
       }
     }
+    if (nextIdx !== -1) {
+      nextLabel = `NEXT ARCHER →`; nextDisabled = false;
+    } else {
+      nextLabel = 'NEXT END →'; nextDisabled = false;
+    }
+  } else {
+    nextLabel = `${curArrows.length}/${cfg.arrows}`; nextDisabled = true;
   }
-
-  // If all done this end — move to first archer (next end starts automatically)
-  if (nextIdx === -1) nextIdx = 0;
-
-  activeArcherIdx = nextIdx;
-  if (allDone && !isEditing) nextLabel = 'VIEW SUMMARY 🏆';
 
   btns += `<button class="pad-btn pad-next" onclick="handleNext()" ${nextDisabled?'disabled':''} style="grid-column:span 2;">${nextLabel}</button>`;
 
@@ -529,75 +450,66 @@ function renderPad() {
 
 /* ── HANDLE SCORE INPUT ── */
 window.handleScore = (val) => {
-  const cfg    = getConfig();
+  const cfg   = getConfig();
   const archer = getCurrentArcher();
   const endIdx = editingEnd!==null ? editingEnd.endIdx : getCurrentEnd();
-  const end    = scores[archer.id].ends[endIdx] || [];
-
+  const end   = scores[archer.id].ends[endIdx]||[];
   if (end.length >= cfg.arrows) return;
   end.push(val);
   scores[archer.id].ends[endIdx] = end;
   recalcStats(archer.id);
-  renderScoreList();
-  renderPad();
-  updateHeader();
+  renderScoreList(); renderPad(); updateHeader();
 };
 
-/* ── BACKSPACE ── */
 window.handleBack = () => {
   const archer = getCurrentArcher();
   const endIdx = editingEnd!==null ? editingEnd.endIdx : getCurrentEnd();
-  const end    = scores[archer.id].ends[endIdx] || [];
+  const end   = scores[archer.id].ends[endIdx]||[];
   if (end.length > 0) {
     end.pop();
     scores[archer.id].ends[endIdx] = end;
     recalcStats(archer.id);
-    renderScoreList();
-    renderPad();
-    updateHeader();
+    renderScoreList(); renderPad(); updateHeader();
   }
 };
 
 /* ── HANDLE NEXT ── */
 window.handleNext = async () => {
-  const cfg    = getConfig();
-  const archer = getCurrentArcher();
-  const endIdx = editingEnd!==null ? editingEnd.endIdx : getCurrentEnd();
+  const cfg = getConfig();
 
   if (editingEnd !== null) {
-    // Done editing — save and exit edit mode
     editingEnd = null;
     await saveScores();
-    renderTabs();
-    renderScoreList();
-    renderPad();
-    updateHeader();
+    renderTabs(); renderScoreList(); renderPad(); updateHeader();
     toast('Scores saved ✓','success');
     return;
   }
 
-  const allDone = targetArchers.every(a => scores[a.id].ends.filter(e=>e.length===cfg.arrows).length===cfg.ends);
+  const allDone = targetArchers.every(a=>scores[a.id].ends.filter(e=>e.length===cfg.arrows).length===cfg.ends);
   if (allDone) { showSummary(); return; }
 
-  // Move to next archer or next end
-  if (activeArcherIdx < targetArchers.length-1) {
-    // next archer same end
-    activeArcherIdx++;
-  } else {
-    // all archers done this end — next end, back to first archer
-    activeArcherIdx = 0;
+  // Find next archer on same end who hasn't scored yet
+  const currentEnd = getCurrentEnd();
+  let nextIdx = -1;
+  for (let i=activeArcherIdx+1; i<targetArchers.length; i++) {
+    if ((scores[targetArchers[i].id].ends[currentEnd]||[]).length < cfg.arrows) { nextIdx=i; break; }
   }
+  if (nextIdx===-1) {
+    for (let i=0; i<activeArcherIdx; i++) {
+      if ((scores[targetArchers[i].id].ends[currentEnd]||[]).length < cfg.arrows) { nextIdx=i; break; }
+    }
+  }
+  // All done this end → go to first archer (they'll be on next end)
+  if (nextIdx===-1) nextIdx = 0;
+
+  activeArcherIdx = nextIdx;
+  editingEnd = null;
 
   await saveScores();
-  editingEnd = null;
-  renderTabs();
-  renderScoreList();
-  renderPad();
-  updateHeader();
+  renderTabs(); renderScoreList(); renderPad(); updateHeader();
   toast('Saved ✓','success');
 };
 
-/* ── RECALC STATS ── */
 function recalcStats(archerId) {
   const all = scores[archerId].ends.flat();
   scores[archerId].total = all.reduce((s,v)=>s+getVal(v),0);
@@ -611,14 +523,14 @@ async function saveScores() {
   try {
     const payload = { scores: {} };
     targetArchers.forEach(a => {
-      const key = String(a.id).replace(/\./g, '_');
+      const key = String(a.id).replace(/\./g,'_');
       payload.scores[key] = scores[a.id];
     });
     await setDoc(doc(db,'competitions',compId), payload, {merge:true});
-    console.log('Saved scores:', JSON.stringify(payload.scores));
+    console.log('Saved OK, keys:', Object.keys(payload.scores));
   } catch(err) {
     console.error('SAVE ERROR:', err);
-    toast('Save failed: '+err.message, 'error');
+    toast('Save failed: '+err.message,'error');
   }
 }
 
@@ -627,18 +539,16 @@ function showSummary() {
   document.getElementById('scoring-screen').style.display = 'none';
   document.getElementById('summary-screen').style.display = 'flex';
   const cfg = getConfig();
-
   document.getElementById('sum-title').textContent = `Target ${targetNum} — Complete`;
   document.getElementById('summary-list').innerHTML = targetArchers.map(a => {
-    const s     = scores[a.id];
-    const label = cfg.label;
+    const s = scores[a.id];
     const endRows = s.ends.map((end,i) => {
-      const total = end.reduce((x,v)=>x+getVal(v),0);
+      const tot = end.reduce((x,v)=>x+getVal(v),0);
       const chips = end.map(v=>`<span class="arrow-chip ${chipClass(v)}" style="font-size:12px;padding:2px 7px;">${v===0?'M':v}</span>`).join('');
       return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);">
-        <div style="font-size:10px;color:var(--muted);width:60px;">${label} ${i+1}</div>
+        <div style="font-size:10px;color:var(--muted);width:60px;">${cfg.label} ${i+1}</div>
         <div style="display:flex;gap:3px;flex:1;">${chips}</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;color:var(--accent);">${total}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;color:var(--accent);">${tot}</div>
       </div>`;
     }).join('');
     return `<div class="summary-archer-card">
@@ -660,22 +570,17 @@ function showSummary() {
 }
 
 window.goBackToScoring = () => {
-  document.getElementById('summary-screen').style.display  = 'none';
-  document.getElementById('scoring-screen').style.display  = 'flex';
-  renderTabs();
-  renderScoreList();
-  renderPad();
-  updateHeader();
+  document.getElementById('summary-screen').style.display = 'none';
+  document.getElementById('scoring-screen').style.display = 'flex';
+  renderTabs(); renderScoreList(); renderPad(); updateHeader();
 };
 
-/* ── TOAST ── */
 function toast(msg,type='success') {
   const el=document.getElementById('toast');
   el.textContent=msg; el.className=`show ${type}`;
   setTimeout(()=>el.classList.remove('show'),2500);
 }
 
-/* ── INIT ── */
 loadCompetitions();
 </script>
 </body>
