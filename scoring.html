@@ -575,13 +575,12 @@ function recalcStats(archerId) {
 /* ── SAVE TO FIREBASE ── */
 async function saveScores() {
   if (!compId) return;
-  const update = {};
-  targetArchers.forEach(a => {
-    update[`scores.${a.id}`] = scores[a.id];
-  });
-  // Use merge with dot notation via setDoc
   const payload = { scores: {} };
-  targetArchers.forEach(a => { payload.scores[a.id] = scores[a.id]; });
+  targetArchers.forEach(a => {
+    // Use string key to avoid floating point issues
+    const key = String(a.id);
+    payload.scores[key] = scores[a.id];
+  });
   await setDoc(doc(db,'competitions',compId), payload, {merge:true});
 }
 
