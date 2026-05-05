@@ -64,9 +64,9 @@ body { font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--te
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
 thead tr { background: var(--surface2); }
 thead th { padding: 10px 12px; text-align: left; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted2); border-bottom: 1px solid var(--border2); }
-tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; background: var(--surface); }
 tbody tr:hover { background: var(--surface2); }
-tbody td { padding: 10px 12px; color: var(--text) !important; }
+tbody td { padding: 10px 12px; color: #f0f0f0; }
 .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.5px; }
 .tag-recurve { background: #1565c0; color: #fff; }
 .tag-compound { background: #4a148c; color: #fff; }
@@ -551,35 +551,52 @@ window.generateTargets = async () => {
   if (!currentCompId) { toast('Select a competition first','error'); return; }
   if (!archers.length) { toast('Add archers to the entry list first','error'); return; }
 
+  const snap = await getDoc(doc(db,'competitions',currentCompId));
+  const discipline = snap.data()?.discipline || 'Outdoor';
+  const is3DorField = discipline==='3D' || discipline==='Field';
+
   targets = [];
   archers.forEach(a => { a.target=null; a.slot=null; });
 
   const slots = ['A','B','C','D'];
   let targetNum = 1;
 
-  // Always group by bow type — each bow gets its own consecutive block of targets
-  // This works correctly for all disciplines (Outdoor, Indoor, 3D, Field)
-  BOW_ORDER.forEach(bow => {
-    const group = archers
-      .filter(a => a.bow === bow)
-      .sort((a,b) => {
-        const ai=AGE_ORDER.indexOf(a.age), bi=AGE_ORDER.indexOf(b.age);
-        if (ai!==bi) return ai-bi;
-        return a.gender.localeCompare(b.gender);
-      });
-    if (!group.length) return;
+  if (is3DorField) {
+    // 3D/Field: all bow types mixed together, sorted by age then gender
+    const group = [...archers].sort((a,b) => {
+      const ai=AGE_ORDER.indexOf(a.age), bi=AGE_ORDER.indexOf(b.age);
+      if (ai!==bi) return ai-bi;
+      return a.gender.localeCompare(b.gender);
+    });
     let currentTarget=null, si=0;
     group.forEach(archer => {
-      if (si===0) {
-        currentTarget={num:targetNum++, bow, A:null, B:null, C:null, D:null};
-        targets.push(currentTarget);
-      }
-      currentTarget[slots[si]]={id:archer.id, name:archer.name, bow:archer.bow, age:archer.age, gender:archer.gender};
+      if (si===0) { currentTarget={num:targetNum++, bow:'Mixed', A:null,B:null,C:null,D:null}; targets.push(currentTarget); }
+      currentTarget[slots[si]]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};
       const orig=archers.find(a=>a.id===archer.id);
       if(orig){orig.target=currentTarget.num; orig.slot=slots[si];}
       si++; if(si>=4) si=0;
     });
-  });
+  } else {
+    // Outdoor/Indoor: each bow type gets its own consecutive block of targets
+    BOW_ORDER.forEach(bow => {
+      const group = archers
+        .filter(a=>a.bow===bow)
+        .sort((a,b) => {
+          const ai=AGE_ORDER.indexOf(a.age), bi=AGE_ORDER.indexOf(b.age);
+          if (ai!==bi) return ai-bi;
+          return a.gender.localeCompare(b.gender);
+        });
+      if (!group.length) return;
+      let currentTarget=null, si=0;
+      group.forEach(archer => {
+        if (si===0) { currentTarget={num:targetNum++,bow,A:null,B:null,C:null,D:null}; targets.push(currentTarget); }
+        currentTarget[slots[si]]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};
+        const orig=archers.find(a=>a.id===archer.id);
+        if(orig){orig.target=currentTarget.num; orig.slot=slots[si];}
+        si++; if(si>=4) si=0;
+      });
+    });
+  }
 
   await saveTargets(); await saveArchers();
   renderAll();
@@ -620,23 +637,18 @@ function renderTargets() {
     return;
   }
 
-  // Group targets by bow type
-  const grouped = {};
-  targets.forEach(t => {
-    if (!grouped[t.bow]) grouped[t.bow] = [];
-    grouped[t.bow].push(t);
-  });
-
+  const allBows = [...new Set(targets.map(t=>t.bow))];
   let html = '';
-  BOW_ORDER.forEach(bow => {
-    const group = grouped[bow];
+  allBows.forEach(bow => {
+    const group = targets.filter(t=>t.bow===bow);
     if (!group) return;
     const color = BOW_COLORS[bow] || '#555';
     const archerCount = group.reduce((n,t)=>n+['A','B','C','D'].filter(s=>t[s]).length, 0);
+    const tRange = group.length>1 ? `T${group[0].num}–T${group[group.length-1].num}` : `T${group[0].num}`;
     html += `<div style="margin-bottom:24px;">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px 14px;background:${color}22;border:1px solid ${color}44;border-radius:8px;">
-        <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:2px;color:${color};">${bow.toUpperCase()}</span>
-        <span style="font-size:11px;color:var(--muted2);">${archerCount} archers · ${group.length} target${group.length!==1?'s':''} (T${group[0].num}–T${group[group.length-1].num})</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:2px;color:${color};">${bow==='Mixed'?'🎯 MIXED (3D/FIELD)':bow.toUpperCase()}</span>
+        <span style="font-size:11px;color:#888;">${archerCount} archers · ${group.length} target${group.length!==1?'s':''} (${tRange})</span>
       </div>
       <div class="target-grid">`;
     group.forEach((t, ti) => {
