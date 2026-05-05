@@ -317,12 +317,13 @@ window.backToStep1 = () => {
 /* ── START SCORING ── */
 window.startScoring = () => {
   const cfg = getConfig();
-  // Init scores for each archer
+  const existing = compData.scores || {};
+
   targetArchers.forEach(a => {
-    scores[a.id] = scores[a.id] || {
-      ends: Array.from({length:cfg.ends}, ()=>[]),
-      total:0, tens:0, xs:0
-    };
+    const key = String(a.id).replace(/\./g, '_');
+    if (existing[key]) scores[a.id] = existing[key];
+    else if (existing[String(a.id)]) scores[a.id] = existing[String(a.id)];
+    else scores[a.id] = { ends: Array.from({length:cfg.ends},()=>[]), total:0, tens:0, xs:0 };
   });
 
   // Load existing scores from Firebase
