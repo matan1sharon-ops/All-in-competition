@@ -438,6 +438,10 @@ window.selectCompetition = async (id) => {
   });
 };
 
+function getScore(archerId) {
+  return scores[String(archerId)] || scores[archerId] || scores[parseFloat(archerId)] || {};
+}
+
 function renderAll() { renderDashboard(); renderEntries(); renderTargets(); renderSessions(); renderResults(); }
 
 /* ── DASHBOARD ── */
@@ -446,7 +450,7 @@ function renderDashboard() {
   document.getElementById('d-total').textContent    = archers.length;
   document.getElementById('d-assigned').textContent = archers.filter(a=>a.target).length;
   document.getElementById('d-targets').textContent  = targets.length;
-  document.getElementById('d-scored').textContent   = archers.filter(a=>(scores[String(a.id)]?.total||scores[a.id]?.total||0)>0).length;
+  document.getElementById('d-scored').textContent   = archers.filter(a=>(getScore(a.id)?.total||0)>0).length;
   document.getElementById('entry-badge').textContent = archers.length;
   document.getElementById('entry-count').textContent = archers.length+' archers';
 
@@ -764,9 +768,9 @@ window.renderResults = () => {
     .filter(a=>(!bowF||a.bow===bowF)&&(!ageF||a.age===ageF))
     .map(a=>({
       ...a,
-      total: scores[String(a.id)]?.total || scores[a.id]?.total || 0,
-      tens:  scores[String(a.id)]?.tens  || scores[a.id]?.tens  || 0,
-      xs:    scores[String(a.id)]?.xs    || scores[a.id]?.xs    || 0
+      total: getScore(a.id)?.total || 0,
+      tens:  getScore(a.id)?.tens  || 0,
+      xs:    getScore(a.id)?.xs    || 0
     }))
     .sort((a,b)=>b.total-a.total||b.tens-a.tens||b.xs-a.xs);
   document.getElementById('results-table').innerHTML = list.map((a,i)=>`
