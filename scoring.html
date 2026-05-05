@@ -493,13 +493,31 @@ function renderPad() {
     nextLabel    = 'DONE EDITING ✓';
     nextDisabled = false;
   } else if (isFull) {
-    if (activeArcherIdx < targetArchers.length-1) nextLabel = 'NEXT ARCHER →';
-    else nextLabel = 'NEXT END →';
-    nextDisabled = false;
-  } else {
-    nextLabel    = isFull ? 'NEXT →' : `${curArrows.length}/${cfg.arrows}`;
-    nextDisabled = true;
+   // Find next archer who hasn't completed this end yet
+  const cfg2 = getConfig();
+  const currentEnd = getCurrentEnd();
+  let nextIdx = -1;
+
+  // Look for next archer after current who hasn't finished this end
+  for (let i = activeArcherIdx + 1; i < targetArchers.length; i++) {
+    if ((scores[targetArchers[i].id].ends[currentEnd]||[]).length < cfg2.arrows) {
+      nextIdx = i; break;
+    }
   }
+
+  // If none found after current, look from beginning
+  if (nextIdx === -1) {
+    for (let i = 0; i < activeArcherIdx; i++) {
+      if ((scores[targetArchers[i].id].ends[currentEnd]||[]).length < cfg2.arrows) {
+        nextIdx = i; break;
+      }
+    }
+  }
+
+  // If all done this end — move to first archer (next end starts automatically)
+  if (nextIdx === -1) nextIdx = 0;
+
+  activeArcherIdx = nextIdx;
   if (allDone && !isEditing) nextLabel = 'VIEW SUMMARY 🏆';
 
   btns += `<button class="pad-btn pad-next" onclick="handleNext()" ${nextDisabled?'disabled':''} style="grid-column:span 2;">${nextLabel}</button>`;
