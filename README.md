@@ -64,9 +64,9 @@ body { font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--te
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
 thead tr { background: var(--surface2); }
 thead th { padding: 10px 12px; text-align: left; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted2); border-bottom: 1px solid var(--border2); }
-tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; background: var(--surface); }
-tbody tr:hover { background: var(--surface2); }
-tbody td { padding: 10px 12px; color: #f0f0f0; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; background: #fff; }
+tbody tr:hover { background: #f5f5f5; }
+tbody td { padding: 10px 12px; color: #111; }
 .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.5px; }
 .tag-recurve { background: #1565c0; color: #fff; }
 .tag-compound { background: #4a148c; color: #fff; }
@@ -516,15 +516,15 @@ window.renderEntries = () => {
   document.getElementById('entry-badge').textContent  = archers.length;
   document.getElementById('entries-table').innerHTML  = filtered.map((a,i)=>`
     <tr>
-      <td style="color:var(--muted)">${archers.indexOf(a)+1}</td>
-      <td><strong>${a.fname}</strong> ${a.lname}</td>
-      <td style="color:var(--muted2)">${a.club||'—'}</td>
+      <td style="color:#999;">${archers.indexOf(a)+1}</td>
+      <td style="color:#111;font-weight:600;">${a.fname} ${a.lname}</td>
+      <td style="color:#555;">${a.club||'—'}</td>
       <td><span class="tag tag-${a.bow.toLowerCase()}">${a.bow}</span></td>
-      <td>${a.age}</td>
+      <td style="color:#111;">${a.age}</td>
       <td><span class="tag tag-${a.gender.toLowerCase()}">${a.gender}</span></td>
-      <td style="color:var(--accent)">${a.target?`T${a.target}${a.slot}`:'<span style="color:var(--muted)">—</span>'}</td>
+      <td style="color:#1565c0;font-weight:700;">${a.target?`T${a.target}${a.slot}`:'<span style="color:#999">—</span>'}</td>
       <td><button class="btn btn-danger btn-sm" onclick="deleteArcher(${a.id})">✕</button></td>
-    </tr>`).join('')||'<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px">No archers yet</td></tr>';
+    </tr>`).join('')||'<tr><td colspan="8" style="text-align:center;color:#999;padding:24px">No archers yet</td></tr>';
 };
 
 window.openImportModal = () => openModal('modal-import');
@@ -767,15 +767,15 @@ window.renderResults = () => {
   document.getElementById('results-table').innerHTML = list.map((a,i)=>`
     <tr>
       <td style="color:#FFD700;font-weight:900;">${a.total>0?i+1:'—'}</td>
-      <td style="color:#f0f0f0;font-weight:600;">${a.name}</td>
-      <td style="color:#f0f0f0;">${a.club||'—'}</td>
+      <td style="color:#111;font-weight:600;">${a.name}</td>
+      <td style="color:#555;">${a.club||'—'}</td>
       <td><span class="tag tag-${a.bow.toLowerCase()}">${a.bow}</span></td>
-      <td style="color:#f0f0f0;">${a.age}</td>
-      <td style="color:#FFD700;">${a.target?`T${a.target}${a.slot}`:'—'}</td>
-      <td style="font-weight:900;font-size:16px;color:#FFD700;">${a.total||'—'}</td>
-      <td style="color:#f0f0f0;">${a.tens||'—'}</td>
-      <td style="color:#f0f0f0;">${a.xs||'—'}</td>
-    </tr>`).join('')||'<tr><td colspan="9" style="text-align:center;color:#666;padding:24px">No results yet</td></tr>';
+      <td style="color:#111;">${a.age}</td>
+      <td style="color:#1565c0;font-weight:700;">${a.target?`T${a.target}${a.slot}`:'—'}</td>
+      <td style="font-weight:900;font-size:16px;color:#111;">${a.total||'—'}</td>
+      <td style="color:#111;">${a.tens||'—'}</td>
+      <td style="color:#111;">${a.xs||'—'}</td>
+    </tr>`).join('')||'<tr><td colspan="9" style="text-align:center;color:#999;padding:24px">No results yet</td></tr>';
 };
 
 window.exportResultsPDF = () => {
