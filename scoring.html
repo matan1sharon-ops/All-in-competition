@@ -590,13 +590,18 @@ function recalcStats(archerId) {
 /* ── SAVE TO FIREBASE ── */
 async function saveScores() {
   if (!compId) return;
-  const payload = { scores: {} };
-  targetArchers.forEach(a => {
-    // Remove dots — Firebase doesn't allow dots in field keys
-    const key = String(a.id).replace(/\./g, '_');
-    payload.scores[key] = scores[a.id];
-  });
-  await setDoc(doc(db,'competitions',compId), payload, {merge:true});
+  try {
+    const payload = { scores: {} };
+    targetArchers.forEach(a => {
+      const key = String(a.id).replace(/\./g, '_');
+      payload.scores[key] = scores[a.id];
+    });
+    await setDoc(doc(db,'competitions',compId), payload, {merge:true});
+    console.log('Saved scores:', JSON.stringify(payload.scores));
+  } catch(err) {
+    console.error('SAVE ERROR:', err);
+    toast('Save failed: '+err.message, 'error');
+  }
 }
 
 /* ── SUMMARY ── */
