@@ -489,7 +489,7 @@ window.addArcher = async () => {
   const lname  = document.getElementById('e-lname').value.trim();
   if (!fname||!lname) { toast('Enter first and last name','error'); return; }
   archers.push({
-    id: Date.now()+Math.random(),
+    id: String(Date.now()),
     fname, lname, name:`${fname} ${lname}`,
     club:  document.getElementById('e-club').value.trim(),
     bow:   document.getElementById('e-bow').value,
@@ -541,7 +541,7 @@ window.importCSV = async () => {
     const [fname,lname,club,bow,age,gender='M'] = line.split(',').map(p=>p.trim());
     if (!fname||!lname) return;
     const bowNorm = BOW_ORDER.find(b=>b.toLowerCase()===bow?.toLowerCase())||'Recurve';
-    archers.push({ id:Date.now()+Math.random(), fname, lname, name:`${fname} ${lname}`, club, bow:bowNorm, age:age||'Senior', gender:(gender||'M').toUpperCase(), target:null, slot:null });
+    archers.push({ id:String(Date.now()+added), fname, lname, name:`${fname} ${lname}`, club, bow:bowNorm, age:age||'Senior', gender:(gender||'M').toUpperCase(), target:null, slot:null });
     added++;
   });
   await saveArchers();
