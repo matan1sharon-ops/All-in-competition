@@ -528,7 +528,7 @@ window.renderEntries = () => {
       <td style="color:#111;">${a.age}</td>
       <td><span class="tag tag-${a.gender.toLowerCase()}">${a.gender}</span></td>
       <td style="color:#1565c0;font-weight:700;">${a.target?`T${a.target}${a.slot}`:'<span style="color:#999">—</span>'}</td>
-      <td><button class="btn btn-danger btn-sm" onclick="deleteArcher(${a.id})">✕</button></td>
+     <td><button class="btn btn-danger btn-sm" onclick="deleteArcher('${a.id}')">✕</button></td>
     </tr>`).join('')||'<tr><td colspan="8" style="text-align:center;color:#999;padding:24px">No archers yet</td></tr>';
 };
 
@@ -693,7 +693,7 @@ window.openAssignModal = (ti, slot) => {
 
 window.confirmAssign = async () => {
   const { ti, slot } = assignPending;
-  const archerId = parseFloat(document.getElementById('assign-archer-select').value);
+  const archerId = document.getElementById('assign-archer-select').value;
   const t = targets[ti];
   if (t[slot]) { const old=archers.find(a=>a.id===t[slot].id); if(old){old.target=null;old.slot=null;} }
   if (archerId) {
