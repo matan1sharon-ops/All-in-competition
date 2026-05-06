@@ -278,6 +278,8 @@ window.startScoring = ()=>{
       scores[a.id]={ends:Array.from({length:cfg.ends},()=>[]),total:0,tens:0,xs:0};
     }
   });
+  // Recalc stats for all archers (fixes g1/g2 for scores loaded from Firebase)
+  targetArchers.forEach(a => recalcStats(a.id));
   activeArcherIdx=0; editingEnd=null;
   document.getElementById('s-comp-name').textContent=compData.name||'';
   document.getElementById('s-target-label').textContent=`TARGET ${targetNum}`;
