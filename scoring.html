@@ -39,7 +39,23 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 .archer-tab.active{background:var(--blue);color:#fff;}
 .archer-tab.done{background:var(--green);color:#fff;}
 .archer-tab .tab-check{position:absolute;top:2px;right:4px;font-size:8px;}
-#score-list{flex:1;overflow-y:auto;padding:10px;}
+#score-list{flex:1;overflow-y:auto;padding:0;background:#fff;color:#111;}
+.sc-half-header{display:grid;grid-template-columns:1fr 36px 36px;background:#444;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.5px;text-align:center;padding:3px 0;}
+.sc-half-header .sc-half-title{text-align:left;padding-left:10px;}
+.sc-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px;border:1.5px solid #999;margin-bottom:0;}
+.sc-table td{border:1px solid #ccc;text-align:center;height:30px;padding:0;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;}
+.sc-end-label{background:#f0f0f0;font-weight:700;font-size:10px;color:#333;border-right:1.5px solid #999;width:42px;}
+.sc-sum-box{background:#f5f5f5;border-left:1px solid #bbb;color:#555;font-size:12px;width:32px;}
+.sc-end-total{background:#e3f2fd;font-weight:700;border-left:1.5px solid #999;color:#1565c0;width:36px;}
+.sc-running{background:#fff8e1;font-weight:700;color:#c62828;border-left:1.5px solid #999;border-right:1.5px solid #999;font-size:13px;width:42px;}
+.sc-stat{font-size:11px;color:#555;background:#fafafa;width:28px;}
+.sc-no-entry{background-image:repeating-linear-gradient(135deg,transparent,transparent 4px,#e0e0e0 4px,#e0e0e0 5px);width:36px;}
+.sc-gold{background-color:#fff9c4!important;color:#5d4037!important;font-weight:700;}
+.sc-active{background-color:#fff3e0!important;outline:2.5px solid #FF9800;outline-offset:-2px;position:relative;z-index:10;}
+.sc-editing{background-color:#e3f2fd!important;outline:2.5px solid #2196f3;outline-offset:-2px;position:relative;z-index:11;}
+.sc-end-sep td{border-bottom:1.5px solid #999!important;}
+.sc-half-total{background:#37474f!important;color:#fff!important;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;height:28px;}
+.sc-half-total td{border-color:#546e7a;color:#fff;}
 .end-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:border-color 0.15s;}
 .end-card.active-end{border-color:var(--accent);background:#1a1500;}
 .end-card.editing{border-color:var(--blue);background:#0a1020;}
@@ -299,36 +315,147 @@ function renderTabs(){
 
 window.switchArcher=(idx)=>{activeArcherIdx=idx;editingEnd=null;renderTabs();renderScoreList();renderPad();updateHeader();};
 
+function scCellHtml(val, isActive, isEditing, endIdx) {
+  const classes=[];
+  if(val==='X'||val===10||val===9||val===11) classes.push('sc-gold');
+  if(isEditing) classes.push('sc-editing');
+  else if(isActive) classes.push('sc-active');
+  const display = val===0||val==='M' ? 'M' : (val===undefined||val===''?'':val);
+  return `<td class="${classes.join(' ')}" onclick="editEnd(${endIdx})">${display}</td>`;
+}
+
 function renderScoreList(){
   const cfg=getConfig(), archer=getCurrentArcher(), ends=scores[archer.id].ends;
-  // Active end = this archer's first incomplete end (their own progress)
-  let archerNextEnd = 0;
-  for(let e=0; e<cfg.ends; e++){
-    if((ends[e]||[]).length < cfg.arrows){ archerNextEnd = e; break; }
+  let archerNextEnd=0;
+  for(let e=0;e<cfg.ends;e++){
+    if((ends[e]||[]).length<cfg.arrows){archerNextEnd=e;break;}
   }
   const curEnd=editingEnd!==null?editingEnd.endIdx:archerNextEnd;
-  let html='';
-  for(let i=0;i<cfg.ends;i++){
-    const ea=ends[i]||[];
-    const isActive=i===curEnd&&editingEnd===null;
-    const isEditing=editingEnd!==null&&editingEnd.endIdx===i;
-    const tot=ea.reduce((s,v)=>s+getVal(v),0);
-    const cls=isEditing?'end-card editing':isActive?'end-card active-end':'end-card';
-    const chips=Array.from({length:cfg.arrows},(_,ai)=>{
-      const v=ea[ai];
-      return v!==undefined?`<span class="arrow-chip ${chipClass(v)}">${v===0?'M':v}</span>`:`<span class="arrow-chip chip-empty">·</span>`;
-    }).join('');
-    html+=`<div class="${cls}" onclick="editEnd(${i})">
-      <div class="end-header">
-        <div class="end-num">${cfg.label} ${i+1}${isEditing?' (EDITING)':isActive?' (ACTIVE)':''}</div>
-        <div class="end-total">${ea.length===cfg.arrows?tot:ea.length?tot:'—'}</div>
-      </div>
-      <div class="end-arrows">${chips}</div>
-    </div>`;
-  }
   const list=document.getElementById('score-list');
-  list.innerHTML=html;
-  setTimeout(()=>{const a=list.querySelector('.active-end,.editing');if(a)a.scrollIntoView({behavior:'smooth',block:'center'});},50);
+
+  // For 3D and Field — keep simple card layout
+  if(discipline==='3D'||discipline==='Field'){
+    let html='';
+    for(let i=0;i<cfg.ends;i++){
+      const ea=ends[i]||[];
+      const isActive=i===curEnd&&editingEnd===null;
+      const isEditing=editingEnd!==null&&editingEnd.endIdx===i;
+      const tot=ea.reduce((s,v)=>s+getVal(v),0);
+      const cls=isEditing?'end-card editing':isActive?'end-card active-end':'end-card';
+      const chips=Array.from({length:cfg.arrows},(_,ai)=>{
+        const v=ea[ai];
+        return v!==undefined?`<span class="arrow-chip ${chipClass(v)}">${v===0?'M':v}</span>`:`<span class="arrow-chip chip-empty">·</span>`;
+      }).join('');
+      html+=`<div class="${cls}" onclick="editEnd(${i})">
+        <div class="end-header">
+          <div class="end-num">${cfg.label} ${i+1}${isEditing?' (EDITING)':isActive?' (ACTIVE)':''}</div>
+          <div class="end-total">${ea.length===cfg.arrows?tot:ea.length?tot:'—'}</div>
+        </div>
+        <div class="end-arrows">${chips}</div>
+      </div>`;
+    }
+    list.innerHTML='<div style="padding:10px;">'+html+'</div>';
+    setTimeout(()=>{const a=list.querySelector('.active-end,.editing');if(a)a.scrollIntoView({behavior:'smooth',block:'center'});},50);
+    return;
+  }
+
+  // Outdoor and Indoor — professional scorecard table
+  if(discipline==='Outdoor'){
+    const h1Label='1st HALF  (Ends 1–6)', h2Label='2nd HALF  (Ends 7–12)';
+    list.innerHTML=`
+      <div class="sc-half-header"><div class="sc-half-title">${h1Label}</div><div>10+X</div><div>X</div></div>
+      <table class="sc-table"><colgroup>
+        <col style="width:42px"><col><col><col><col style="width:32px"><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px">
+      </colgroup><tbody id="sc-body-1"></tbody></table>
+      <div class="sc-half-header" style="margin-top:6px;"><div class="sc-half-title">${h2Label}</div><div>10+X</div><div>X</div></div>
+      <table class="sc-table"><colgroup>
+        <col style="width:42px"><col><col><col><col style="width:32px"><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px">
+      </colgroup><tbody id="sc-body-2"></tbody></table>
+      <div style="height:10px;"></div>`;
+    renderScOutdoor(ends,0,6,'sc-body-1',curEnd);
+    renderScOutdoor(ends,6,12,'sc-body-2',curEnd);
+  } else {
+    // Indoor
+    const h1Label='1st HALF  (Ends 1–10)', h2Label='2nd HALF  (Ends 11–20)';
+    list.innerHTML=`
+      <div class="sc-half-header"><div class="sc-half-title">${h1Label}</div><div>10</div><div>9</div></div>
+      <table class="sc-table"><colgroup>
+        <col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px">
+      </colgroup><tbody id="sc-body-1"></tbody></table>
+      <div class="sc-half-header" style="margin-top:6px;"><div class="sc-half-title">${h2Label}</div><div>10</div><div>9</div></div>
+      <table class="sc-table"><colgroup>
+        <col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px">
+      </colgroup><tbody id="sc-body-2"></tbody></table>
+      <div style="height:10px;"></div>`;
+    renderScIndoor(ends,0,10,'sc-body-1',curEnd);
+    renderScIndoor(ends,10,20,'sc-body-2',curEnd);
+  }
+  setTimeout(()=>{const a=list.querySelector('.sc-active,.sc-editing');if(a)a.scrollIntoView({behavior:'smooth',block:'center'});},50);
+}
+
+function renderScOutdoor(ends,startEnd,endEnd,bodyId,curEnd){
+  let html='',running=0,tens=0,xs=0;
+  for(let e=startEnd;e<endEnd;e++){
+    const ea=ends[e]||[];
+    const isActive=e===curEnd&&editingEnd===null;
+    const isEditing=editingEnd!==null&&editingEnd.endIdx===e;
+    const v=ea.map(x=>getVal(x));
+    const s1=(ea[0]!==undefined&&ea[1]!==undefined&&ea[2]!==undefined&&ea.length>=3)?v[0]+v[1]+v[2]:'';
+    const s2=(ea[3]!==undefined&&ea[4]!==undefined&&ea[5]!==undefined&&ea.length>=6)?v[3]+v[4]+v[5]:'';
+    const et=s2!==''?(Number(s1)||0)+s2:'';
+    if(et!=='') running+=et;
+    const c10=ea.filter(x=>x===10||x==='X').length, cx=ea.filter(x=>x==='X').length;
+    if(ea.length>0){tens+=c10;xs+=cx;}
+    const rowActive=(isActive||isEditing)&&ea.length<3;
+    const row2Active=(isActive||isEditing)&&ea.length>=3&&ea.length<6;
+    html+=`<tr>
+      <td rowspan="2" class="sc-end-label" onclick="editEnd(${e})">End ${e+1}${isActive?' ▶':isEditing?' ✏':''}
+      </td>
+      ${scCellHtml(ea[0],rowActive&&ea.length===0,isEditing&&ea.length===0,e)}
+      ${scCellHtml(ea[1],rowActive&&ea.length===1,isEditing&&ea.length===1,e)}
+      ${scCellHtml(ea[2],rowActive&&ea.length===2,isEditing&&ea.length===2,e)}
+      <td class="sc-sum-box">${s1}</td>
+      <td class="sc-no-entry"></td>
+      <td rowspan="2" class="sc-running">${et!==''?running:''}</td>
+      <td class="sc-stat">${ea.length>0?c10:''}</td>
+      <td class="sc-stat">${ea.length>0?cx:''}</td>
+    </tr><tr class="sc-end-sep">
+      ${scCellHtml(ea[3],row2Active&&ea.length===3,isEditing&&ea.length===3,e)}
+      ${scCellHtml(ea[4],row2Active&&ea.length===4,isEditing&&ea.length===4,e)}
+      ${scCellHtml(ea[5],row2Active&&ea.length===5,isEditing&&ea.length===5,e)}
+      <td class="sc-sum-box">${s2}</td>
+      <td class="sc-end-total">${et}</td>
+      <td class="sc-stat"></td><td class="sc-stat"></td>
+    </tr>`;
+  }
+  html+=`<tr class="sc-half-total"><td colspan="5">HALF TOTAL</td><td>${running}</td><td></td><td>${tens}</td><td>${xs}</td></tr>`;
+  document.getElementById(bodyId).innerHTML=html;
+}
+
+function renderScIndoor(ends,startEnd,endEnd,bodyId,curEnd){
+  let html='',running=0,tens=0,nines=0;
+  for(let e=startEnd;e<endEnd;e++){
+    const ea=ends[e]||[];
+    const isActive=e===curEnd&&editingEnd===null;
+    const isEditing=editingEnd!==null&&editingEnd.endIdx===e;
+    const v=ea.map(x=>getVal(x));
+    const et=(ea.length>=3)?v[0]+v[1]+v[2]:'';
+    if(et!=='') running+=et;
+    const c10=ea.filter(x=>x===10||x==='X').length, c9=ea.filter(x=>x===9).length;
+    if(ea.length>0){tens+=c10;nines+=c9;}
+    html+=`<tr class="sc-end-sep">
+      <td class="sc-end-label" onclick="editEnd(${e})">End ${e+1}${isActive?' ▶':isEditing?' ✏':''}</td>
+      ${scCellHtml(ea[0],isActive&&ea.length===0,isEditing&&ea.length===0,e)}
+      ${scCellHtml(ea[1],isActive&&ea.length===1,isEditing&&ea.length===1,e)}
+      ${scCellHtml(ea[2],isActive&&ea.length===2,isEditing&&ea.length===2,e)}
+      <td class="sc-end-total">${et}</td>
+      <td class="sc-running">${et!==''?running:''}</td>
+      <td class="sc-stat">${ea.length>0?c10:''}</td>
+      <td class="sc-stat">${ea.length>0?c9:''}</td>
+    </tr>`;
+  }
+  html+=`<tr class="sc-half-total"><td colspan="4">HALF TOTAL</td><td>${running}</td><td></td><td>${tens}</td><td>${nines}</td></tr>`;
+  document.getElementById(bodyId).innerHTML=html;
 }
 
 window.editEnd=(endIdx)=>{
