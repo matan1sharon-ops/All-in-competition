@@ -291,7 +291,7 @@ tbody td { padding: 10px 12px; color: #111; }
           </div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Rank</th><th>Name</th><th>Club</th><th>Bow</th><th>Age</th><th>Target</th><th>Score</th><th>Golds</th><th>10+X</th><th>X</th></tr></thead>
+              <thead><tr><th>Rank</th><th>Name</th><th>Club</th><th>Bow</th><th>Age</th><th>Target</th><th>Score</th><th>G1</th><th>G2</th><th>10+X</th><th>X</th></tr></thead>
               <tbody id="results-table"></tbody>
             </table>
           </div>
@@ -771,11 +771,12 @@ window.renderResults = () => {
    .map(a=>({
       ...a,
       total: getScore(a.id)?.total || 0,
-      golds: getScore(a.id)?.golds || 0,
+     g1: getScore(a.id)?.g1 || 0,
+      g2: getScore(a.id)?.g2 || 0,
       tens:  getScore(a.id)?.tens  || 0,
       xs:    getScore(a.id)?.xs    || 0
     }))
-  .sort((a,b)=>b.total-a.total||b.golds-a.golds||b.tens-a.tens||b.xs-a.xs);
+  .sort((a,b)=>b.total-a.total||b.g1-a.g1||b.g2-a.g2||b.tens-a.tens||b.xs-a.xs);
   document.getElementById('results-table').innerHTML = list.map((a,i)=>`
     <tr>
       <td style="color:#FFD700;font-weight:900;">${a.total>0?i+1:'—'}</td>
@@ -785,7 +786,8 @@ window.renderResults = () => {
       <td style="color:#111;">${a.age}</td>
       <td style="color:#1565c0;font-weight:700;">${a.target?`T${a.target}${a.slot}`:'—'}</td>
      <td style="font-weight:900;font-size:16px;color:#111;">${a.total||'—'}</td>
-      <td style="color:#111;">${a.golds||'—'}</td>
+      <td style="color:#111;">${a.g1||'—'}</td>
+      <td style="color:#111;">${a.g2||'—'}</td>
       <td style="color:#111;">${a.tens||'—'}</td>
       <td style="color:#111;">${a.xs||'—'}</td>
     </tr>`).join('')||'<tr><td colspan="9" style="text-align:center;color:#999;padding:24px">No results yet</td></tr>';
