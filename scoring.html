@@ -398,16 +398,12 @@ function renderPad(){
     nextLabel='DONE EDITING ✓'; nextDisabled=false;
   } else if(allDone){
     nextLabel='VIEW SUMMARY 🏆'; nextDisabled=false;
- } else if(!isEditing && !allDone) {
-    // No button shown while scoring — auto-advances on last arrow
-    btns+=`<button class="pad-btn pad-back" onclick="handleBack()" style="grid-column:span 2;">BACKSPACE ←</button>`;
-    const pad=document.getElementById('score-pad');
-    pad.style.gridTemplateColumns=cols;
-    pad.innerHTML=btns;
-    return;
+  } else {
+    // Scoring pad only — auto-advances on last arrow
+    nextLabel=`${curArrows.length}/${cfg.arrows}`; nextDisabled=true;
   }
 
-if(!nextDisabled){
+  if(!nextDisabled){
     btns+=`<button class="pad-btn pad-next" onclick="handleNext()" style="grid-column:span 2;">${nextLabel}</button>`;
   }
   const pad=document.getElementById('score-pad');
