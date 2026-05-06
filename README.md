@@ -270,7 +270,7 @@ tbody td { padding: 10px 12px; color: #111; }
           </div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Rank</th><th>Name</th><th>Club</th><th>Bow</th><th>Age</th><th>Target</th><th>Score</th><th id="th-g1">G1</th><th id="th-g2">G2</th></tr></thead>
+              <thead><tr><th>Rank</th><th>Name</th><th>Club</th><th>Bow</th><th>Age</th><th>Target</th><th>Score</th><th id="th-h1" style="display:none">H1</th><th id="th-h2" style="display:none">H2</th><th id="th-g1">G1</th><th id="th-g2">G2</th></tr></thead>
               <tbody id="results-table"></tbody>
             </table>
           </div>
@@ -703,19 +703,49 @@ window.renderResults = () => {
   const labels = getGoldLabels();
   const el1=document.getElementById('th-g1'); if(el1) el1.textContent=labels.g1;
   const el2=document.getElementById('th-g2'); if(el2) el2.textContent=labels.g2;
+  const showHalves = currentDiscipline==='Outdoor'||currentDiscipline==='Indoor';
+  const thH1=document.getElementById('th-h1'), thH2=document.getElementById('th-h2');
+  if(thH1) thH1.style.display=showHalves?'':'none';
+  if(thH2) thH2.style.display=showHalves?'':'none';
+
+  // Read h1/h2 directly from Firebase score
+  function getHalves(archerId) {
+    const s = getScore(archerId);
+    if(!s) return {h1:0,h2:0};
+    return {h1:s.h1||0, h2:s.h2||0};
+  }
+
+  // Fix target: also look up from targets array in case archers snapshot is stale
+  function getTarget(a) {
+    if(a.target&&a.slot) return `T${a.target}${a.slot}`;
+    // fallback: search targets array
+    for(const t of targets){
+      for(const s of ['A','B','C','D']){
+        if(t[s]&&String(t[s].id)===String(a.id)) return `T${t.num}${s}`;
+      }
+    }
+    return '—';
+  }
 
   const bowF = document.getElementById('r-filter-bow')?.value||'';
   const ageF = document.getElementById('r-filter-age')?.value||'';
   const list = archers
     .filter(a=>(!bowF||a.bow===bowF)&&(!ageF||a.age===ageF))
-    .map(a=>({
-      ...a,
-      total: getScore(a.id)?.total || 0,
-      g1:    getScore(a.id)?.g1   || 0,
-      g2:    getScore(a.id)?.g2   || 0,
-    }))
+    .map(a=>{
+      const halves=getHalves(a.id);
+      return {
+        ...a,
+        total: getScore(a.id)?.total || 0,
+        g1:    getScore(a.id)?.g1   || 0,
+        g2:    getScore(a.id)?.g2   || 0,
+        h1:    halves.h1,
+        h2:    halves.h2,
+        targetLabel: getTarget(a),
+      };
+    })
     .sort((a,b)=>b.total-a.total||b.g1-a.g1||b.g2-a.g2);
 
+  const colspan = showHalves ? 11 : 9;
   document.getElementById('results-table').innerHTML = list.map((a,i)=>`
     <tr>
       <td style="color:#FFD700;font-weight:900;">${a.total>0?i+1:'—'}</td>
@@ -723,11 +753,12 @@ window.renderResults = () => {
       <td style="color:#555;">${a.club||'—'}</td>
       <td><span class="tag tag-${a.bow.toLowerCase()}">${a.bow}</span></td>
       <td style="color:#111;">${a.age}</td>
-      <td style="color:#1565c0;font-weight:700;">${a.target?`T${a.target}${a.slot}`:'—'}</td>
+      <td style="color:#1565c0;font-weight:700;">${a.targetLabel}</td>
       <td style="font-weight:900;font-size:16px;color:#111;">${a.total||'—'}</td>
+      ${showHalves?`<td style="color:#555;">${a.h1||'—'}</td><td style="color:#555;">${a.h2||'—'}</td>`:''}
       <td style="color:#111;">${a.g1||'—'}</td>
       <td style="color:#111;">${a.g2||'—'}</td>
-    </tr>`).join('')||'<tr><td colspan="9" style="text-align:center;color:#999;padding:24px">No results yet</td></tr>';
+    </tr>`).join('')||`<tr><td colspan="${colspan}" style="text-align:center;color:#999;padding:24px">No results yet</td></tr>`;
 };
 
 window.exportResultsPDF = () => {
