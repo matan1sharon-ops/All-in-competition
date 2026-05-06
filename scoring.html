@@ -390,19 +390,23 @@ window.handleNext=async()=>{
   const allDone=targetArchers.every(a=>scores[a.id].ends.filter(e=>e.length===cfg.arrows).length===cfg.ends);
   if(allDone){showSummary();return;}
 
-  const globalEnd=getGlobalEnd();
+// getGlobalEnd() AFTER saving will point to the new end
+  // So capture it BEFORE deciding who goes next
+  const currentEnd=getGlobalEnd();
+  const currentArcher=getCurrentArcher();
+  const currentArrowsDone=(scores[currentArcher.id].ends[currentEnd]||[]).length;
 
-  // Find next archer on globalEnd who hasn't scored yet
+  // Find next archer on currentEnd who hasn't scored yet
   let nextIdx=-1;
   for(let i=activeArcherIdx+1;i<targetArchers.length;i++){
-    if((scores[targetArchers[i].id].ends[globalEnd]||[]).length<cfg.arrows){nextIdx=i;break;}
+    if((scores[targetArchers[i].id].ends[currentEnd]||[]).length<cfg.arrows){nextIdx=i;break;}
   }
   if(nextIdx===-1){
     for(let i=0;i<activeArcherIdx;i++){
-      if((scores[targetArchers[i].id].ends[globalEnd]||[]).length<cfg.arrows){nextIdx=i;break;}
+      if((scores[targetArchers[i].id].ends[currentEnd]||[]).length<cfg.arrows){nextIdx=i;break;}
     }
   }
-  // All done this end → first archer (globalEnd auto-advances)
+  // All done this end → go to first archer (getGlobalEnd will now return next end)
   if(nextIdx===-1) nextIdx=0;
 
   activeArcherIdx=nextIdx;
