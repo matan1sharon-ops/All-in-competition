@@ -138,6 +138,7 @@ tbody td { padding: 10px 12px; color: #111; }
       <div class="nav-item" onclick="showPanel('targets')" data-panel="targets"><span class="icon">🎯</span><span>Target Assignment</span></div>
       <div class="nav-item" onclick="showPanel('schedule')" data-panel="schedule"><span class="icon">⏰</span><span>Schedule</span></div>
       <div class="nav-item" onclick="showPanel('results')" data-panel="results"><span class="icon">📋</span><span>Live Results</span></div>
+      <div class="nav-item" onclick="showPanel('scorecards')" data-panel="scorecards"><span class="icon">📄</span><span>Scorecards</span></div>
     </nav>
     <div class="sidebar-footer">
       <div class="lang-toggle">
@@ -274,6 +275,15 @@ tbody td { padding: 10px 12px; color: #111; }
               <tbody id="results-table"></tbody>
             </table>
           </div>
+        </div>
+      </div>
+
+      <!-- SCORECARDS -->
+      <div id="panel-scorecards" class="panel">
+        <div class="card">
+          <div class="card-title">📄 Submitted Scorecards</div>
+          <p style="font-size:13px;color:var(--muted2);margin-bottom:16px;">Scorecards submitted by archers from the scoring app appear here.</p>
+          <div id="scorecards-list"></div>
         </div>
       </div>
 
@@ -423,8 +433,10 @@ window.selectCompetition = async (id) => {
     scores            = d.scores    || {};
     archers           = d.archers   || [];
     currentDiscipline = d.discipline || 'Outdoor';
+    window._scorecards = d.scorecards || {};
     renderResults();
     renderDashboard();
+    renderScorecards();
   });
 };
 
@@ -433,7 +445,7 @@ function getScore(archerId) {
   return scores[key] || scores[String(archerId)] || {};
 }
 
-function renderAll() { renderDashboard(); renderEntries(); renderTargets(); renderSessions(); renderResults(); }
+function renderAll() { renderDashboard(); renderEntries(); renderTargets(); renderSessions(); renderResults(); renderScorecards(); }
 
 /* ── DASHBOARD ── */
 function renderDashboard() {
@@ -761,6 +773,33 @@ window.renderResults = () => {
     </tr>`).join('')||`<tr><td colspan="${colspan}" style="text-align:center;color:#999;padding:24px">No results yet</td></tr>`;
 };
 
+function renderScorecards() {
+  const list = document.getElementById('scorecards-list');
+  if(!list) return;
+  const cards = scores ? Object.entries(
+    (() => { try { return JSON.parse(JSON.stringify(window._scorecards||{})); } catch(e){ return {}; } })()
+  ) : [];
+  // Load from Firestore snapshot
+  if(!currentCompId){ list.innerHTML='<p style="color:var(--muted2)">Select a competition first.</p>'; return; }
+  // Use cached scorecards from onSnapshot
+  const sc = window._scorecards || {};
+  const entries = Object.values(sc);
+  if(!entries.length){
+    list.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted2);">No scorecards submitted yet.<br>Archers tap <strong>📤 SEND PDF</strong> after finishing.</div>';
+    return;
+  }
+  entries.sort((a,b)=>a.target-b.target||(a.slot||'').localeCompare(b.slot||''));
+  list.innerHTML=entries.map(e=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;margin-bottom:8px;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--accent);min-width:50px;">T${e.target}${e.slot}</div>
+      <div style="flex:1;">
+        <div style="font-weight:600;font-size:14px;">${e.name}</div>
+        <div style="font-size:11px;color:var(--muted2);">Score: <strong style="color:var(--accent)">${e.total}</strong> · ${e.uploadedAt?new Date(e.uploadedAt).toLocaleString():''}</div>
+      </div>
+      <a href="${e.url}" target="_blank" style="background:var(--accent);color:#000;padding:8px 14px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;text-decoration:none;">VIEW 📄</a>
+    </div>`).join('');
+}
+
 window.exportResultsPDF = () => {
   const labels=getGoldLabels();
   const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Results</title>
@@ -776,7 +815,8 @@ window.showPanel = (name) => {
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById(`panel-${name}`).classList.add('active');
   document.querySelector(`[data-panel="${name}"]`).classList.add('active');
-  document.getElementById('topbar-title').textContent={dashboard:'Dashboard',entries:'Entry List',targets:'Target Assignment',schedule:'Schedule',results:'Live Results'}[name]||name;
+  document.getElementById('topbar-title').textContent={dashboard:'Dashboard',entries:'Entry List',targets:'Target Assignment',schedule:'Schedule',results:'Live Results',scorecards:'Scorecards'}[name]||name;
+  if(name==='scorecards') renderScorecards();
 };
 function openModal(id){document.getElementById(id).classList.add('open');}
 window.closeModal=(id)=>{document.getElementById(id).classList.remove('open');};
