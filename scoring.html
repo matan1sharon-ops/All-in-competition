@@ -338,7 +338,7 @@ function updateHeader(){
   document.getElementById('s-end-label').textContent=`${cfg.label.toUpperCase()} ${eIdx+1}${editingEnd?' — EDITING':''}`;
   document.getElementById('s-archer-name').textContent=archer.name;
   document.getElementById('s-archer-slot').textContent=archer.slot;
-  const grand=targetArchers.reduce((s,a)=>s+scores[a.id].total,0);
+  const grand=scores[getCurrentArcher().id]?.total||0;
   document.getElementById('s-grand-total').textContent=grand;
   const total=cfg.ends*targetArchers.length;
   const done=targetArchers.reduce((s,a)=>s+scores[a.id].ends.filter(e=>e.length===cfg.arrows).length,0);
