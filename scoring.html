@@ -155,15 +155,20 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 <div id="summary-screen">
   <div class="summary-header">
     <div class="summary-title" id="sum-title">Complete</div>
-    <button style="background:var(--accent);border:none;color:#000;padding:8px 16px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:13px;cursor:pointer;" onclick="goBackToScoring()">← BACK</button>
+    <div style="display:flex;gap:6px;">
+      <button style="background:#4a148c;border:none;color:#ce93d8;padding:8px 14px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:13px;cursor:pointer;" onclick="exportAndUploadPDF()">📤 SEND PDF</button>
+      <button style="background:var(--accent);border:none;color:#000;padding:8px 14px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:13px;cursor:pointer;" onclick="goBackToScoring()">← BACK</button>
+    </div>
   </div>
-  <div id="summary-list"></div>
+  <div id="summary-archer-tabs" style="display:flex;gap:4px;padding:6px 8px;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;"></div>
+  <div id="summary-list" style="flex:1;overflow-y:auto;background:#fff;color:#111;"></div>
 </div>
 <div id="toast"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, doc, getDoc, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To",
@@ -176,6 +181,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
+const storage = getStorage(app);
 
 let compId=null, compData=null, targetNum=null;
 let targetArchers=[], activeArcherIdx=0, editingEnd=null;
@@ -678,32 +684,286 @@ async function saveScores(){
   }
 }
 
+let summaryArcherIdx = 0;
+
 function showSummary(){
   document.getElementById('scoring-screen').style.display='none';
   document.getElementById('summary-screen').style.display='flex';
-  const cfg=getConfig();
   document.getElementById('sum-title').textContent=`Target ${targetNum} — Complete`;
-  document.getElementById('summary-list').innerHTML=targetArchers.map(a=>{
-    const s=scores[a.id];
+  summaryArcherIdx = 0;
+  renderSummaryTabs();
+  renderSummaryScorecard(0);
+}
+
+function renderSummaryTabs(){
+  const tabs = document.getElementById('summary-archer-tabs');
+  if(targetArchers.length<=1){ tabs.style.display='none'; return; }
+  tabs.style.display='flex';
+  tabs.innerHTML = targetArchers.map((a,i)=>
+    `<button onclick="switchSummaryArcher(${i})" style="flex:1;padding:8px 6px;border:none;border-radius:6px;background:${i===summaryArcherIdx?'var(--blue)':'transparent'};color:${i===summaryArcherIdx?'#fff':'var(--muted)'};font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">${a.slot} · ${a.name.split(' ')[0]}</button>`
+  ).join('');
+}
+
+window.switchSummaryArcher=(idx)=>{
+  summaryArcherIdx=idx;
+  renderSummaryTabs();
+  renderSummaryScorecard(idx);
+};
+
+function renderSummaryScorecard(idx){
+  const a = targetArchers[idx];
+  const s = scores[a.id];
+  const list = document.getElementById('summary-list');
+
+  // For 3D and Field — simple end list
+  if(discipline==='3D'||discipline==='Field'){
+    const cfg=getConfig();
     const endRows=s.ends.map((end,i)=>{
       const tot=end.reduce((x,v)=>x+getVal(v),0);
       const chips=end.map(v=>`<span class="arrow-chip ${chipClass(v)}" style="font-size:12px;padding:2px 7px;">${v===0?'M':v}</span>`).join('');
-      return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);">
-        <div style="font-size:10px;color:var(--muted);width:60px;">${cfg.label} ${i+1}</div>
+      return `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #eee;">
+        <div style="font-size:11px;color:#888;width:70px;">${cfg.label} ${i+1}</div>
         <div style="display:flex;gap:3px;flex:1;">${chips}</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;color:var(--accent);">${tot}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#1565c0;">${tot}</div>
       </div>`;
     }).join('');
-    return `<div class="summary-archer-card">
-      <div class="summary-archer-header">
-        <div><div style="font-size:10px;color:var(--muted);margin-bottom:2px;">${a.slot} · ${a.bow} · ${a.age}</div><div class="summary-archer-name">${a.name}</div></div>
-        <div class="summary-score">${s.total}</div>
+    list.innerHTML=`
+      <div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
+        <div><div style="font-size:11px;color:#aaa;">${a.slot} · ${a.bow} · ${a.age}</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;">${a.name}</div></div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:var(--accent);">${s.total}</div>
       </div>
-      <div class="summary-stats"><div>10+X: <span>${s.tens}</span></div><div>X: <span>${s.xs}</span></div><div>Ends: <span>${s.ends.filter(e=>e.length===cfg.arrows).length}/${cfg.ends}</span></div></div>
-      <div style="margin-top:10px;">${endRows}</div>
-    </div>`;
-  }).join('');
+      <div>${endRows}</div>`;
+    return;
+  }
+
+  // Outdoor and Indoor — professional scorecard
+  if(discipline==='Outdoor'){
+    list.innerHTML=`
+      <div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
+        <div><div style="font-size:11px;color:#aaa;">${a.slot} · ${a.bow} · ${a.age}</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;">${a.name}</div></div>
+        <div style="text-align:right;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:#FFD700;">${s.total}</div><div style="font-size:11px;color:#aaa;">X:${s.xs} · 10+X:${s.tens}</div></div>
+      </div>
+      <div class="sc-half-header"><div class="sc-half-title">1st HALF  (Ends 1–6)</div><div>10+X</div><div>X</div></div>
+      <table class="sc-table"><colgroup>
+        <col style="width:42px"><col><col><col><col style="width:32px"><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px">
+      </colgroup><tbody id="sum-body-1"></tbody></table>
+      <div class="sc-half-header" style="margin-top:6px;"><div class="sc-half-title">2nd HALF  (Ends 7–12)</div><div>10+X</div><div>X</div></div>
+      <table class="sc-table"><colgroup>
+        <col style="width:42px"><col><col><col><col style="width:32px"><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px">
+      </colgroup><tbody id="sum-body-2"></tbody></table>
+      <div style="height:10px;"></div>`;
+    renderSumOutdoor(s.ends,0,6,'sum-body-1');
+    renderSumOutdoor(s.ends,6,12,'sum-body-2');
+  } else {
+    list.innerHTML=`
+      <div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
+        <div><div style="font-size:11px;color:#aaa;">${a.slot} · ${a.bow} · ${a.age}</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;">${a.name}</div></div>
+        <div style="text-align:right;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:#FFD700;">${s.total}</div><div style="font-size:11px;color:#aaa;">10:${s.g1} · 9:${s.g2}</div></div>
+      </div>
+      <div class="sc-half-header"><div class="sc-half-title">1st HALF  (Ends 1–10)</div><div>10</div><div>9</div></div>
+      <table class="sc-table"><colgroup>
+        <col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px">
+      </colgroup><tbody id="sum-body-1"></tbody></table>
+      <div class="sc-half-header" style="margin-top:6px;"><div class="sc-half-title">2nd HALF  (Ends 11–20)</div><div>10</div><div>9</div></div>
+      <table class="sc-table"><colgroup>
+        <col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px">
+      </colgroup><tbody id="sum-body-2"></tbody></table>
+      <div style="height:10px;"></div>`;
+    renderSumIndoor(s.ends,0,10,'sum-body-1');
+    renderSumIndoor(s.ends,10,20,'sum-body-2');
+  }
 }
+
+function sumCellHtml(val){
+  const v = val===undefined||val==='' ? '' : (val===0?'M':val);
+  const cls = (val==='X'||val===10||val===9||val===11) ? 'sc-gold' : '';
+  return `<td class="${cls}">${v}</td>`;
+}
+
+function renderSumOutdoor(ends,startEnd,endEnd,bodyId){
+  let html='',running=0,tens=0,xs=0;
+  for(let e=startEnd;e<endEnd;e++){
+    const ea=ends[e]||[];
+    const v=ea.map(x=>getVal(x));
+    const s1=ea.length>=3?v[0]+v[1]+v[2]:'';
+    const s2=ea.length>=6?v[3]+v[4]+v[5]:'';
+    const et=s2!==''?(Number(s1)||0)+s2:'';
+    if(et!=='') running+=et;
+    const c10=ea.filter(x=>x===10||x==='X').length, cx=ea.filter(x=>x==='X').length;
+    if(ea.length>0){tens+=c10;xs+=cx;}
+    html+=`<tr>
+      <td rowspan="2" class="sc-end-label">End ${e+1}</td>
+      ${sumCellHtml(ea[0])}${sumCellHtml(ea[1])}${sumCellHtml(ea[2])}
+      <td class="sc-sum-box">${s1}</td><td class="sc-no-entry"></td>
+      <td rowspan="2" class="sc-running">${et!==''?running:''}</td>
+      <td class="sc-stat">${ea.length>0?c10:''}</td><td class="sc-stat">${ea.length>0?cx:''}</td>
+    </tr><tr class="sc-end-sep">
+      ${sumCellHtml(ea[3])}${sumCellHtml(ea[4])}${sumCellHtml(ea[5])}
+      <td class="sc-sum-box">${s2}</td><td class="sc-end-total">${et}</td>
+      <td class="sc-stat"></td><td class="sc-stat"></td>
+    </tr>`;
+  }
+  html+=`<tr class="sc-half-total"><td colspan="5">HALF TOTAL</td><td>${running}</td><td></td><td>${tens}</td><td>${xs}</td></tr>`;
+  document.getElementById(bodyId).innerHTML=html;
+}
+
+function renderSumIndoor(ends,startEnd,endEnd,bodyId){
+  let html='',running=0,tens=0,nines=0;
+  for(let e=startEnd;e<endEnd;e++){
+    const ea=ends[e]||[];
+    const v=ea.map(x=>getVal(x));
+    const et=ea.length>=3?v[0]+v[1]+v[2]:'';
+    if(et!=='') running+=et;
+    const c10=ea.filter(x=>x===10||x==='X').length, c9=ea.filter(x=>x===9).length;
+    if(ea.length>0){tens+=c10;nines+=c9;}
+    html+=`<tr class="sc-end-sep">
+      <td class="sc-end-label">End ${e+1}</td>
+      ${sumCellHtml(ea[0])}${sumCellHtml(ea[1])}${sumCellHtml(ea[2])}
+      <td class="sc-end-total">${et}</td>
+      <td class="sc-running">${et!==''?running:''}</td>
+      <td class="sc-stat">${ea.length>0?c10:''}</td><td class="sc-stat">${ea.length>0?c9:''}</td>
+    </tr>`;
+  }
+  html+=`<tr class="sc-half-total"><td colspan="4">HALF TOTAL</td><td>${running}</td><td></td><td>${tens}</td><td>${nines}</td></tr>`;
+  document.getElementById(bodyId).innerHTML=html;
+}
+
+/* ── PDF EXPORT & UPLOAD ── */
+function buildScorecardHTML(archerIdx){
+  const a = targetArchers[archerIdx];
+  const s = scores[a.id];
+  const isOut = discipline==='Outdoor';
+  const isIn  = discipline==='Indoor';
+  const cfg   = getConfig();
+
+  function cellStyle(val){
+    return (val==='X'||val===10||val===9||val===11)?'background:#fff9c4;color:#5d4037;font-weight:700;':'';
+  }
+
+  let tableHtml='';
+  if(isOut){
+    function buildHalfOut(ends,startEnd,endEnd){
+      let rows='',running=0,tens=0,xs=0;
+      for(let e=startEnd;e<endEnd;e++){
+        const ea=ends[e]||[];
+        const v=ea.map(x=>getVal(x));
+        const s1=ea.length>=3?v[0]+v[1]+v[2]:'';
+        const s2=ea.length>=6?v[3]+v[4]+v[5]:'';
+        const et=s2!==''?(Number(s1)||0)+s2:'';
+        if(et!=='') running+=et;
+        const c10=ea.filter(x=>x===10||x==='X').length,cx=ea.filter(x=>x==='X').length;
+        if(ea.length>0){tens+=c10;xs+=cx;}
+        const d=v=>ea[v]===0?'M':(ea[v]===undefined?'':ea[v]);
+        rows+=`<tr>
+          <td rowspan="2" style="background:#f0f0f0;font-weight:700;font-size:10px;border-right:2px solid #999;">End ${e+1}</td>
+          <td style="${cellStyle(ea[0])}">${d(0)}</td><td style="${cellStyle(ea[1])}">${d(1)}</td><td style="${cellStyle(ea[2])}">${d(2)}</td>
+          <td style="background:#f5f5f5;font-size:11px;">${s1}</td><td style="background:#eee;"></td>
+          <td rowspan="2" style="background:#fff8e1;font-weight:700;color:#c62828;border-left:2px solid #999;border-right:2px solid #999;">${et!==''?running:''}</td>
+          <td style="font-size:11px;color:#555;">${ea.length>0?c10:''}</td><td style="font-size:11px;color:#555;">${ea.length>0?cx:''}</td>
+        </tr><tr style="border-bottom:1.5px solid #aaa;">
+          <td style="${cellStyle(ea[3])}">${d(3)}</td><td style="${cellStyle(ea[4])}">${d(4)}</td><td style="${cellStyle(ea[5])}">${d(5)}</td>
+          <td style="background:#f5f5f5;font-size:11px;">${s2}</td>
+          <td style="background:#e3f2fd;font-weight:700;color:#1565c0;border-left:2px solid #999;">${et}</td>
+          <td></td><td></td>
+        </tr>`;
+      }
+      rows+=`<tr style="background:#37474f;color:#fff;font-weight:700;"><td colspan="5">HALF TOTAL</td><td>${running}</td><td></td><td>${tens}</td><td>${xs}</td></tr>`;
+      return rows;
+    }
+    const cols='<colgroup><col style="width:46px"><col><col><col><col style="width:32px"><col style="width:34px"><col style="width:44px"><col style="width:28px"><col style="width:28px"></colgroup>';
+    const thead='<tr style="background:#555;color:#fff;font-size:10px;font-weight:700;"><th colspan="4" style="text-align:left;padding:3px 6px;">ARROWS</th><th>SUB</th><th>END</th><th>TOTAL</th><th>10+X</th><th>X</th></tr>';
+    tableHtml=`
+      <div style="background:#446;color:#fff;padding:3px 6px;font-size:10px;font-weight:700;">1st HALF (Ends 1–6)</div>
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:12px;">${cols}<tbody>${thead}${buildHalfOut(s.ends,0,6)}</tbody></table>
+      <div style="background:#446;color:#fff;padding:3px 6px;font-size:10px;font-weight:700;margin-top:6px;">2nd HALF (Ends 7–12)</div>
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:12px;">${cols}<tbody>${thead}${buildHalfOut(s.ends,6,12)}</tbody></table>`;
+  } else if(isIn){
+    function buildHalfIn(ends,startEnd,endEnd){
+      let rows='',running=0,tens=0,nines=0;
+      for(let e=startEnd;e<endEnd;e++){
+        const ea=ends[e]||[];
+        const v=ea.map(x=>getVal(x));
+        const et=ea.length>=3?v[0]+v[1]+v[2]:'';
+        if(et!=='') running+=et;
+        const c10=ea.filter(x=>x===10||x==='X').length,c9=ea.filter(x=>x===9).length;
+        if(ea.length>0){tens+=c10;nines+=c9;}
+        const d=v=>ea[v]===0?'M':(ea[v]===undefined?'':ea[v]);
+        rows+=`<tr style="border-bottom:1px solid #ccc;">
+          <td style="background:#f0f0f0;font-weight:700;font-size:10px;border-right:2px solid #999;">End ${e+1}</td>
+          <td style="${cellStyle(ea[0])}">${d(0)}</td><td style="${cellStyle(ea[1])}">${d(1)}</td><td style="${cellStyle(ea[2])}">${d(2)}</td>
+          <td style="background:#e3f2fd;font-weight:700;color:#1565c0;border-left:2px solid #999;">${et}</td>
+          <td style="background:#fff8e1;font-weight:700;color:#c62828;border-left:2px solid #999;border-right:2px solid #999;">${et!==''?running:''}</td>
+          <td style="font-size:11px;color:#555;">${ea.length>0?c10:''}</td><td style="font-size:11px;color:#555;">${ea.length>0?c9:''}</td>
+        </tr>`;
+      }
+      rows+=`<tr style="background:#37474f;color:#fff;font-weight:700;"><td colspan="4">HALF TOTAL</td><td>${running}</td><td></td><td>${tens}</td><td>${nines}</td></tr>`;
+      return rows;
+    }
+    const cols='<colgroup><col style="width:46px"><col><col><col><col style="width:38px"><col style="width:46px"><col style="width:28px"><col style="width:28px"></colgroup>';
+    const thead='<tr style="background:#555;color:#fff;font-size:10px;font-weight:700;"><th colspan="4" style="text-align:left;padding:3px 6px;">ARROWS</th><th>END</th><th>TOTAL</th><th>10</th><th>9</th></tr>';
+    tableHtml=`
+      <div style="background:#446;color:#fff;padding:3px 6px;font-size:10px;font-weight:700;">1st HALF (Ends 1–10)</div>
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:12px;">${cols}<tbody>${thead}${buildHalfIn(s.ends,0,10)}</tbody></table>
+      <div style="background:#446;color:#fff;padding:3px 6px;font-size:10px;font-weight:700;margin-top:6px;">2nd HALF (Ends 11–20)</div>
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:12px;">${cols}<tbody>${thead}${buildHalfIn(s.ends,10,20)}</tbody></table>`;
+  } else {
+    // 3D / Field simple table
+    let rows='',running=0;
+    s.ends.forEach((ea,i)=>{
+      const tot=ea.reduce((x,v)=>x+getVal(v),0);
+      if(ea.length>0) running+=tot;
+      const cells=ea.map(v=>`<td>${v===0?'M':v}</td>`).join('');
+      rows+=`<tr style="border-bottom:1px solid #ccc;"><td style="background:#f0f0f0;font-size:10px;font-weight:700;">${cfg.label} ${i+1}</td>${cells}<td style="background:#e3f2fd;font-weight:700;color:#1565c0;">${ea.length>0?tot:''}</td><td style="background:#fff8e1;font-weight:700;color:#c62828;">${ea.length>0?running:''}</td></tr>`;
+    });
+    tableHtml=`<table style="width:100%;border-collapse:collapse;border:1.5px solid #999;font-size:12px;"><tbody>${rows}</tbody></table>`;
+  }
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8">
+  <style>body{margin:12px;font-family:Arial,sans-serif;color:#111;}td,th{border:1px solid #ccc;text-align:center;height:22px;padding:0 2px;}
+  @media print{@page{size:A4 portrait;margin:8mm;}}</style></head><body>
+  <div style="background:#37474f;color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <div>
+      <div style="font-size:11px;color:#aaa;">${discipline} · Target ${targetNum}${a.slot} · ${a.bow} · ${a.age}</div>
+      <div style="font-size:20px;font-weight:700;">${a.name}</div>
+    </div>
+    <div style="font-size:36px;font-weight:900;color:#FFD700;">${s.total}</div>
+  </div>
+  ${tableHtml}
+  </body></html>`;
+}
+
+window.exportAndUploadPDF = async () => {
+  const a = targetArchers[summaryArcherIdx];
+  const html = buildScorecardHTML(summaryArcherIdx);
+
+  // Open print dialog
+  const iframe = document.createElement('iframe');
+  iframe.style.cssText='position:fixed;width:0;height:0;border:none;left:-999px;top:-999px;';
+  document.body.appendChild(iframe);
+  iframe.contentDocument.write(html);
+  iframe.contentDocument.close();
+  setTimeout(()=>{ iframe.contentWindow.print(); setTimeout(()=>document.body.removeChild(iframe),1000); },400);
+
+  // Upload HTML to Firebase Storage
+  try {
+    toast('Uploading to admin...','success');
+    const now = new Date();
+    const dateStr = now.toISOString().replace(/[:.]/g,'-').slice(0,16);
+    const fileName = `scorecards/${compId}/T${targetNum}${a.slot}_${a.name.replace(/\s+/g,'_')}_${dateStr}.html`;
+    const storageRef = ref(storage, fileName);
+    await uploadString(storageRef, html, 'raw', {contentType:'text/html'});
+    const url = await getDownloadURL(storageRef);
+    // Save reference to Firestore
+    const scKey = `T${targetNum}${a.slot}_${String(a.id)}`;
+    await setDoc(doc(db,'competitions',compId),{
+      scorecards: { [scKey]: { name:a.name, target:targetNum, slot:a.slot, url, uploadedAt:now.toISOString(), total:scores[a.id].total } }
+    },{merge:true});
+    toast('Sent to admin ✓','success');
+  } catch(err){
+    console.error('Upload error:',err);
+    toast('Upload failed: '+err.message,'error');
+  }
+};
 
 window.goBackToScoring=()=>{
   document.getElementById('summary-screen').style.display='none';
