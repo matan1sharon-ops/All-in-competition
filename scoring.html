@@ -415,7 +415,7 @@ window.handleNext=async()=>{
   editingEnd=null;
   await saveScores();
   renderTabs();renderScoreList();renderPad();updateHeader();
-  toast('Saved ✓','success');
+ toast(`→ Archer ${targetArchers[nextIdx].name} End ${currentArcherEnd+1}`,'success');
 };
 
 function recalcStats(archerId){
