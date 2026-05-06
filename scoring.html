@@ -360,13 +360,8 @@ function renderPad(){
     nextLabel='DONE EDITING ✓'; nextDisabled=false;
   } else if(allDone){
     nextLabel='VIEW SUMMARY 🏆'; nextDisabled=false;
-  } else if(isFull){
-    // This archer is done for this end — check if others still need to score
-    const gEnd=getGlobalEnd();
-    const othersLeft=targetArchers.some((a,i)=>i!==activeArcherIdx&&(scores[a.id].ends[gEnd]||[]).length<cfg.arrows);
-    nextLabel=othersLeft?'NEXT ARCHER →':'NEXT END →';
-    nextDisabled=false;
   } else {
+    // Scoring pad only — auto-advances on last arrow
     nextLabel=`${curArrows.length}/${cfg.arrows}`; nextDisabled=true;
   }
 
@@ -376,14 +371,44 @@ function renderPad(){
   pad.innerHTML=btns;
 }
 
-window.handleScore=(val)=>{
+window.handleScore=async(val)=>{
   const cfg=getConfig(), archer=getCurrentArcher();
-  const endIdx=editingEnd!==null?editingEnd.endIdx:getGlobalEnd();
+  const archerEnds=scores[archer.id].ends;
+  let archerNextEnd=0;
+  for(let e=0;e<cfg.ends;e++){ if((archerEnds[e]||[]).length<cfg.arrows){archerNextEnd=e;break;} }
+  const endIdx=editingEnd!==null?editingEnd.endIdx:archerNextEnd;
   const end=scores[archer.id].ends[endIdx]||[];
   if(end.length>=cfg.arrows) return;
   end.push(val);
   scores[archer.id].ends[endIdx]=end;
   recalcStats(archer.id);
+
+  // Auto-advance when end is full (unless editing)
+  if(!editingEnd && end.length===cfg.arrows){
+    const myFullEnds=scores[archer.id].ends.filter(e=>e.length===cfg.arrows).length;
+    const allDone=targetArchers.every(a=>scores[a.id].ends.filter(e=>e.length===cfg.arrows).length===cfg.ends);
+    if(allDone){
+      await saveScores();
+      renderTabs(); renderScoreList(); renderPad(); updateHeader();
+      showSummary(); return;
+    }
+    // Find next archer with fewer full ends
+    let nextIdx=-1;
+    for(let i=activeArcherIdx+1;i<targetArchers.length;i++){
+      if(scores[targetArchers[i].id].ends.filter(e=>e.length===cfg.arrows).length<myFullEnds){nextIdx=i;break;}
+    }
+    if(nextIdx===-1){
+      for(let i=0;i<activeArcherIdx;i++){
+        if(scores[targetArchers[i].id].ends.filter(e=>e.length===cfg.arrows).length<myFullEnds){nextIdx=i;break;}
+      }
+    }
+    if(nextIdx===-1) nextIdx=0; // all done this end → archer 0 next end
+    activeArcherIdx=nextIdx;
+    await saveScores();
+    renderTabs(); renderScoreList(); renderPad(); updateHeader();
+    return;
+  }
+
   renderScoreList(); renderPad(); updateHeader();
 };
 
