@@ -440,7 +440,8 @@ window.selectCompetition = async (id) => {
 
 function getScore(archerId) {
   const key = String(archerId).replace(/\./g, '_');
-  return scores[key] || scores[String(archerId)] || {};
+  const raw = scores[key] || scores[String(archerId)] || {};
+  return raw;
 }
 
 function renderAll() { renderDashboard(); renderEntries(); renderTargets(); renderSessions(); renderResults(); }
