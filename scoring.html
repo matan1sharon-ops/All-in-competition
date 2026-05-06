@@ -387,7 +387,8 @@ function renderPad(){
 
   let btns=padScores.map(s=>{
     const label=s===0?'M':s;
-    return `<button class="pad-btn ${padBtnClass(s)}" onclick="handleScore(${JSON.stringify(s)})" ${isFull&&!isEditing?'disabled style="opacity:0.4"':''}>${label}</button>`;
+ const scoreArg = s==='X' ? "'X'" : s;
+    return `<button class="pad-btn ${padBtnClass(s)}" onclick="handleScore(${scoreArg})" ${isFull&&!isEditing?'disabled style="opacity:0.4"':''}>${label}</button>`;
   }).join('');
 
   btns+=`<button class="pad-btn pad-back" onclick="handleBack()" style="grid-column:span 2;">BACKSPACE ←</button>`;
