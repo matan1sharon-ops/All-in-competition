@@ -275,8 +275,12 @@ window.switchArcher=(idx)=>{activeArcherIdx=idx;editingEnd=null;renderTabs();ren
 
 function renderScoreList(){
   const cfg=getConfig(), archer=getCurrentArcher(), ends=scores[archer.id].ends;
-  const globalEnd=getGlobalEnd();
-  const curEnd=editingEnd!==null?editingEnd.endIdx:globalEnd;
+  // Active end = this archer's first incomplete end (their own progress)
+  let archerNextEnd = 0;
+  for(let e=0; e<cfg.ends; e++){
+    if((ends[e]||[]).length < cfg.arrows){ archerNextEnd = e; break; }
+  }
+  const curEnd=editingEnd!==null?editingEnd.endIdx:archerNextEnd;
   let html='';
   for(let i=0;i<cfg.ends;i++){
     const ea=ends[i]||[];
@@ -311,7 +315,13 @@ window.editEnd=(endIdx)=>{
 
 function updateHeader(){
   const cfg=getConfig(), archer=getCurrentArcher();
-  const eIdx=editingEnd!==null?editingEnd.endIdx:getGlobalEnd();
+  // Show this archer's own current end
+  const archerEnds2 = scores[getCurrentArcher().id].ends;
+  let archerNextEnd2 = 0;
+  for(let e=0; e<cfg.ends; e++){
+    if((archerEnds2[e]||[]).length < cfg.arrows){ archerNextEnd2 = e; break; }
+  }
+  const eIdx=editingEnd!==null?editingEnd.endIdx:archerNextEnd2;
   document.getElementById('s-end-label').textContent=`${cfg.label.toUpperCase()} ${eIdx+1}${editingEnd?' — EDITING':''}`;
   document.getElementById('s-archer-name').textContent=archer.name;
   document.getElementById('s-archer-slot').textContent=archer.slot;
@@ -324,8 +334,13 @@ function updateHeader(){
 
 function renderPad(){
   const cfg=getConfig(), archer=getCurrentArcher();
-  const globalEnd=getGlobalEnd();
-  const endIdx=editingEnd!==null?editingEnd.endIdx:globalEnd;
+  // Use this archer's own next incomplete end
+  const archerEnds3 = scores[getCurrentArcher().id].ends;
+  let archerNextEnd3 = 0;
+  for(let e=0; e<cfg.ends; e++){
+    if((archerEnds3[e]||[]).length < cfg.arrows){ archerNextEnd3 = e; break; }
+  }
+  const endIdx=editingEnd!==null?editingEnd.endIdx:archerNextEnd3;
   const curArrows=scores[archer.id].ends[endIdx]||[];
   const padScores=getPadScores();
   const isFull=curArrows.length>=cfg.arrows;
@@ -347,7 +362,8 @@ function renderPad(){
     nextLabel='VIEW SUMMARY 🏆'; nextDisabled=false;
   } else if(isFull){
     // This archer is done for this end — check if others still need to score
-    const othersLeft=targetArchers.some((a,i)=>i!==activeArcherIdx&&(scores[a.id].ends[globalEnd]||[]).length<cfg.arrows);
+    const gEnd=getGlobalEnd();
+    const othersLeft=targetArchers.some((a,i)=>i!==activeArcherIdx&&(scores[a.id].ends[gEnd]||[]).length<cfg.arrows);
     nextLabel=othersLeft?'NEXT ARCHER →':'NEXT END →';
     nextDisabled=false;
   } else {
@@ -390,32 +406,27 @@ window.handleNext=async()=>{
   const allDone=targetArchers.every(a=>scores[a.id].ends.filter(e=>e.length===cfg.arrows).length===cfg.ends);
   if(allDone){showSummary();return;}
 
-  // Find the end the CURRENT archer just finished
-  // (the last full end in their score sheet)
-  const archerEnds = scores[getCurrentArcher().id].ends;
-  let currentArcherEnd = 0;
-  for(let e=cfg.ends-1; e>=0; e--){
-    if((archerEnds[e]||[]).length === cfg.arrows){ currentArcherEnd = e; break; }
-  }
+  // Current archer just completed an end — how many full ends do they have?
+  const myFullEnds = scores[getCurrentArcher().id].ends.filter(e=>e.length===cfg.arrows).length;
 
-  // Find next archer on that same end who hasn't scored yet
+  // Find next archer who has FEWER full ends (they haven't scored this end yet)
   let nextIdx = -1;
   for(let i=activeArcherIdx+1; i<targetArchers.length; i++){
-    if((scores[targetArchers[i].id].ends[currentArcherEnd]||[]).length < cfg.arrows){nextIdx=i; break;}
+    if(scores[targetArchers[i].id].ends.filter(e=>e.length===cfg.arrows).length < myFullEnds){nextIdx=i; break;}
   }
   if(nextIdx===-1){
     for(let i=0; i<activeArcherIdx; i++){
-      if((scores[targetArchers[i].id].ends[currentArcherEnd]||[]).length < cfg.arrows){nextIdx=i; break;}
+      if(scores[targetArchers[i].id].ends.filter(e=>e.length===cfg.arrows).length < myFullEnds){nextIdx=i; break;}
     }
   }
-  // All archers done this end → jump to archer 0 (next end)
+  // All archers have same number of full ends → end complete, go to archer 0
   if(nextIdx===-1) nextIdx = 0;
 
-  activeArcherIdx=nextIdx;
-  editingEnd=null;
+  activeArcherIdx = nextIdx;
+  editingEnd = null;
   await saveScores();
-  renderTabs();renderScoreList();renderPad();updateHeader();
- toast(`→ Archer ${targetArchers[nextIdx].name} End ${currentArcherEnd+1}`,'success');
+  renderTabs(); renderScoreList(); renderPad(); updateHeader();
+  toast(`→ ${targetArchers[nextIdx].name.split(' ')[0]} End ${myFullEnds+1}`,'success');
 };
 
 function recalcStats(archerId){
