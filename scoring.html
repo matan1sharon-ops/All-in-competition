@@ -108,7 +108,16 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
   <div class="score-header">
     <div class="score-header-top">
       <div><div class="comp-name" id="s-comp-name"></div><div class="target-label" id="s-target-label"></div></div>
-      <div style="text-align:right;"><div style="font-size:11px;color:var(--muted);">TOTAL</div><div id="s-grand-total" style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:var(--accent);">0</div></div>
+      <div style="display:flex;gap:16px;align-items:flex-end;">
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:var(--muted);" id="s-golds-label">X+10</div>
+          <div id="s-golds" style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--accent);">0</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:var(--muted);">TOTAL</div>
+          <div id="s-grand-total" style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:var(--accent);">0</div>
+        </div>
+      </div>
     </div>
     <div class="progress-bar-wrap"><div class="progress-bar" id="s-progress"></div></div>
   </div>
@@ -338,8 +347,13 @@ function updateHeader(){
   document.getElementById('s-end-label').textContent=`${cfg.label.toUpperCase()} ${eIdx+1}${editingEnd?' — EDITING':''}`;
   document.getElementById('s-archer-name').textContent=archer.name;
   document.getElementById('s-archer-slot').textContent=archer.slot;
-  const grand=scores[getCurrentArcher().id]?.total||0;
+  const archerScore=scores[getCurrentArcher().id]||{};
+  const grand=archerScore.total||0;
+  const golds=archerScore.golds||0;
+  const goldLabel=discipline==='3D'?'11+10':discipline==='Field'?'6+5':discipline==='Indoor'?'10+9':'X+10';
   document.getElementById('s-grand-total').textContent=grand;
+  document.getElementById('s-golds').textContent=golds;
+  document.getElementById('s-golds-label').textContent=goldLabel;
   const total=cfg.ends*targetArchers.length;
   const done=targetArchers.reduce((s,a)=>s+scores[a.id].ends.filter(e=>e.length===cfg.arrows).length,0);
   document.getElementById('s-progress').style.width=(total>0?done/total*100:0)+'%';
@@ -472,6 +486,11 @@ function recalcStats(archerId){
   scores[archerId].total=all.reduce((s,v)=>s+getVal(v),0);
   scores[archerId].tens=all.filter(v=>v===10||v==='X'||v===11).length;
   scores[archerId].xs=all.filter(v=>v==='X').length;
+  // Golds: discipline-specific top scores
+  if(discipline==='3D')     scores[archerId].golds=all.filter(v=>v===11||v===10).length;
+  else if(discipline==='Field') scores[archerId].golds=all.filter(v=>v===6||v===5).length;
+  else if(discipline==='Indoor')scores[archerId].golds=all.filter(v=>v===10||v===9).length;
+  else scores[archerId].golds=all.filter(v=>v==='X'||v===10).length; // Outdoor X+10
 }
 
 async function saveScores(){
