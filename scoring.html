@@ -622,23 +622,39 @@ window.handleNext=async()=>{
 };
 
 function recalcStats(archerId){
-  const all=scores[archerId].ends.flat();
+  const cfg=getConfig();
+  const ends=scores[archerId].ends;
+  const all=ends.flat();
   scores[archerId].total=all.reduce((s,v)=>s+getVal(v),0);
   scores[archerId].tens=all.filter(v=>v===10||v==='X'||v===11).length;
   scores[archerId].xs=all.filter(v=>v==='X').length;
-  // Separate gold counts per discipline
-  if(discipline==='3D'){
-    scores[archerId].g1=all.filter(v=>v===11).length;  // 11
-    scores[archerId].g2=all.filter(v=>v===10).length;  // 10
-  } else if(discipline==='Field'){
-    scores[archerId].g1=all.filter(v=>v===6).length;   // 6
-    scores[archerId].g2=all.filter(v=>v===5).length;   // 5
+  // Half totals
+  if(discipline==='Outdoor'){
+    const h1=ends.slice(0,6).flat();
+    const h2=ends.slice(6,12).flat();
+    scores[archerId].h1=h1.reduce((s,v)=>s+getVal(v),0);
+    scores[archerId].h2=h2.reduce((s,v)=>s+getVal(v),0);
   } else if(discipline==='Indoor'){
-    scores[archerId].g1=all.filter(v=>v===10).length;  // 10
-    scores[archerId].g2=all.filter(v=>v===9).length;   // 9
+    const h1=ends.slice(0,10).flat();
+    const h2=ends.slice(10,20).flat();
+    scores[archerId].h1=h1.reduce((s,v)=>s+getVal(v),0);
+    scores[archerId].h2=h2.reduce((s,v)=>s+getVal(v),0);
   } else {
-    scores[archerId].g1=all.filter(v=>v==='X').length; // X
-    scores[archerId].g2=all.filter(v=>v===10).length;  // 10
+    scores[archerId].h1=0; scores[archerId].h2=0;
+  }
+  // Gold counts per discipline
+  if(discipline==='3D'){
+    scores[archerId].g1=all.filter(v=>v===11).length;
+    scores[archerId].g2=all.filter(v=>v===10).length;
+  } else if(discipline==='Field'){
+    scores[archerId].g1=all.filter(v=>v===6).length;
+    scores[archerId].g2=all.filter(v=>v===5).length;
+  } else if(discipline==='Indoor'){
+    scores[archerId].g1=all.filter(v=>v===10).length;
+    scores[archerId].g2=all.filter(v=>v===9).length;
+  } else {
+    scores[archerId].g1=all.filter(v=>v==='X').length;
+    scores[archerId].g2=all.filter(v=>v===10).length;
   }
 }
 
@@ -652,7 +668,7 @@ async function saveScores(){
       // Convert ends array-of-arrays to object (Firestore doesn't support nested arrays)
       const endsObj={};
       s.ends.forEach((end,i)=>{ endsObj[String(i)]=end; });
-      payload.scores[key]={total:s.total,tens:s.tens,xs:s.xs,g1:s.g1||0,g2:s.g2||0,ends:endsObj};
+      payload.scores[key]={total:s.total,tens:s.tens,xs:s.xs,g1:s.g1||0,g2:s.g2||0,h1:s.h1||0,h2:s.h2||0,ends:endsObj};
     });
     await setDoc(doc(db,'competitions',compId),payload,{merge:true});
     console.log('Saved OK',Object.keys(payload.scores));
