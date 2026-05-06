@@ -75,26 +75,12 @@ tbody td { padding: 10px 12px; color: #111; }
 .tag-longbow { background: #37474f; color: #fff; }
 .tag-m { background: #1565c0; color: #fff; }
 .tag-f { background: #880e4f; color: #fff; }
-
-/* BOW GROUP SEPARATOR */
-.bow-group-header {
-  grid-column: 1 / -1;
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 0 6px;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 13px; font-weight: 900; letter-spacing: 2px;
-  text-transform: uppercase; color: var(--accent);
-  border-top: 1px solid var(--border2);
-  margin-top: 8px;
-}
+.bow-group-header { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; padding: 10px 0 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); border-top: 1px solid var(--border2); margin-top: 8px; }
 .bow-group-header:first-child { border-top: none; margin-top: 0; }
 .bow-group-header .count { font-size: 10px; color: var(--muted2); font-weight: 600; letter-spacing: 0; background: var(--surface2); padding: 2px 8px; border-radius: 10px; }
-
-/* TARGET GRID */
 .target-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
 .target-card { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 12px; }
 .target-card .target-num { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900; color: var(--accent); margin-bottom: 4px; }
-.target-card .target-bow { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted2); margin-bottom: 8px; }
 .target-slot { background: var(--surface3); border: 1px dashed var(--border2); border-radius: 6px; padding: 8px 10px; margin-bottom: 4px; min-height: 36px; cursor: pointer; transition: border-color 0.15s; }
 .target-slot:hover { border-color: var(--muted2); }
 .target-slot.filled { border-style: solid; border-color: var(--border2); background: var(--surface); }
@@ -102,7 +88,6 @@ tbody td { padding: 10px 12px; color: #111; }
 .target-slot .slot-name { font-size: 12px; font-weight: 600; color: var(--text); }
 .target-slot .slot-cat { font-size: 10px; color: var(--muted2); }
 .target-slot.empty .slot-name { color: var(--muted); font-style: italic; font-size: 11px; }
-
 .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 20px; }
 .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; text-align: center; }
 .stat-val { font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 900; color: var(--accent); }
@@ -206,14 +191,10 @@ tbody td { padding: 10px 12px; color: #111; }
             <div class="form-group"><label>Last Name</label><input type="text" id="e-lname" placeholder="Last name"></div>
             <div class="form-group"><label>Club</label><input type="text" id="e-club" placeholder="Club name"></div>
             <div class="form-group"><label>Bow Type</label>
-              <select id="e-bow">
-                <option>Recurve</option><option>Compound</option><option>Barebow</option><option>Traditional</option><option>Longbow</option>
-              </select>
+              <select id="e-bow"><option>Recurve</option><option>Compound</option><option>Barebow</option><option>Traditional</option><option>Longbow</option></select>
             </div>
             <div class="form-group"><label>Age Category</label>
-              <select id="e-age">
-                <option>U12</option><option>U14</option><option>U18</option><option>U21</option><option>Senior</option><option>Master 50+</option><option>Master 60+</option>
-              </select>
+              <select id="e-age"><option>U12</option><option>U14</option><option>U18</option><option>U21</option><option>Senior</option><option>Master 50+</option><option>Master 60+</option></select>
             </div>
             <div class="form-group"><label>Gender</label>
               <select id="e-gender"><option value="M">Male</option><option value="F">Female</option></select>
@@ -245,9 +226,7 @@ tbody td { padding: 10px 12px; color: #111; }
       <div id="panel-targets" class="panel">
         <div class="card">
           <div class="card-title">Target Assignment</div>
-          <p style="font-size:13px;color:var(--muted2);margin-bottom:16px;">
-            Targets are generated automatically from the entry list — each bow type gets its own group of targets, 4 slots per target (A/B/C/D), sorted by age then gender. You can manually reassign any archer by tapping a slot.
-          </p>
+          <p style="font-size:13px;color:var(--muted2);margin-bottom:16px;">Targets are generated automatically from the entry list — 4 slots per target (A/B/C/D), sorted by age then gender.</p>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button class="btn btn-primary" onclick="generateTargets()">⚡ AUTO GENERATE FROM ENTRIES</button>
             <button class="btn btn-secondary" onclick="clearAssignments()">CLEAR ALL</button>
@@ -291,7 +270,7 @@ tbody td { padding: 10px 12px; color: #111; }
           </div>
           <div class="table-wrap">
             <table>
-             <thead><tr><th>Rank</th><th>Name</th><th>Club</th><th>Bow</th><th>Age</th><th>Target</th><th>Score</th><th>G1</th><th>G2</th><th>10+X</th><th>X</th></tr></thead>
+              <thead><tr><th>Rank</th><th>Name</th><th>Club</th><th>Bow</th><th>Age</th><th>Target</th><th>Score</th><th id="th-g1">G1</th><th id="th-g2">G2</th></tr></thead>
               <tbody id="results-table"></tbody>
             </table>
           </div>
@@ -368,6 +347,7 @@ const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
 let currentCompId = null;
+let currentDiscipline = 'Outdoor';
 let archers = [], targets = [], sessions = [], scores = {};
 let assignPending = { ti: null, slot: null };
 let lang = 'en';
@@ -375,6 +355,14 @@ let lang = 'en';
 const BOW_ORDER  = ['Recurve','Compound','Barebow','Traditional','Longbow'];
 const AGE_ORDER  = ['U12','U14','U18','U21','Senior','Master 50+','Master 60+'];
 const BOW_COLORS = { Recurve:'#1565c0', Compound:'#4a148c', Barebow:'#1b5e20', Traditional:'#e65100', Longbow:'#37474f' };
+
+/* ── GOLD LABELS BY DISCIPLINE ── */
+function getGoldLabels() {
+  if(currentDiscipline==='3D')     return {g1:'11', g2:'10'};
+  if(currentDiscipline==='Field')  return {g1:'6',  g2:'5'};
+  if(currentDiscipline==='Indoor') return {g1:'10', g2:'9'};
+  return {g1:'X', g2:'10'};
+}
 
 /* ── SAVE HELPERS ── */
 async function saveArchers()  { if(currentCompId) await setDoc(doc(db,'competitions',currentCompId),{archers},{merge:true}); }
@@ -420,10 +408,11 @@ window.selectCompetition = async (id) => {
   const snap = await getDoc(doc(db,'competitions',id));
   if (!snap.exists()) return;
   const data = snap.data();
-  archers  = data.archers  || [];
-  targets  = data.targets  || [];
-  sessions = data.sessions || [];
-  scores   = data.scores   || {};
+  archers           = data.archers   || [];
+  targets           = data.targets   || [];
+  sessions          = data.sessions  || [];
+  scores            = data.scores    || {};
+  currentDiscipline = data.discipline || 'Outdoor';
   document.getElementById('no-comp-msg').style.display  = 'none';
   document.getElementById('dash-content').style.display = 'block';
   document.getElementById('conn-status').textContent    = '🟢 Connected';
@@ -431,8 +420,9 @@ window.selectCompetition = async (id) => {
   renderAll();
   onSnapshot(doc(db,'competitions',id), snap => {
     const d = snap.data();
-    scores  = d.scores  || {};
-    archers = d.archers || [];
+    scores            = d.scores    || {};
+    archers           = d.archers   || [];
+    currentDiscipline = d.discipline || 'Outdoor';
     renderResults();
     renderDashboard();
   });
@@ -440,8 +430,7 @@ window.selectCompetition = async (id) => {
 
 function getScore(archerId) {
   const key = String(archerId).replace(/\./g, '_');
-  const raw = scores[key] || scores[String(archerId)] || {};
-  return raw;
+  return scores[key] || scores[String(archerId)] || {};
 }
 
 function renderAll() { renderDashboard(); renderEntries(); renderTargets(); renderSessions(); renderResults(); }
@@ -455,7 +444,6 @@ function renderDashboard() {
   document.getElementById('d-scored').textContent   = archers.filter(a=>(getScore(a.id)?.total||0)>0).length;
   document.getElementById('entry-badge').textContent = archers.length;
   document.getElementById('entry-count').textContent = archers.length+' archers';
-
   getDoc(doc(db,'competitions',currentCompId)).then(s => {
     const d = s.data();
     document.getElementById('comp-info-grid').innerHTML = `
@@ -465,8 +453,6 @@ function renderDashboard() {
       <div class="form-group"><label>Discipline</label><input value="${d.discipline||''}" readonly style="opacity:0.7;"></div>
       <div class="form-group"><label>Organizer</label><input value="${d.organizer||''}" readonly style="opacity:0.7;"></div>`;
   });
-
-  // breakdown per bow+age
   const cats = {};
   archers.forEach(a => {
     const k = `${a.bow}|${a.age}`;
@@ -487,21 +473,13 @@ function renderDashboard() {
 /* ── ENTRIES ── */
 window.addArcher = async () => {
   if (!currentCompId) { toast('Select a competition first','error'); return; }
-  const fname  = document.getElementById('e-fname').value.trim();
-  const lname  = document.getElementById('e-lname').value.trim();
+  const fname = document.getElementById('e-fname').value.trim();
+  const lname = document.getElementById('e-lname').value.trim();
   if (!fname||!lname) { toast('Enter first and last name','error'); return; }
-  archers.push({
-    id: String(Date.now()),
-    fname, lname, name:`${fname} ${lname}`,
-    club:  document.getElementById('e-club').value.trim(),
-    bow:   document.getElementById('e-bow').value,
-    age:   document.getElementById('e-age').value,
-    gender:document.getElementById('e-gender').value,
-    target:null, slot:null
-  });
+  archers.push({ id:String(Date.now()), fname, lname, name:`${fname} ${lname}`, club:document.getElementById('e-club').value.trim(), bow:document.getElementById('e-bow').value, age:document.getElementById('e-age').value, gender:document.getElementById('e-gender').value, target:null, slot:null });
   await saveArchers();
-  document.getElementById('e-fname').value = '';
-  document.getElementById('e-lname').value = '';
+  document.getElementById('e-fname').value='';
+  document.getElementById('e-lname').value='';
   renderAll();
   toast(`${fname} ${lname} added ✓`,'success');
 };
@@ -518,9 +496,9 @@ window.renderEntries = () => {
   const search = (document.getElementById('search-archer')?.value||'').toLowerCase();
   const bowF   = document.getElementById('filter-bow')?.value||'';
   const filtered = archers.filter(a=>(a.name.toLowerCase().includes(search)||(a.club||'').toLowerCase().includes(search))&&(!bowF||a.bow===bowF));
-  document.getElementById('entry-count').textContent  = archers.length+' archers';
-  document.getElementById('entry-badge').textContent  = archers.length;
-  document.getElementById('entries-table').innerHTML  = filtered.map((a,i)=>`
+  document.getElementById('entry-count').textContent = archers.length+' archers';
+  document.getElementById('entry-badge').textContent = archers.length;
+  document.getElementById('entries-table').innerHTML = filtered.map((a)=>`
     <tr>
       <td style="color:#999;">${archers.indexOf(a)+1}</td>
       <td style="color:#111;font-weight:600;">${a.fname} ${a.lname}</td>
@@ -529,7 +507,7 @@ window.renderEntries = () => {
       <td style="color:#111;">${a.age}</td>
       <td><span class="tag tag-${a.gender.toLowerCase()}">${a.gender}</span></td>
       <td style="color:#1565c0;font-weight:700;">${a.target?`T${a.target}${a.slot}`:'<span style="color:#999">—</span>'}</td>
-     <td><button class="btn btn-danger btn-sm" onclick="deleteArcher('${a.id}')">✕</button></td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteArcher('${a.id}')">✕</button></td>
     </tr>`).join('')||'<tr><td colspan="8" style="text-align:center;color:#999;padding:24px">No archers yet</td></tr>';
 };
 
@@ -555,55 +533,36 @@ window.importCSV = async () => {
 /* ── TARGET GENERATION ── */
 window.generateTargets = async () => {
   if (!currentCompId) { toast('Select a competition first','error'); return; }
-  if (!archers.length) { toast('Add archers to the entry list first','error'); return; }
-
-  const snap = await getDoc(doc(db,'competitions',currentCompId));
-  const discipline = snap.data()?.discipline || 'Outdoor';
-  const is3DorField = discipline==='3D' || discipline==='Field';
-
+  if (!archers.length) { toast('Add archers first','error'); return; }
+  const is3DorField = currentDiscipline==='3D' || currentDiscipline==='Field';
   targets = [];
   archers.forEach(a => { a.target=null; a.slot=null; });
-
   const slots = ['A','B','C','D'];
   let targetNum = 1;
-
   if (is3DorField) {
-    // 3D/Field: all bow types mixed together, sorted by age then gender
-    const group = [...archers].sort((a,b) => {
-      const ai=AGE_ORDER.indexOf(a.age), bi=AGE_ORDER.indexOf(b.age);
-      if (ai!==bi) return ai-bi;
-      return a.gender.localeCompare(b.gender);
-    });
-    let currentTarget=null, si=0;
+    const group = [...archers].sort((a,b) => { const ai=AGE_ORDER.indexOf(a.age),bi=AGE_ORDER.indexOf(b.age); if(ai!==bi)return ai-bi; return a.gender.localeCompare(b.gender); });
+    let cur=null, si=0;
     group.forEach(archer => {
-      if (si===0) { currentTarget={num:targetNum++, bow:'Mixed', A:null,B:null,C:null,D:null}; targets.push(currentTarget); }
-      currentTarget[slots[si]]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};
+      if(si===0){cur={num:targetNum++,bow:'Mixed',A:null,B:null,C:null,D:null};targets.push(cur);}
+      cur[slots[si]]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};
       const orig=archers.find(a=>a.id===archer.id);
-      if(orig){orig.target=currentTarget.num; orig.slot=slots[si];}
-      si++; if(si>=4) si=0;
+      if(orig){orig.target=cur.num;orig.slot=slots[si];}
+      si++; if(si>=4)si=0;
     });
   } else {
-    // Outdoor/Indoor: each bow type gets its own consecutive block of targets
     BOW_ORDER.forEach(bow => {
-      const group = archers
-        .filter(a=>a.bow===bow)
-        .sort((a,b) => {
-          const ai=AGE_ORDER.indexOf(a.age), bi=AGE_ORDER.indexOf(b.age);
-          if (ai!==bi) return ai-bi;
-          return a.gender.localeCompare(b.gender);
-        });
-      if (!group.length) return;
-      let currentTarget=null, si=0;
+      const group = archers.filter(a=>a.bow===bow).sort((a,b)=>{ const ai=AGE_ORDER.indexOf(a.age),bi=AGE_ORDER.indexOf(b.age); if(ai!==bi)return ai-bi; return a.gender.localeCompare(b.gender); });
+      if(!group.length) return;
+      let cur=null, si=0;
       group.forEach(archer => {
-        if (si===0) { currentTarget={num:targetNum++,bow,A:null,B:null,C:null,D:null}; targets.push(currentTarget); }
-        currentTarget[slots[si]]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};
+        if(si===0){cur={num:targetNum++,bow,A:null,B:null,C:null,D:null};targets.push(cur);}
+        cur[slots[si]]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};
         const orig=archers.find(a=>a.id===archer.id);
-        if(orig){orig.target=currentTarget.num; orig.slot=slots[si];}
-        si++; if(si>=4) si=0;
+        if(orig){orig.target=cur.num;orig.slot=slots[si];}
+        si++; if(si>=4)si=0;
       });
     });
   }
-
   await saveTargets(); await saveArchers();
   renderAll();
   toast(`${targets.length} targets generated ✓`,'success');
@@ -614,11 +573,10 @@ window.deleteCompetition = async () => {
   if (!currentCompId) return;
   const snap = await getDoc(doc(db,'competitions',currentCompId));
   const name = snap.data()?.name || 'this competition';
-  if (!confirm(`DELETE "${name}"?\n\nThis will permanently remove all archers, targets and scores. This cannot be undone.`)) return;
+  if (!confirm(`DELETE "${name}"?\n\nThis cannot be undone.`)) return;
   const { deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
   await deleteDoc(doc(db,'competitions',currentCompId));
-  currentCompId = null;
-  archers=[]; targets=[]; sessions=[]; scores={};
+  currentCompId=null; archers=[]; targets=[]; sessions=[]; scores={};
   document.getElementById('no-comp-msg').style.display='block';
   document.getElementById('dash-content').style.display='none';
   document.getElementById('btn-delete-comp').style.display='none';
@@ -635,76 +593,62 @@ window.clearAssignments = async () => {
   renderAll(); toast('Assignments cleared','success');
 };
 
-/* ── RENDER TARGETS — grouped by bow ── */
+/* ── RENDER TARGETS ── */
 function renderTargets() {
   const grid = document.getElementById('target-grid');
-  if (!targets.length) {
-    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">🎯</div><p>No targets yet.<br>Add archers then click <strong>AUTO GENERATE FROM ENTRIES</strong>.</p></div>';
-    return;
-  }
-
+  if (!targets.length) { grid.innerHTML='<div class="empty-state"><div class="empty-icon">🎯</div><p>No targets yet.<br>Add archers then click <strong>AUTO GENERATE FROM ENTRIES</strong>.</p></div>'; return; }
   const allBows = [...new Set(targets.map(t=>t.bow))];
   let html = '';
   allBows.forEach(bow => {
     const group = targets.filter(t=>t.bow===bow);
-    if (!group) return;
-    const color = BOW_COLORS[bow] || '#555';
-    const archerCount = group.reduce((n,t)=>n+['A','B','C','D'].filter(s=>t[s]).length, 0);
-    const tRange = group.length>1 ? `T${group[0].num}–T${group[group.length-1].num}` : `T${group[0].num}`;
-    html += `<div style="margin-bottom:24px;">
+    const color = BOW_COLORS[bow]||'#555';
+    const archerCount = group.reduce((n,t)=>n+['A','B','C','D'].filter(s=>t[s]).length,0);
+    const tRange = group.length>1?`T${group[0].num}–T${group[group.length-1].num}`:`T${group[0].num}`;
+    html+=`<div style="margin-bottom:24px;">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px 14px;background:${color}22;border:1px solid ${color}44;border-radius:8px;">
         <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:2px;color:${color};">${bow==='Mixed'?'🎯 MIXED (3D/FIELD)':bow.toUpperCase()}</span>
         <span style="font-size:11px;color:#888;">${archerCount} archers · ${group.length} target${group.length!==1?'s':''} (${tRange})</span>
-      </div>
-      <div class="target-grid">`;
-    group.forEach((t, ti) => {
-      const globalTi = targets.indexOf(t);
-      const slotsHtml = ['A','B','C','D'].map(s => {
-        const archer = t[s];
+      </div><div class="target-grid">`;
+    group.forEach(t => {
+      const globalTi=targets.indexOf(t);
+      const slotsHtml=['A','B','C','D'].map(s=>{
+        const archer=t[s];
         return `<div class="target-slot ${archer?'filled':'empty'}" onclick="openAssignModal(${globalTi},'${s}')">
           <div class="slot-label">${s}</div>
-          ${archer
-            ? `<div class="slot-name">${archer.name}</div><div class="slot-cat">${archer.age} · ${archer.gender}</div>`
-            : `<div class="slot-name">Tap to assign</div>`}
+          ${archer?`<div class="slot-name">${archer.name}</div><div class="slot-cat">${archer.age} · ${archer.gender}</div>`:`<div class="slot-name">Tap to assign</div>`}
         </div>`;
       }).join('');
-      html += `<div class="target-card">
-        <div class="target-num">T${t.num}</div>
-        ${slotsHtml}
-      </div>`;
+      html+=`<div class="target-card"><div class="target-num">T${t.num}</div>${slotsHtml}</div>`;
     });
-    html += '</div></div>';
+    html+='</div></div>';
   });
-
-  grid.innerHTML = html;
+  grid.innerHTML=html;
 }
 
 /* ── ASSIGN MODAL ── */
 window.openAssignModal = (ti, slot) => {
-  assignPending = { ti, slot };
-  const t = targets[ti];
-  document.getElementById('assign-modal-title').textContent = `Target ${t.num} — Slot ${slot}`;
-  const unassigned = archers.filter(a => !a.target || (a.target===t.num && a.slot===slot));
-  document.getElementById('assign-archer-select').innerHTML =
-    '<option value="">— Unassign —</option>' +
-    unassigned.map(a=>`<option value="${a.id}" ${t[slot]?.id===a.id?'selected':''}>${a.name} (${a.bow} · ${a.age})</option>`).join('');
-  document.getElementById('btn-remove-slot').style.display = t[slot] ? 'block' : 'none';
+  assignPending={ti,slot};
+  const t=targets[ti];
+  document.getElementById('assign-modal-title').textContent=`Target ${t.num} — Slot ${slot}`;
+  const unassigned=archers.filter(a=>!a.target||(a.target===t.num&&a.slot===slot));
+  document.getElementById('assign-archer-select').innerHTML='<option value="">— Unassign —</option>'+unassigned.map(a=>`<option value="${a.id}" ${t[slot]?.id===a.id?'selected':''}>${a.name} (${a.bow} · ${a.age})</option>`).join('');
+  document.getElementById('btn-remove-slot').style.display=t[slot]?'block':'none';
   openModal('modal-assign');
 };
 
 window.confirmAssign = async () => {
-  const { ti, slot } = assignPending;
-  const archerId = document.getElementById('assign-archer-select').value;
-  const t = targets[ti];
-  if (t[slot]) { const old=archers.find(a=>a.id===t[slot].id); if(old){old.target=null;old.slot=null;} }
-  if (archerId) {
-    const archer = archers.find(a=>a.id===archerId);
-    if (archer) {
-      if (archer.target) { const oldT=targets.find(x=>x.num===archer.target); if(oldT) oldT[archer.slot]=null; }
-      t[slot] = { id:archer.id, name:archer.name, bow:archer.bow, age:archer.age, gender:archer.gender };
+  const {ti,slot}=assignPending;
+  const archerId=document.getElementById('assign-archer-select').value;
+  const t=targets[ti];
+  if(t[slot]){const old=archers.find(a=>a.id===t[slot].id);if(old){old.target=null;old.slot=null;}}
+  if(archerId){
+    const archer=archers.find(a=>a.id===archerId);
+    if(archer){
+      if(archer.target){const oldT=targets.find(x=>x.num===archer.target);if(oldT)oldT[archer.slot]=null;}
+      t[slot]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};
       archer.target=t.num; archer.slot=slot;
     }
-  } else { t[slot]=null; }
+  } else {t[slot]=null;}
   await saveTargets(); await saveArchers();
   closeModal('modal-assign');
   renderTargets(); renderEntries();
@@ -712,9 +656,9 @@ window.confirmAssign = async () => {
 };
 
 window.removeFromSlot = async () => {
-  const { ti, slot } = assignPending;
-  const t = targets[ti];
-  if (t[slot]) { const old=archers.find(a=>a.id===t[slot].id); if(old){old.target=null;old.slot=null;} t[slot]=null; }
+  const {ti,slot}=assignPending;
+  const t=targets[ti];
+  if(t[slot]){const old=archers.find(a=>a.id===t[slot].id);if(old){old.target=null;old.slot=null;}t[slot]=null;}
   await saveTargets(); await saveArchers();
   closeModal('modal-assign');
   renderTargets(); renderEntries();
@@ -723,65 +667,55 @@ window.removeFromSlot = async () => {
 
 /* ── PRINT START LIST ── */
 window.printStartList = () => {
-  const grouped = {};
-  targets.forEach(t => { if(!grouped[t.bow]) grouped[t.bow]=[]; grouped[t.bow].push(t); });
-  let rows = '';
-  BOW_ORDER.forEach(bow => {
-    const group = grouped[bow]; if(!group) return;
-    rows += `<tr style="background:#37474f;color:#fff;"><td colspan="5"><strong>${bow.toUpperCase()}</strong></td></tr>`;
-    group.forEach(t => {
-      ['A','B','C','D'].forEach(s => {
-        const a = t[s];
-        rows += `<tr><td>T${t.num}${s}</td><td>${a?a.name:'—'}</td><td>${a?a.age:'—'}</td><td>${a?a.gender:'—'}</td><td>${bow}</td></tr>`;
-      });
-    });
+  const grouped={};
+  targets.forEach(t=>{if(!grouped[t.bow])grouped[t.bow]=[];grouped[t.bow].push(t);});
+  let rows='';
+  BOW_ORDER.forEach(bow=>{
+    const group=grouped[bow]; if(!group)return;
+    rows+=`<tr style="background:#37474f;color:#fff;"><td colspan="5"><strong>${bow.toUpperCase()}</strong></td></tr>`;
+    group.forEach(t=>{['A','B','C','D'].forEach(s=>{const a=t[s];rows+=`<tr><td>T${t.num}${s}</td><td>${a?a.name:'—'}</td><td>${a?a.age:'—'}</td><td>${a?a.gender:'—'}</td><td>${bow}</td></tr>`;});});
   });
-  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Start List</title>
-  <style>body{font-family:Arial,sans-serif;margin:20px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ccc;padding:6px 10px;}thead{background:#555;color:#fff;}@media print{@page{size:A4 portrait;margin:10mm;}}</style>
-  </head><body><h2>Start List</h2><table><thead><tr><th>Target</th><th>Name</th><th>Age</th><th>Gender</th><th>Bow</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Start List</title><style>body{font-family:Arial,sans-serif;margin:20px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ccc;padding:6px 10px;}thead{background:#555;color:#fff;}@media print{@page{size:A4 portrait;margin:10mm;}}</style></head><body><h2>Start List</h2><table><thead><tr><th>Target</th><th>Name</th><th>Age</th><th>Gender</th><th>Bow</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
   const win=window.open('','_blank'); win.document.write(html); win.document.close(); setTimeout(()=>win.print(),400);
 };
 
 /* ── SCHEDULE ── */
 window.addSession = async () => {
-  if (!currentCompId) { toast('Select a competition first','error'); return; }
-  const name = document.getElementById('s-name').value.trim();
-  if (!name) { toast('Enter session name','error'); return; }
-  sessions.push({ id:Date.now(), name, date:document.getElementById('s-date').value, time:document.getElementById('s-time').value, dist:document.getElementById('s-dist').value, ends:parseInt(document.getElementById('s-ends').value), arrows:parseInt(document.getElementById('s-arrows').value) });
+  if(!currentCompId){toast('Select a competition first','error');return;}
+  const name=document.getElementById('s-name').value.trim();
+  if(!name){toast('Enter session name','error');return;}
+  sessions.push({id:Date.now(),name,date:document.getElementById('s-date').value,time:document.getElementById('s-time').value,dist:document.getElementById('s-dist').value,ends:parseInt(document.getElementById('s-ends').value),arrows:parseInt(document.getElementById('s-arrows').value)});
   await saveSessions(); renderSessions(); toast('Session added ✓','success');
 };
 window.deleteSession = async (id) => { sessions=sessions.filter(s=>s.id!==id); await saveSessions(); renderSessions(); };
 function renderSessions() {
-  const list = document.getElementById('sessions-list');
-  list.innerHTML = sessions.length ? sessions.map(s=>`
+  const list=document.getElementById('sessions-list');
+  list.innerHTML=sessions.length?sessions.map(s=>`
     <div class="session-block">
       <div class="session-time">${s.time||'--:--'}</div>
       <div class="session-info"><div class="session-name">${s.name}</div><div class="session-sub">${s.date||''} · ${s.dist} · ${s.ends} ends × ${s.arrows} arrows</div></div>
       <button class="btn btn-danger btn-sm" onclick="deleteSession(${s.id})">✕</button>
-    </div>`).join('')
-    : '<div class="empty-state"><div class="empty-icon">⏰</div><p>No sessions yet.</p></div>';
+    </div>`).join(''):'<div class="empty-state"><div class="empty-icon">⏰</div><p>No sessions yet.</p></div>';
 }
 
 /* ── RESULTS ── */
 window.renderResults = () => {
-const compSnap = document.getElementById('comp-select').selectedOptions[0]?.text||'';
-  const g1h = compSnap.includes('3D')?'11':compSnap.includes('Field')?'6':compSnap.includes('Indoor')?'10':'X';
-  const g2h = compSnap.includes('3D')?'10':compSnap.includes('Field')?'5':compSnap.includes('Indoor')?'9':'10';
-  const el1=document.getElementById('th-g1'); if(el1) el1.textContent=g1h;
-  const el2=document.getElementById('th-g2'); if(el2) el2.textContent=g2h;
+  const labels = getGoldLabels();
+  const el1=document.getElementById('th-g1'); if(el1) el1.textContent=labels.g1;
+  const el2=document.getElementById('th-g2'); if(el2) el2.textContent=labels.g2;
+
   const bowF = document.getElementById('r-filter-bow')?.value||'';
   const ageF = document.getElementById('r-filter-age')?.value||'';
   const list = archers
     .filter(a=>(!bowF||a.bow===bowF)&&(!ageF||a.age===ageF))
- .map(a=>({
+    .map(a=>({
       ...a,
       total: getScore(a.id)?.total || 0,
       g1:    getScore(a.id)?.g1   || 0,
       g2:    getScore(a.id)?.g2   || 0,
-      tens:  getScore(a.id)?.tens  || 0,
-      xs:    getScore(a.id)?.xs    || 0
     }))
-.sort((a,b)=>b.total-a.total||b.g1-a.g1||b.g2-a.g2||b.tens-a.tens||b.xs-a.xs);
+    .sort((a,b)=>b.total-a.total||b.g1-a.g1||b.g2-a.g2);
+
   document.getElementById('results-table').innerHTML = list.map((a,i)=>`
     <tr>
       <td style="color:#FFD700;font-weight:900;">${a.total>0?i+1:'—'}</td>
@@ -790,18 +724,17 @@ const compSnap = document.getElementById('comp-select').selectedOptions[0]?.text
       <td><span class="tag tag-${a.bow.toLowerCase()}">${a.bow}</span></td>
       <td style="color:#111;">${a.age}</td>
       <td style="color:#1565c0;font-weight:700;">${a.target?`T${a.target}${a.slot}`:'—'}</td>
-     <td style="font-weight:900;font-size:16px;color:#111;">${a.total||'—'}</td>
+      <td style="font-weight:900;font-size:16px;color:#111;">${a.total||'—'}</td>
       <td style="color:#111;">${a.g1||'—'}</td>
       <td style="color:#111;">${a.g2||'—'}</td>
-      <td style="color:#111;">${a.tens||'—'}</td>
-      <td style="color:#111;">${a.xs||'—'}</td>
     </tr>`).join('')||'<tr><td colspan="9" style="text-align:center;color:#999;padding:24px">No results yet</td></tr>';
 };
 
 window.exportResultsPDF = () => {
+  const labels=getGoldLabels();
   const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Results</title>
   <style>body{font-family:Arial,sans-serif;margin:20px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ccc;padding:6px 10px;}thead{background:#37474f;color:#fff;}@media print{@page{size:A4 landscape;margin:10mm;}}</style></head>
-  <body><h2>Results</h2><table><thead><tr><th>Rank</th><th>Name</th><th>Club</th><th>Bow</th><th>Age</th><th>Target</th><th>Score</th><th id="th-g1">G1</th><th id="th-g2">G2</th><th>10+X</th><th>X</th></tr></thead>
+  <body><h2>Results</h2><table><thead><tr><th>Rank</th><th>Name</th><th>Club</th><th>Bow</th><th>Age</th><th>Target</th><th>Score</th><th>${labels.g1}</th><th>${labels.g2}</th></tr></thead>
   <tbody>${Array.from(document.getElementById('results-table').querySelectorAll('tr')).map(r=>`<tr>${Array.from(r.querySelectorAll('td')).map(td=>`<td>${td.innerText}</td>`).join('')}</tr>`).join('')}</tbody></table></body></html>`;
   const win=window.open('','_blank'); win.document.write(html); win.document.close(); setTimeout(()=>win.print(),400);
 };
@@ -812,17 +745,17 @@ window.showPanel = (name) => {
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById(`panel-${name}`).classList.add('active');
   document.querySelector(`[data-panel="${name}"]`).classList.add('active');
-  document.getElementById('topbar-title').textContent = {dashboard:'Dashboard',entries:'Entry List',targets:'Target Assignment',schedule:'Schedule',results:'Live Results'}[name]||name;
+  document.getElementById('topbar-title').textContent={dashboard:'Dashboard',entries:'Entry List',targets:'Target Assignment',schedule:'Schedule',results:'Live Results'}[name]||name;
 };
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-window.closeModal = (id) => { document.getElementById(id).classList.remove('open'); };
-function toast(msg,type='success') {
+function openModal(id){document.getElementById(id).classList.add('open');}
+window.closeModal=(id)=>{document.getElementById(id).classList.remove('open');};
+function toast(msg,type='success'){
   const el=document.getElementById('toast');
   el.textContent=(type==='success'?'✓ ':'✕ ')+msg;
   el.className=`show ${type}`;
   setTimeout(()=>el.classList.remove('show'),3000);
 }
-window.setLang = (l) => {
+window.setLang=(l)=>{
   lang=l;
   document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent.trim()===(l==='en'?'EN':'עב')));
 };
@@ -830,8 +763,8 @@ window.setLang = (l) => {
 /* ── INIT ── */
 loadCompetitions();
 document.getElementById('conn-status').textContent='🟡 Connecting...';
-setTimeout(()=>{ if(!currentCompId) document.getElementById('conn-status').textContent='🟢 Firebase ready'; },1500);
-document.querySelectorAll('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); }));
+setTimeout(()=>{if(!currentCompId)document.getElementById('conn-status').textContent='🟢 Firebase ready';},1500);
+document.querySelectorAll('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 </script>
 </body>
 </html>
