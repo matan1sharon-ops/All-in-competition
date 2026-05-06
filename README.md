@@ -776,12 +776,7 @@ window.renderResults = () => {
 function renderScorecards() {
   const list = document.getElementById('scorecards-list');
   if(!list) return;
-  const cards = scores ? Object.entries(
-    (() => { try { return JSON.parse(JSON.stringify(window._scorecards||{})); } catch(e){ return {}; } })()
-  ) : [];
-  // Load from Firestore snapshot
   if(!currentCompId){ list.innerHTML='<p style="color:var(--muted2)">Select a competition first.</p>'; return; }
-  // Use cached scorecards from onSnapshot
   const sc = window._scorecards || {};
   const entries = Object.values(sc);
   if(!entries.length){
