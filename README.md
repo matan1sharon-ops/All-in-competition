@@ -291,7 +291,7 @@ tbody td { padding: 10px 12px; color: #111; }
           </div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Rank</th><th>Name</th><th>Club</th><th>Bow</th><th>Age</th><th>Target</th><th>Score</th><th>10+X</th><th>X</th></tr></thead>
+              <thead><tr><th>Rank</th><th>Name</th><th>Club</th><th>Bow</th><th>Age</th><th>Target</th><th>Score</th><th>Golds</th><th>10+X</th><th>X</th></tr></thead>
               <tbody id="results-table"></tbody>
             </table>
           </div>
