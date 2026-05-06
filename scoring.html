@@ -273,15 +273,11 @@ window.startScoring = ()=>{
         endsArr=Array.from({length:cfg.ends},()=>[]);
         Object.keys(raw.ends||{}).forEach(i=>{ endsArr[parseInt(i)]=raw.ends[i]||[]; });
       }
-      scores[a.id]={total:raw.total||0,tens:raw.tens||0,xs:raw.xs||0,ends:endsArr};
+      scores[a.id]={total:raw.total||0,tens:raw.tens||0,xs:raw.xs||0,g1:raw.g1||0,g2:raw.g2||0,ends:endsArr};
     } else {
       scores[a.id]={ends:Array.from({length:cfg.ends},()=>[]),total:0,tens:0,xs:0};
     }
   });
-  // Recalc stats for all archers (fixes g1/g2 for scores loaded from Firebase)
-  targetArchers.forEach(a => recalcStats(a.id));
-// Recalculate all stats from actual arrows (ensures g1/g2 are correct)
-  targetArchers.forEach(a => recalcStats(a.id));
   activeArcherIdx=0; editingEnd=null;
   document.getElementById('s-comp-name').textContent=compData.name||'';
   document.getElementById('s-target-label').textContent=`TARGET ${targetNum}`;
@@ -526,7 +522,7 @@ async function saveScores(){
       // Convert ends array-of-arrays to object (Firestore doesn't support nested arrays)
       const endsObj={};
       s.ends.forEach((end,i)=>{ endsObj[String(i)]=end; });
-      payload.scores[key]={total:s.total,tens:s.tens,xs:s.xs,ends:endsObj};
+      payload.scores[key]={total:s.total,tens:s.tens,xs:s.xs,g1:s.g1||0,g2:s.g2||0,ends:endsObj};
     });
     await setDoc(doc(db,'competitions',compId),payload,{merge:true});
     console.log('Saved OK',Object.keys(payload.scores));
