@@ -764,11 +764,16 @@ function renderSessions() {
 
 /* ── RESULTS ── */
 window.renderResults = () => {
+const compSnap = document.getElementById('comp-select').selectedOptions[0]?.text||'';
+  const g1h = compSnap.includes('3D')?'11':compSnap.includes('Field')?'6':compSnap.includes('Indoor')?'10':'X';
+  const g2h = compSnap.includes('3D')?'10':compSnap.includes('Field')?'5':compSnap.includes('Indoor')?'9':'10';
+  const el1=document.getElementById('th-g1'); if(el1) el1.textContent=g1h;
+  const el2=document.getElementById('th-g2'); if(el2) el2.textContent=g2h;
   const bowF = document.getElementById('r-filter-bow')?.value||'';
   const ageF = document.getElementById('r-filter-age')?.value||'';
   const list = archers
     .filter(a=>(!bowF||a.bow===bowF)&&(!ageF||a.age===ageF))
-  .map(a=>({
+ .map(a=>({
       ...a,
       total: getScore(a.id)?.total || 0,
       g1:    getScore(a.id)?.g1   || 0,
@@ -796,7 +801,7 @@ window.renderResults = () => {
 window.exportResultsPDF = () => {
   const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Results</title>
   <style>body{font-family:Arial,sans-serif;margin:20px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ccc;padding:6px 10px;}thead{background:#37474f;color:#fff;}@media print{@page{size:A4 landscape;margin:10mm;}}</style></head>
-  <body><h2>Results</h2><table><thead><tr><th>Rank</th><th>Name</th><th>Club</th><th>Bow</th><th>Age</th><th>Target</th><th>Score</th><th>10+X</th><th>X</th></tr></thead>
+  <body><h2>Results</h2><table><thead><tr><th>Rank</th><th>Name</th><th>Club</th><th>Bow</th><th>Age</th><th>Target</th><th>Score</th><th id="th-g1">G1</th><th id="th-g2">G2</th><th>10+X</th><th>X</th></tr></thead>
   <tbody>${Array.from(document.getElementById('results-table').querySelectorAll('tr')).map(r=>`<tr>${Array.from(r.querySelectorAll('td')).map(td=>`<td>${td.innerText}</td>`).join('')}</tr>`).join('')}</tbody></table></body></html>`;
   const win=window.open('','_blank'); win.document.write(html); win.document.close(); setTimeout(()=>win.print(),400);
 };
