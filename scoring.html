@@ -387,7 +387,7 @@ function renderPad(){
 
   let btns=padScores.map(s=>{
     const label=s===0?'M':s;
- const scoreArg = s==='X' ? "'X'" : s;
+    const scoreArg=s==='X'?"'X'":s;
     return `<button class="pad-btn ${padBtnClass(s)}" onclick="handleScore(${scoreArg})" ${isFull&&!isEditing?'disabled style="opacity:0.4"':''}>${label}</button>`;
   }).join('');
 
