@@ -250,7 +250,20 @@ window.startScoring = ()=>{
   const cfg=getConfig(), existing=compData.scores||{};
   targetArchers.forEach(a=>{
     const key=String(a.id).replace(/\./g,'_');
-    scores[a.id]=existing[key]||existing[String(a.id)]||{ends:Array.from({length:cfg.ends},()=>[]),total:0,tens:0,xs:0};
+    const raw=existing[key]||existing[String(a.id)];
+    if(raw){
+      // Convert ends from object back to array-of-arrays
+      let endsArr;
+      if(Array.isArray(raw.ends)){
+        endsArr=raw.ends;
+      } else {
+        endsArr=Array.from({length:cfg.ends},()=>[]);
+        Object.keys(raw.ends||{}).forEach(i=>{ endsArr[parseInt(i)]=raw.ends[i]||[]; });
+      }
+      scores[a.id]={total:raw.total||0,tens:raw.tens||0,xs:raw.xs||0,ends:endsArr};
+    } else {
+      scores[a.id]={ends:Array.from({length:cfg.ends},()=>[]),total:0,tens:0,xs:0};
+    }
   });
   activeArcherIdx=0; editingEnd=null;
   document.getElementById('s-comp-name').textContent=compData.name||'';
@@ -467,7 +480,11 @@ async function saveScores(){
     const payload={scores:{}};
     targetArchers.forEach(a=>{
       const key=String(a.id).replace(/\./g,'_');
-      payload.scores[key]=scores[a.id];
+      const s=scores[a.id];
+      // Convert ends array-of-arrays to object (Firestore doesn't support nested arrays)
+      const endsObj={};
+      s.ends.forEach((end,i)=>{ endsObj[String(i)]=end; });
+      payload.scores[key]={total:s.total,tens:s.tens,xs:s.xs,ends:endsObj};
     });
     await setDoc(doc(db,'competitions',compId),payload,{merge:true});
     console.log('Saved OK',Object.keys(payload.scores));
