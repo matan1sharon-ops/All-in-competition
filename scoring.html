@@ -950,12 +950,12 @@ function renderMatchSets(){
 
       html+=`<div style="display:grid;grid-template-columns:1fr auto auto auto 1fr;gap:4px;align-items:center;padding:6px 8px;margin-bottom:4px;background:${setBg};border:1px solid ${borderCol};border-radius:8px;">
         <div style="display:flex;gap:3px;flex-wrap:wrap;">${chips1}</div>
-        <div style="min-width:34px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:${c1};">${done1?s1:(arr1.length?arr1.reduce((s,v)=>s+getVal(v),0):'')}</div>
+        <div style="min-width:34px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:${c1};">${bothDone?s1:''}</div>
         <div style="min-width:32px;text-align:center;">
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;color:${isTB?'var(--red)':'var(--muted2)'};">${setLabel}</div>
           ${bothDone&&!isTB?`<div style="font-size:9px;color:var(--muted2);">${pts1}–${pts2}</div>`:''}
         </div>
-        <div style="min-width:34px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:${c2};">${done2?s2:(arr2.length?arr2.reduce((s,v)=>s+getVal(v),0):'')}</div>
+        <div style="min-width:34px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:${c2};">${bothDone?s2:''}</div>
         <div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end;">${chips2}</div>
       </div>`;
 
