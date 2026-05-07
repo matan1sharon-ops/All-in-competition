@@ -201,9 +201,10 @@ tbody td { padding: 10px 12px; color: #111; }
               <select id="e-gender"><option value="M">Male</option><option value="F">Female</option></select>
             </div>
           </div>
-          <div style="margin-top:14px;display:flex;gap:8px;">
+          <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
             <button class="btn btn-primary" onclick="addArcher()">+ ADD ARCHER</button>
             <button class="btn btn-secondary" onclick="openImportModal()">📥 IMPORT CSV</button>
+            <button class="btn btn-secondary" onclick="copyRegLink()">🔗 REGISTRATION LINK</button>
           </div>
         </div>
         <div class="card">
@@ -1006,6 +1007,17 @@ window.printAllScorecards=()=>{
   </head><body>${sections}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),400);
+};
+
+window.copyRegLink = () => {
+  if(!currentCompId){ toast('Select a competition first','error'); return; }
+  const url = `https://matan1sharon-ops.github.io/All-in-competition/register.html?comp=${currentCompId}`;
+  navigator.clipboard.writeText(url).then(()=>{
+    toast('Registration link copied! Share it with archers ✓','success');
+  }).catch(()=>{
+    // Fallback: show the link
+    prompt('Copy this registration link:', url);
+  });
 };
 
 window.exportResultsPDF = () => {
