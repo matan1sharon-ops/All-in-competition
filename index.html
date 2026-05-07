@@ -264,6 +264,7 @@ tbody td { padding: 10px 12px; color: #111; }
           <div style="margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap;">
             <button class="btn btn-secondary btn-sm" onclick="exportResultsPDF()">📄 EXPORT PDF</button>
             <button class="btn btn-secondary btn-sm" onclick="openDisplayScreen()">🖥 DISPLAY SCREEN</button>
+            <button class="btn btn-secondary btn-sm" onclick="copyResultsLink()">🔗 SHARE RESULTS</button>
           </div>
           <div id="results-by-category"></div>
         </div>
@@ -1129,6 +1130,16 @@ window.copyRegLink = () => {
   }).catch(()=>{
     // Fallback: show the link
     prompt('Copy this registration link:', url);
+  });
+};
+
+window.copyResultsLink = () => {
+  if(!currentCompId){ toast('Select a competition first','error'); return; }
+  const url = `https://matan1sharon-ops.github.io/All-in-competition/results.html?comp=${currentCompId}`;
+  navigator.clipboard.writeText(url).then(()=>{
+    toast('Results link copied! Share it with archers ✓','success');
+  }).catch(()=>{
+    prompt('Copy this results link:', url);
   });
 };
 
