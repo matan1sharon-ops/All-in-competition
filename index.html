@@ -261,21 +261,10 @@ tbody td { padding: 10px 12px; color: #111; }
       <div id="panel-results" class="panel">
         <div class="card">
           <div class="card-title"><span class="status-dot status-live"></span> Live Results</div>
-          <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;">
-            <select id="r-filter-bow" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;" onchange="renderResults()">
-              <option value="">All Bows</option><option>Recurve</option><option>Compound</option><option>Barebow</option><option>Traditional</option><option>Longbow</option>
-            </select>
-            <select id="r-filter-age" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;" onchange="renderResults()">
-              <option value="">All Ages</option><option>U12</option><option>U14</option><option>U18</option><option>U21</option><option>Senior</option><option>Master 50+</option><option>Master 60+</option>
-            </select>
+          <div style="margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap;">
             <button class="btn btn-secondary btn-sm" onclick="exportResultsPDF()">📄 EXPORT PDF</button>
           </div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Rank</th><th>Name</th><th>Club</th><th>Bow</th><th>Age</th><th>Target</th><th>Score</th><th id="th-h1" style="display:none">H1</th><th id="th-h2" style="display:none">H2</th><th id="th-g1">G1</th><th id="th-g2">G2</th></tr></thead>
-              <tbody id="results-table"></tbody>
-            </table>
-          </div>
+          <div id="results-by-category"></div>
         </div>
       </div>
 
@@ -799,53 +788,98 @@ function renderSessions() {
 
 /* ── RESULTS ── */
 window.renderResults = () => {
+  const container = document.getElementById('results-by-category');
+  if(!container) return;
+  if(!archers.length){ container.innerHTML='<p style="color:var(--muted2)">No archers yet.</p>'; return; }
+
   const labels = getGoldLabels();
-  const el1=document.getElementById('th-g1'); if(el1) el1.textContent=labels.g1;
-  const el2=document.getElementById('th-g2'); if(el2) el2.textContent=labels.g2;
   const showHalves = currentDiscipline==='Outdoor'||currentDiscipline==='Indoor';
-  const thH1=document.getElementById('th-h1'), thH2=document.getElementById('th-h2');
-  if(thH1) thH1.style.display=showHalves?'':'none';
-  if(thH2) thH2.style.display=showHalves?'':'none';
 
-  // Read h1/h2 directly from Firebase score
-  function getHalves(archerId) {
-    const s = getScore(archerId);
-    if(!s) return {h1:0,h2:0};
-    return {h1:s.h1||0, h2:s.h2||0};
-  }
-
-  const bowF = document.getElementById('r-filter-bow')?.value||'';
-  const ageF = document.getElementById('r-filter-age')?.value||'';
-  const list = archers
-    .filter(a=>(!bowF||a.bow===bowF)&&(!ageF||a.age===ageF))
+  // Build scored archers list
+  const scoredArchers = archers
+    .filter(a=>(getScore(a.id)?.total||0)>0)
     .map(a=>{
-      const halves=getHalves(a.id);
+      const s=getScore(a.id);
       return {
         ...a,
-        total: getScore(a.id)?.total || 0,
-        g1:    getScore(a.id)?.g1   || 0,
-        g2:    getScore(a.id)?.g2   || 0,
-        h1:    halves.h1,
-        h2:    halves.h2,
+        total: s.total||0,
+        g1:    s.g1||0,
+        g2:    s.g2||0,
+        h1:    s.h1||0,
+        h2:    s.h2||0,
         targetLabel: getTarget(a),
       };
-    })
-    .sort((a,b)=>b.total-a.total||b.g1-a.g1||b.g2-a.g2);
+    });
 
-  const colspan = showHalves ? 11 : 9;
-  document.getElementById('results-table').innerHTML = list.map((a,i)=>`
-    <tr>
-      <td style="color:#FFD700;font-weight:900;">${a.total>0?i+1:'—'}</td>
-      <td style="color:#111;font-weight:600;">${a.name}</td>
-      <td style="color:#555;">${a.club||'—'}</td>
-      <td><span class="tag tag-${a.bow.toLowerCase()}">${a.bow}</span></td>
-      <td style="color:#111;">${a.age}</td>
-      <td style="color:#1565c0;font-weight:700;">${a.targetLabel}</td>
-      <td style="font-weight:900;font-size:16px;color:#111;">${a.total||'—'}</td>
-      ${showHalves?`<td style="color:#555;">${a.h1||'—'}</td><td style="color:#555;">${a.h2||'—'}</td>`:''}
-      <td style="color:#111;">${a.g1||'—'}</td>
-      <td style="color:#111;">${a.g2||'—'}</td>
-    </tr>`).join('')||`<tr><td colspan="${colspan}" style="text-align:center;color:#999;padding:24px">No results yet</td></tr>`;
+  if(!scoredArchers.length){
+    container.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted2);">No scores yet.<br>Results will appear here as archers complete their rounds.</div>';
+    return;
+  }
+
+  // Build categories: bow + age + gender
+  const catMap = {};
+  scoredArchers.forEach(a=>{
+    const key = `${a.bow}||${a.age}||${a.gender}`;
+    if(!catMap[key]) catMap[key]={bow:a.bow,age:a.age,gender:a.gender,archers:[]};
+    catMap[key].archers.push(a);
+  });
+
+  // Sort categories by BOW_ORDER then AGE_ORDER then gender
+  const sortedCats = Object.values(catMap).sort((a,b)=>{
+    const bi = BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);
+    if(bi!==0) return bi;
+    const ai = AGE_ORDER.indexOf(a.age)-AGE_ORDER.indexOf(b.age);
+    if(ai!==0) return ai;
+    return a.gender.localeCompare(b.gender);
+  });
+
+  // Build HTML
+  let html='';
+  sortedCats.forEach(cat=>{
+    // Sort archers within category by score
+    const ranked = [...cat.archers].sort((a,b)=>b.total-a.total||b.g1-a.g1||b.g2-a.g2);
+    const color = BOW_COLORS[cat.bow]||'#555';
+    const gLabel = cat.gender==='M'?'Men':'Women';
+
+    // Category header
+    html+=`<div style="margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 14px;background:${color}22;border:1px solid ${color}44;border-radius:8px;margin-bottom:8px;">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:1px;color:${color};">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</span>
+        <span style="font-size:11px;color:var(--muted2);">${ranked.length} archer${ranked.length!==1?'s':''}</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:40px;">Rank</th>
+              <th>Name</th>
+              <th>Club</th>
+              <th>Target</th>
+              <th>Score</th>
+              ${showHalves?'<th>H1</th><th>H2</th>':''}
+              <th>${labels.g1}</th>
+              <th>${labels.g2}</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${ranked.map((a,i)=>`
+              <tr>
+                <td style="color:#FFD700;font-weight:900;text-align:center;">${i+1}</td>
+                <td style="color:#111;font-weight:600;">${a.name}</td>
+                <td style="color:#555;">${a.club||'—'}</td>
+                <td style="color:#1565c0;font-weight:700;">${a.targetLabel}</td>
+                <td style="font-weight:900;font-size:16px;color:#111;">${a.total}</td>
+                ${showHalves?`<td style="color:#555;">${a.h1||'—'}</td><td style="color:#555;">${a.h2||'—'}</td>`:''}
+                <td style="color:#111;">${a.g1||'—'}</td>
+                <td style="color:#111;">${a.g2||'—'}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+  });
+
+  container.innerHTML = html;
 };
 
 function getArcherEnds(archerId) {
@@ -1103,10 +1137,71 @@ window.copyRegLink = () => {
 
 window.exportResultsPDF = () => {
   const labels=getGoldLabels();
+  const showHalves=currentDiscipline==='Outdoor'||currentDiscipline==='Indoor';
+
+  // Get all scored archers grouped by category
+  const scoredArchers = archers
+    .filter(a=>(getScore(a.id)?.total||0)>0)
+    .map(a=>{
+      const s=getScore(a.id);
+      return {...a,total:s.total||0,g1:s.g1||0,g2:s.g2||0,h1:s.h1||0,h2:s.h2||0,targetLabel:getTarget(a)};
+    });
+
+  if(!scoredArchers.length){ toast('No scores yet','error'); return; }
+
+  const catMap={};
+  scoredArchers.forEach(a=>{
+    const key=`${a.bow}||${a.age}||${a.gender}`;
+    if(!catMap[key]) catMap[key]={bow:a.bow,age:a.age,gender:a.gender,archers:[]};
+    catMap[key].archers.push(a);
+  });
+  const sortedCats=Object.values(catMap).sort((a,b)=>{
+    const bi=BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);
+    if(bi!==0) return bi;
+    const ai=AGE_ORDER.indexOf(a.age)-AGE_ORDER.indexOf(b.age);
+    if(ai!==0) return ai;
+    return a.gender.localeCompare(b.gender);
+  });
+
+  let sections='';
+  sortedCats.forEach(cat=>{
+    const ranked=[...cat.archers].sort((a,b)=>b.total-a.total||b.g1-a.g1||b.g2-a.g2);
+    const gLabel=cat.gender==='M'?'Men':'Women';
+    const rows=ranked.map((a,i)=>`<tr>
+      <td style="text-align:center;font-weight:700;">${i+1}</td>
+      <td style="font-weight:600;">${a.name}</td>
+      <td>${a.club||'—'}</td>
+      <td>${a.targetLabel}</td>
+      <td style="font-weight:700;font-size:14px;">${a.total}</td>
+      ${showHalves?`<td>${a.h1||'—'}</td><td>${a.h2||'—'}</td>`:''}
+      <td>${a.g1||'—'}</td>
+      <td>${a.g2||'—'}</td>
+    </tr>`).join('');
+    sections+=`
+      <h3 style="margin:16px 0 6px;color:#37474f;">${cat.bow} · ${cat.age} · ${gLabel}</h3>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:8px;">
+        <thead style="background:#37474f;color:#fff;">
+          <tr>
+            <th style="padding:6px 8px;width:40px;">Rank</th>
+            <th style="padding:6px 8px;">Name</th>
+            <th style="padding:6px 8px;">Club</th>
+            <th style="padding:6px 8px;">Target</th>
+            <th style="padding:6px 8px;">Score</th>
+            ${showHalves?'<th style="padding:6px 8px;">H1</th><th style="padding:6px 8px;">H2</th>':''}
+            <th style="padding:6px 8px;">${labels.g1}</th>
+            <th style="padding:6px 8px;">${labels.g2}</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  });
+
   const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Results</title>
-  <style>body{font-family:Arial,sans-serif;margin:20px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ccc;padding:6px 10px;}thead{background:#37474f;color:#fff;}@media print{@page{size:A4 landscape;margin:10mm;}}</style></head>
-  <body><h2>Results</h2><table><thead><tr><th>Rank</th><th>Name</th><th>Club</th><th>Bow</th><th>Age</th><th>Target</th><th>Score</th><th>${labels.g1}</th><th>${labels.g2}</th></tr></thead>
-  <tbody>${Array.from(document.getElementById('results-table').querySelectorAll('tr')).map(r=>`<tr>${Array.from(r.querySelectorAll('td')).map(td=>`<td>${td.innerText}</td>`).join('')}</tr>`).join('')}</tbody></table></body></html>`;
+  <style>body{font-family:Arial,sans-serif;margin:20px;}td,th{border:1px solid #ccc;padding:5px 8px;}tbody tr:nth-child(even){background:#f9f9f9;}@media print{@page{size:A4 portrait;margin:10mm;}}</style>
+  </head><body>
+  <h2 style="margin-bottom:4px;">🏹 Results — ${currentDiscipline}</h2>
+  ${sections}
+  </body></html>`;
   const win=window.open('','_blank'); win.document.write(html); win.document.close(); setTimeout(()=>win.print(),400);
 };
 
