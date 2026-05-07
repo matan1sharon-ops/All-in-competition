@@ -821,19 +821,39 @@ function calcMatchPoints(){
   });
   return {p1,p2};
 }
+function getTBArrows(setIdx){ return setIdx===MAX_SETS ? 1 : ARROWS_PER_SET; }
+
 function getActiveMatchSet(){
-  for(let i=0;i<MAX_SETS;i++){
-    if(getMatchArrows(i,matchActiveArcher).length<ARROWS_PER_SET) return i;
+  const maxSets = isTiebreakNeeded() ? MAX_SETS+1 : MAX_SETS;
+  for(let i=0;i<maxSets;i++){
+    if(getMatchArrows(i,matchActiveArcher).length < getTBArrows(i)) return i;
   }
-  return MAX_SETS-1;
+  return maxSets-1;
 }
 function checkMatchDone(){
   const {p1,p2}=calcMatchPoints();
   if(p1>=SETS_TO_WIN||p2>=SETS_TO_WIN) return true;
+  // After 5 sets check if tiebreak needed or done
   if(matchSets.length>=MAX_SETS){
-    return matchSets.slice(0,MAX_SETS).every(s=>s&&s.arrows1.length===ARROWS_PER_SET&&s.arrows2.length===ARROWS_PER_SET);
+    const all5done=matchSets.slice(0,MAX_SETS).every(s=>s&&s.arrows1.length===ARROWS_PER_SET&&s.arrows2.length===ARROWS_PER_SET);
+    if(!all5done) return false;
+    if(p1===5&&p2===5){
+      // Tiebreak set needed — 1 arrow each
+      const tb=matchSets[MAX_SETS];
+      if(!tb||tb.arrows1.length<1||tb.arrows2.length<1) return false;
+      return true;
+    }
+    return true;
   }
   return false;
+}
+
+function isTiebreakNeeded(){
+  if(matchSets.length<MAX_SETS) return false;
+  const all5done=matchSets.slice(0,MAX_SETS).every(s=>s&&s.arrows1.length===ARROWS_PER_SET&&s.arrows2.length===ARROWS_PER_SET);
+  if(!all5done) return false;
+  const {p1,p2}=calcMatchPoints();
+  return p1===5&&p2===5;
 }
 
 window.startMatch=()=>{
@@ -867,7 +887,7 @@ function updateMatchHeader(){
     const si=getActiveMatchSet();
     document.getElementById('m-set-label').textContent=`SET ${si+1}`;
     const arr=getMatchArrows(si,matchActiveArcher);
-    document.getElementById('m-arrow-count').textContent=`${arr.length}/${ARROWS_PER_SET}`;
+    document.getElementById('m-arrow-count').textContent=`${arr.length}/${getTBArrows(si)}`;
   } else {
     const t1=cumArrows1.reduce((s,v)=>s+getVal(v),0);
     const t2=cumArrows2.reduce((s,v)=>s+getVal(v),0);
@@ -886,7 +906,9 @@ function renderMatchSets(){
   let html='';
   const activeSi=getActiveMatchSet();
   if(matchFormat==='sets'){
-    for(let i=0;i<MAX_SETS;i++){
+    const totalSets = isTiebreakNeeded() ? MAX_SETS+1 : MAX_SETS;
+    for(let i=0;i<totalSets;i++){
+      const isTB = i===MAX_SETS;
       const myArr=getMatchArrows(i,matchActiveArcher);
       const oppArr=getMatchArrows(i,1-matchActiveArcher);
       const myScore=getMatchSetScore(i,matchActiveArcher);
@@ -898,17 +920,30 @@ function renderMatchSets(){
       const cls=bothDone?'set-card complete':isActive?'set-card active-set':'set-card';
       let resultHtml='';
       if(bothDone){
-        const myWin=myScore>oppScore,draw=myScore===oppScore;
-        const pts=myWin?2:draw?1:0;
-        const color=myWin?'var(--green)':draw?'var(--accent)':'var(--red)';
-        resultHtml=`<span class="set-result" style="color:${color}">${myScore}–${oppScore} (${pts}pt${pts!==1?'s':''})</span>`;
-      } else if(isActive){resultHtml=`<span style="font-size:11px;color:var(--accent);">ACTIVE</span>`;}
+        if(isTB){
+          const myWin=myScore>oppScore;
+          const color=myWin?'var(--green)':'var(--red)';
+          resultHtml=`<span class="set-result" style="color:${color}">${myScore}–${oppScore} 🏆</span>`;
+        } else {
+          const myWin=myScore>oppScore,draw=myScore===oppScore;
+          const pts=myWin?2:draw?1:0;
+          const color=myWin?'var(--green)':draw?'var(--accent)':'var(--red)';
+          resultHtml=`<span class="set-result" style="color:${color}">${myScore}–${oppScore} (${pts}pt${pts!==1?'s':''})</span>`;
+        }
+      } else if(isActive){resultHtml=`<span style="font-size:11px;color:${isTB?'var(--red)':'var(--accent)'};">${isTB?'TIEBREAK!':'ACTIVE'}</span>`;}
       else if(myDone&&!oppDone){resultHtml=`<span style="font-size:11px;color:var(--muted);">Waiting...</span>`;}
-      const chips=Array.from({length:ARROWS_PER_SET},(_,ai)=>{
+      const arrowCount = getTBArrows(i);
+      const chips=Array.from({length:arrowCount},(_,ai)=>{
         const v=myArr[ai];
         return v!==undefined?`<span class="arrow-chip ${chipClass(v)}">${v===0?'M':v}</span>`:`<span class="arrow-chip chip-empty">·</span>`;
       }).join('');
-      html+=`<div class="${cls}"><div class="set-header"><div class="set-num">SET ${i+1}</div>${resultHtml}</div><div class="end-arrows">${chips}</div></div>`;
+      html+=`<div class="${cls}" style="${isTB?'border-color:var(--red);':''}">
+        <div class="set-header">
+          <div class="set-num" style="${isTB?'color:var(--red);':''}">${isTB?'⚡ TIEBREAK (1 arrow)':`SET ${i+1}`}</div>
+          ${resultHtml}
+        </div>
+        <div class="end-arrows">${chips}</div>
+      </div>`;
     }
   } else {
     const myCum=matchActiveArcher===0?cumArrows1:cumArrows2;
@@ -933,7 +968,7 @@ function renderMatchSets(){
 function renderMatchPad(){
   const padScores=['X',10,9,8,7,6,5,4,3,2,1,0];
   let isFull;
-  if(matchFormat==='sets'){isFull=getMatchArrows(getActiveMatchSet(),matchActiveArcher).length>=ARROWS_PER_SET;}
+  if(matchFormat==='sets'){const asi=getActiveMatchSet();isFull=getMatchArrows(asi,matchActiveArcher).length>=getTBArrows(asi);}
   else{const myCum=matchActiveArcher===0?cumArrows1:cumArrows2;isFull=myCum.length>=CUM_ENDS*CUM_ARROWS;}
   let btns=padScores.map(s=>{
     const label=s===0?'M':s;
@@ -956,14 +991,14 @@ window.handleMatchScore=async(val)=>{
     arrows.push(val);
     setMatchArrows(si,matchActiveArcher,arrows);
     await saveMatchProgress();
-    if(arrows.length===ARROWS_PER_SET){
+    if(arrows.length===getTBArrows(si)){
       const otherArr=getMatchArrows(si,1-matchActiveArcher);
-      if(otherArr.length<ARROWS_PER_SET){
+      if(otherArr.length<getTBArrows(si)){
         // Other archer hasn't scored this set yet — switch to them
         matchActiveArcher=1-matchActiveArcher;
         renderMatchTabs();
       } else {
-        // Both done this set — go to archer 0 for next set
+        // Both done this set — go to archer 0 for next set (or tiebreak)
         matchActiveArcher=0;
         renderMatchTabs();
       }
@@ -1006,20 +1041,62 @@ async function saveMatchProgress(){
 }
 
 window.submitMatch=async()=>{
-  await saveMatchProgress();
+  // Auto-calculate winner
+  let winnerId=null, winnerName='', loserName='';
+  if(matchFormat==='sets'){
+    const {p1,p2}=calcMatchPoints();
+    if(p1>p2){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';loserName=matchData.archer2?.name||'A2';}
+    else if(p2>p1){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';loserName=matchData.archer1?.name||'A1';}
+    else if(isTiebreakNeeded()||matchSets[MAX_SETS]){
+      // Tiebreak set score decides
+      const tb=matchSets[MAX_SETS];
+      if(tb){
+        if(tb.score1>tb.score2){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';loserName=matchData.archer2?.name||'A2';}
+        else if(tb.score2>tb.score1){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';loserName=matchData.archer1?.name||'A1';}
+      }
+    }
+  } else {
+    const t1=cumArrows1.reduce((s,v)=>s+getVal(v),0);
+    const t2=cumArrows2.reduce((s,v)=>s+getVal(v),0);
+    if(t1>t2){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';loserName=matchData.archer2?.name||'A2';}
+    else if(t2>t1){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';loserName=matchData.archer1?.name||'A1';}
+  }
+
+  // Save winner to Firebase
+  if(winnerId){
+    try{
+      const snap=await getDoc(doc(db,'competitions',compId));
+      const data=snap.data();
+      const match=data.elimination[matchCatKey].rounds[matchRoundKey][matchIdx];
+      match.winnerChoice=winnerId;
+      if(matchFormat==='sets'){
+        match.sets=matchSets.map(s=>({score1:s.score1||0,score2:s.score2||0,arrows1:s.arrows1||[],arrows2:s.arrows2||[]}));
+        const {p1,p2}=calcMatchPoints();
+        match.score1=p1; match.score2=p2;
+      } else {
+        match.arrows1=cumArrows1;match.score1=cumArrows1.reduce((s,v)=>s+getVal(v),0);
+        match.arrows2=cumArrows2;match.score2=cumArrows2.reduce((s,v)=>s+getVal(v),0);
+      }
+      data.elimination[matchCatKey].rounds[matchRoundKey][matchIdx]=match;
+      await setDoc(doc(db,'competitions',compId),{elimination:data.elimination},{merge:true});
+    }catch(e){console.error('Save error:',e);}
+  } else {
+    await saveMatchProgress();
+  }
+
   document.getElementById('match-screen').style.display='none';
   document.getElementById('summary-screen').style.display='flex';
   document.getElementById('summary-archer-tabs').style.display='none';
   document.getElementById('sum-title').textContent='Match Complete';
   const {p1,p2}=matchFormat==='sets'?calcMatchPoints():{p1:cumArrows1.reduce((s,v)=>s+getVal(v),0),p2:cumArrows2.reduce((s,v)=>s+getVal(v),0)};
-  let html=`<div style="background:#37474f;color:#fff;padding:16px;text-align:center;">
+  let html=`<div style="background:${winnerId?'#1b5e20':'#37474f'};color:#fff;padding:16px;text-align:center;">
     <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;color:#aaa;margin-bottom:6px;">MATCH RESULT</div>
     <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;">${matchData.archer1?.name||'A1'}</div>
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:var(--accent);">${p1} — ${p2}</div>
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;">${matchData.archer2?.name||'A2'}</div>
     </div>
-    <div style="font-size:12px;color:#aaa;margin-top:8px;">Scores saved — admin will confirm the winner</div>
+    ${winnerId?`<div style="font-size:14px;color:#a5d6a7;margin-top:8px;">🏆 Winner: <strong>${winnerName}</strong></div>`:'<div style="font-size:12px;color:#aaa;margin-top:8px;">Still tied — admin will decide winner</div>'}
   </div>`;
   if(matchFormat==='sets'){
     html+='<div style="padding:12px;">';
