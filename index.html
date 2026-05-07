@@ -290,6 +290,9 @@ tbody td { padding: 10px 12px; color: #111; }
         <div class="card">
           <div class="card-title">⚔️ Elimination Rounds</div>
           <div style="margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+            <button class="btn btn-secondary btn-sm" onclick="copyMatchLink()" style="margin-left:auto;">🔗 SHARE MATCH SCORING LINK</button>
+          </div>
+          <div style="margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
             <div class="form-group" style="min-width:180px;">
               <label>Category</label>
               <select id="elim-cat-select" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;width:100%;"></select>
@@ -1178,6 +1181,14 @@ window.copyResultsLink = () => {
   }).catch(()=>{
     prompt('Copy this results link:', url);
   });
+};
+
+window.copyMatchLink = () => {
+  if(!currentCompId){ toast('Select a competition first','error'); return; }
+  const url = `https://matan1sharon-ops.github.io/All-in-competition/matches.html`;
+  navigator.clipboard.writeText(url).then(()=>{
+    toast('Match scoring link copied! Share with archers ✓','success');
+  }).catch(()=>{ prompt('Copy this link:',url); });
 };
 
 window.openDisplayScreen = () => {
