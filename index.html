@@ -370,7 +370,7 @@ let lang = 'en';
 
 const BOW_ORDER  = ['Recurve','Compound','Barebow','Traditional','Longbow'];
 const AGE_ORDER  = ['U12','U14','U18','U21','Senior','Master 50+','Master 60+'];
-const BOW_COLORS = { Recurve:'#1565c0', Compound:'#4a148c', Barebow:'#1b5e20', Traditional:'#e65100', Longbow:'#37474f' };
+const BOW_COLORS = { Recurve:'#1565c0', Compound:'#4a148c', Barebow:'#1b5e20', Traditional:'#e65100', Longbow:'#37474f', 'Trad/Longbow':'#e65100', Mixed:'#546e7a' };
 
 /* ── GOLD LABELS BY DISCIPLINE ── */
 function getGoldLabels() {
@@ -449,6 +449,16 @@ window.selectCompetition = async (id) => {
 function getScore(archerId) {
   const key = String(archerId).replace(/\./g, '_');
   return scores[key] || scores[String(archerId)] || {};
+}
+
+function getDistanceLabel(bow, discipline) {
+  if(discipline==='Outdoor'){
+    if(bow==='Recurve') return '70m / 60m / 30m';
+    if(bow==='Compound') return '50m';
+    if(bow==='Barebow') return '50m';
+    if(bow==='Trad/Longbow') return '30m';
+  }
+  return '';
 }
 
 function renderAll() { renderDashboard(); renderEntries(); renderTargets(); renderSessions(); renderResults(); renderScorecards(); }
@@ -552,35 +562,58 @@ window.importCSV = async () => {
 window.generateTargets = async () => {
   if (!currentCompId) { toast('Select a competition first','error'); return; }
   if (!archers.length) { toast('Add archers first','error'); return; }
-  const is3DorField = currentDiscipline==='3D' || currentDiscipline==='Field';
   targets = [];
   archers.forEach(a => { a.target=null; a.slot=null; });
   const slots = ['A','B','C','D'];
   let targetNum = 1;
-  if (is3DorField) {
-    const group = [...archers].sort((a,b) => { const ai=AGE_ORDER.indexOf(a.age),bi=AGE_ORDER.indexOf(b.age); if(ai!==bi)return ai-bi; return a.gender.localeCompare(b.gender); });
+
+  function assignGroup(group, bowLabel) {
+    if(!group.length) return;
     let cur=null, si=0;
     group.forEach(archer => {
-      if(si===0){cur={num:targetNum++,bow:'Mixed',A:null,B:null,C:null,D:null};targets.push(cur);}
+      if(si===0){cur={num:targetNum++,bow:bowLabel,A:null,B:null,C:null,D:null};targets.push(cur);}
       cur[slots[si]]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};
       const orig=archers.find(a=>a.id===archer.id);
       if(orig){orig.target=cur.num;orig.slot=slots[si];}
       si++; if(si>=4)si=0;
     });
-  } else {
-    BOW_ORDER.forEach(bow => {
-      const group = archers.filter(a=>a.bow===bow).sort((a,b)=>{ const ai=AGE_ORDER.indexOf(a.age),bi=AGE_ORDER.indexOf(b.age); if(ai!==bi)return ai-bi; return a.gender.localeCompare(b.gender); });
-      if(!group.length) return;
-      let cur=null, si=0;
-      group.forEach(archer => {
-        if(si===0){cur={num:targetNum++,bow,A:null,B:null,C:null,D:null};targets.push(cur);}
-        cur[slots[si]]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};
-        const orig=archers.find(a=>a.id===archer.id);
-        if(orig){orig.target=cur.num;orig.slot=slots[si];}
-        si++; if(si>=4)si=0;
-      });
+  }
+
+  function sortByAgeGender(group) {
+    return group.sort((a,b)=>{
+      const ai=AGE_ORDER.indexOf(a.age),bi=AGE_ORDER.indexOf(b.age);
+      if(ai!==bi) return ai-bi;
+      return a.gender.localeCompare(b.gender);
     });
   }
+
+  if(currentDiscipline==='3D'||currentDiscipline==='Field'){
+    // Mixed — sort by age then gender
+    assignGroup(sortByAgeGender([...archers]), 'Mixed');
+
+  } else if(currentDiscipline==='Outdoor'){
+    // WA Outdoor order: farthest to closest distance, left to right
+    // 70m: Recurve Senior, U21
+    assignGroup(sortByAgeGender(archers.filter(a=>a.bow==='Recurve'&&['Senior','U21'].includes(a.age))), 'Recurve');
+    // 60m: Recurve U18, Master 50+, Master 60+
+    assignGroup(sortByAgeGender(archers.filter(a=>a.bow==='Recurve'&&['U18','Master 50+','Master 60+'].includes(a.age))), 'Recurve');
+    // 50m: Compound all ages
+    assignGroup(sortByAgeGender(archers.filter(a=>a.bow==='Compound')), 'Compound');
+    // 50m: Barebow all ages
+    assignGroup(sortByAgeGender(archers.filter(a=>a.bow==='Barebow')), 'Barebow');
+    // 30m: Recurve U14, U12
+    assignGroup(sortByAgeGender(archers.filter(a=>a.bow==='Recurve'&&['U14','U12'].includes(a.age))), 'Recurve');
+    // 30m: Traditional + Longbow mixed
+    assignGroup(sortByAgeGender(archers.filter(a=>a.bow==='Traditional'||a.bow==='Longbow')), 'Trad/Longbow');
+
+  } else if(currentDiscipline==='Indoor'){
+    // Indoor order: Recurve → Compound → Barebow → Traditional/Longbow mixed
+    assignGroup(sortByAgeGender(archers.filter(a=>a.bow==='Recurve')), 'Recurve');
+    assignGroup(sortByAgeGender(archers.filter(a=>a.bow==='Compound')), 'Compound');
+    assignGroup(sortByAgeGender(archers.filter(a=>a.bow==='Barebow')), 'Barebow');
+    assignGroup(sortByAgeGender(archers.filter(a=>a.bow==='Traditional'||a.bow==='Longbow')), 'Trad/Longbow');
+  }
+
   await saveTargets(); await saveArchers();
   renderAll();
   toast(`${targets.length} targets generated ✓`,'success');
@@ -622,9 +655,11 @@ function renderTargets() {
     const color = BOW_COLORS[bow]||'#555';
     const archerCount = group.reduce((n,t)=>n+['A','B','C','D'].filter(s=>t[s]).length,0);
     const tRange = group.length>1?`T${group[0].num}–T${group[group.length-1].num}`:`T${group[0].num}`;
+    const distLabel = getDistanceLabel(bow, currentDiscipline);
     html+=`<div style="margin-bottom:24px;">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px 14px;background:${color}22;border:1px solid ${color}44;border-radius:8px;">
-        <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:2px;color:${color};">${bow==='Mixed'?'🎯 MIXED (3D/FIELD)':bow.toUpperCase()}</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:2px;color:${color};">${bow==='Mixed'?'🎯 MIXED (3D/FIELD)':bow==='Trad/Longbow'?'🏹 TRAD / LONGBOW':bow.toUpperCase()}</span>
+        ${distLabel?`<span style="font-size:12px;font-weight:700;color:var(--accent);background:rgba(255,215,0,0.15);padding:2px 8px;border-radius:4px;">${distLabel}</span>`:''}
         <span style="font-size:11px;color:#888;">${archerCount} archers · ${group.length} target${group.length!==1?'s':''} (${tRange})</span>
       </div><div class="target-grid">`;
     group.forEach(t => {
