@@ -958,7 +958,15 @@ window.handleMatchScore=async(val)=>{
     await saveMatchProgress();
     if(arrows.length===ARROWS_PER_SET){
       const otherArr=getMatchArrows(si,1-matchActiveArcher);
-      if(otherArr.length<ARROWS_PER_SET){matchActiveArcher=1-matchActiveArcher;renderMatchTabs();}
+      if(otherArr.length<ARROWS_PER_SET){
+        // Other archer hasn't scored this set yet — switch to them
+        matchActiveArcher=1-matchActiveArcher;
+        renderMatchTabs();
+      } else {
+        // Both done this set — go to archer 0 for next set
+        matchActiveArcher=0;
+        renderMatchTabs();
+      }
     }
   } else {
     if(matchActiveArcher===0){if(cumArrows1.length>=CUM_ENDS*CUM_ARROWS)return;cumArrows1.push(val);}
