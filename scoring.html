@@ -396,6 +396,7 @@ window.checkPhase = async () => {
 
   // No match found — try to find target from database
   const archer = compData.archers?.find(a=>a.id===selectedArcherId);
+  toast(`Archer: ${archer?.name}, target: ${archer?.target}, slot: ${archer?.slot}`,'success');
   if(archer?.target){
     // Auto-load their target
     targetNum = archer.target;
