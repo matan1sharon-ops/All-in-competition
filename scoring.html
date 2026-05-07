@@ -913,8 +913,8 @@ function renderMatchSets(){
       const oppArr=getMatchArrows(i,1-matchActiveArcher);
       const myScore=getMatchSetScore(i,matchActiveArcher);
       const oppScore=getMatchSetScore(i,1-matchActiveArcher);
-      const myDone=myArr.length===ARROWS_PER_SET;
-      const oppDone=oppArr.length===ARROWS_PER_SET;
+      const myDone=myArr.length===getTBArrows(i);
+      const oppDone=oppArr.length===getTBArrows(i);
       const bothDone=myDone&&oppDone;
       const isActive=i===activeSi&&!myDone;
       const cls=bothDone?'set-card complete':isActive?'set-card active-set':'set-card';
