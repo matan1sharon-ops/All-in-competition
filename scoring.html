@@ -987,7 +987,7 @@ window.handleMatchScore=async(val)=>{
   if(matchFormat==='sets'){
     const si=getActiveMatchSet();
     const arrows=[...getMatchArrows(si,matchActiveArcher)];
-    if(arrows.length>=ARROWS_PER_SET) return;
+    if(arrows.length>=getTBArrows(si)) return;
     arrows.push(val);
     setMatchArrows(si,matchActiveArcher,arrows);
     await saveMatchProgress();
