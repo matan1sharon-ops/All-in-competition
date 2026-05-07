@@ -94,9 +94,13 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
     <div class="error-msg" id="error-msg"></div>
     <label class="login-label">Competition</label>
     <select id="comp-select" class="login-select"><option value="">Loading...</option></select>
-    <label class="login-label">Your Name</label>
-    <select id="archer-select" class="login-select"><option value="">— Select competition first —</option></select>
-    <button class="login-btn" onclick="findMatch()">FIND MY MATCH →</button>
+    <label class="login-label">Category</label>
+    <select id="cat-select" class="login-select"><option value="">— Select competition first —</option></select>
+    <label class="login-label">Round</label>
+    <select id="round-select" class="login-select"><option value="">— Select category first —</option></select>
+    <label class="login-label">Match</label>
+    <select id="match-select" class="login-select"><option value="">— Select round first —</option></select>
+    <button class="login-btn" onclick="loadMatch()">LOAD MATCH →</button>
   </div>
 </div>
 
@@ -109,19 +113,15 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
     </div>
     <div style="font-size:11px;color:var(--muted)" id="m-format-label">Set System · First to 6 pts</div>
   </div>
-  <div class="vs-bar">
-    <div class="vs-archer me" id="m-my-name">—</div>
-    <div class="vs-sep">VS</div>
-    <div class="vs-archer opp" id="m-opp-name">—</div>
-  </div>
+  <div id="archer-tabs" style="display:flex;gap:4px;padding:8px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;"></div>
   <div class="sp-bar">
     <div style="text-align:center;">
-      <div class="sp-label" id="sp-my-label">MY SETS</div>
+      <div class="sp-label" id="sp-my-label">A1 PTS</div>
       <div class="sp-val" id="sp-my">0</div>
     </div>
     <div class="sp-sep">—</div>
     <div style="text-align:center;">
-      <div class="sp-label" id="sp-opp-label">OPP SETS</div>
+      <div class="sp-label" id="sp-opp-label">A2 PTS</div>
       <div class="sp-val" id="sp-opp">0</div>
     </div>
   </div>
@@ -198,7 +198,59 @@ function padBtnClass(s){
   return 'pad-miss';
 }
 
-// Load competitions
+// ── STATE ──
+let activeArcherIdx = 0; // 0 = archer1, 1 = archer2
+// sets: array of {score1, score2, arrows1, arrows2}
+// cumArrows1, cumArrows2: arrays for cumulative
+
+let sets = [];
+let cumArrows1 = [], cumArrows2 = [];
+
+function getMyArrows(idx, setIdx){
+  return idx===0 ? (sets[setIdx]?.arrows1||[]) : (sets[setIdx]?.arrows2||[]);
+}
+function setMyArrows(idx, setIdx, arrows){
+  if(!sets[setIdx]) sets[setIdx]={score1:0,score2:0,arrows1:[],arrows2:[]};
+  if(idx===0){ sets[setIdx].arrows1=arrows; sets[setIdx].score1=arrows.reduce((s,v)=>s+getVal(v),0); }
+  else        { sets[setIdx].arrows2=arrows; sets[setIdx].score2=arrows.reduce((s,v)=>s+getVal(v),0); }
+}
+
+function getActiveSet(){
+  // Current set = first set where active archer hasn't finished
+  for(let i=0;i<MAX_SETS;i++){
+    const arrows = getMyArrows(activeArcherIdx, i);
+    if(arrows.length < ARROWS_PER_SET) return i;
+  }
+  return MAX_SETS-1;
+}
+
+function calcSetPoints(){
+  let p1=0,p2=0;
+  sets.forEach(s=>{
+    if(s.score1>s.score2){p1+=2;}
+    else if(s.score2>s.score1){p2+=2;}
+    else{p1+=1;p2+=1;}
+  });
+  return {p1,p2};
+}
+
+function checkSetComplete(setIdx){
+  const s=sets[setIdx];
+  return s&&s.arrows1.length===ARROWS_PER_SET&&s.arrows2.length===ARROWS_PER_SET;
+}
+
+function checkMatchDone(){
+  const {p1,p2}=calcSetPoints();
+  if(p1>=SETS_TO_WIN||p2>=SETS_TO_WIN) return true;
+  // All 5 sets complete
+  if(sets.length>=MAX_SETS){
+    const lastComplete = sets.slice(0,MAX_SETS).every(s=>
+      s&&s.arrows1.length===ARROWS_PER_SET&&s.arrows2.length===ARROWS_PER_SET);
+    if(lastComplete) return true;
+  }
+  return false;
+}
+
 async function loadComps() {
   try {
     const snap = await getDocs(collection(db,'competitions'));
@@ -209,20 +261,64 @@ async function loadComps() {
       o.value=d.id; o.textContent=c.name+(c.date?` (${c.date})`:'');
       sel.appendChild(o);
     });
-    sel.onchange = () => loadArchers(sel.value);
+    sel.onchange = () => loadCategories(sel.value);
   } catch(e){ showError('Connection error'); }
 }
 
-async function loadArchers(id) {
+async function loadCategories(id) {
   if(!id) return;
   compId = id;
   const snap = await getDoc(doc(db,'competitions',id));
   if(!snap.exists()) return;
   compData = snap.data();
-  const archers = compData.archers||[];
-  const sel = document.getElementById('archer-select');
-  sel.innerHTML = '<option value="">— Select your name —</option>' +
-    archers.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
+  const elim = compData.elimination||{};
+  const catSel = document.getElementById('cat-select');
+  catSel.innerHTML = '<option value="">— Select Category —</option>';
+  Object.entries(elim).forEach(([ck,data])=>{
+    const gLabel=data.gender==='M'?'Men':'Women';
+    const o=document.createElement('option');
+    o.value=ck; o.textContent=`${data.bow} · ${data.age} · ${gLabel}`;
+    catSel.appendChild(o);
+  });
+  catSel.onchange = () => loadRounds(catSel.value);
+  document.getElementById('round-select').innerHTML='<option value="">— Select category first —</option>';
+  document.getElementById('match-select').innerHTML='<option value="">— Select round first —</option>';
+}
+
+function loadRounds(ck) {
+  if(!ck) return;
+  catKey = ck;
+  const data = compData.elimination[ck];
+  const roundOrder=['R1','QF','SF','F','B'];
+  const roundLabels={R1:'Round of 16',QF:'Quarter Finals',SF:'Semi Finals',F:'Final',B:'Bronze Medal'};
+  const roundSel = document.getElementById('round-select');
+  roundSel.innerHTML = '<option value="">— Select Round —</option>';
+  roundOrder.forEach(rk=>{
+    const matches = data.rounds?.[rk]||[];
+    if(!matches.length) return;
+    const pending = matches.filter(m=>!m.winnerChoice).length;
+    if(!pending) return;
+    const o=document.createElement('option');
+    o.value=rk; o.textContent=`${roundLabels[rk]||rk} (${pending} pending)`;
+    roundSel.appendChild(o);
+  });
+  roundSel.onchange = () => loadMatches(ck, roundSel.value);
+  document.getElementById('match-select').innerHTML='<option value="">— Select round first —</option>';
+}
+
+function loadMatches(ck, rk) {
+  if(!rk) return;
+  roundKey = rk;
+  const matches = compData.elimination[ck].rounds[rk]||[];
+  const matchSel = document.getElementById('match-select');
+  matchSel.innerHTML = '<option value="">— Select Match —</option>';
+  matches.forEach((m,i)=>{
+    if(m.winnerChoice) return;
+    const o=document.createElement('option');
+    o.value=i;
+    o.textContent=`Match ${m.position}: ${m.archer1?.name||'?'} vs ${m.archer2?.name||'?'}`;
+    matchSel.appendChild(o);
+  });
 }
 
 function showError(msg){
@@ -230,65 +326,64 @@ function showError(msg){
   el.textContent=msg; el.style.display='block';
 }
 
-window.findMatch = async () => {
-  const archerId = document.getElementById('archer-select').value;
+window.loadMatch = async () => {
+  const mi = document.getElementById('match-select').value;
   if(!compId){ showError('Select a competition'); return; }
-  if(!archerId){ showError('Select your name'); return; }
+  if(!catKey){ showError('Select a category'); return; }
+  if(!roundKey){ showError('Select a round'); return; }
+  if(mi===''){ showError('Select a match'); return; }
   document.getElementById('error-msg').style.display='none';
 
   // Reload fresh data
   const snap = await getDoc(doc(db,'competitions',compId));
   compData = snap.data();
-  const elimination = compData.elimination||{};
+  const data = compData.elimination[catKey];
+  matchIdx = parseInt(mi);
+  matchData = data.rounds[roundKey][matchIdx];
+  format = data.format;
 
-  // Find archer's current match
-  let found=false;
-  const roundOrder=['R1','QF','SF','F','B'];
+  myArcher = matchData.archer1;
+  oppArcher = matchData.archer2;
 
-  for(const [ck, data] of Object.entries(elimination)){
-    for(const rk of roundOrder){
-      const matches = data.rounds?.[rk]||[];
-      for(let mi=0;mi<matches.length;mi++){
-        const m = matches[mi];
-        const isA1 = m.archer1?.id===archerId;
-        const isA2 = m.archer2?.id===archerId;
-        if((isA1||isA2)&&!m.winnerChoice){
-          // Found active match!
-          found=true;
-          catKey=ck; roundKey=rk; matchIdx=mi;
-          matchData=m;
-          format=data.format;
-          amArcher1=isA1;
-          myArcher = isA1?m.archer1:m.archer2;
-          oppArcher = isA1?m.archer2:m.archer1;
-
-          // Load existing scores
-          if(format==='sets'){
-            sets = (m.sets||[]).map(s=>({
-              myScore: isA1?s.score1:s.score2,
-              oppScore: isA1?s.score2:s.score1,
-              arrows: isA1?(s.arrows1||[]):(s.arrows2||[])
-            }));
-            // Find current set
-            currentSet = sets.length;
-            // Check if current set is incomplete
-            const lastSet = sets[sets.length-1];
-            if(lastSet && lastSet.arrows.length < ARROWS_PER_SET){
-              currentSet = sets.length-1;
-            }
-          } else {
-            cumArrows = isA1?(m.arrows1||[]):(m.arrows2||[]);
-          }
-
-          startMatch(data.bow, data.age, data.gender, data.bracketSize, rk);
-          return;
-        }
-      }
-    }
+  // Load existing scores
+  if(format==='sets'){
+    sets = (matchData.sets||[]).map(s=>({
+      score1:s.score1||0, score2:s.score2||0,
+      arrows1:s.arrows1||[], arrows2:s.arrows2||[]
+    }));
+  } else {
+    cumArrows1 = matchData.arrows1||[];
+    cumArrows2 = matchData.arrows2||[];
   }
 
-  if(!found) showError('No active match found for you in this competition.');
+  activeArcherIdx = 0;
+  startMatch(data.bow, data.age, data.gender, data.bracketSize, roundKey);
 };
+
+function switchArcher(idx){
+  activeArcherIdx=idx;
+  renderTabs(); renderSets(); renderPad(); updateHeader();
+}
+
+function renderTabs(){
+  const tabs = document.getElementById('archer-tabs');
+  const a1 = myArcher?.name||'Archer 1';
+  const a2 = oppArcher?.name||'Archer 2';
+  // Check done status
+  const a1done = format==='sets'
+    ? sets.slice(0,MAX_SETS).filter(s=>s&&s.arrows1.length===ARROWS_PER_SET).length === (checkMatchDone()?sets.length:0)
+    : cumArrows1.length>=CUM_ENDS*CUM_ARROWS;
+  const a2done = format==='sets'
+    ? sets.slice(0,MAX_SETS).filter(s=>s&&s.arrows2.length===ARROWS_PER_SET).length === (checkMatchDone()?sets.length:0)
+    : cumArrows2.length>=CUM_ENDS*CUM_ARROWS;
+  tabs.innerHTML=[a1,a2].map((name,i)=>`
+    <button onclick="switchArcher(${i})" style="flex:1;padding:8px 6px;border:none;border-radius:6px;
+      background:${i===activeArcherIdx?'var(--blue)':'transparent'};
+      color:${i===activeArcherIdx?'#fff':'var(--muted)'};
+      font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">
+      ${name}
+    </button>`).join('');
+}
 
 function getRoundLabel(rk, bracketSize){
   if(rk==='R1') return `Round of ${bracketSize*2}`;
@@ -304,19 +399,18 @@ function startMatch(bow, age, gender, bracketSize, rk){
   document.getElementById('match-screen').style.display='flex';
   document.getElementById('m-comp-name').textContent = compData.name||'';
   document.getElementById('m-match-label').textContent = getRoundLabel(rk, bracketSize);
-  document.getElementById('m-my-name').textContent = myArcher.name;
-  document.getElementById('m-opp-name').textContent = oppArcher?.name||'TBD';
 
   if(format==='sets'){
     document.getElementById('m-format-label').textContent = 'Set System · First to 6 pts';
-    document.getElementById('sp-my-label').textContent = 'MY PTS';
-    document.getElementById('sp-opp-label').textContent = 'OPP PTS';
+    document.getElementById('sp-my-label').textContent = `${myArcher?.name?.split(' ')[0]||'A1'} PTS`;
+    document.getElementById('sp-opp-label').textContent = `${oppArcher?.name?.split(' ')[0]||'A2'} PTS`;
   } else {
     document.getElementById('m-format-label').textContent = 'Cumulative · 15 arrows total';
-    document.getElementById('sp-my-label').textContent = 'MY SCORE';
-    document.getElementById('sp-opp-label').textContent = 'OPP SCORE';
+    document.getElementById('sp-my-label').textContent = myArcher?.name?.split(' ')[0]||'A1';
+    document.getElementById('sp-opp-label').textContent = oppArcher?.name?.split(' ')[0]||'A2';
   }
 
+  renderTabs();
   renderSets();
   renderPad();
   updateHeader();
@@ -333,49 +427,60 @@ function calcSetPoints(){
 }
 
 function updateHeader(){
+  const archer = activeArcherIdx===0?myArcher:oppArcher;
   if(format==='sets'){
-    const {my,opp}=calcSetPoints();
-    document.getElementById('sp-my').textContent=my;
-    document.getElementById('sp-opp').textContent=opp;
-    const setNum = Math.min(currentSet+1, MAX_SETS);
-    document.getElementById('m-set-label').textContent=`SET ${setNum}`;
-    const curArrows = sets[currentSet]?.arrows||[];
+    const {p1,p2}=calcSetPoints();
+    document.getElementById('sp-my').textContent=p1;
+    document.getElementById('sp-opp').textContent=p2;
+    const setIdx=getActiveSet();
+    document.getElementById('m-set-label').textContent=`SET ${setIdx+1}`;
+    const curArrows=getMyArrows(activeArcherIdx,setIdx);
     document.getElementById('m-arrow-count').textContent=`${curArrows.length}/${ARROWS_PER_SET}`;
   } else {
-    const myTotal = cumArrows.reduce((s,v)=>s+getVal(v),0);
-    const oppTotal = amArcher1?(matchData.score2||0):(matchData.score1||0);
-    document.getElementById('sp-my').textContent=myTotal;
-    document.getElementById('sp-opp').textContent=oppTotal||'?';
-    const end = Math.floor(cumArrows.length/CUM_ARROWS)+1;
+    const t1=cumArrows1.reduce((s,v)=>s+getVal(v),0);
+    const t2=cumArrows2.reduce((s,v)=>s+getVal(v),0);
+    document.getElementById('sp-my').textContent=t1;
+    document.getElementById('sp-opp').textContent=t2;
+    const myCum=activeArcherIdx===0?cumArrows1:cumArrows2;
+    const end=Math.floor(myCum.length/CUM_ARROWS)+1;
     document.getElementById('m-set-label').textContent=`END ${Math.min(end,CUM_ENDS)}`;
-    document.getElementById('m-arrow-count').textContent=`${cumArrows.length%CUM_ARROWS||cumArrows.length}/${CUM_ARROWS}`;
+    document.getElementById('m-arrow-count').textContent=`${myCum.length%CUM_ARROWS||0}/${CUM_ARROWS}`;
   }
-  document.getElementById('m-archer-name').textContent=myArcher.name;
+  document.getElementById('m-archer-name').textContent=archer?.name||'—';
 }
 
 function renderSets(){
   const list=document.getElementById('sets-list');
   let html='';
+  const activeSetIdx=getActiveSet();
 
   if(format==='sets'){
     for(let i=0;i<MAX_SETS;i++){
       const s=sets[i];
-      const isActive=i===currentSet;
-      const isComplete=s&&s.arrows.length===ARROWS_PER_SET;
-      const cls=isComplete?'set-card complete':isActive?'set-card active-set':'set-card';
+      const myArrows=getMyArrows(activeArcherIdx,i);
+      const oppArrows=getMyArrows(1-activeArcherIdx,i);
+      const myScore=(s?(activeArcherIdx===0?s.score1:s.score2):0)||0;
+      const oppScore=(s?(activeArcherIdx===0?s.score2:s.score1):0)||0;
+      const myDone=myArrows.length===ARROWS_PER_SET;
+      const oppDone=oppArrows.length===ARROWS_PER_SET;
+      const bothDone=myDone&&oppDone;
+      const isActive=i===activeSetIdx&&!myDone;
+      const cls=bothDone?'set-card complete':isActive?'set-card active-set':'set-card';
 
       let resultHtml='';
-      if(isComplete){
-        const win=s.myScore>s.oppScore, draw=s.myScore===s.oppScore;
-        const pts=win?2:draw?1:0;
-        const color=win?'var(--green)':draw?'var(--accent)':'var(--red)';
-        resultHtml=`<span class="set-result" style="color:${color}">${s.myScore}–${s.oppScore} (${pts}pt${pts!==1?'s':''})</span>`;
+      if(bothDone){
+        const myWin=myScore>oppScore, draw=myScore===oppScore;
+        const pts=myWin?2:draw?1:0;
+        const color=myWin?'var(--green)':draw?'var(--accent)':'var(--red)';
+        resultHtml=`<span class="set-result" style="color:${color}">${myScore}–${oppScore} (${pts}pt${pts!==1?'s':''})</span>`;
       } else if(isActive){
         resultHtml=`<span style="font-size:11px;color:var(--accent);">ACTIVE</span>`;
+      } else if(myDone&&!oppDone){
+        resultHtml=`<span style="font-size:11px;color:var(--muted);">Waiting for opp...</span>`;
       }
 
       const chips=Array.from({length:ARROWS_PER_SET},(_,ai)=>{
-        const v=s?.arrows[ai];
+        const v=myArrows[ai];
         return v!==undefined
           ?`<span class="arrow-chip ${chipClass(v)}">${v===0?'M':v}</span>`
           :`<span class="arrow-chip chip-empty">·</span>`;
@@ -390,11 +495,11 @@ function renderSets(){
       </div>`;
     }
   } else {
-    // Cumulative — show ends
+    const myCum=activeArcherIdx===0?cumArrows1:cumArrows2;
     for(let e=0;e<CUM_ENDS;e++){
       const startIdx=e*CUM_ARROWS;
-      const endArrows=cumArrows.slice(startIdx,startIdx+CUM_ARROWS);
-      const isActive=e===Math.floor(cumArrows.length/CUM_ARROWS)&&cumArrows.length<CUM_ENDS*CUM_ARROWS;
+      const endArrows=myCum.slice(startIdx,startIdx+CUM_ARROWS);
+      const isActive=e===Math.floor(myCum.length/CUM_ARROWS)&&myCum.length<CUM_ENDS*CUM_ARROWS;
       const isComplete=endArrows.length===CUM_ARROWS;
       const cls=isComplete?'set-card complete':isActive?'set-card active-set':'set-card';
       const tot=endArrows.reduce((s,v)=>s+getVal(v),0);
@@ -423,9 +528,14 @@ function renderSets(){
 
 function renderPad(){
   const padScores = ['X',10,9,8,7,6,5,4,3,2,1,0];
-  const isFull = format==='sets'
-    ? (sets[currentSet]?.arrows||[]).length>=ARROWS_PER_SET
-    : cumArrows.length>=CUM_ENDS*CUM_ARROWS;
+  let isFull;
+  if(format==='sets'){
+    const setIdx=getActiveSet();
+    isFull=getMyArrows(activeArcherIdx,setIdx).length>=ARROWS_PER_SET;
+  } else {
+    const myCum=activeArcherIdx===0?cumArrows1:cumArrows2;
+    isFull=myCum.length>=CUM_ENDS*CUM_ARROWS;
+  }
 
   let btns = padScores.map(s=>{
     const label=s===0?'M':s;
@@ -435,11 +545,12 @@ function renderPad(){
 
   btns+=`<button class="pad-btn pad-back" onclick="handleBack()" style="grid-column:span 2;">BACKSPACE ←</button>`;
 
-  const allDone = format==='sets'
+  // Both archers done?
+  const a1done = format==='sets'
     ? checkMatchDone()
-    : cumArrows.length>=CUM_ENDS*CUM_ARROWS;
+    : cumArrows1.length>=CUM_ENDS*CUM_ARROWS&&cumArrows2.length>=CUM_ENDS*CUM_ARROWS;
 
-  if(allDone){
+  if(a1done){
     btns+=`<button class="pad-btn pad-done" onclick="submitMatch()" style="grid-column:span 2;">SUBMIT MATCH ✓</button>`;
   }
 
@@ -457,20 +568,28 @@ function checkMatchDone(){
 
 window.handleScore = (val) => {
   if(format==='sets'){
-    if(!sets[currentSet]) sets[currentSet]={myScore:0,oppScore:0,arrows:[]};
-    const curArrows=sets[currentSet].arrows;
-    if(curArrows.length>=ARROWS_PER_SET) return;
-    curArrows.push(val);
-    // Calculate set score when complete
-    if(curArrows.length===ARROWS_PER_SET){
-      sets[currentSet].myScore=curArrows.reduce((s,v)=>s+getVal(v),0);
-      // Auto advance to next set if match not done
-      if(!checkMatchDone()) currentSet=sets.length;
-      saveProgress();
+    const setIdx=getActiveSet();
+    const arrows=[...getMyArrows(activeArcherIdx,setIdx)];
+    if(arrows.length>=ARROWS_PER_SET) return;
+    arrows.push(val);
+    setMyArrows(activeArcherIdx,setIdx,arrows);
+    saveProgress();
+    // Auto-switch to other archer if this set is done but other archer hasn't scored
+    if(arrows.length===ARROWS_PER_SET){
+      const otherArrows=getMyArrows(1-activeArcherIdx,setIdx);
+      if(otherArrows.length<ARROWS_PER_SET){
+        activeArcherIdx=1-activeArcherIdx;
+        renderTabs();
+      }
     }
   } else {
-    if(cumArrows.length>=CUM_ENDS*CUM_ARROWS) return;
-    cumArrows.push(val);
+    if(activeArcherIdx===0){
+      if(cumArrows1.length>=CUM_ENDS*CUM_ARROWS) return;
+      cumArrows1.push(val);
+    } else {
+      if(cumArrows2.length>=CUM_ENDS*CUM_ARROWS) return;
+      cumArrows2.push(val);
+    }
     saveProgress();
   }
   renderSets(); renderPad(); updateHeader();
@@ -478,19 +597,16 @@ window.handleScore = (val) => {
 
 window.handleBack = () => {
   if(format==='sets'){
-    const curArrows=sets[currentSet]?.arrows||[];
-    if(curArrows.length>0){
-      curArrows.pop();
-      if(!sets[currentSet]) sets[currentSet]={myScore:0,oppScore:0,arrows:[]};
-      sets[currentSet].arrows=curArrows;
-      sets[currentSet].myScore=curArrows.reduce((s,v)=>s+getVal(v),0);
-    } else if(currentSet>0){
-      // Go back to previous set
-      sets.pop();
-      currentSet=sets.length-1;
+    const setIdx=getActiveSet();
+    const arrows=[...getMyArrows(activeArcherIdx,setIdx)];
+    if(arrows.length>0){
+      arrows.pop();
+      setMyArrows(activeArcherIdx,setIdx,arrows);
     }
   } else {
-    if(cumArrows.length>0) cumArrows.pop();
+    if(activeArcherIdx===0){ if(cumArrows1.length>0) cumArrows1.pop(); }
+    else                    { if(cumArrows2.length>0) cumArrows2.pop(); }
+    saveProgress();
   }
   renderSets(); renderPad(); updateHeader();
 };
@@ -503,17 +619,15 @@ async function saveProgress(){
     const match = data.elimination[catKey].rounds[roundKey][matchIdx];
 
     if(format==='sets'){
-      // Save sets with both sides
-      const updatedSets = sets.map((s,i)=>{
-        const existing = match.sets?.[i]||{};
-        return amArcher1
-          ? {...existing, score1:s.myScore, score2:s.oppScore||existing.score2||0, arrows1:s.arrows}
-          : {...existing, score2:s.myScore, score1:s.oppScore||existing.score1||0, arrows2:s.arrows};
-      });
-      match.sets = updatedSets;
+      match.sets = sets.map(s=>({
+        score1:s.score1||0, score2:s.score2||0,
+        arrows1:s.arrows1||[], arrows2:s.arrows2||[]
+      }));
     } else {
-      if(amArcher1){ match.arrows1=cumArrows; match.score1=cumArrows.reduce((s,v)=>s+getVal(v),0); }
-      else          { match.arrows2=cumArrows; match.score2=cumArrows.reduce((s,v)=>s+getVal(v),0); }
+      match.arrows1=cumArrows1;
+      match.score1=cumArrows1.reduce((s,v)=>s+getVal(v),0);
+      match.arrows2=cumArrows2;
+      match.score2=cumArrows2.reduce((s,v)=>s+getVal(v),0);
     }
 
     data.elimination[catKey].rounds[roundKey][matchIdx]=match;
@@ -523,33 +637,33 @@ async function saveProgress(){
 
 window.submitMatch = async () => {
   await saveProgress();
-  // Show complete screen
   document.getElementById('match-screen').style.display='none';
   document.getElementById('complete-screen').style.display='flex';
 
-  const {my,opp}=format==='sets'?calcSetPoints():{my:cumArrows.reduce((s,v)=>s+getVal(v),0),opp:0};
-  const myWon=format==='sets'?(my>opp):(my>0);
+  const {p1,p2}=format==='sets'?calcSetPoints():{
+    p1:cumArrows1.reduce((s,v)=>s+getVal(v),0),
+    p2:cumArrows2.reduce((s,v)=>s+getVal(v),0)
+  };
 
-  document.getElementById('complete-icon').textContent=myWon?'🏆':'💪';
-  document.getElementById('complete-title').textContent=myWon?'MATCH WON!':'MATCH COMPLETE';
-  document.getElementById('complete-sub').textContent=myWon
-    ?'Your scores have been submitted. Well done!'
-    :'Your scores have been submitted. Great effort!';
+  document.getElementById('complete-icon').textContent='🏆';
+  document.getElementById('complete-title').textContent='MATCH COMPLETE';
+  document.getElementById('complete-sub').textContent='Scores saved! The admin will confirm the winner.';
 
-  let resultHtml='';
+  let resultHtml=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+    <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;">${myArcher?.name||'A1'}</span>
+    <span style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:var(--accent);">${p1}–${p2}</span>
+    <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;">${oppArcher?.name||'A2'}</span>
+  </div>`;
   if(format==='sets'){
-    resultHtml=`<div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;margin-bottom:12px;color:var(--accent);">${my} — ${opp}</div>`;
     sets.forEach((s,i)=>{
-      const win=s.myScore>s.oppScore,draw=s.myScore===s.oppScore;
-      const color=win?'var(--green)':draw?'var(--accent)':'var(--red)';
+      const color1=s.score1>s.score2?'var(--green)':s.score1<s.score2?'var(--red)':'var(--accent)';
+      const color2=s.score2>s.score1?'var(--green)':s.score2<s.score1?'var(--red)':'var(--accent)';
       resultHtml+=`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);">
+        <span style="font-weight:700;color:${color1};">${s.score1}</span>
         <span style="color:var(--muted2);font-size:12px;">Set ${i+1}</span>
-        <span style="font-weight:700;color:${color};">${s.myScore} — ${s.oppScore}</span>
+        <span style="font-weight:700;color:${color2};">${s.score2}</span>
       </div>`;
     });
-  } else {
-    resultHtml=`<div style="font-size:14px;color:var(--muted2);">Your score</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:var(--accent);">${my}</div>`;
   }
   document.getElementById('result-box').innerHTML=resultHtml;
   toast('Scores submitted ✓','success');
