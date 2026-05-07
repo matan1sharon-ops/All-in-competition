@@ -685,16 +685,62 @@ window.removeFromSlot = async () => {
 
 /* ── PRINT START LIST ── */
 window.printStartList = () => {
-  const grouped={};
-  targets.forEach(t=>{if(!grouped[t.bow])grouped[t.bow]=[];grouped[t.bow].push(t);});
-  let rows='';
-  BOW_ORDER.forEach(bow=>{
-    const group=grouped[bow]; if(!group)return;
-    rows+=`<tr style="background:#37474f;color:#fff;"><td colspan="5"><strong>${bow.toUpperCase()}</strong></td></tr>`;
-    group.forEach(t=>{['A','B','C','D'].forEach(s=>{const a=t[s];rows+=`<tr><td>T${t.num}${s}</td><td>${a?a.name:'—'}</td><td>${a?a.age:'—'}</td><td>${a?a.gender:'—'}</td><td>${bow}</td></tr>`;});});
+  if(!targets.length){ toast('No targets to print','error'); return; }
+  // Get all bow groups including Mixed
+  const allBows = [...new Set(targets.map(t=>t.bow))];
+  // Sort: BOW_ORDER first, then Mixed
+  allBows.sort((a,b)=>{
+    const ai=BOW_ORDER.indexOf(a), bi=BOW_ORDER.indexOf(b);
+    if(ai===-1&&bi===-1) return 0;
+    if(ai===-1) return 1;
+    if(bi===-1) return -1;
+    return ai-bi;
   });
-  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Start List</title><style>body{font-family:Arial,sans-serif;margin:20px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ccc;padding:6px 10px;}thead{background:#555;color:#fff;}@media print{@page{size:A4 portrait;margin:10mm;}}</style></head><body><h2>Start List</h2><table><thead><tr><th>Target</th><th>Name</th><th>Age</th><th>Gender</th><th>Bow</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
-  const win=window.open('','_blank'); win.document.write(html); win.document.close(); setTimeout(()=>win.print(),400);
+
+  let rows='';
+  allBows.forEach(bow=>{
+    const group=targets.filter(t=>t.bow===bow);
+    if(!group.length) return;
+    rows+=`<tr style="background:#37474f;color:#fff;"><td colspan="5"><strong>${bow.toUpperCase()}</strong></td></tr>`;
+    group.forEach(t=>{
+      ['A','B','C','D'].forEach(s=>{
+        const a=t[s];
+        if(!a&&!['A','B','C','D'].some(sl=>t[sl])) return;
+        rows+=`<tr>
+          <td style="font-weight:700;color:#1565c0;">T${t.num}${s}</td>
+          <td style="font-weight:600;">${a?a.name:'—'}</td>
+          <td>${a?a.age:'—'}</td>
+          <td>${a?a.gender:'—'}</td>
+          <td>${a?a.bow:'—'}</td>
+        </tr>`;
+      });
+    });
+  });
+
+  const compName = document.getElementById('topbar-title').textContent||'Competition';
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Start List</title>
+  <style>
+    body{font-family:Arial,sans-serif;margin:20px;}
+    h2{margin-bottom:4px;}
+    .sub{font-size:12px;color:#666;margin-bottom:16px;}
+    table{width:100%;border-collapse:collapse;}
+    th,td{border:1px solid #ccc;padding:8px 12px;font-size:13px;}
+    thead{background:#37474f;color:#fff;}
+    tbody tr:nth-child(even){background:#f9f9f9;}
+    @media print{@page{size:A4 portrait;margin:10mm;}}
+  </style>
+  </head><body>
+  <h2>🏹 Start List</h2>
+  <div class="sub">${currentDiscipline} · ${targets.length} targets · ${archers.length} archers</div>
+  <table>
+    <thead><tr><th>Target</th><th>Name</th><th>Age</th><th>Gender</th><th>Bow</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  </body></html>`;
+  const win=window.open('','_blank');
+  win.document.write(html);
+  win.document.close();
+  setTimeout(()=>win.print(),400);
 };
 
 /* ── SCHEDULE ── */
