@@ -921,9 +921,14 @@ function renderMatchSets(){
       let resultHtml='';
       if(bothDone){
         if(isTB){
-          const myWin=myScore>oppScore;
-          const color=myWin?'var(--green)':'var(--red)';
-          resultHtml=`<span class="set-result" style="color:${color}">${myScore}–${oppScore} 🏆</span>`;
+          if(myScore===oppScore){
+            // Tied tiebreak — show closest to center selector
+            resultHtml=`<span style="font-size:11px;color:var(--accent);">TIED — select closest to center</span>`;
+          } else {
+            const myWin=myScore>oppScore;
+            const color=myWin?'var(--green)':'var(--red)';
+            resultHtml=`<span class="set-result" style="color:${color}">${myScore}–${oppScore} 🏆</span>`;
+          }
         } else {
           const myWin=myScore>oppScore,draw=myScore===oppScore;
           const pts=myWin?2:draw?1:0;
@@ -937,12 +942,26 @@ function renderMatchSets(){
         const v=myArr[ai];
         return v!==undefined?`<span class="arrow-chip ${chipClass(v)}">${v===0?'M':v}</span>`:`<span class="arrow-chip chip-empty">·</span>`;
       }).join('');
+      // Show closest to center buttons if tiebreak tied
+      const tbTiedUI = (isTB && bothDone && myScore===oppScore) ? `
+        <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">
+          <div style="font-size:11px;color:var(--accent);margin-bottom:8px;font-weight:700;">WHO IS CLOSEST TO CENTER?</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <button onclick="setTBWinner(0)" id="tb-win-0" style="padding:10px;border-radius:8px;border:2px solid ${window._tbWinner===0?'var(--green)':'var(--border)'};background:${window._tbWinner===0?'rgba(67,160,71,0.2)':'var(--surface2)'};color:${window._tbWinner===0?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">
+              ${matchData.archer1?.name||'A1'}
+            </button>
+            <button onclick="setTBWinner(1)" id="tb-win-1" style="padding:10px;border-radius:8px;border:2px solid ${window._tbWinner===1?'var(--green)':'var(--border)'};background:${window._tbWinner===1?'rgba(67,160,71,0.2)':'var(--surface2)'};color:${window._tbWinner===1?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">
+              ${matchData.archer2?.name||'A2'}
+            </button>
+          </div>
+        </div>` : '';
       html+=`<div class="${cls}" style="${isTB?'border-color:var(--red);':''}">
         <div class="set-header">
           <div class="set-num" style="${isTB?'color:var(--red);':''}">${isTB?'⚡ TIEBREAK (1 arrow)':`SET ${i+1}`}</div>
           ${resultHtml}
         </div>
         <div class="end-arrows">${chips}</div>
+        ${tbTiedUI}
       </div>`;
     }
   } else {
@@ -977,7 +996,10 @@ function renderMatchPad(){
   }).join('');
   btns+=`<button class="pad-btn pad-back" onclick="handleMatchBack()" style="grid-column:span 2;">BACKSPACE ←</button>`;
   const allDone=matchFormat==='sets'?checkMatchDone():(cumArrows1.length>=CUM_ENDS*CUM_ARROWS&&cumArrows2.length>=CUM_ENDS*CUM_ARROWS);
-  if(allDone) btns+=`<button class="pad-btn pad-done" onclick="submitMatch()" style="grid-column:span 2;">SUBMIT MATCH ✓</button>`;
+  const tbTied = matchSets[MAX_SETS]&&matchSets[MAX_SETS].score1===matchSets[MAX_SETS].score2&&matchSets[MAX_SETS].arrows1.length>=1&&matchSets[MAX_SETS].arrows2.length>=1;
+  const canSubmit = allDone && (!tbTied || window._tbWinner!==null);
+  if(canSubmit) btns+=`<button class="pad-btn pad-done" onclick="submitMatch()" style="grid-column:span 2;">SUBMIT MATCH ✓</button>`;
+  else if(allDone&&tbTied) btns+=`<button class="pad-btn" style="grid-column:span 2;background:#333;color:#888;cursor:not-allowed;">SELECT CLOSEST TO CENTER ↑</button>`;
   const pad=document.getElementById('match-pad');
   pad.style.gridTemplateColumns='repeat(4,1fr)';
   pad.innerHTML=btns;
@@ -1040,6 +1062,13 @@ async function saveMatchProgress(){
   }catch(e){console.error('Save error:',e);}
 }
 
+window._tbWinner = null;
+window.setTBWinner = (idx) => {
+  window._tbWinner = idx;
+  renderMatchSets();
+  renderMatchPad();
+};
+
 window.submitMatch=async()=>{
   // Auto-calculate winner
   let winnerId=null, winnerName='', loserName='';
@@ -1048,11 +1077,12 @@ window.submitMatch=async()=>{
     if(p1>p2){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';loserName=matchData.archer2?.name||'A2';}
     else if(p2>p1){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';loserName=matchData.archer1?.name||'A1';}
     else if(isTiebreakNeeded()||matchSets[MAX_SETS]){
-      // Tiebreak set score decides
       const tb=matchSets[MAX_SETS];
       if(tb){
-        if(tb.score1>tb.score2){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';loserName=matchData.archer2?.name||'A2';}
-        else if(tb.score2>tb.score1){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';loserName=matchData.archer1?.name||'A1';}
+        if(tb.score1>tb.score2){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';}
+        else if(tb.score2>tb.score1){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';}
+        else if(window._tbWinner===0){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';}
+        else if(window._tbWinner===1){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';}
       }
     }
   } else {
