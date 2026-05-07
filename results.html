@@ -44,9 +44,10 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
 .rank-2{color:#C0C0C0;}
 .rank-3{color:#CD7F32;}
 .rank-n{color:var(--muted2);}
-.archer-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;flex:1;}
-.archer-score{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--accent);text-align:right;width:60px;}
-.archer-gold{font-size:12px;color:var(--muted2);text-align:right;width:40px;}
+.archer-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;}
+.archer-score{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--accent);text-align:right;min-width:46px;}
+.archer-half{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--muted2);text-align:right;min-width:38px;}
+.archer-stat{font-size:12px;color:var(--muted2);text-align:right;min-width:36px;white-space:nowrap;}
 
 /* SELECTOR */
 .selector-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
@@ -201,18 +202,23 @@ function renderResults(data) {
     const rows = ranked.map((a,i)=>{
       const rankClass = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-n';
       const rankLabel = i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
+      const h1h2 = showHalves
+        ? `<td style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--muted2);text-align:center;padding:8px 6px;min-width:36px;">${a.h1||0}</td>
+           <td style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--muted2);text-align:center;padding:8px 6px;min-width:36px;">${a.h2||0}</td>`
+        : '';
       return `<tr>
-        <td class="rank ${rankClass}">${rankLabel}</td>
-        <td class="archer-name">${a.name}</td>
-        <td class="archer-score">${a.total}</td>
-        <td class="archer-gold" style="color:var(--muted2);font-size:11px;">${g1label}:${a.g1} · ${g2label}:${a.g2}</td>
+        <td style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;text-align:center;padding:8px 8px;width:36px;" class="${rankClass}">${rankLabel}</td>
+        <td style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;padding:8px 10px;flex:1;">${a.name}</td>
+        ${h1h2}
+        <td style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--accent);text-align:center;padding:8px 10px;min-width:52px;">${a.total}</td>
+        <td style="font-size:12px;color:var(--muted2);text-align:center;padding:8px 6px;min-width:40px;">${g1label}:${a.g1}</td>
+        <td style="font-size:12px;color:var(--muted2);text-align:center;padding:8px 6px;min-width:40px;">${g2label}:${a.g2}</td>
       </tr>`;
     }).join('');
 
     html+=`<div class="cat-block">
       <div class="cat-header" style="background:${color}33;color:${color};border-bottom:2px solid ${color}44;">
         ${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}
-        <span style="font-size:11px;color:var(--muted2);font-weight:400;margin-left:8px;">${ranked.length} archers</span>
       </div>
       <table class="cat-table"><tbody>${rows}</tbody></table>
     </div>`;
