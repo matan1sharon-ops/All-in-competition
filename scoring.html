@@ -825,7 +825,13 @@ function calcMatchPoints(){
 }
 function getTBArrows(setIdx){ return setIdx===MAX_SETS ? 1 : ARROWS_PER_SET; }
 
+function isMatchWon(){
+  const {p1,p2}=calcMatchPoints();
+  return p1>=SETS_TO_WIN||p2>=SETS_TO_WIN;
+}
+
 function getActiveMatchSet(){
+  if(isMatchWon()) return -1; // match over, no active set
   const maxSets = isTiebreakNeeded() ? MAX_SETS+1 : MAX_SETS;
   for(let i=0;i<maxSets;i++){
     if(getMatchArrows(i,matchActiveArcher).length < getTBArrows(i)) return i;
@@ -945,8 +951,9 @@ function renderMatchSets(){
       const chips2=Array.from({length:arrowCount},(_,ai)=>arrowChip(arr2[ai],isActive2&&ai===arr2.length)).join('');
       const pts1=bothDone&&!isTB?(s1>s2?2:s1===s2?1:0):'';
       const pts2=bothDone&&!isTB?(s2>s1?2:s1===s2?1:0):'';
-      const borderCol=isTB?'var(--red)':bothDone?'var(--green)':i===activeSi?'var(--accent)':'var(--border)';
-      const setBg=i===activeSi&&!bothDone?'rgba(255,215,0,0.04)':'transparent';
+      const matchAlreadyWon = isMatchWon() && !bothDone && i>0;
+      const borderCol=isTB?'var(--red)':bothDone?'var(--green)':i===activeSi?'var(--accent)':matchAlreadyWon?'var(--surface2)':'var(--border)';
+      const setBg=i===activeSi&&!bothDone?'rgba(255,215,0,0.04)':matchAlreadyWon?'rgba(0,0,0,0.2)':'transparent';
       const setLabel=isTB?'TB':'S'+(i+1);
 
       html+=`<div style="display:grid;grid-template-columns:1fr auto auto auto 1fr;gap:4px;align-items:center;padding:6px 8px;margin-bottom:4px;background:${setBg};border:1px solid ${borderCol};border-radius:8px;">
@@ -1006,7 +1013,10 @@ function renderMatchSets(){
 function renderMatchPad(){
   const padScores=['X',10,9,8,7,6,5,4,3,2,1,0];
   let isFull;
-  if(matchFormat==='sets'){const asi=getActiveMatchSet();isFull=getMatchArrows(asi,matchActiveArcher).length>=getTBArrows(asi);}
+  if(matchFormat==='sets'){
+    const asi=getActiveMatchSet();
+    isFull = asi===-1 || isMatchWon() || getMatchArrows(asi,matchActiveArcher).length>=getTBArrows(asi);
+  }
   else{const myCum=matchActiveArcher===0?cumArrows1:cumArrows2;isFull=myCum.length>=CUM_ENDS*CUM_ARROWS;}
   let btns=padScores.map(s=>{
     const label=s===0?'M':s;
@@ -1026,7 +1036,9 @@ function renderMatchPad(){
 
 window.handleMatchScore=async(val)=>{
   if(matchFormat==='sets'){
+    if(isMatchWon()) return; // match already decided
     const si=getActiveMatchSet();
+    if(si===-1) return;
     const arrows=[...getMatchArrows(si,matchActiveArcher)];
     if(arrows.length>=getTBArrows(si)) return;
     arrows.push(val);
