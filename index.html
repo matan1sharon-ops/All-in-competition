@@ -306,6 +306,7 @@ tbody td { padding: 10px 12px; color: #111; }
               </select>
             </div>
             <button class="btn btn-primary" onclick="generateElimination()">⚡ GENERATE BRACKET</button>
+            <button class="btn btn-success" onclick="generateAllElimination()">⚡ GENERATE ALL</button>
           </div>
           <div id="elim-content"></div>
         </div>
@@ -1310,56 +1311,99 @@ function initElimination(){
   renderElimContent();
 }
 
-window.generateElimination = async () => {
-  const catKey = document.getElementById('elim-cat-select').value;
-  const bracketSize = parseInt(document.getElementById('elim-bracket').value);
-  if(!catKey){ toast('Select a category','error'); return; }
+// Determine correct bracket size based on archer count and max bracket
+function getActualBracketSize(archerCount, maxBracket){
+  if(archerCount < 3) return null;
+  if(archerCount <= 4) return 2;
+  if(archerCount <= 8) return Math.min(maxBracket, 4);
+  return Math.min(maxBracket, 8);
+}
 
+// Build matches with byes for a bracket
+function buildBracketMatches(seeds, bracketSize, firstRound){
+  const totalSlots = bracketSize * 2;
+  const matches = [];
+  const slots = Array.from({length:totalSlots}, (_,i) => seeds[i] || null);
+  for(let i=0;i<totalSlots/2;i++){
+    const a1 = slots[i];
+    const a2 = slots[totalSlots-1-i];
+    const isBye = a1 && !a2;
+    if(isBye){
+      matches.push({
+        id:`${firstRound}_m${i+1}`, round:firstRound, position:i+1,
+        archer1:{id:a1.id,name:a1.name,seed:i+1,qualScore:a1.qualScore},
+        archer2:null, isBye:true,
+        sets:[],score1:null,score2:null,tiebreak1:null,tiebreak2:null,
+        winnerChoice:a1.id
+      });
+    } else {
+      matches.push({
+        id:`${firstRound}_m${i+1}`, round:firstRound, position:i+1,
+        archer1:{id:a1.id,name:a1.name,seed:i+1,qualScore:a1.qualScore},
+        archer2:{id:a2.id,name:a2.name,seed:totalSlots-i,qualScore:a2.qualScore},
+        sets:[],score1:null,score2:null,tiebreak1:null,tiebreak2:null,winnerChoice:null
+      });
+    }
+  }
+  return matches;
+}
+
+async function generateBracketForCategory(catKey, maxBracket){
   const [bow,age,gender] = catKey.split('||');
   const format = getElimFormat(bow);
-
-  // Get scored archers in this category sorted by qualification score
   const catArchers = archers
     .filter(a=>a.bow===bow&&a.age===age&&a.gender===gender&&(getScore(a.id)?.total||0)>0)
     .map(a=>({...a,qualScore:getScore(a.id)?.total||0,g1:getScore(a.id)?.g1||0,g2:getScore(a.id)?.g2||0}))
     .sort((a,b)=>b.qualScore-a.qualScore||b.g1-a.g1||b.g2-a.g2);
-
-  const totalSlots = bracketSize*2;
-  const seeds = catArchers.slice(0,totalSlots);
-
-  if(seeds.length < 4){ toast('Not enough archers for elimination (minimum 4)','error'); return; }
-
-  // WA seeding: 1v(n), 2v(n-1), 3v(n-2)...
-  const n = seeds.length;
-  // Determine first round name based on bracket size
+  if(catArchers.length < 3) return null;
+  const bracketSize = getActualBracketSize(catArchers.length, maxBracket);
+  if(!bracketSize) return null;
   const firstRound = bracketSize===8?'R1':bracketSize===4?'QF':'SF';
+  const totalSlots = bracketSize * 2;
+  const seeds = catArchers.slice(0, totalSlots);
+  const matches = buildBracketMatches(seeds, bracketSize, firstRound);
+  return { catKey, bow, age, gender, format, bracketSize, rounds:{[firstRound]:matches}, currentRound:firstRound, createdAt:Date.now() };
+}
 
-  const matches = [];
-  for(let i=0;i<n/2;i++){
-    matches.push({
-      id:`${firstRound}_m${i+1}`,
-      round:firstRound, position:i+1,
-      archer1:{id:seeds[i].id,name:seeds[i].name,seed:i+1,qualScore:seeds[i].qualScore},
-      archer2:{id:seeds[n-1-i].id,name:seeds[n-1-i].name,seed:n-i,qualScore:seeds[n-1-i].qualScore},
-      sets:[],winner:null,score1:null,score2:null,tiebreak1:null,tiebreak2:null,winnerChoice:null
-    });
-  }
-
-  // Save to Firebase
-  const elimData = {
-    catKey, bow, age, gender, format, bracketSize,
-    rounds: { [firstRound]: matches },
-    currentRound: firstRound,
-    createdAt: Date.now()
-  };
-
-  await setDoc(doc(db,'competitions',currentCompId),{
-    elimination:{ [catKey]: elimData }
-  },{merge:true});
-
-  toast(`Bracket generated! ${seeds.length} archers seeded ✓`,'success');
+window.generateElimination = async () => {
+  const catKey = document.getElementById('elim-cat-select').value;
+  const maxBracket = parseInt(document.getElementById('elim-bracket').value);
+  if(!catKey){ toast('Select a category','error'); return; }
+  const elimData = await generateBracketForCategory(catKey, maxBracket);
+  if(!elimData){ toast('Not enough archers (minimum 3)','error'); return; }
+  await setDoc(doc(db,'competitions',currentCompId),{elimination:{[catKey]:elimData}},{merge:true});
+  const slots=elimData.bracketSize*2;
+  const actual=archers.filter(a=>{const[b,ag,g]=catKey.split('||');return a.bow===b&&a.age===ag&&a.gender===g&&(getScore(a.id)?.total||0)>0;}).length;
+  const byes=slots-Math.min(actual,slots);
+  toast(`Bracket generated! ${Math.min(actual,slots)} archers${byes>0?`, ${byes} bye${byes>1?'s':''}`:''}  ✓`,'success');
   renderElimContent();
 };
+
+window.generateAllElimination = async () => {
+  const maxBracket = parseInt(document.getElementById('elim-bracket').value);
+  if(!currentCompId){ toast('Select a competition first','error'); return; }
+  const scored = archers.filter(a=>(getScore(a.id)?.total||0)>0);
+  const catMap={};
+  scored.forEach(a=>{
+    const key=`${a.bow}||${a.age}||${a.gender}`;
+    if(!catMap[key]) catMap[key]=0;
+    catMap[key]++;
+  });
+  const eligible = Object.entries(catMap).filter(([k,n])=>n>=3);
+  if(!eligible.length){ toast('No categories with 3+ scored archers','error'); return; }
+  const existing = window._elimData||{};
+  let generated=0, skipped=0;
+  const newElim = {...existing};
+  for(const [catKey] of eligible){
+    if(existing[catKey]){ skipped++; continue; }
+    const data = await generateBracketForCategory(catKey, maxBracket);
+    if(data){ newElim[catKey]=data; generated++; }
+  }
+  if(!generated){ toast(`No new brackets — ${skipped} already exist`,'error'); return; }
+  await setDoc(doc(db,'competitions',currentCompId),{elimination:newElim},{merge:true});
+  toast(`${generated} bracket${generated>1?'s':''} generated!${skipped>0?` (${skipped} skipped)`:''}  ✓`,'success');
+  renderElimContent();
+};;
 
 function renderElimContent(){
   if(!currentCompId) return;
@@ -1436,6 +1480,7 @@ function renderElimContent(){
 }
 
 function renderMatchRow(archer,match,won,num){
+  if(!archer && match.isBye) return `<div style="padding:6px 8px;background:var(--surface3);border-radius:6px;color:var(--accent);font-size:12px;font-weight:700;">BYE ✓</div>`;
   if(!archer) return `<div style="padding:6px 8px;background:var(--surface3);border-radius:6px;color:var(--muted);font-size:12px;">TBD</div>`;
   const score = num===1?match.score1:match.score2;
   return `<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:${won?'rgba(67,160,71,0.15)':'var(--surface3)'};border-radius:6px;border:1px solid ${won?'var(--green)':'transparent'};">
