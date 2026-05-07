@@ -1386,8 +1386,10 @@ function renderElimContent(){
         <button class="btn btn-danger btn-sm" onclick="deleteElimination('${catKey}')">✕ DELETE</button>
       </div>`;
 
-    // Show all rounds
-    Object.entries(data.rounds||{}).forEach(([roundKey,matches])=>{
+    // Show all rounds in fixed order
+    const roundOrder2 = ['R1','QF','SF','F','B'];
+    const sortedRounds = roundOrder2.filter(rk=>data.rounds?.[rk]?.length>0).map(rk=>[rk,data.rounds[rk]]);
+    sortedRounds.forEach(([roundKey,matches])=>{
       const roundLabel = roundKey==='R1'?`Round of ${data.bracketSize*2}`:
                          roundKey==='QF'?(data.bracketSize===4?`Round of ${data.bracketSize*2}`:'Quarter Finals'):
                          roundKey==='SF'?'Semi Finals':
