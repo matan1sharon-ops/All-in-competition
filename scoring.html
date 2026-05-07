@@ -813,9 +813,10 @@ function setMatchArrows(setIdx,archerIdx,arrows){
 }
 function calcMatchPoints(){
   let p1=0,p2=0;
-  // Only count first MAX_SETS sets for set points (not tiebreak)
-  matchSets.slice(0,MAX_SETS).forEach(s=>{
+  // Only count first MAX_SETS sets, and only when BOTH archers have finished that set
+  matchSets.slice(0,MAX_SETS).forEach((s,i)=>{
     if(!s) return;
+    if(s.arrows1.length<ARROWS_PER_SET||s.arrows2.length<ARROWS_PER_SET) return;
     if(s.score1>s.score2) p1+=2;
     else if(s.score2>s.score1) p2+=2;
     else{p1+=1;p2+=1;}
