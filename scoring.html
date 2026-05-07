@@ -789,8 +789,17 @@ function renderSummaryScorecard(idx){
 
 window.goBackToScoring=()=>{
   document.getElementById('summary-screen').style.display='none';
-  document.getElementById('scoring-screen').style.display='flex';
-  renderTabs();renderScoreList();renderPad();updateQualHeader();
+  // If we came from a match, go back to login. Otherwise go back to qual scoring.
+  if(matchData){
+    document.getElementById('login-screen').style.display='flex';
+    // Reset match state
+    matchData=null; matchCatKey=null; matchRoundKey=null; matchIdx=null;
+    matchSets=[]; cumArrows1=[]; cumArrows2=[]; window._tbWinner=null;
+    showLoginStep('login-step-1');
+  } else {
+    document.getElementById('scoring-screen').style.display='flex';
+    renderTabs();renderScoreList();renderPad();updateQualHeader();
+  }
 };
 
 /* ══════════════════════════════════════════
