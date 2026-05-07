@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ALL IN — Registration</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#111;--surface:#1e1e1e;--surface2:#2a2a2a;--border:#333;--accent:#FFD700;--red:#e53935;--green:#43a047;--text:#f0f0f0;--muted:#888;--radius:12px;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 24px;width:100%;max-width:420px;}
+.logo{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;letter-spacing:4px;color:var(--accent);text-align:center;margin-bottom:4px;}
+.sub{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:8px;}
+.comp-name{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:var(--text);text-align:center;margin-bottom:24px;padding:10px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);}
+.form-group{margin-bottom:14px;}
+.form-group label{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;}
+.form-group input,.form-group select{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:12px 14px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:16px;outline:none;transition:border-color 0.15s;}
+.form-group input:focus,.form-group select:focus{border-color:var(--accent);}
+.form-group select option{background:var(--surface2);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.submit-btn{width:100%;padding:16px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:20px;letter-spacing:1px;cursor:pointer;margin-top:8px;transition:filter 0.15s,transform 0.1s;}
+.submit-btn:active{transform:scale(0.97);filter:brightness(0.9);}
+.submit-btn:disabled{background:#333;color:#555;cursor:not-allowed;}
+.success-screen{display:none;text-align:center;padding:20px 0;}
+.success-icon{font-size:64px;margin-bottom:16px;}
+.success-title{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:var(--green);letter-spacing:1px;margin-bottom:8px;}
+.success-sub{font-size:14px;color:var(--muted);line-height:1.6;}
+.success-score{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-top:16px;padding:12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);}
+.error-msg{background:#b71c1c22;border:1px solid var(--red);color:var(--red);padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none;}
+.loading{display:none;text-align:center;padding:20px 0;color:var(--muted);}
+#register-another-btn{width:100%;padding:12px;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:var(--radius);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-top:12px;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">ALL IN</div>
+  <div class="sub">Competition Registration</div>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">⏳ Loading competition...</div>
+
+  <!-- Error -->
+  <div class="error-msg" id="error-msg"></div>
+
+  <!-- Form -->
+  <div id="form-section" style="display:none;">
+    <div class="comp-name" id="comp-display">—</div>
+    <div class="form-group">
+      <label>First Name</label>
+      <input type="text" id="fname" placeholder="First name" autocomplete="given-name">
+    </div>
+    <div class="form-group">
+      <label>Last Name</label>
+      <input type="text" id="lname" placeholder="Last name" autocomplete="family-name">
+    </div>
+    <div class="form-group">
+      <label>Club</label>
+      <input type="text" id="club" placeholder="Club name (optional)" autocomplete="organization">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Bow Type</label>
+        <select id="bow">
+          <option>Recurve</option>
+          <option>Compound</option>
+          <option>Barebow</option>
+          <option>Traditional</option>
+          <option>Longbow</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Gender</label>
+        <select id="gender">
+          <option value="M">Male</option>
+          <option value="F">Female</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Age Category</label>
+      <select id="age">
+        <option>U12</option>
+        <option>U14</option>
+        <option>U18</option>
+        <option>U21</option>
+        <option selected>Senior</option>
+        <option>Master 50+</option>
+        <option>Master 60+</option>
+      </select>
+    </div>
+    <button class="submit-btn" id="submit-btn" onclick="submitRegistration()">REGISTER →</button>
+  </div>
+
+  <!-- Success -->
+  <div class="success-screen" id="success-screen">
+    <div class="success-icon">🏹</div>
+    <div class="success-title">REGISTERED!</div>
+    <div class="success-sub">You have been successfully registered for the competition.</div>
+    <div class="success-score" id="success-details"></div>
+    <button id="register-another-btn" onclick="registerAnother()">+ Register Another Archer</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To",
+  authDomain: "all-in-competition.firebaseapp.com",
+  projectId: "all-in-competition",
+  storageBucket: "all-in-competition.firebasestorage.app",
+  messagingSenderId: "620146958631",
+  appId: "1:620146958631:web:1e88019d1436372689c902"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+// Get competition ID from URL
+const params = new URLSearchParams(window.location.search);
+const compId = params.get('comp');
+
+let compData = null;
+
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg;
+  el.style.display = 'block';
+  document.getElementById('loading').style.display = 'none';
+}
+
+async function loadCompetition() {
+  document.getElementById('loading').style.display = 'block';
+
+  if (!compId) {
+    showError('No competition specified. Please use the link provided by the organizer.');
+    return;
+  }
+
+  try {
+    const snap = await getDoc(doc(db, 'competitions', compId));
+    if (!snap.exists()) {
+      showError('Competition not found. Please check your registration link.');
+      return;
+    }
+    compData = snap.data();
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('form-section').style.display = 'block';
+    document.getElementById('comp-display').textContent =
+      `🏆 ${compData.name}` + (compData.date ? `  ·  ${compData.date}` : '') +
+      (compData.location ? `  ·  ${compData.location}` : '');
+    document.title = `Register — ${compData.name}`;
+  } catch(err) {
+    showError('Connection error. Please try again.');
+  }
+}
+
+window.submitRegistration = async () => {
+  const fname = document.getElementById('fname').value.trim();
+  const lname = document.getElementById('lname').value.trim();
+  const club  = document.getElementById('club').value.trim();
+  const bow   = document.getElementById('bow').value;
+  const gender= document.getElementById('gender').value;
+  const age   = document.getElementById('age').value;
+
+  // Validate
+  document.getElementById('error-msg').style.display = 'none';
+  if (!fname) { showError('Please enter your first name.'); return; }
+  if (!lname) { showError('Please enter your last name.'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'REGISTERING...';
+
+  try {
+    // Load latest archers list
+    const snap = await getDoc(doc(db, 'competitions', compId));
+    const data = snap.data();
+    const archers = data.archers || [];
+
+    // Check if already registered
+    const exists = archers.find(a =>
+      a.fname?.toLowerCase() === fname.toLowerCase() &&
+      a.lname?.toLowerCase() === lname.toLowerCase()
+    );
+    if (exists) {
+      showError(`${fname} ${lname} is already registered for this competition.`);
+      btn.disabled = false;
+      btn.textContent = 'REGISTER →';
+      return;
+    }
+
+    // Add archer
+    archers.push({
+      id: String(Date.now()),
+      fname, lname,
+      name: `${fname} ${lname}`,
+      club, bow, age, gender,
+      target: null, slot: null,
+      registeredAt: new Date().toISOString()
+    });
+
+    await setDoc(doc(db, 'competitions', compId), { archers }, { merge: true });
+
+    // Show success
+    document.getElementById('form-section').style.display = 'none';
+    document.getElementById('success-screen').style.display = 'block';
+    document.getElementById('success-details').innerHTML =
+      `<strong>${fname} ${lname}</strong><br>` +
+      `${bow} · ${age} · ${gender === 'M' ? 'Male' : 'Female'}` +
+      (club ? `<br>${club}` : '');
+
+  } catch(err) {
+    showError('Registration failed. Please try again.');
+    btn.disabled = false;
+    btn.textContent = 'REGISTER →';
+  }
+};
+
+window.registerAnother = () => {
+  document.getElementById('success-screen').style.display = 'none';
+  document.getElementById('form-section').style.display = 'block';
+  document.getElementById('fname').value = '';
+  document.getElementById('lname').value = '';
+  document.getElementById('club').value = '';
+  document.getElementById('error-msg').style.display = 'none';
+  document.getElementById('submit-btn').disabled = false;
+  document.getElementById('submit-btn').textContent = 'REGISTER →';
+};
+
+loadCompetition();
+</script>
+</body>
+</html>
