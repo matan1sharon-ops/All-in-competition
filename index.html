@@ -263,6 +263,7 @@ tbody td { padding: 10px 12px; color: #111; }
           <div class="card-title"><span class="status-dot status-live"></span> Live Results</div>
           <div style="margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap;">
             <button class="btn btn-secondary btn-sm" onclick="exportResultsPDF()">📄 EXPORT PDF</button>
+            <button class="btn btn-secondary btn-sm" onclick="openDisplayScreen()">🖥 DISPLAY SCREEN</button>
           </div>
           <div id="results-by-category"></div>
         </div>
@@ -1129,6 +1130,11 @@ window.copyRegLink = () => {
     // Fallback: show the link
     prompt('Copy this registration link:', url);
   });
+};
+
+window.openDisplayScreen = () => {
+  if(!currentCompId){ toast('Select a competition first','error'); return; }
+  window.open(`https://matan1sharon-ops.github.io/All-in-competition/results.html?comp=${currentCompId}`,'_blank');
 };
 
 window.exportResultsPDF = () => {
