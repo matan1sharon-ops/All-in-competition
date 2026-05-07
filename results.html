@@ -203,24 +203,41 @@ function renderResults(data) {
       const rankClass = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-n';
       const rankLabel = i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
       const h1h2 = showHalves
-        ? `<td style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--muted2);text-align:center;padding:8px 6px;min-width:36px;">${a.h1||0}</td>
-           <td style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--muted2);text-align:center;padding:8px 6px;min-width:36px;">${a.h2||0}</td>`
+        ? `<td style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted2);text-align:center;padding:6px 4px;min-width:32px;">${a.h1||0}</td>
+           <td style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted2);text-align:center;padding:6px 4px;min-width:32px;">${a.h2||0}</td>`
         : '';
       return `<tr>
-        <td style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;text-align:center;padding:8px 8px;width:36px;" class="${rankClass}">${rankLabel}</td>
-        <td style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;padding:8px 10px;flex:1;">${a.name}</td>
+        <td style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;text-align:center;padding:6px 6px;width:32px;" class="${rankClass}">${rankLabel}</td>
+        <td style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;padding:6px 8px;white-space:nowrap;">${a.name}</td>
         ${h1h2}
-        <td style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--accent);text-align:center;padding:8px 10px;min-width:52px;">${a.total}</td>
-        <td style="font-size:12px;color:var(--muted2);text-align:center;padding:8px 6px;min-width:40px;">${g1label}:${a.g1}</td>
-        <td style="font-size:12px;color:var(--muted2);text-align:center;padding:8px 6px;min-width:40px;">${g2label}:${a.g2}</td>
+        <td style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;color:var(--accent);text-align:center;padding:6px 8px;min-width:46px;">${a.total}</td>
+        <td style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted2);text-align:center;padding:6px 4px;min-width:32px;">${a.g1}</td>
+        <td style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted2);text-align:center;padding:6px 4px;min-width:32px;">${a.g2}</td>
       </tr>`;
     }).join('');
 
+    const colHeaders = showHalves
+      ? `<tr style="border-bottom:1px solid var(--border2);">
+          <td style="width:36px;"></td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px;">NAME</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">H1</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">H2</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 10px;text-align:center;font-family:'Barlow Condensed',sans-serif;">SCORE</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${g1label}</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${g2label}</td>
+        </tr>`
+      : `<tr style="border-bottom:1px solid var(--border2);">
+          <td style="width:36px;"></td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px;">NAME</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 10px;text-align:center;font-family:'Barlow Condensed',sans-serif;">SCORE</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${g1label}</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${g2label}</td>
+        </tr>`;
     html+=`<div class="cat-block">
       <div class="cat-header" style="background:${color}33;color:${color};border-bottom:2px solid ${color}44;">
         ${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}
       </div>
-      <table class="cat-table"><tbody>${rows}</tbody></table>
+      <table class="cat-table"><tbody>${colHeaders}${rows}</tbody></table>
     </div>`;
   });
   html+='</div>';
