@@ -901,87 +901,105 @@ function updateMatchHeader(){
   document.getElementById('m-archer-name').textContent=archer?.name||'—';
 }
 
+function arrowChip(v, isActive){
+  if(v===undefined) return `<span style="width:28px;height:28px;border-radius:6px;background:var(--surface2);border:1px dashed var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);">·</span>`;
+  const cls=chipClass(v);
+  const act=isActive?'outline:2px solid var(--accent);outline-offset:1px;':'';
+  return `<span class="arrow-chip ${cls}" style="min-width:28px;text-align:center;${act}">${v===0?'M':v}</span>`;
+}
+
 function renderMatchSets(){
   const list=document.getElementById('sets-list');
-  let html='';
+  const a1=matchData.archer1, a2=matchData.archer2;
   const activeSi=getActiveMatchSet();
+
   if(matchFormat==='sets'){
     const totalSets = isTiebreakNeeded() ? MAX_SETS+1 : MAX_SETS;
+    let html=`<div style="display:grid;grid-template-columns:1fr auto auto auto 1fr;gap:4px;padding:6px 10px;background:var(--surface2);border-radius:8px;margin-bottom:6px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--muted);">
+      <div>${a1?.name||'A1'}</div>
+      <div style="min-width:34px;text-align:center;">SET</div>
+      <div style="min-width:32px;text-align:center;"></div>
+      <div style="min-width:34px;text-align:center;">SET</div>
+      <div style="text-align:right;">${a2?.name||'A2'}</div>
+    </div>`;
+
     for(let i=0;i<totalSets;i++){
-      const isTB = i===MAX_SETS;
-      const myArr=getMatchArrows(i,matchActiveArcher);
-      const oppArr=getMatchArrows(i,1-matchActiveArcher);
-      const myScore=getMatchSetScore(i,matchActiveArcher);
-      const oppScore=getMatchSetScore(i,1-matchActiveArcher);
-      const myDone=myArr.length===getTBArrows(i);
-      const oppDone=oppArr.length===getTBArrows(i);
-      const bothDone=myDone&&oppDone;
-      const isActive=i===activeSi&&!myDone;
-      const cls=bothDone?'set-card complete':isActive?'set-card active-set':'set-card';
-      let resultHtml='';
+      const isTB=i===MAX_SETS;
+      const arr1=getMatchArrows(i,0), arr2=getMatchArrows(i,1);
+      const s1=getMatchSetScore(i,0), s2=getMatchSetScore(i,1);
+      const done1=arr1.length===getTBArrows(i), done2=arr2.length===getTBArrows(i);
+      const bothDone=done1&&done2;
+      const isActive1=i===activeSi&&matchActiveArcher===0&&!done1;
+      const isActive2=i===activeSi&&matchActiveArcher===1&&!done2;
+
+      let c1='var(--muted2)', c2='var(--muted2)';
       if(bothDone){
-        if(isTB){
-          if(myScore===oppScore){
-            // Tied tiebreak — show closest to center selector
-            resultHtml=`<span style="font-size:11px;color:var(--accent);">TIED — select closest to center</span>`;
-          } else {
-            const myWin=myScore>oppScore;
-            const color=myWin?'var(--green)':'var(--red)';
-            resultHtml=`<span class="set-result" style="color:${color}">${myScore}–${oppScore} 🏆</span>`;
-          }
-        } else {
-          const myWin=myScore>oppScore,draw=myScore===oppScore;
-          const pts=myWin?2:draw?1:0;
-          const color=myWin?'var(--green)':draw?'var(--accent)':'var(--red)';
-          resultHtml=`<span class="set-result" style="color:${color}">${myScore}–${oppScore} (${pts}pt${pts!==1?'s':''})</span>`;
-        }
-      } else if(isActive){resultHtml=`<span style="font-size:11px;color:${isTB?'var(--red)':'var(--accent)'};">${isTB?'TIEBREAK!':'ACTIVE'}</span>`;}
-      else if(myDone&&!oppDone){resultHtml=`<span style="font-size:11px;color:var(--muted);">Waiting...</span>`;}
-      const arrowCount = getTBArrows(i);
-      const chips=Array.from({length:arrowCount},(_,ai)=>{
-        const v=myArr[ai];
-        return v!==undefined?`<span class="arrow-chip ${chipClass(v)}">${v===0?'M':v}</span>`:`<span class="arrow-chip chip-empty">·</span>`;
-      }).join('');
-      // Show closest to center buttons if tiebreak tied
-      const tbTiedUI = (isTB && bothDone && myScore===oppScore) ? `
-        <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">
-          <div style="font-size:11px;color:var(--accent);margin-bottom:8px;font-weight:700;">WHO IS CLOSEST TO CENTER?</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-            <button onclick="setTBWinner(0)" id="tb-win-0" style="padding:10px;border-radius:8px;border:2px solid ${window._tbWinner===0?'var(--green)':'var(--border)'};background:${window._tbWinner===0?'rgba(67,160,71,0.2)':'var(--surface2)'};color:${window._tbWinner===0?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">
-              ${matchData.archer1?.name||'A1'}
-            </button>
-            <button onclick="setTBWinner(1)" id="tb-win-1" style="padding:10px;border-radius:8px;border:2px solid ${window._tbWinner===1?'var(--green)':'var(--border)'};background:${window._tbWinner===1?'rgba(67,160,71,0.2)':'var(--surface2)'};color:${window._tbWinner===1?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">
-              ${matchData.archer2?.name||'A2'}
-            </button>
-          </div>
-        </div>` : '';
-      html+=`<div class="${cls}" style="${isTB?'border-color:var(--red);':''}">
-        <div class="set-header">
-          <div class="set-num" style="${isTB?'color:var(--red);':''}">${isTB?'⚡ TIEBREAK (1 arrow)':`SET ${i+1}`}</div>
-          ${resultHtml}
+        if(s1>s2){c1='var(--green)';}
+        else if(s2>s1){c2='var(--green)';}
+        else{c1='var(--accent)';c2='var(--accent)';}
+      }
+
+      const arrowCount=getTBArrows(i);
+      const chips1=Array.from({length:arrowCount},(_,ai)=>arrowChip(arr1[ai],isActive1&&ai===arr1.length)).join('');
+      const chips2=Array.from({length:arrowCount},(_,ai)=>arrowChip(arr2[ai],isActive2&&ai===arr2.length)).join('');
+      const pts1=bothDone&&!isTB?(s1>s2?2:s1===s2?1:0):'';
+      const pts2=bothDone&&!isTB?(s2>s1?2:s1===s2?1:0):'';
+      const borderCol=isTB?'var(--red)':bothDone?'var(--green)':i===activeSi?'var(--accent)':'var(--border)';
+      const setBg=i===activeSi&&!bothDone?'rgba(255,215,0,0.04)':'transparent';
+      const setLabel=isTB?'TB':'S'+(i+1);
+
+      html+=`<div style="display:grid;grid-template-columns:1fr auto auto auto 1fr;gap:4px;align-items:center;padding:6px 8px;margin-bottom:4px;background:${setBg};border:1px solid ${borderCol};border-radius:8px;">
+        <div style="display:flex;gap:3px;flex-wrap:wrap;">${chips1}</div>
+        <div style="min-width:34px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:${c1};">${done1?s1:(arr1.length?arr1.reduce((s,v)=>s+getVal(v),0):'')}</div>
+        <div style="min-width:32px;text-align:center;">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;color:${isTB?'var(--red)':'var(--muted2)'};">${setLabel}</div>
+          ${bothDone&&!isTB?`<div style="font-size:9px;color:var(--muted2);">${pts1}–${pts2}</div>`:''}
         </div>
-        <div class="end-arrows">${chips}</div>
-        ${tbTiedUI}
+        <div style="min-width:34px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:${c2};">${done2?s2:(arr2.length?arr2.reduce((s,v)=>s+getVal(v),0):'')}</div>
+        <div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end;">${chips2}</div>
+      </div>`;
+
+      if(isTB&&bothDone&&s1===s2){
+        html+=`<div style="background:var(--surface2);border:1px solid var(--red);border-radius:8px;padding:12px;margin-bottom:4px;">
+          <div style="font-size:11px;color:var(--red);margin-bottom:8px;font-weight:700;text-align:center;">⚡ TIED — WHO IS CLOSEST TO CENTER?</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <button onclick="setTBWinner(0)" style="padding:10px;border-radius:8px;border:2px solid ${window._tbWinner===0?'var(--green)':'var(--border)'};background:${window._tbWinner===0?'rgba(67,160,71,0.2)':'var(--surface3)'};color:${window._tbWinner===0?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">${a1?.name||'A1'}</button>
+            <button onclick="setTBWinner(1)" style="padding:10px;border-radius:8px;border:2px solid ${window._tbWinner===1?'var(--green)':'var(--border)'};background:${window._tbWinner===1?'rgba(67,160,71,0.2)':'var(--surface3)'};color:${window._tbWinner===1?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">${a2?.name||'A2'}</button>
+          </div>
+        </div>`;
+      }
+    }
+    list.innerHTML=html;
+  } else {
+    let html=`<div style="display:grid;grid-template-columns:1fr auto auto auto 1fr;gap:4px;padding:6px 10px;background:var(--surface2);border-radius:8px;margin-bottom:6px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--muted);">
+      <div>${a1?.name||'A1'}</div>
+      <div style="text-align:center;">END</div><div></div><div style="text-align:center;">END</div>
+      <div style="text-align:right;">${a2?.name||'A2'}</div>
+    </div>`;
+    for(let e=0;e<CUM_ENDS;e++){
+      const si=e*CUM_ARROWS;
+      const ea1=cumArrows1.slice(si,si+CUM_ARROWS), ea2=cumArrows2.slice(si,si+CUM_ARROWS);
+      const t1=ea1.reduce((s,v)=>s+getVal(v),0), t2=ea2.reduce((s,v)=>s+getVal(v),0);
+      const d1=ea1.length===CUM_ARROWS, d2=ea2.length===CUM_ARROWS;
+      const isActive1=matchActiveArcher===0&&e===Math.floor(cumArrows1.length/CUM_ARROWS)&&!d1;
+      const isActive2=matchActiveArcher===1&&e===Math.floor(cumArrows2.length/CUM_ARROWS)&&!d2;
+      const borderCol=isActive1||isActive2?'var(--accent)':d1&&d2?'var(--green)':'var(--border)';
+      const chips1=Array.from({length:CUM_ARROWS},(_,ai)=>arrowChip(ea1[ai],isActive1&&ai===ea1.length)).join('');
+      const chips2=Array.from({length:CUM_ARROWS},(_,ai)=>arrowChip(ea2[ai],isActive2&&ai===ea2.length)).join('');
+      html+=`<div style="display:grid;grid-template-columns:1fr auto auto auto 1fr;gap:4px;align-items:center;padding:6px 8px;margin-bottom:4px;border:1px solid ${borderCol};border-radius:8px;">
+        <div style="display:flex;gap:3px;">${chips1}</div>
+        <div style="min-width:34px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;color:var(--accent);">${d1?t1:''}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--muted2);min-width:28px;text-align:center;">E${e+1}</div>
+        <div style="min-width:34px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;color:var(--accent);">${d2?t2:''}</div>
+        <div style="display:flex;gap:3px;justify-content:flex-end;">${chips2}</div>
       </div>`;
     }
-  } else {
-    const myCum=matchActiveArcher===0?cumArrows1:cumArrows2;
-    for(let e=0;e<CUM_ENDS;e++){
-      const startIdx=e*CUM_ARROWS;
-      const endArrows=myCum.slice(startIdx,startIdx+CUM_ARROWS);
-      const isActive=e===Math.floor(myCum.length/CUM_ARROWS)&&myCum.length<CUM_ENDS*CUM_ARROWS;
-      const isComplete=endArrows.length===CUM_ARROWS;
-      const cls=isComplete?'set-card complete':isActive?'set-card active-set':'set-card';
-      const tot=endArrows.reduce((s,v)=>s+getVal(v),0);
-      const chips=Array.from({length:CUM_ARROWS},(_,ai)=>{
-        const v=endArrows[ai];
-        return v!==undefined?`<span class="arrow-chip ${chipClass(v)}">${v===0?'M':v}</span>`:`<span class="arrow-chip chip-empty">·</span>`;
-      }).join('');
-      html+=`<div class="${cls}"><div class="set-header"><div class="set-num">END ${e+1}</div>${isComplete?`<span class="set-result" style="color:var(--accent);">${tot}</span>`:''}</div><div class="end-arrows">${chips}</div></div>`;
-    }
+    list.innerHTML=html;
   }
-  list.innerHTML=html;
-  setTimeout(()=>{const a=list.querySelector('.active-set');if(a)a.scrollIntoView({behavior:'smooth',block:'center'});},50);
+  setTimeout(()=>{
+    const rows=list.querySelectorAll('[style*="border:1px solid var(--accent)"]');
+    if(rows.length) rows[rows.length-1].scrollIntoView({behavior:'smooth',block:'center'});
+  },50);
 }
 
 function renderMatchPad(){
