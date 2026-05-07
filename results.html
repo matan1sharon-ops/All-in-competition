@@ -267,11 +267,11 @@ function renderResults(data) {
     });
 
   // Check for elimination data
-  const elimData = d.elimination || {};
+  const elimData = data.elimination || {};
   const hasElim = Object.keys(elimData).length > 0;
 
   if(hasElim){
-    renderElimDisplay(elimData, d.discipline||'Outdoor');
+    renderElimDisplay(elimData, data.discipline||'Outdoor');
     return;
   }
 
