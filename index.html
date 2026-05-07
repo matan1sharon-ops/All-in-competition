@@ -1459,16 +1459,16 @@ window.openMatchModal = (catKey,roundKey,matchIdx) => {
     });
     setsHtml=`<div style="margin-bottom:12px;">
       <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-        <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;">Set Points: ${sp1} — ${sp2}</span>
+        <span id="set-points-display" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;">Set Points: ${sp1} — ${sp2}</span>
         <span style="font-size:11px;color:var(--muted2);">(First to 6 wins)</span>
       </div>`;
     for(let i=0;i<5;i++){
       const s = match.sets?.[i]||{};
       setsHtml+=`<div style="display:grid;grid-template-columns:1fr auto auto 1fr;gap:8px;align-items:center;margin-bottom:6px;">
-        <input type="number" id="ms1_${i}" value="${s.score1||''}" min="0" max="30" placeholder="${match.archer1?.name||'A'}" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:6px;font-size:14px;outline:none;text-align:center;">
+        <input type="number" id="ms1_${i}" value="${s.score1||''}" min="0" max="30" oninput="calcSetPoints()" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:6px;font-size:14px;outline:none;text-align:center;">
         <span style="color:var(--muted2);font-size:12px;">SET ${i+1}</span>
         <span style="color:var(--muted2);">—</span>
-        <input type="number" id="ms2_${i}" value="${s.score2||''}" min="0" max="30" placeholder="${match.archer2?.name||'B'}" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:6px;font-size:14px;outline:none;text-align:center;">
+        <input type="number" id="ms2_${i}" value="${s.score2||''}" min="0" max="30" oninput="calcSetPoints()" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:6px;font-size:14px;outline:none;text-align:center;">
       </div>`;
     }
     setsHtml+='</div>';
@@ -1527,6 +1527,24 @@ window.selectWinner = (num) => {
     btn2.style.borderColor = num===2?'var(--green)':'var(--border2)';
     btn2.style.background  = num===2?'rgba(67,160,71,0.2)':'var(--surface3)';
     btn2.style.color       = num===2?'var(--green)':'var(--text)';
+  }
+};
+
+window.calcSetPoints = () => {
+  let sp1=0, sp2=0;
+  for(let i=0;i<5;i++){
+    const v1 = document.getElementById(`ms1_${i}`)?.value;
+    const v2 = document.getElementById(`ms2_${i}`)?.value;
+    if(v1===''||v2===''||v1===null||v2===null) continue;
+    const s1=parseInt(v1)||0, s2=parseInt(v2)||0;
+    if(s1>s2) sp1+=2;
+    else if(s2>s1) sp2+=2;
+    else{sp1+=1;sp2+=1;}
+  }
+  const el = document.getElementById('set-points-display');
+  if(el){
+    el.textContent=`Set Points: ${sp1} — ${sp2}`;
+    el.style.color = sp1>=6?'var(--green)':sp2>=6?'var(--red)':'var(--text)';
   }
 };
 
