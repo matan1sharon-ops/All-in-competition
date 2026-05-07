@@ -394,7 +394,34 @@ window.checkPhase = async () => {
     }
   }
 
-  // No match found — go to qualification
+  // No match found — try to find target from database
+  const archer = compData.archers?.find(a=>a.id===selectedArcherId);
+  if(archer?.target){
+    // Auto-load their target
+    targetNum = archer.target;
+    const target = (compData.targets||[]).find(t=>t.num===targetNum);
+    if(target){
+      const allArchers = compData.archers||[];
+      targetArchers = ['A','B','C','D'].filter(s=>target[s]).map(s=>{
+        const sd=target[s];
+        const fa=allArchers.find(a=>String(a.id)===String(sd.id)||a.name===sd.name);
+        return {...(fa||sd),slot:s,id:fa?fa.id:sd.id};
+      });
+      if(targetArchers.length){
+        document.getElementById('confirm-archers').innerHTML=targetArchers.map(a=>`
+          <div class="confirm-archer">
+            <div class="confirm-slot">${a.slot}</div>
+            <div style="flex:1;padding:0 10px;">
+              <div class="confirm-name">${a.name}</div>
+              <div class="confirm-cat">${a.bow} · ${a.age}</div>
+            </div>
+          </div>`).join('');
+        showLoginStep('login-step-2');
+        return;
+      }
+    }
+  }
+  // No target assigned — ask for target number
   showLoginStep('login-step-qual');
 };
 
