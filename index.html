@@ -1320,11 +1320,14 @@ window.generateElimination = async () => {
 
   // WA seeding: 1v(n), 2v(n-1), 3v(n-2)...
   const n = seeds.length;
+  // Determine first round name based on bracket size
+  const firstRound = bracketSize===8?'R1':bracketSize===4?'QF':'SF';
+
   const matches = [];
   for(let i=0;i<n/2;i++){
     matches.push({
-      id:`r1_m${i+1}`,
-      round:'R1', position:i+1,
+      id:`${firstRound}_m${i+1}`,
+      round:firstRound, position:i+1,
       archer1:{id:seeds[i].id,name:seeds[i].name,seed:i+1,qualScore:seeds[i].qualScore},
       archer2:{id:seeds[n-1-i].id,name:seeds[n-1-i].name,seed:n-i,qualScore:seeds[n-1-i].qualScore},
       sets:[],winner:null,score1:null,score2:null,tiebreak1:null,tiebreak2:null,winnerChoice:null
@@ -1334,8 +1337,8 @@ window.generateElimination = async () => {
   // Save to Firebase
   const elimData = {
     catKey, bow, age, gender, format, bracketSize,
-    rounds: { R1: matches },
-    currentRound: 'R1',
+    rounds: { [firstRound]: matches },
+    currentRound: firstRound,
     createdAt: Date.now()
   };
 
@@ -1375,10 +1378,10 @@ function renderElimContent(){
     // Show all rounds
     Object.entries(data.rounds||{}).forEach(([roundKey,matches])=>{
       const roundLabel = roundKey==='R1'?`Round of ${data.bracketSize*2}`:
-                         roundKey==='QF'?'Quarter Finals':
+                         roundKey==='QF'?(data.bracketSize===4?`Round of ${data.bracketSize*2}`:'Quarter Finals'):
                          roundKey==='SF'?'Semi Finals':
-                         roundKey==='F'?'Final':
-                         roundKey==='B'?'Bronze Medal':'Round';
+                         roundKey==='F'?'🏆 Final':
+                         roundKey==='B'?'🥉 Bronze Medal':'Round';
       html+=`<div style="margin-bottom:12px;">
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--muted2);margin-bottom:8px;text-transform:uppercase;">${roundLabel}</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:8px;">`;
@@ -1400,22 +1403,18 @@ function renderElimContent(){
       html+='</div></div>';
     });
 
-    // Add next round button if R1 complete
-    const r1 = data.rounds?.R1||[];
-    const r1done = r1.length>0 && r1.every(m=>m.winnerChoice);
-    if(r1done && !data.rounds?.QF && !data.rounds?.SF && !data.rounds?.F){
-      html+=`<button class="btn btn-success" onclick="advanceRound('${catKey}')">⚡ ADVANCE TO NEXT ROUND</button>`;
-    }
-    const qf = data.rounds?.QF||[];
-    const qfdone = qf.length>0 && qf.every(m=>m.winnerChoice);
-    if(qfdone && !data.rounds?.SF){
-      html+=`<button class="btn btn-success" onclick="advanceRound('${catKey}')">⚡ ADVANCE TO SEMI FINALS</button>`;
-    }
-    const sf = data.rounds?.SF||[];
-    const sfdone = sf.length>0 && sf.every(m=>m.winnerChoice);
-    if(sfdone && !data.rounds?.F){
-      html+=`<button class="btn btn-success" onclick="advanceRound('${catKey}')">⚡ GENERATE FINAL + BRONZE</button>`;
-    }
+    // Show advance button based on what round is complete and what comes next
+    const r1done = (data.rounds?.R1||[]).length>0 && (data.rounds?.R1||[]).every(m=>m.winnerChoice);
+    const qfdone = (data.rounds?.QF||[]).length>0 && (data.rounds?.QF||[]).every(m=>m.winnerChoice);
+    const sfdone = (data.rounds?.SF||[]).length>0 && (data.rounds?.SF||[]).every(m=>m.winnerChoice);
+    const fdone  = (data.rounds?.F||[]).length>0  && (data.rounds?.F||[]).every(m=>m.winnerChoice);
+
+    if(r1done && !data.rounds?.QF && !data.rounds?.SF && !data.rounds?.F)
+      html+=`<button class="btn btn-success" style="margin-top:8px;" onclick="advanceRound('${catKey}')">⚡ ADVANCE TO QUARTER FINALS</button>`;
+    else if(qfdone && !data.rounds?.SF && !data.rounds?.F)
+      html+=`<button class="btn btn-success" style="margin-top:8px;" onclick="advanceRound('${catKey}')">⚡ ADVANCE TO SEMI FINALS</button>`;
+    else if(sfdone && !data.rounds?.F)
+      html+=`<button class="btn btn-success" style="margin-top:8px;" onclick="advanceRound('${catKey}')">⚡ GENERATE FINAL + BRONZE</button>`;
 
     html+='</div>';
   });
@@ -1601,39 +1600,41 @@ window.advanceRound = async (catKey) => {
   const data = (window._elimData||{})[catKey];
   if(!data) return;
 
-  // Find the latest completed round
+  // Find the latest completed round in correct order
   const roundOrder = ['R1','QF','SF'];
-  let lastRound=null, nextRound=null, finalNext=false;
+  let lastRound=null, finalNext=false;
 
   for(let i=0;i<roundOrder.length;i++){
     const r=roundOrder[i];
-    if(data.rounds[r]&&data.rounds[r].every(m=>m.winnerChoice)){
+    if(data.rounds[r]&&data.rounds[r].length>0&&data.rounds[r].every(m=>m.winnerChoice)){
       lastRound=r;
-      nextRound=roundOrder[i+1]||null;
       if(r==='SF') finalNext=true;
     }
   }
 
+  if(!lastRound){ toast('No completed round found','error'); return; }
+
   const winners = (data.rounds[lastRound]||[]).map(m=>
     m.winnerChoice===m.archer1.id?m.archer1:m.archer2
   );
-  const losers = finalNext ? (data.rounds['SF']||[]).map(m=>
+  const losers = (data.rounds[lastRound]||[]).map(m=>
     m.winnerChoice===m.archer1.id?m.archer2:m.archer1
-  ) : [];
+  );
 
   let newMatches=[];
-  if(finalNext){
-    // Final
+  if(finalNext || lastRound==='SF'){
+    // Generate Final + Bronze
     newMatches=[{id:'f_m1',round:'F',position:1,
       archer1:winners[0],archer2:winners[1],
       sets:[],winner:null,score1:null,score2:null,tiebreak1:null,tiebreak2:null,winnerChoice:null}];
-    // Bronze
     const bronzeMatches=[{id:'b_m1',round:'B',position:1,
       archer1:losers[0],archer2:losers[1],
       sets:[],winner:null,score1:null,score2:null,tiebreak1:null,tiebreak2:null,winnerChoice:null}];
     data.rounds['F']=newMatches;
     data.rounds['B']=bronzeMatches;
   } else {
+    // Determine next round
+    const nextRound = lastRound==='R1'?'QF':lastRound==='QF'?'SF':'SF';
     // Pair up winners: 1v2, 3v4...
     for(let i=0;i<winners.length;i+=2){
       newMatches.push({id:`${nextRound}_m${i/2+1}`,round:nextRound,position:i/2+1,
