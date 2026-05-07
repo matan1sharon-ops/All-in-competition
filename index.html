@@ -1302,7 +1302,7 @@ function initElimination(){
     if(!catMap[key]) catMap[key]={bow:a.bow,age:a.age,gender:a.gender,count:0};
     catMap[key].count++;
   });
-  const cats = Object.entries(catMap).filter(([k,v])=>v.count>=4);
+  const cats = Object.entries(catMap).filter(([k,v])=>v.count>=3);
   const sel = document.getElementById('elim-cat-select');
   sel.innerHTML = '<option value="">— Select Category —</option>' +
     cats.map(([k,v])=>`<option value="${k}">${v.bow} · ${v.age} · ${v.gender==='M'?'Men':'Women'} (${v.count})</option>`).join('');
