@@ -853,8 +853,6 @@ window.renderResults = () => {
             <tr>
               <th style="width:40px;">Rank</th>
               <th>Name</th>
-              <th>Club</th>
-              <th>Target</th>
               <th>Score</th>
               ${showHalves?'<th>H1</th><th>H2</th>':''}
               <th>${labels.g1}</th>
@@ -866,8 +864,6 @@ window.renderResults = () => {
               <tr>
                 <td style="color:#FFD700;font-weight:900;text-align:center;">${i+1}</td>
                 <td style="color:#111;font-weight:600;">${a.name}</td>
-                <td style="color:#555;">${a.club||'—'}</td>
-                <td style="color:#1565c0;font-weight:700;">${a.targetLabel}</td>
                 <td style="font-weight:900;font-size:16px;color:#111;">${a.total}</td>
                 ${showHalves?`<td style="color:#555;">${a.h1||'—'}</td><td style="color:#555;">${a.h2||'—'}</td>`:''}
                 <td style="color:#111;">${a.g1||'—'}</td>
@@ -1170,8 +1166,6 @@ window.exportResultsPDF = () => {
     const rows=ranked.map((a,i)=>`<tr>
       <td style="text-align:center;font-weight:700;">${i+1}</td>
       <td style="font-weight:600;">${a.name}</td>
-      <td>${a.club||'—'}</td>
-      <td>${a.targetLabel}</td>
       <td style="font-weight:700;font-size:14px;">${a.total}</td>
       ${showHalves?`<td>${a.h1||'—'}</td><td>${a.h2||'—'}</td>`:''}
       <td>${a.g1||'—'}</td>
@@ -1184,8 +1178,6 @@ window.exportResultsPDF = () => {
           <tr>
             <th style="padding:6px 8px;width:40px;">Rank</th>
             <th style="padding:6px 8px;">Name</th>
-            <th style="padding:6px 8px;">Club</th>
-            <th style="padding:6px 8px;">Target</th>
             <th style="padding:6px 8px;">Score</th>
             ${showHalves?'<th style="padding:6px 8px;">H1</th><th style="padding:6px 8px;">H2</th>':''}
             <th style="padding:6px 8px;">${labels.g1}</th>
