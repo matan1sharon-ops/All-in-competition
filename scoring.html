@@ -11,6 +11,8 @@
 :root{--bg:#111;--surface:#1e1e1e;--surface2:#2a2a2a;--border:#333;--accent:#FFD700;--red:#e53935;--green:#43a047;--blue:#1e88e5;--text:#f0f0f0;--muted:#888;--radius:12px;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);height:100dvh;overflow:hidden;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);}
+
+/* ── LOGIN ── */
 #login-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
 .login-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 24px;width:100%;max-width:360px;}
 .login-logo{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;letter-spacing:4px;color:var(--accent);text-align:center;margin-bottom:4px;}
@@ -21,12 +23,16 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 .login-select{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:12px 14px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:15px;outline:none;margin-bottom:12px;cursor:pointer;}
 .login-btn{width:100%;padding:16px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;letter-spacing:1px;cursor:pointer;margin-top:8px;}
 .login-btn:active{filter:brightness(0.9);}
+.login-back{width:100%;padding:12px;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:var(--radius);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-top:8px;}
 .confirm-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;}
 .confirm-archer{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
 .confirm-archer:last-child{border-bottom:none;}
 .confirm-slot{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--accent);width:28px;}
 .confirm-name{flex:1;font-size:14px;font-weight:600;}
 .confirm-cat{font-size:11px;color:var(--muted);}
+.error-msg{background:#b71c1c22;border:1px solid var(--red);color:var(--red);padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none;}
+
+/* ── QUALIFICATION SCORING ── */
 #scoring-screen{flex:1;display:none;flex-direction:column;overflow:hidden;}
 .score-header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;}
 .score-header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
@@ -76,22 +82,39 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 .current-archer-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--text);}
 .current-archer-slot{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--accent);}
 .current-end-label{font-size:11px;color:var(--muted);}
+
+/* ── MATCH SCORING ── */
+#match-screen{flex:1;display:none;flex-direction:column;overflow:hidden;}
+.match-header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;}
+.match-header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.match-label{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--accent);}
+.sp-bar{display:flex;align-items:center;justify-content:center;gap:16px;padding:8px 14px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;}
+.sp-val{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:var(--accent);}
+.sp-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;text-align:center;}
+.sp-sep{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:var(--muted2);}
+#sets-list{flex:1;overflow-y:auto;padding:10px;}
+.set-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;}
+.set-card.active-set{border-color:var(--accent);background:#1a1500;}
+.set-card.complete{border-color:var(--green);background:#0a1a0a;}
+.set-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.set-num{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+.set-result{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;}
+
+/* ── SUMMARY ── */
+#summary-screen{flex:1;display:none;flex-direction:column;overflow:hidden;}
+.summary-header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
+.summary-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--accent);letter-spacing:1px;}
+
+/* ── PAD ── */
 .pad{display:grid;gap:5px;}
 .pad-btn{height:52px;border:none;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,0.35);transition:transform 0.08s,box-shadow 0.08s;}
 .pad-btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,0.35);}
 .pad-gold{background:#FFD700;color:#3e2000;}.pad-red{background:#e53935;color:#fff;}.pad-blue{background:#1e88e5;color:#fff;}
 .pad-black{background:#2d2d2d;color:#fff;border:1px solid #555;}.pad-white{background:#f5f5f5;color:#111;border:1px solid #ccc;}.pad-miss{background:#757575;color:#fff;}
-.pad-back{background:#333;color:#aaa;font-size:16px;}.pad-next{background:var(--accent);color:#000;font-size:15px;}.pad-next:disabled{background:#333;color:#555;}
-#summary-screen{flex:1;display:none;flex-direction:column;overflow:hidden;}
-.summary-header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
-.summary-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--accent);letter-spacing:1px;}
-#summary-list{flex:1;overflow-y:auto;padding:12px;}
-.summary-archer-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;}
-.summary-archer-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.summary-archer-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;}
-.summary-score{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:var(--accent);}
-.summary-stats{display:flex;gap:12px;font-size:12px;color:var(--muted);}
-.summary-stats span{color:var(--text);font-weight:700;}
+.pad-back{background:#333;color:#aaa;font-size:16px;}
+.pad-next{background:var(--accent);color:#000;font-size:15px;}
+.pad-done{background:var(--green);color:#fff;font-size:15px;}
+
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 20px;font-size:13px;font-weight:600;z-index:999;transition:transform 0.3s ease;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.5);}
 #toast.show{transform:translateX(-50%) translateY(0);}
 #toast.success{border-color:var(--green);color:var(--green);}
@@ -100,26 +123,52 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 </head>
 <body>
 
+<!-- ── LOGIN ── -->
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo">ALL IN</div>
-    <div class="login-sub">Competition Scoring</div>
+    <div class="login-sub">Scoring</div>
+
+    <!-- Step 1: Select competition + name -->
     <div id="login-step-1">
-      <label class="login-label">Select Competition</label>
+      <div class="error-msg" id="error-msg"></div>
+      <label class="login-label">Competition</label>
       <select id="comp-select" class="login-select"><option value="">Loading...</option></select>
+      <label class="login-label">Your Name</label>
+      <select id="archer-select" class="login-select"><option value="">— Select competition first —</option></select>
+      <button class="login-btn" onclick="checkPhase()">CONTINUE →</button>
+    </div>
+
+    <!-- Step 2a: Qualification — confirm target -->
+    <div id="login-step-qual" style="display:none;">
       <label class="login-label">Target Number</label>
       <input type="number" id="target-input" class="login-input" placeholder="e.g. 5" min="1">
-      <button class="login-btn" onclick="loadTarget()">LOAD TARGET →</button>
+      <button class="login-btn" onclick="loadTarget()">START SCORING →</button>
+      <button class="login-back" onclick="backToStep1()">← BACK</button>
     </div>
+
+    <!-- Step 2b: Match found — confirm -->
+    <div id="login-step-match" style="display:none;">
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">ACTIVE MATCH FOUND</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--accent);" id="match-confirm-label"></div>
+        <div style="font-size:13px;margin-top:6px;" id="match-confirm-vs"></div>
+      </div>
+      <button class="login-btn" onclick="startMatch()">START MATCH →</button>
+      <button class="login-back" onclick="backToStep1()">← BACK</button>
+    </div>
+
+    <!-- Step 2c: Confirm qualification archers -->
     <div id="login-step-2" style="display:none;">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">Confirm Archers on this Target</div>
       <div class="confirm-card" id="confirm-archers"></div>
       <button class="login-btn" onclick="startScoring()">START SCORING →</button>
-      <button style="width:100%;padding:12px;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:var(--radius);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-top:8px;" onclick="backToStep1()">← BACK</button>
+      <button class="login-back" onclick="showQualStep()">← BACK</button>
     </div>
   </div>
 </div>
 
+<!-- ── QUALIFICATION SCORING ── -->
 <div id="scoring-screen">
   <div class="score-header">
     <div class="score-header-top">
@@ -152,17 +201,49 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
   </div>
 </div>
 
+<!-- ── MATCH SCORING ── -->
+<div id="match-screen">
+  <div class="match-header">
+    <div class="match-header-top">
+      <div class="comp-name" id="m-comp-name"></div>
+      <div class="match-label" id="m-match-label">SEMI FINAL</div>
+    </div>
+    <div style="font-size:11px;color:var(--muted)" id="m-format-label"></div>
+  </div>
+  <div id="match-archer-tabs" style="display:flex;gap:4px;padding:8px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;"></div>
+  <div class="sp-bar">
+    <div style="text-align:center;">
+      <div class="sp-label" id="sp-a1-label">A1</div>
+      <div class="sp-val" id="sp-a1">0</div>
+    </div>
+    <div class="sp-sep">—</div>
+    <div style="text-align:center;">
+      <div class="sp-label" id="sp-a2-label">A2</div>
+      <div class="sp-val" id="sp-a2">0</div>
+    </div>
+  </div>
+  <div id="sets-list"></div>
+  <div class="score-footer">
+    <div class="current-archer-bar">
+      <div><div class="current-end-label" id="m-set-label">SET 1</div><div class="current-archer-name" id="m-archer-name">—</div></div>
+      <div class="current-archer-slot" id="m-arrow-count">0/3</div>
+    </div>
+    <div class="pad" id="match-pad"></div>
+  </div>
+</div>
+
+<!-- ── SUMMARY ── -->
 <div id="summary-screen">
   <div class="summary-header">
     <div class="summary-title" id="sum-title">Complete</div>
     <div style="display:flex;gap:6px;">
-      <button style="background:#4a148c;border:none;color:#ce93d8;padding:8px 14px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:13px;cursor:pointer;" onclick="exportAndUploadPDF()">📤 SEND PDF</button>
       <button style="background:var(--accent);border:none;color:#000;padding:8px 14px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:13px;cursor:pointer;" onclick="goBackToScoring()">← BACK</button>
     </div>
   </div>
   <div id="summary-archer-tabs" style="display:flex;gap:4px;padding:6px 8px;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;"></div>
   <div id="summary-list" style="flex:1;overflow-y:auto;background:#fff;color:#111;"></div>
 </div>
+
 <div id="toast"></div>
 
 <script type="module">
@@ -183,22 +264,30 @@ const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 const storage = getStorage(app);
 
-let compId=null, compData=null, targetNum=null;
-let targetArchers=[], activeArcherIdx=0, editingEnd=null;
-let scores={}, discipline='Outdoor';
+/* ══════════════════════════════════════════
+   SHARED STATE
+══════════════════════════════════════════ */
+let compId=null, compData=null;
+let selectedArcherId=null;
+let discipline='Outdoor';
 
-function getConfig() {
-  if(discipline==='3D')     return {arrows:2,ends:24,label:'Station'};
-  if(discipline==='Field')  return {arrows:3,ends:24,label:'Target'};
-  if(discipline==='Indoor') return {arrows:3,ends:20,label:'End'};
-  return {arrows:6,ends:12,label:'End'};
-}
-function getPadScores() {
-  if(discipline==='3D')    return [11,10,8,5,0];
-  if(discipline==='Field') return [6,5,4,3,2,1,0];
-  if(discipline==='Indoor')return [10,9,8,7,6,5,4,3,2,1,0];
-  return ['X',10,9,8,7,6,5,4,3,2,1,0];
-}
+/* ══════════════════════════════════════════
+   QUALIFICATION STATE
+══════════════════════════════════════════ */
+let targetNum=null, targetArchers=[], activeArcherIdx=0, editingEnd=null;
+let scores={};
+
+/* ══════════════════════════════════════════
+   MATCH STATE
+══════════════════════════════════════════ */
+let matchCatKey=null, matchRoundKey=null, matchIdx=null, matchData=null;
+let matchFormat='sets', matchActiveArcher=0;
+let matchSets=[], cumArrows1=[], cumArrows2=[];
+const ARROWS_PER_SET=3, MAX_SETS=5, SETS_TO_WIN=6, CUM_ENDS=5, CUM_ARROWS=3;
+
+/* ══════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════ */
 function getVal(s){return s==='X'?10:(parseInt(s)||0);}
 function chipClass(s){
   if(s==='X'||s===10||s===9||s===11)return 'chip-gold';
@@ -217,89 +306,150 @@ function padBtnClass(s){
   if(s===2||s===1)return 'pad-white';
   return 'pad-miss';
 }
-
-/* ── GLOBAL END — the current end being played across all archers ── */
-function getGlobalEnd() {
-  const cfg = getConfig();
-  for(let e=0;e<cfg.ends;e++){
-    if(targetArchers.some(a=>(scores[a.id].ends[e]||[]).length < cfg.arrows)) return e;
-  }
-  return cfg.ends-1;
+function getConfig(){
+  if(discipline==='3D')    return {arrows:2,ends:24,label:'Station'};
+  if(discipline==='Field') return {arrows:3,ends:24,label:'Target'};
+  if(discipline==='Indoor')return {arrows:3,ends:20,label:'End'};
+  return {arrows:6,ends:12,label:'End'};
+}
+function getPadScores(){
+  if(discipline==='3D')    return [11,10,8,5,0];
+  if(discipline==='Field') return [6,5,4,3,2,1,0];
+  if(discipline==='Indoor')return [10,9,8,7,6,5,4,3,2,1,0];
+  return ['X',10,9,8,7,6,5,4,3,2,1,0];
+}
+function showError(msg){
+  const el=document.getElementById('error-msg');
+  el.textContent=msg; el.style.display='block';
+}
+function toast(msg,type='success'){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className=`show ${type}`;
+  setTimeout(()=>el.classList.remove('show'),2500);
 }
 
-async function loadCompetitions() {
-  try {
-    const snap = await getDocs(collection(db,'competitions'));
-    const sel = document.getElementById('comp-select');
-    sel.innerHTML = '<option value="">— Select Competition —</option>';
+/* ══════════════════════════════════════════
+   LOGIN FLOW
+══════════════════════════════════════════ */
+async function loadCompetitions(){
+  try{
+    const snap=await getDocs(collection(db,'competitions'));
+    const sel=document.getElementById('comp-select');
+    sel.innerHTML='<option value="">— Select Competition —</option>';
     snap.docs.forEach(d=>{
       const c=d.data(), o=document.createElement('option');
       o.value=d.id; o.textContent=c.name+(c.date?` (${c.date})`:'');
       sel.appendChild(o);
     });
     if(!snap.docs.length) sel.innerHTML='<option value="">No competitions found</option>';
-  } catch(err) {
-    document.getElementById('comp-select').innerHTML='<option value="">Connection error</option>';
-    toast('Error: '+err.message,'error');
-  }
+    sel.onchange=()=>loadArchers(sel.value);
+  }catch(e){showError('Connection error');}
 }
 
-window.loadTarget = async () => {
-  compId    = document.getElementById('comp-select').value;
-  targetNum = parseInt(document.getElementById('target-input').value);
-  if(!compId)   {toast('Select a competition','error');return;}
+async function loadArchers(id){
+  if(!id) return;
+  compId=id;
+  const snap=await getDoc(doc(db,'competitions',id));
+  if(!snap.exists()) return;
+  compData=snap.data();
+  discipline=compData.discipline||'Outdoor';
+  const archers=compData.archers||[];
+  const sel=document.getElementById('archer-select');
+  sel.innerHTML='<option value="">— Select your name —</option>'+
+    archers.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
+}
+
+window.checkPhase = async () => {
+  selectedArcherId=document.getElementById('archer-select').value;
+  if(!compId){showError('Select a competition');return;}
+  if(!selectedArcherId){showError('Select your name');return;}
+  document.getElementById('error-msg').style.display='none';
+
+  // Reload fresh data
+  const snap=await getDoc(doc(db,'competitions',compId));
+  compData=snap.data();
+  discipline=compData.discipline||'Outdoor';
+
+  // Check for active elimination match
+  const elim=compData.elimination||{};
+  const roundOrder=['R1','QF','SF','F','B'];
+  for(const [ck,data] of Object.entries(elim)){
+    for(const rk of roundOrder){
+      const matches=data.rounds?.[rk]||[];
+      for(let mi=0;mi<matches.length;mi++){
+        const m=matches[mi];
+        if((m.archer1?.id===selectedArcherId||m.archer2?.id===selectedArcherId)&&!m.winnerChoice){
+          // Found active match!
+          matchCatKey=ck; matchRoundKey=rk; matchIdx=mi; matchData=m; matchFormat=data.format;
+          matchSets=(m.sets||[]).map(s=>({score1:s.score1||0,score2:s.score2||0,arrows1:s.arrows1||[],arrows2:s.arrows2||[]}));
+          cumArrows1=m.arrows1||[]; cumArrows2=m.arrows2||[];
+          const rl={R1:`Round of ${data.bracketSize*2}`,QF:'Quarter Final',SF:'Semi Final',F:'Final',B:'Bronze Medal'};
+          document.getElementById('match-confirm-label').textContent=rl[rk]||rk;
+          document.getElementById('match-confirm-vs').innerHTML=
+            `<strong>${m.archer1?.name||'?'}</strong> vs <strong>${m.archer2?.name||'?'}</strong>`;
+          showLoginStep('login-step-match');
+          return;
+        }
+      }
+    }
+  }
+
+  // No match found — go to qualification
+  showLoginStep('login-step-qual');
+};
+
+function showLoginStep(id){
+  ['login-step-1','login-step-qual','login-step-match','login-step-2'].forEach(s=>{
+    document.getElementById(s).style.display=s===id?'block':'none';
+  });
+}
+
+window.backToStep1=()=>showLoginStep('login-step-1');
+window.showQualStep=()=>showLoginStep('login-step-qual');
+
+/* ══════════════════════════════════════════
+   QUALIFICATION SCORING
+══════════════════════════════════════════ */
+window.loadTarget=async()=>{
+  targetNum=parseInt(document.getElementById('target-input').value);
   if(!targetNum){toast('Enter target number','error');return;}
-  try {
-    const snap = await getDoc(doc(db,'competitions',compId));
-    if(!snap.exists()){toast('Competition not found','error');return;}
-    compData   = snap.data();
-    discipline = compData.discipline||'Outdoor';
-    const target = (compData.targets||[]).find(t=>t.num===targetNum);
-    if(!target){toast(`Target ${targetNum} not found`,'error');return;}
-    const allArchers = compData.archers||[];
-    targetArchers = ['A','B','C','D'].filter(s=>target[s]).map(s=>{
-      const sd=target[s];
-      const fa=allArchers.find(a=>String(a.id)===String(sd.id)||a.name===sd.name);
-      return {...(fa||sd),slot:s,id:fa?fa.id:sd.id};
-    });
-    if(!targetArchers.length){toast('No archers on this target','error');return;}
-    document.getElementById('confirm-archers').innerHTML=targetArchers.map(a=>`
-      <div class="confirm-archer">
-        <div class="confirm-slot">${a.slot}</div>
-        <div style="flex:1;padding:0 10px;">
-          <div class="confirm-name">${a.name}</div>
-          <div class="confirm-cat">${a.bow} · ${a.age}</div>
-        </div>
-      </div>`).join('');
-    document.getElementById('login-step-1').style.display='none';
-    document.getElementById('login-step-2').style.display='block';
-  } catch(err){toast('Error: '+err.message,'error');}
+  const snap=await getDoc(doc(db,'competitions',compId));
+  compData=snap.data();
+  const target=(compData.targets||[]).find(t=>t.num===targetNum);
+  if(!target){toast(`Target ${targetNum} not found`,'error');return;}
+  const allArchers=compData.archers||[];
+  targetArchers=['A','B','C','D'].filter(s=>target[s]).map(s=>{
+    const sd=target[s];
+    const fa=allArchers.find(a=>String(a.id)===String(sd.id)||a.name===sd.name);
+    return {...(fa||sd),slot:s,id:fa?fa.id:sd.id};
+  });
+  if(!targetArchers.length){toast('No archers on this target','error');return;}
+  document.getElementById('confirm-archers').innerHTML=targetArchers.map(a=>`
+    <div class="confirm-archer">
+      <div class="confirm-slot">${a.slot}</div>
+      <div style="flex:1;padding:0 10px;">
+        <div class="confirm-name">${a.name}</div>
+        <div class="confirm-cat">${a.bow} · ${a.age}</div>
+      </div>
+    </div>`).join('');
+  showLoginStep('login-step-2');
 };
 
-window.backToStep1 = ()=>{
-  document.getElementById('login-step-1').style.display='block';
-  document.getElementById('login-step-2').style.display='none';
-};
-
-window.startScoring = ()=>{
+window.startScoring=()=>{
   const cfg=getConfig(), existing=compData.scores||{};
   targetArchers.forEach(a=>{
     const key=String(a.id).replace(/\./g,'_');
     const raw=existing[key]||existing[String(a.id)];
     if(raw){
-      // Convert ends from object back to array-of-arrays
       let endsArr;
-      if(Array.isArray(raw.ends)){
-        endsArr=raw.ends;
-      } else {
-        endsArr=Array.from({length:cfg.ends},()=>[]);
-        Object.keys(raw.ends||{}).forEach(i=>{ endsArr[parseInt(i)]=raw.ends[i]||[]; });
-      }
-      scores[a.id]={total:raw.total||0,tens:raw.tens||0,xs:raw.xs||0,g1:raw.g1||0,g2:raw.g2||0,ends:endsArr};
+      if(Array.isArray(raw.ends)){endsArr=raw.ends;}
+      else{endsArr=Array.from({length:cfg.ends},()=>[]);Object.keys(raw.ends||{}).forEach(i=>{endsArr[parseInt(i)]=raw.ends[i]||[];});}
+      scores[a.id]={total:raw.total||0,tens:raw.tens||0,xs:raw.xs||0,g1:raw.g1||0,g2:raw.g2||0,h1:raw.h1||0,h2:raw.h2||0,ends:endsArr};
     } else {
-      scores[a.id]={ends:Array.from({length:cfg.ends},()=>[]),total:0,tens:0,xs:0};
+      scores[a.id]={ends:Array.from({length:cfg.ends},()=>[]),total:0,tens:0,xs:0,g1:0,g2:0,h1:0,h2:0};
     }
   });
+  targetArchers.forEach(a=>recalcStats(a.id));
   activeArcherIdx=0; editingEnd=null;
   document.getElementById('s-comp-name').textContent=compData.name||'';
   document.getElementById('s-target-label').textContent=`TARGET ${targetNum}`;
@@ -321,25 +471,21 @@ function renderTabs(){
 
 window.switchArcher=(idx)=>{activeArcherIdx=idx;editingEnd=null;renderTabs();renderScoreList();renderPad();updateHeader();};
 
-function scCellHtml(val, isActive, isEditing, endIdx) {
+function scCellHtml(val,isActive,isEditing,endIdx){
   const classes=[];
   if(val==='X'||val===10||val===9||val===11) classes.push('sc-gold');
   if(isEditing) classes.push('sc-editing');
   else if(isActive) classes.push('sc-active');
-  const display = val===0||val==='M' ? 'M' : (val===undefined||val===''?'':val);
+  const display=val===0||val==='M'?'M':(val===undefined||val===''?'':val);
   return `<td class="${classes.join(' ')}" onclick="editEnd(${endIdx})">${display}</td>`;
 }
 
 function renderScoreList(){
   const cfg=getConfig(), archer=getCurrentArcher(), ends=scores[archer.id].ends;
   let archerNextEnd=0;
-  for(let e=0;e<cfg.ends;e++){
-    if((ends[e]||[]).length<cfg.arrows){archerNextEnd=e;break;}
-  }
+  for(let e=0;e<cfg.ends;e++){if((ends[e]||[]).length<cfg.arrows){archerNextEnd=e;break;}}
   const curEnd=editingEnd!==null?editingEnd.endIdx:archerNextEnd;
   const list=document.getElementById('score-list');
-
-  // For 3D and Field — keep simple card layout
   if(discipline==='3D'||discipline==='Field'){
     let html='';
     for(let i=0;i<cfg.ends;i++){
@@ -352,46 +498,27 @@ function renderScoreList(){
         const v=ea[ai];
         return v!==undefined?`<span class="arrow-chip ${chipClass(v)}">${v===0?'M':v}</span>`:`<span class="arrow-chip chip-empty">·</span>`;
       }).join('');
-      html+=`<div class="${cls}" onclick="editEnd(${i})">
-        <div class="end-header">
-          <div class="end-num">${cfg.label} ${i+1}${isEditing?' (EDITING)':isActive?' (ACTIVE)':''}</div>
-          <div class="end-total">${ea.length===cfg.arrows?tot:ea.length?tot:'—'}</div>
-        </div>
-        <div class="end-arrows">${chips}</div>
-      </div>`;
+      html+=`<div class="${cls}" onclick="editEnd(${i})"><div class="end-header"><div class="end-num">${cfg.label} ${i+1}${isEditing?' (EDITING)':isActive?' (ACTIVE)':''}</div><div class="end-total">${ea.length===cfg.arrows?tot:ea.length?tot:'—'}</div></div><div class="end-arrows">${chips}</div></div>`;
     }
     list.innerHTML='<div style="padding:10px;">'+html+'</div>';
     setTimeout(()=>{const a=list.querySelector('.active-end,.editing');if(a)a.scrollIntoView({behavior:'smooth',block:'center'});},50);
     return;
   }
-
-  // Outdoor and Indoor — professional scorecard table
   if(discipline==='Outdoor'){
-    const h1Label='1st HALF  (Ends 1–6)', h2Label='2nd HALF  (Ends 7–12)';
     list.innerHTML=`
-      <div class="sc-half-header"><div class="sc-half-title">${h1Label}</div><div>10+X</div><div>X</div></div>
-      <table class="sc-table"><colgroup>
-        <col style="width:42px"><col><col><col><col style="width:32px"><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px">
-      </colgroup><tbody id="sc-body-1"></tbody></table>
-      <div class="sc-half-header" style="margin-top:6px;"><div class="sc-half-title">${h2Label}</div><div>10+X</div><div>X</div></div>
-      <table class="sc-table"><colgroup>
-        <col style="width:42px"><col><col><col><col style="width:32px"><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px">
-      </colgroup><tbody id="sc-body-2"></tbody></table>
+      <div class="sc-half-header"><div class="sc-half-title">1st HALF (Ends 1–6)</div><div>10+X</div><div>X</div></div>
+      <table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:32px"><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sc-body-1"></tbody></table>
+      <div class="sc-half-header" style="margin-top:6px;"><div class="sc-half-title">2nd HALF (Ends 7–12)</div><div>10+X</div><div>X</div></div>
+      <table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:32px"><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sc-body-2"></tbody></table>
       <div style="height:10px;"></div>`;
     renderScOutdoor(ends,0,6,'sc-body-1',curEnd);
     renderScOutdoor(ends,6,12,'sc-body-2',curEnd);
   } else {
-    // Indoor
-    const h1Label='1st HALF  (Ends 1–10)', h2Label='2nd HALF  (Ends 11–20)';
     list.innerHTML=`
-      <div class="sc-half-header"><div class="sc-half-title">${h1Label}</div><div>10</div><div>9</div></div>
-      <table class="sc-table"><colgroup>
-        <col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px">
-      </colgroup><tbody id="sc-body-1"></tbody></table>
-      <div class="sc-half-header" style="margin-top:6px;"><div class="sc-half-title">${h2Label}</div><div>10</div><div>9</div></div>
-      <table class="sc-table"><colgroup>
-        <col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px">
-      </colgroup><tbody id="sc-body-2"></tbody></table>
+      <div class="sc-half-header"><div class="sc-half-title">1st HALF (Ends 1–10)</div><div>10</div><div>9</div></div>
+      <table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sc-body-1"></tbody></table>
+      <div class="sc-half-header" style="margin-top:6px;"><div class="sc-half-title">2nd HALF (Ends 11–20)</div><div>10</div><div>9</div></div>
+      <table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sc-body-2"></tbody></table>
       <div style="height:10px;"></div>`;
     renderScIndoor(ends,0,10,'sc-body-1',curEnd);
     renderScIndoor(ends,10,20,'sc-body-2',curEnd);
@@ -406,31 +533,22 @@ function renderScOutdoor(ends,startEnd,endEnd,bodyId,curEnd){
     const isActive=e===curEnd&&editingEnd===null;
     const isEditing=editingEnd!==null&&editingEnd.endIdx===e;
     const v=ea.map(x=>getVal(x));
-    const s1=(ea[0]!==undefined&&ea[1]!==undefined&&ea[2]!==undefined&&ea.length>=3)?v[0]+v[1]+v[2]:'';
-    const s2=(ea[3]!==undefined&&ea[4]!==undefined&&ea[5]!==undefined&&ea.length>=6)?v[3]+v[4]+v[5]:'';
+    const s1=(ea.length>=3)?v[0]+v[1]+v[2]:'';
+    const s2=(ea.length>=6)?v[3]+v[4]+v[5]:'';
     const et=s2!==''?(Number(s1)||0)+s2:'';
     if(et!=='') running+=et;
-    const c10=ea.filter(x=>x===10||x==='X').length, cx=ea.filter(x=>x==='X').length;
+    const c10=ea.filter(x=>x===10||x==='X').length,cx=ea.filter(x=>x==='X').length;
     if(ea.length>0){tens+=c10;xs+=cx;}
-    const rowActive=(isActive||isEditing)&&ea.length<3;
-    const row2Active=(isActive||isEditing)&&ea.length>=3&&ea.length<6;
-    html+=`<tr>
-      <td rowspan="2" class="sc-end-label" onclick="editEnd(${e})">End ${e+1}${isActive?' ▶':isEditing?' ✏':''}
-      </td>
-      ${scCellHtml(ea[0],rowActive&&ea.length===0,isEditing&&ea.length===0,e)}
-      ${scCellHtml(ea[1],rowActive&&ea.length===1,isEditing&&ea.length===1,e)}
-      ${scCellHtml(ea[2],rowActive&&ea.length===2,isEditing&&ea.length===2,e)}
-      <td class="sc-sum-box">${s1}</td>
-      <td class="sc-no-entry"></td>
+    const ra=(isActive||isEditing)&&ea.length<3;
+    const r2=(isActive||isEditing)&&ea.length>=3&&ea.length<6;
+    html+=`<tr><td rowspan="2" class="sc-end-label" onclick="editEnd(${e})">End ${e+1}${isActive?' ▶':isEditing?' ✏':''}</td>
+      ${scCellHtml(ea[0],ra&&ea.length===0,isEditing&&ea.length===0,e)}${scCellHtml(ea[1],ra&&ea.length===1,isEditing&&ea.length===1,e)}${scCellHtml(ea[2],ra&&ea.length===2,isEditing&&ea.length===2,e)}
+      <td class="sc-sum-box">${s1}</td><td class="sc-no-entry"></td>
       <td rowspan="2" class="sc-running">${et!==''?running:''}</td>
-      <td class="sc-stat">${ea.length>0?c10:''}</td>
-      <td class="sc-stat">${ea.length>0?cx:''}</td>
+      <td class="sc-stat">${ea.length>0?c10:''}</td><td class="sc-stat">${ea.length>0?cx:''}</td>
     </tr><tr class="sc-end-sep">
-      ${scCellHtml(ea[3],row2Active&&ea.length===3,isEditing&&ea.length===3,e)}
-      ${scCellHtml(ea[4],row2Active&&ea.length===4,isEditing&&ea.length===4,e)}
-      ${scCellHtml(ea[5],row2Active&&ea.length===5,isEditing&&ea.length===5,e)}
-      <td class="sc-sum-box">${s2}</td>
-      <td class="sc-end-total">${et}</td>
+      ${scCellHtml(ea[3],r2&&ea.length===3,isEditing&&ea.length===3,e)}${scCellHtml(ea[4],r2&&ea.length===4,isEditing&&ea.length===4,e)}${scCellHtml(ea[5],r2&&ea.length===5,isEditing&&ea.length===5,e)}
+      <td class="sc-sum-box">${s2}</td><td class="sc-end-total">${et}</td>
       <td class="sc-stat"></td><td class="sc-stat"></td>
     </tr>`;
   }
@@ -447,380 +565,11 @@ function renderScIndoor(ends,startEnd,endEnd,bodyId,curEnd){
     const v=ea.map(x=>getVal(x));
     const et=(ea.length>=3)?v[0]+v[1]+v[2]:'';
     if(et!=='') running+=et;
-    const c10=ea.filter(x=>x===10||x==='X').length, c9=ea.filter(x=>x===9).length;
+    const c10=ea.filter(x=>x===10||x==='X').length,c9=ea.filter(x=>x===9).length;
     if(ea.length>0){tens+=c10;nines+=c9;}
-    html+=`<tr class="sc-end-sep">
-      <td class="sc-end-label" onclick="editEnd(${e})">End ${e+1}${isActive?' ▶':isEditing?' ✏':''}</td>
-      ${scCellHtml(ea[0],isActive&&ea.length===0,isEditing&&ea.length===0,e)}
-      ${scCellHtml(ea[1],isActive&&ea.length===1,isEditing&&ea.length===1,e)}
-      ${scCellHtml(ea[2],isActive&&ea.length===2,isEditing&&ea.length===2,e)}
-      <td class="sc-end-total">${et}</td>
-      <td class="sc-running">${et!==''?running:''}</td>
-      <td class="sc-stat">${ea.length>0?c10:''}</td>
-      <td class="sc-stat">${ea.length>0?c9:''}</td>
-    </tr>`;
-  }
-  html+=`<tr class="sc-half-total"><td colspan="4">HALF TOTAL</td><td>${running}</td><td></td><td>${tens}</td><td>${nines}</td></tr>`;
-  document.getElementById(bodyId).innerHTML=html;
-}
-
-window.editEnd=(endIdx)=>{
-  const archer=getCurrentArcher(), ea=scores[archer.id].ends[endIdx]||[];
-  if(ea.length===0&&endIdx!==getGlobalEnd()) return;
-  editingEnd={endIdx,originalArrows:[...ea]};
-  scores[archer.id].ends[endIdx]=[...ea];
-  renderScoreList(); renderPad(); updateHeader();
-};
-
-function updateHeader(){
-  const cfg=getConfig(), archer=getCurrentArcher();
-  // Show this archer's own current end
-  const archerEnds2 = scores[getCurrentArcher().id].ends;
-  let archerNextEnd2 = 0;
-  for(let e=0; e<cfg.ends; e++){
-    if((archerEnds2[e]||[]).length < cfg.arrows){ archerNextEnd2 = e; break; }
-  }
-  const eIdx=editingEnd!==null?editingEnd.endIdx:archerNextEnd2;
-  document.getElementById('s-end-label').textContent=`${cfg.label.toUpperCase()} ${eIdx+1}${editingEnd?' — EDITING':''}`;
-  document.getElementById('s-archer-name').textContent=archer.name;
-  document.getElementById('s-archer-slot').textContent=archer.slot;
-  const archerScore=scores[getCurrentArcher().id]||{};
-  const grand=archerScore.total||0;
-  const g1=archerScore.g1||0, g2=archerScore.g2||0;
-  let g1label,g2label;
-  if(discipline==='3D'){g1label='11';g2label='10';}
-  else if(discipline==='Field'){g1label='6';g2label='5';}
-  else if(discipline==='Indoor'){g1label='10';g2label='9';}
-  else {g1label='X';g2label='10';}
-  document.getElementById('s-grand-total').textContent=grand;
-  document.getElementById('s-g1').textContent=g1;
-  document.getElementById('s-g2').textContent=g2;
-  document.getElementById('s-g1-label').textContent=g1label;
-  document.getElementById('s-g2-label').textContent=g2label;
-  const total=cfg.ends*targetArchers.length;
-  const done=targetArchers.reduce((s,a)=>s+scores[a.id].ends.filter(e=>e.length===cfg.arrows).length,0);
-  document.getElementById('s-progress').style.width=(total>0?done/total*100:0)+'%';
-}
-
-function renderPad(){
-  const cfg=getConfig(), archer=getCurrentArcher();
-  // Use this archer's own next incomplete end
-  const archerEnds3 = scores[getCurrentArcher().id].ends;
-  let archerNextEnd3 = 0;
-  for(let e=0; e<cfg.ends; e++){
-    if((archerEnds3[e]||[]).length < cfg.arrows){ archerNextEnd3 = e; break; }
-  }
-  const endIdx=editingEnd!==null?editingEnd.endIdx:archerNextEnd3;
-  const curArrows=scores[archer.id].ends[endIdx]||[];
-  const padScores=getPadScores();
-  const isFull=curArrows.length>=cfg.arrows;
-  const isEditing=editingEnd!==null;
-  const allDone=targetArchers.every(a=>scores[a.id].ends.filter(e=>e.length===cfg.arrows).length===cfg.ends);
-  const cols=padScores.length<=5?'repeat(3,1fr)':'repeat(4,1fr)';
-
-  let btns=padScores.map(s=>{
-    const label=s===0?'M':s;
-    const scoreArg=s==='X'?"'X'":s;
-    return `<button class="pad-btn ${padBtnClass(s)}" onclick="handleScore(${scoreArg})" ${isFull&&!isEditing?'disabled style="opacity:0.4"':''}>${label}</button>`;
-  }).join('');
-
-  btns+=`<button class="pad-btn pad-back" onclick="handleBack()" style="grid-column:span 2;">BACKSPACE ←</button>`;
-
-  let nextLabel, nextDisabled;
-  if(isEditing){
-    nextLabel='DONE EDITING ✓'; nextDisabled=false;
-  } else if(allDone){
-    nextLabel='VIEW SUMMARY 🏆'; nextDisabled=false;
-  } else {
-    // Scoring pad only — auto-advances on last arrow
-    nextLabel=`${curArrows.length}/${cfg.arrows}`; nextDisabled=true;
-  }
-
-  if(!nextDisabled){
-    btns+=`<button class="pad-btn pad-next" onclick="handleNext()" style="grid-column:span 2;">${nextLabel}</button>`;
-  }
-  const pad=document.getElementById('score-pad');
-  pad.style.gridTemplateColumns=cols;
-  pad.innerHTML=btns;
-}
-
-window.handleScore=async(val)=>{
-  const cfg=getConfig(), archer=getCurrentArcher();
-  const archerEnds=scores[archer.id].ends;
-  let archerNextEnd=0;
-  for(let e=0;e<cfg.ends;e++){ if((archerEnds[e]||[]).length<cfg.arrows){archerNextEnd=e;break;} }
-  const endIdx=editingEnd!==null?editingEnd.endIdx:archerNextEnd;
-  const end=scores[archer.id].ends[endIdx]||[];
-  if(end.length>=cfg.arrows) return;
-  end.push(val);
-  scores[archer.id].ends[endIdx]=end;
-  recalcStats(archer.id);
-
-  // Auto-advance when end is full (unless editing)
-  if(!editingEnd && end.length===cfg.arrows){
-    const myFullEnds=scores[archer.id].ends.filter(e=>e.length===cfg.arrows).length;
-    const allDone=targetArchers.every(a=>scores[a.id].ends.filter(e=>e.length===cfg.arrows).length===cfg.ends);
-    if(allDone){
-      await saveScores();
-      renderTabs(); renderScoreList(); renderPad(); updateHeader();
-      showSummary(); return;
-    }
-    // Find next archer with fewer full ends
-    let nextIdx=-1;
-    for(let i=activeArcherIdx+1;i<targetArchers.length;i++){
-      if(scores[targetArchers[i].id].ends.filter(e=>e.length===cfg.arrows).length<myFullEnds){nextIdx=i;break;}
-    }
-    if(nextIdx===-1){
-      for(let i=0;i<activeArcherIdx;i++){
-        if(scores[targetArchers[i].id].ends.filter(e=>e.length===cfg.arrows).length<myFullEnds){nextIdx=i;break;}
-      }
-    }
-    if(nextIdx===-1) nextIdx=0; // all done this end → archer 0 next end
-    activeArcherIdx=nextIdx;
-    await saveScores();
-    renderTabs(); renderScoreList(); renderPad(); updateHeader();
-    return;
-  }
-
-  renderScoreList(); renderPad(); updateHeader();
-};
-
-window.handleBack=()=>{
-  const archer=getCurrentArcher();
-  const endIdx=editingEnd!==null?editingEnd.endIdx:getGlobalEnd();
-  const end=scores[archer.id].ends[endIdx]||[];
-  if(end.length>0){end.pop();scores[archer.id].ends[endIdx]=end;recalcStats(archer.id);renderScoreList();renderPad();updateHeader();}
-};
-
-window.handleNext=async()=>{
-  const cfg=getConfig();
-  if(editingEnd!==null){
-    editingEnd=null;
-    await saveScores();
-    renderTabs();renderScoreList();renderPad();updateHeader();
-    toast('Scores saved ✓','success');
-    return;
-  }
-  const allDone=targetArchers.every(a=>scores[a.id].ends.filter(e=>e.length===cfg.arrows).length===cfg.ends);
-  if(allDone){showSummary();return;}
-
-  // Current archer just completed an end — how many full ends do they have?
-  const myFullEnds = scores[getCurrentArcher().id].ends.filter(e=>e.length===cfg.arrows).length;
-
-  // Find next archer who has FEWER full ends (they haven't scored this end yet)
-  let nextIdx = -1;
-  for(let i=activeArcherIdx+1; i<targetArchers.length; i++){
-    if(scores[targetArchers[i].id].ends.filter(e=>e.length===cfg.arrows).length < myFullEnds){nextIdx=i; break;}
-  }
-  if(nextIdx===-1){
-    for(let i=0; i<activeArcherIdx; i++){
-      if(scores[targetArchers[i].id].ends.filter(e=>e.length===cfg.arrows).length < myFullEnds){nextIdx=i; break;}
-    }
-  }
-  // All archers have same number of full ends → end complete, go to archer 0
-  if(nextIdx===-1) nextIdx = 0;
-
-  activeArcherIdx = nextIdx;
-  editingEnd = null;
-  await saveScores();
-  renderTabs(); renderScoreList(); renderPad(); updateHeader();
-  toast(`→ ${targetArchers[nextIdx].name.split(' ')[0]} End ${myFullEnds+1}`,'success');
-};
-
-function recalcStats(archerId){
-  const cfg=getConfig();
-  const ends=scores[archerId].ends;
-  const all=ends.flat();
-  scores[archerId].total=all.reduce((s,v)=>s+getVal(v),0);
-  scores[archerId].tens=all.filter(v=>v===10||v==='X'||v===11).length;
-  scores[archerId].xs=all.filter(v=>v==='X').length;
-  // Half totals
-  if(discipline==='Outdoor'){
-    const h1=ends.slice(0,6).flat();
-    const h2=ends.slice(6,12).flat();
-    scores[archerId].h1=h1.reduce((s,v)=>s+getVal(v),0);
-    scores[archerId].h2=h2.reduce((s,v)=>s+getVal(v),0);
-  } else if(discipline==='Indoor'){
-    const h1=ends.slice(0,10).flat();
-    const h2=ends.slice(10,20).flat();
-    scores[archerId].h1=h1.reduce((s,v)=>s+getVal(v),0);
-    scores[archerId].h2=h2.reduce((s,v)=>s+getVal(v),0);
-  } else {
-    scores[archerId].h1=0; scores[archerId].h2=0;
-  }
-  // Gold counts per discipline
-  if(discipline==='3D'){
-    scores[archerId].g1=all.filter(v=>v===11).length;
-    scores[archerId].g2=all.filter(v=>v===10).length;
-  } else if(discipline==='Field'){
-    scores[archerId].g1=all.filter(v=>v===6).length;
-    scores[archerId].g2=all.filter(v=>v===5).length;
-  } else if(discipline==='Indoor'){
-    scores[archerId].g1=all.filter(v=>v===10).length;
-    scores[archerId].g2=all.filter(v=>v===9).length;
-  } else {
-    scores[archerId].g1=all.filter(v=>v==='X').length;
-    scores[archerId].g2=all.filter(v=>v===10).length;
-  }
-}
-
-async function saveScores(){
-  if(!compId) return;
-  try{
-    const payload={scores:{}};
-    targetArchers.forEach(a=>{
-      const key=String(a.id).replace(/\./g,'_');
-      const s=scores[a.id];
-      // Convert ends array-of-arrays to object (Firestore doesn't support nested arrays)
-      const endsObj={};
-      s.ends.forEach((end,i)=>{ endsObj[String(i)]=end; });
-      payload.scores[key]={total:s.total,tens:s.tens,xs:s.xs,g1:s.g1||0,g2:s.g2||0,h1:s.h1||0,h2:s.h2||0,ends:endsObj};
-    });
-    await setDoc(doc(db,'competitions',compId),payload,{merge:true});
-    console.log('Saved OK',Object.keys(payload.scores));
-  }catch(err){
-    console.error('SAVE ERROR:',err);
-    toast('Save failed: '+err.message,'error');
-  }
-}
-
-let summaryArcherIdx = 0;
-
-function showSummary(){
-  document.getElementById('scoring-screen').style.display='none';
-  document.getElementById('summary-screen').style.display='flex';
-  document.getElementById('sum-title').textContent=`Target ${targetNum} — Complete`;
-  summaryArcherIdx = 0;
-  renderSummaryTabs();
-  renderSummaryScorecard(0);
-}
-
-function renderSummaryTabs(){
-  const tabs = document.getElementById('summary-archer-tabs');
-  if(targetArchers.length<=1){ tabs.style.display='none'; return; }
-  tabs.style.display='flex';
-  tabs.innerHTML = targetArchers.map((a,i)=>
-    `<button onclick="switchSummaryArcher(${i})" style="flex:1;padding:8px 6px;border:none;border-radius:6px;background:${i===summaryArcherIdx?'var(--blue)':'transparent'};color:${i===summaryArcherIdx?'#fff':'var(--muted)'};font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">${a.slot} · ${a.name.split(' ')[0]}</button>`
-  ).join('');
-}
-
-window.switchSummaryArcher=(idx)=>{
-  summaryArcherIdx=idx;
-  renderSummaryTabs();
-  renderSummaryScorecard(idx);
-};
-
-function renderSummaryScorecard(idx){
-  const a = targetArchers[idx];
-  const s = scores[a.id];
-  const list = document.getElementById('summary-list');
-
-  // For 3D and Field — simple end list
-  if(discipline==='3D'||discipline==='Field'){
-    const cfg=getConfig();
-    const endRows=s.ends.map((end,i)=>{
-      const tot=end.reduce((x,v)=>x+getVal(v),0);
-      const chips=end.map(v=>`<span class="arrow-chip ${chipClass(v)}" style="font-size:12px;padding:2px 7px;">${v===0?'M':v}</span>`).join('');
-      return `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #eee;">
-        <div style="font-size:11px;color:#888;width:70px;">${cfg.label} ${i+1}</div>
-        <div style="display:flex;gap:3px;flex:1;">${chips}</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#1565c0;">${tot}</div>
-      </div>`;
-    }).join('');
-    list.innerHTML=`
-      <div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
-        <div><div style="font-size:11px;color:#aaa;">${a.slot} · ${a.bow} · ${a.age}</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;">${a.name}</div></div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:var(--accent);">${s.total}</div>
-      </div>
-      <div>${endRows}</div>`;
-    return;
-  }
-
-  // Outdoor and Indoor — professional scorecard
-  if(discipline==='Outdoor'){
-    list.innerHTML=`
-      <div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
-        <div><div style="font-size:11px;color:#aaa;">${a.slot} · ${a.bow} · ${a.age}</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;">${a.name}</div></div>
-        <div style="text-align:right;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:#FFD700;">${s.total}</div><div style="font-size:11px;color:#aaa;">X:${s.xs} · 10+X:${s.tens}</div></div>
-      </div>
-      <div class="sc-half-header"><div class="sc-half-title">1st HALF  (Ends 1–6)</div><div>10+X</div><div>X</div></div>
-      <table class="sc-table"><colgroup>
-        <col style="width:42px"><col><col><col><col style="width:32px"><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px">
-      </colgroup><tbody id="sum-body-1"></tbody></table>
-      <div class="sc-half-header" style="margin-top:6px;"><div class="sc-half-title">2nd HALF  (Ends 7–12)</div><div>10+X</div><div>X</div></div>
-      <table class="sc-table"><colgroup>
-        <col style="width:42px"><col><col><col><col style="width:32px"><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px">
-      </colgroup><tbody id="sum-body-2"></tbody></table>
-      <div style="height:10px;"></div>`;
-    renderSumOutdoor(s.ends,0,6,'sum-body-1');
-    renderSumOutdoor(s.ends,6,12,'sum-body-2');
-  } else {
-    list.innerHTML=`
-      <div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
-        <div><div style="font-size:11px;color:#aaa;">${a.slot} · ${a.bow} · ${a.age}</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;">${a.name}</div></div>
-        <div style="text-align:right;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:#FFD700;">${s.total}</div><div style="font-size:11px;color:#aaa;">10:${s.g1} · 9:${s.g2}</div></div>
-      </div>
-      <div class="sc-half-header"><div class="sc-half-title">1st HALF  (Ends 1–10)</div><div>10</div><div>9</div></div>
-      <table class="sc-table"><colgroup>
-        <col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px">
-      </colgroup><tbody id="sum-body-1"></tbody></table>
-      <div class="sc-half-header" style="margin-top:6px;"><div class="sc-half-title">2nd HALF  (Ends 11–20)</div><div>10</div><div>9</div></div>
-      <table class="sc-table"><colgroup>
-        <col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px">
-      </colgroup><tbody id="sum-body-2"></tbody></table>
-      <div style="height:10px;"></div>`;
-    renderSumIndoor(s.ends,0,10,'sum-body-1');
-    renderSumIndoor(s.ends,10,20,'sum-body-2');
-  }
-}
-
-function sumCellHtml(val){
-  const v = val===undefined||val==='' ? '' : (val===0?'M':val);
-  const cls = (val==='X'||val===10||val===9||val===11) ? 'sc-gold' : '';
-  return `<td class="${cls}">${v}</td>`;
-}
-
-function renderSumOutdoor(ends,startEnd,endEnd,bodyId){
-  let html='',running=0,tens=0,xs=0;
-  for(let e=startEnd;e<endEnd;e++){
-    const ea=ends[e]||[];
-    const v=ea.map(x=>getVal(x));
-    const s1=ea.length>=3?v[0]+v[1]+v[2]:'';
-    const s2=ea.length>=6?v[3]+v[4]+v[5]:'';
-    const et=s2!==''?(Number(s1)||0)+s2:'';
-    if(et!=='') running+=et;
-    const c10=ea.filter(x=>x===10||x==='X').length, cx=ea.filter(x=>x==='X').length;
-    if(ea.length>0){tens+=c10;xs+=cx;}
-    html+=`<tr>
-      <td rowspan="2" class="sc-end-label">End ${e+1}</td>
-      ${sumCellHtml(ea[0])}${sumCellHtml(ea[1])}${sumCellHtml(ea[2])}
-      <td class="sc-sum-box">${s1}</td><td class="sc-no-entry"></td>
-      <td rowspan="2" class="sc-running">${et!==''?running:''}</td>
-      <td class="sc-stat">${ea.length>0?c10:''}</td><td class="sc-stat">${ea.length>0?cx:''}</td>
-    </tr><tr class="sc-end-sep">
-      ${sumCellHtml(ea[3])}${sumCellHtml(ea[4])}${sumCellHtml(ea[5])}
-      <td class="sc-sum-box">${s2}</td><td class="sc-end-total">${et}</td>
-      <td class="sc-stat"></td><td class="sc-stat"></td>
-    </tr>`;
-  }
-  html+=`<tr class="sc-half-total"><td colspan="5">HALF TOTAL</td><td>${running}</td><td></td><td>${tens}</td><td>${xs}</td></tr>`;
-  document.getElementById(bodyId).innerHTML=html;
-}
-
-function renderSumIndoor(ends,startEnd,endEnd,bodyId){
-  let html='',running=0,tens=0,nines=0;
-  for(let e=startEnd;e<endEnd;e++){
-    const ea=ends[e]||[];
-    const v=ea.map(x=>getVal(x));
-    const et=ea.length>=3?v[0]+v[1]+v[2]:'';
-    if(et!=='') running+=et;
-    const c10=ea.filter(x=>x===10||x==='X').length, c9=ea.filter(x=>x===9).length;
-    if(ea.length>0){tens+=c10;nines+=c9;}
-    html+=`<tr class="sc-end-sep">
-      <td class="sc-end-label">End ${e+1}</td>
-      ${sumCellHtml(ea[0])}${sumCellHtml(ea[1])}${sumCellHtml(ea[2])}
-      <td class="sc-end-total">${et}</td>
-      <td class="sc-running">${et!==''?running:''}</td>
+    html+=`<tr class="sc-end-sep"><td class="sc-end-label" onclick="editEnd(${e})">End ${e+1}${isActive?' ▶':isEditing?' ✏':''}</td>
+      ${scCellHtml(ea[0],isActive&&ea.length===0,isEditing&&ea.length===0,e)}${scCellHtml(ea[1],isActive&&ea.length===1,isEditing&&ea.length===1,e)}${scCellHtml(ea[2],isActive&&ea.length===2,isEditing&&ea.length===2,e)}
+      <td class="sc-end-total">${et}</td><td class="sc-running">${et!==''?running:''}</td>
       <td class="sc-stat">${ea.length>0?c10:''}</td><td class="sc-stat">${ea.length>0?c9:''}</td>
     </tr>`;
   }
@@ -828,155 +577,463 @@ function renderSumIndoor(ends,startEnd,endEnd,bodyId){
   document.getElementById(bodyId).innerHTML=html;
 }
 
-/* ── PDF EXPORT & UPLOAD ── */
-function buildScorecardHTML(archerIdx){
-  const a = targetArchers[archerIdx];
-  const s = scores[a.id];
-  const isOut = discipline==='Outdoor';
-  const isIn  = discipline==='Indoor';
-  const cfg   = getConfig();
+window.editEnd=(endIdx)=>{
+  const archer=getCurrentArcher(),ea=scores[archer.id].ends[endIdx]||[];
+  if(ea.length===0&&endIdx!==getGlobalEnd()) return;
+  editingEnd={endIdx,originalArrows:[...ea]};
+  scores[archer.id].ends[endIdx]=[...ea];
+  renderScoreList();renderPad();updateQualHeader();
+};
 
-  function cellStyle(val){
-    return (val==='X'||val===10||val===9||val===11)?'background:#fff9c4;color:#5d4037;font-weight:700;':'';
-  }
-
-  let tableHtml='';
-  if(isOut){
-    function buildHalfOut(ends,startEnd,endEnd){
-      let rows='',running=0,tens=0,xs=0;
-      for(let e=startEnd;e<endEnd;e++){
-        const ea=ends[e]||[];
-        const v=ea.map(x=>getVal(x));
-        const s1=ea.length>=3?v[0]+v[1]+v[2]:'';
-        const s2=ea.length>=6?v[3]+v[4]+v[5]:'';
-        const et=s2!==''?(Number(s1)||0)+s2:'';
-        if(et!=='') running+=et;
-        const c10=ea.filter(x=>x===10||x==='X').length,cx=ea.filter(x=>x==='X').length;
-        if(ea.length>0){tens+=c10;xs+=cx;}
-        const d=v=>ea[v]===0?'M':(ea[v]===undefined?'':ea[v]);
-        rows+=`<tr>
-          <td rowspan="2" style="background:#f0f0f0;font-weight:700;font-size:10px;border-right:2px solid #999;">End ${e+1}</td>
-          <td style="${cellStyle(ea[0])}">${d(0)}</td><td style="${cellStyle(ea[1])}">${d(1)}</td><td style="${cellStyle(ea[2])}">${d(2)}</td>
-          <td style="background:#f5f5f5;font-size:11px;">${s1}</td><td style="background:#eee;"></td>
-          <td rowspan="2" style="background:#fff8e1;font-weight:700;color:#c62828;border-left:2px solid #999;border-right:2px solid #999;">${et!==''?running:''}</td>
-          <td style="font-size:11px;color:#555;">${ea.length>0?c10:''}</td><td style="font-size:11px;color:#555;">${ea.length>0?cx:''}</td>
-        </tr><tr style="border-bottom:1.5px solid #aaa;">
-          <td style="${cellStyle(ea[3])}">${d(3)}</td><td style="${cellStyle(ea[4])}">${d(4)}</td><td style="${cellStyle(ea[5])}">${d(5)}</td>
-          <td style="background:#f5f5f5;font-size:11px;">${s2}</td>
-          <td style="background:#e3f2fd;font-weight:700;color:#1565c0;border-left:2px solid #999;">${et}</td>
-          <td></td><td></td>
-        </tr>`;
-      }
-      rows+=`<tr style="background:#37474f;color:#fff;font-weight:700;"><td colspan="5">HALF TOTAL</td><td>${running}</td><td></td><td>${tens}</td><td>${xs}</td></tr>`;
-      return rows;
-    }
-    const cols='<colgroup><col style="width:46px"><col><col><col><col style="width:32px"><col style="width:34px"><col style="width:44px"><col style="width:28px"><col style="width:28px"></colgroup>';
-    const thead='<tr style="background:#555;color:#fff;font-size:10px;font-weight:700;"><th colspan="4" style="text-align:left;padding:3px 6px;">ARROWS</th><th>SUB</th><th>END</th><th>TOTAL</th><th>10+X</th><th>X</th></tr>';
-    tableHtml=`
-      <div style="background:#446;color:#fff;padding:3px 6px;font-size:10px;font-weight:700;">1st HALF (Ends 1–6)</div>
-      <table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:12px;">${cols}<tbody>${thead}${buildHalfOut(s.ends,0,6)}</tbody></table>
-      <div style="background:#446;color:#fff;padding:3px 6px;font-size:10px;font-weight:700;margin-top:6px;">2nd HALF (Ends 7–12)</div>
-      <table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:12px;">${cols}<tbody>${thead}${buildHalfOut(s.ends,6,12)}</tbody></table>`;
-  } else if(isIn){
-    function buildHalfIn(ends,startEnd,endEnd){
-      let rows='',running=0,tens=0,nines=0;
-      for(let e=startEnd;e<endEnd;e++){
-        const ea=ends[e]||[];
-        const v=ea.map(x=>getVal(x));
-        const et=ea.length>=3?v[0]+v[1]+v[2]:'';
-        if(et!=='') running+=et;
-        const c10=ea.filter(x=>x===10||x==='X').length,c9=ea.filter(x=>x===9).length;
-        if(ea.length>0){tens+=c10;nines+=c9;}
-        const d=v=>ea[v]===0?'M':(ea[v]===undefined?'':ea[v]);
-        rows+=`<tr style="border-bottom:1px solid #ccc;">
-          <td style="background:#f0f0f0;font-weight:700;font-size:10px;border-right:2px solid #999;">End ${e+1}</td>
-          <td style="${cellStyle(ea[0])}">${d(0)}</td><td style="${cellStyle(ea[1])}">${d(1)}</td><td style="${cellStyle(ea[2])}">${d(2)}</td>
-          <td style="background:#e3f2fd;font-weight:700;color:#1565c0;border-left:2px solid #999;">${et}</td>
-          <td style="background:#fff8e1;font-weight:700;color:#c62828;border-left:2px solid #999;border-right:2px solid #999;">${et!==''?running:''}</td>
-          <td style="font-size:11px;color:#555;">${ea.length>0?c10:''}</td><td style="font-size:11px;color:#555;">${ea.length>0?c9:''}</td>
-        </tr>`;
-      }
-      rows+=`<tr style="background:#37474f;color:#fff;font-weight:700;"><td colspan="4">HALF TOTAL</td><td>${running}</td><td></td><td>${tens}</td><td>${nines}</td></tr>`;
-      return rows;
-    }
-    const cols='<colgroup><col style="width:46px"><col><col><col><col style="width:38px"><col style="width:46px"><col style="width:28px"><col style="width:28px"></colgroup>';
-    const thead='<tr style="background:#555;color:#fff;font-size:10px;font-weight:700;"><th colspan="4" style="text-align:left;padding:3px 6px;">ARROWS</th><th>END</th><th>TOTAL</th><th>10</th><th>9</th></tr>';
-    tableHtml=`
-      <div style="background:#446;color:#fff;padding:3px 6px;font-size:10px;font-weight:700;">1st HALF (Ends 1–10)</div>
-      <table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:12px;">${cols}<tbody>${thead}${buildHalfIn(s.ends,0,10)}</tbody></table>
-      <div style="background:#446;color:#fff;padding:3px 6px;font-size:10px;font-weight:700;margin-top:6px;">2nd HALF (Ends 11–20)</div>
-      <table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:12px;">${cols}<tbody>${thead}${buildHalfIn(s.ends,10,20)}</tbody></table>`;
-  } else {
-    // 3D / Field simple table
-    let rows='',running=0;
-    s.ends.forEach((ea,i)=>{
-      const tot=ea.reduce((x,v)=>x+getVal(v),0);
-      if(ea.length>0) running+=tot;
-      const cells=ea.map(v=>`<td>${v===0?'M':v}</td>`).join('');
-      rows+=`<tr style="border-bottom:1px solid #ccc;"><td style="background:#f0f0f0;font-size:10px;font-weight:700;">${cfg.label} ${i+1}</td>${cells}<td style="background:#e3f2fd;font-weight:700;color:#1565c0;">${ea.length>0?tot:''}</td><td style="background:#fff8e1;font-weight:700;color:#c62828;">${ea.length>0?running:''}</td></tr>`;
-    });
-    tableHtml=`<table style="width:100%;border-collapse:collapse;border:1.5px solid #999;font-size:12px;"><tbody>${rows}</tbody></table>`;
-  }
-
-  return `<!DOCTYPE html><html><head><meta charset="utf-8">
-  <style>body{margin:12px;font-family:Arial,sans-serif;color:#111;}td,th{border:1px solid #ccc;text-align:center;height:22px;padding:0 2px;}
-  @media print{@page{size:A4 portrait;margin:8mm;}}</style></head><body>
-  <div style="background:#37474f;color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-    <div>
-      <div style="font-size:11px;color:#aaa;">${discipline} · Target ${targetNum}${a.slot} · ${a.bow} · ${a.age}</div>
-      <div style="font-size:20px;font-weight:700;">${a.name}</div>
-    </div>
-    <div style="font-size:36px;font-weight:900;color:#FFD700;">${s.total}</div>
-  </div>
-  ${tableHtml}
-  </body></html>`;
+function getGlobalEnd(){
+  const cfg=getConfig();
+  for(let e=0;e<cfg.ends;e++){if(targetArchers.some(a=>(scores[a.id].ends[e]||[]).length<cfg.arrows))return e;}
+  return cfg.ends-1;
 }
 
-window.exportAndUploadPDF = async () => {
-  const a = targetArchers[summaryArcherIdx];
-  const html = buildScorecardHTML(summaryArcherIdx);
+function updateHeader(){updateQualHeader();}
 
-  // Open print dialog
-  const iframe = document.createElement('iframe');
-  iframe.style.cssText='position:fixed;width:0;height:0;border:none;left:-999px;top:-999px;';
-  document.body.appendChild(iframe);
-  iframe.contentDocument.write(html);
-  iframe.contentDocument.close();
-  setTimeout(()=>{ iframe.contentWindow.print(); setTimeout(()=>document.body.removeChild(iframe),1000); },400);
+function updateQualHeader(){
+  const cfg=getConfig(),archer=getCurrentArcher();
+  const archerEnds=scores[archer.id].ends;
+  let next=0;
+  for(let e=0;e<cfg.ends;e++){if((archerEnds[e]||[]).length<cfg.arrows){next=e;break;}}
+  const eIdx=editingEnd!==null?editingEnd.endIdx:next;
+  document.getElementById('s-end-label').textContent=`${cfg.label.toUpperCase()} ${eIdx+1}${editingEnd?' — EDITING':''}`;
+  document.getElementById('s-archer-name').textContent=archer.name;
+  document.getElementById('s-archer-slot').textContent=archer.slot;
+  const s=scores[archer.id]||{};
+  let g1l,g2l;
+  if(discipline==='3D'){g1l='11';g2l='10';}else if(discipline==='Field'){g1l='6';g2l='5';}else if(discipline==='Indoor'){g1l='10';g2l='9';}else{g1l='X';g2l='10';}
+  document.getElementById('s-grand-total').textContent=s.total||0;
+  document.getElementById('s-g1').textContent=s.g1||0;
+  document.getElementById('s-g2').textContent=s.g2||0;
+  document.getElementById('s-g1-label').textContent=g1l;
+  document.getElementById('s-g2-label').textContent=g2l;
+  const total=cfg.ends*targetArchers.length;
+  const done=targetArchers.reduce((s,a)=>s+scores[a.id].ends.filter(e=>e.length===cfg.arrows).length,0);
+  document.getElementById('s-progress').style.width=(total>0?done/total*100:0)+'%';
+}
 
-  // Upload HTML to Firebase Storage
-  try {
-    toast('Uploading to admin...','success');
-    const now = new Date();
-    const dateStr = now.toISOString().replace(/[:.]/g,'-').slice(0,16);
-    const fileName = `scorecards/${compId}/T${targetNum}${a.slot}_${a.name.replace(/\s+/g,'_')}_${dateStr}.html`;
-    const storageRef = ref(storage, fileName);
-    await uploadString(storageRef, html, 'raw', {contentType:'text/html'});
-    const url = await getDownloadURL(storageRef);
-    // Save reference to Firestore
-    const scKey = `T${targetNum}${a.slot}_${String(a.id)}`;
-    await setDoc(doc(db,'competitions',compId),{
-      scorecards: { [scKey]: { name:a.name, target:targetNum, slot:a.slot, url, uploadedAt:now.toISOString(), total:scores[a.id].total } }
-    },{merge:true});
-    toast('Sent to admin ✓','success');
-  } catch(err){
-    console.error('Upload error:',err);
-    toast('Upload failed: '+err.message,'error');
+function renderPad(){
+  const cfg=getConfig(),archer=getCurrentArcher();
+  const archerEnds=scores[archer.id].ends;
+  let next=0;
+  for(let e=0;e<cfg.ends;e++){if((archerEnds[e]||[]).length<cfg.arrows){next=e;break;}}
+  const endIdx=editingEnd!==null?editingEnd.endIdx:next;
+  const curArrows=scores[archer.id].ends[endIdx]||[];
+  const padScores=getPadScores();
+  const isFull=curArrows.length>=cfg.arrows;
+  const isEditing=editingEnd!==null;
+  const allDone=targetArchers.every(a=>scores[a.id].ends.filter(e=>e.length===cfg.arrows).length===cfg.ends);
+  const cols=padScores.length<=5?'repeat(3,1fr)':'repeat(4,1fr)';
+  let btns=padScores.map(s=>{
+    const label=s===0?'M':s;
+    const scoreArg=s==='X'?"'X'":s;
+    return `<button class="pad-btn ${padBtnClass(s)}" onclick="handleScore(${scoreArg})" ${isFull&&!isEditing?'disabled style="opacity:0.4"':''}>${label}</button>`;
+  }).join('');
+  btns+=`<button class="pad-btn pad-back" onclick="handleBack()" style="grid-column:span 2;">BACKSPACE ←</button>`;
+  let nextLabel,nextDisabled;
+  if(isEditing){nextLabel='DONE EDITING ✓';nextDisabled=false;}
+  else if(allDone){nextLabel='VIEW SUMMARY 🏆';nextDisabled=false;}
+  else{nextLabel=`${curArrows.length}/${cfg.arrows}`;nextDisabled=true;}
+  if(!nextDisabled) btns+=`<button class="pad-btn pad-next" onclick="handleNext()" style="grid-column:span 2;">${nextLabel}</button>`;
+  const pad=document.getElementById('score-pad');
+  pad.style.gridTemplateColumns=cols;
+  pad.innerHTML=btns;
+}
+
+window.handleScore=async(val)=>{
+  const cfg=getConfig(),archer=getCurrentArcher();
+  const archerEnds=scores[archer.id].ends;
+  let next=0;
+  for(let e=0;e<cfg.ends;e++){if((archerEnds[e]||[]).length<cfg.arrows){next=e;break;}}
+  const endIdx=editingEnd!==null?editingEnd.endIdx:next;
+  const end=scores[archer.id].ends[endIdx]||[];
+  if(end.length>=cfg.arrows) return;
+  end.push(val);
+  scores[archer.id].ends[endIdx]=end;
+  recalcStats(archer.id);
+  if(!editingEnd&&end.length===cfg.arrows){
+    const myFull=scores[archer.id].ends.filter(e=>e.length===cfg.arrows).length;
+    const allDone=targetArchers.every(a=>scores[a.id].ends.filter(e=>e.length===cfg.arrows).length===cfg.ends);
+    if(allDone){await saveQualScores();renderTabs();renderScoreList();renderPad();updateQualHeader();showQualSummary();return;}
+    let nextIdx=-1;
+    for(let i=activeArcherIdx+1;i<targetArchers.length;i++){if(scores[targetArchers[i].id].ends.filter(e=>e.length===cfg.arrows).length<myFull){nextIdx=i;break;}}
+    if(nextIdx===-1){for(let i=0;i<activeArcherIdx;i++){if(scores[targetArchers[i].id].ends.filter(e=>e.length===cfg.arrows).length<myFull){nextIdx=i;break;}}}
+    if(nextIdx===-1) nextIdx=0;
+    activeArcherIdx=nextIdx;
+    await saveQualScores();
+    renderTabs();renderScoreList();renderPad();updateQualHeader();
+    return;
   }
+  renderScoreList();renderPad();updateQualHeader();
 };
+
+window.handleBack=()=>{
+  const archer=getCurrentArcher();
+  const endIdx=editingEnd!==null?editingEnd.endIdx:getGlobalEnd();
+  const end=scores[archer.id].ends[endIdx]||[];
+  if(end.length>0){end.pop();scores[archer.id].ends[endIdx]=end;recalcStats(archer.id);renderScoreList();renderPad();updateQualHeader();}
+};
+
+window.handleNext=async()=>{
+  const cfg=getConfig();
+  if(editingEnd!==null){editingEnd=null;await saveQualScores();renderTabs();renderScoreList();renderPad();updateQualHeader();toast('Scores saved ✓','success');return;}
+  const allDone=targetArchers.every(a=>scores[a.id].ends.filter(e=>e.length===cfg.arrows).length===cfg.ends);
+  if(allDone){showQualSummary();return;}
+  const myFull=scores[getCurrentArcher().id].ends.filter(e=>e.length===cfg.arrows).length;
+  let nextIdx=-1;
+  for(let i=activeArcherIdx+1;i<targetArchers.length;i++){if(scores[targetArchers[i].id].ends.filter(e=>e.length===cfg.arrows).length<myFull){nextIdx=i;break;}}
+  if(nextIdx===-1){for(let i=0;i<activeArcherIdx;i++){if(scores[targetArchers[i].id].ends.filter(e=>e.length===cfg.arrows).length<myFull){nextIdx=i;break;}}}
+  if(nextIdx===-1) nextIdx=0;
+  activeArcherIdx=nextIdx; editingEnd=null;
+  await saveQualScores();
+  renderTabs();renderScoreList();renderPad();updateQualHeader();
+};
+
+function recalcStats(archerId){
+  const cfg=getConfig(),ends=scores[archerId].ends,all=ends.flat();
+  scores[archerId].total=all.reduce((s,v)=>s+getVal(v),0);
+  scores[archerId].tens=all.filter(v=>v===10||v==='X'||v===11).length;
+  scores[archerId].xs=all.filter(v=>v==='X').length;
+  if(discipline==='Outdoor'){
+    scores[archerId].h1=ends.slice(0,6).flat().reduce((s,v)=>s+getVal(v),0);
+    scores[archerId].h2=ends.slice(6,12).flat().reduce((s,v)=>s+getVal(v),0);
+    scores[archerId].g1=all.filter(v=>v==='X').length;
+    scores[archerId].g2=all.filter(v=>v===10).length;
+  }else if(discipline==='Indoor'){
+    scores[archerId].h1=ends.slice(0,10).flat().reduce((s,v)=>s+getVal(v),0);
+    scores[archerId].h2=ends.slice(10,20).flat().reduce((s,v)=>s+getVal(v),0);
+    scores[archerId].g1=all.filter(v=>v===10||v==='X').length;
+    scores[archerId].g2=all.filter(v=>v===9).length;
+  }else if(discipline==='3D'){
+    scores[archerId].h1=0;scores[archerId].h2=0;
+    scores[archerId].g1=all.filter(v=>v===11).length;
+    scores[archerId].g2=all.filter(v=>v===10).length;
+  }else{
+    scores[archerId].h1=0;scores[archerId].h2=0;
+    scores[archerId].g1=all.filter(v=>v===6).length;
+    scores[archerId].g2=all.filter(v=>v===5).length;
+  }
+}
+
+async function saveQualScores(){
+  if(!compId) return;
+  try{
+    const payload={scores:{}};
+    targetArchers.forEach(a=>{
+      const key=String(a.id).replace(/\./g,'_');
+      const s=scores[a.id];
+      const endsObj={};
+      s.ends.forEach((end,i)=>{endsObj[String(i)]=end;});
+      payload.scores[key]={total:s.total,tens:s.tens,xs:s.xs,g1:s.g1||0,g2:s.g2||0,h1:s.h1||0,h2:s.h2||0,ends:endsObj};
+    });
+    await setDoc(doc(db,'competitions',compId),payload,{merge:true});
+  }catch(e){toast('Save failed','error');}
+}
+
+/* ── QUALIFICATION SUMMARY ── */
+let summaryArcherIdx=0;
+function showQualSummary(){
+  document.getElementById('scoring-screen').style.display='none';
+  document.getElementById('summary-screen').style.display='flex';
+  document.getElementById('sum-title').textContent=`Target ${targetNum} — Complete`;
+  summaryArcherIdx=0;
+  renderSummaryTabs();
+  renderSummaryScorecard(0);
+}
+
+function renderSummaryTabs(){
+  const tabs=document.getElementById('summary-archer-tabs');
+  if(targetArchers.length<=1){tabs.style.display='none';return;}
+  tabs.style.display='flex';
+  tabs.innerHTML=targetArchers.map((a,i)=>
+    `<button onclick="switchSummaryArcher(${i})" style="flex:1;padding:8px 6px;border:none;border-radius:6px;background:${i===summaryArcherIdx?'var(--blue)':'transparent'};color:${i===summaryArcherIdx?'#fff':'var(--muted)'};font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">${a.slot} · ${a.name.split(' ')[0]}</button>`
+  ).join('');
+}
+
+window.switchSummaryArcher=(idx)=>{summaryArcherIdx=idx;renderSummaryTabs();renderSummaryScorecard(idx);};
+
+function renderSummaryScorecard(idx){
+  const a=targetArchers[idx],s=scores[a.id],list=document.getElementById('summary-list');
+  if(discipline==='3D'||discipline==='Field'){
+    const cfg=getConfig();
+    const endRows=s.ends.map((end,i)=>{
+      const tot=end.reduce((x,v)=>x+getVal(v),0);
+      const chips=end.map(v=>`<span class="arrow-chip ${chipClass(v)}" style="font-size:12px;padding:2px 7px;">${v===0?'M':v}</span>`).join('');
+      return `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #eee;"><div style="font-size:11px;color:#888;width:70px;">${cfg.label} ${i+1}</div><div style="display:flex;gap:3px;flex:1;">${chips}</div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#1565c0;">${tot}</div></div>`;
+    }).join('');
+    list.innerHTML=`<div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:11px;color:#aaa;">${a.slot} · ${a.bow} · ${a.age}</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;">${a.name}</div></div><div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:var(--accent);">${s.total}</div></div><div>${endRows}</div>`;
+    return;
+  }
+  function sumCell(val){const v=val===undefined||val===''?'':(val===0?'M':val);const cls=(val==='X'||val===10||val===9||val===11)?'sc-gold':'';return `<td class="${cls}">${v}</td>`;}
+  if(discipline==='Outdoor'){
+    list.innerHTML=`<div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:11px;color:#aaa;">${a.slot} · ${a.bow} · ${a.age}</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;">${a.name}</div></div><div style="text-align:right;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:#FFD700;">${s.total}</div><div style="font-size:11px;color:#aaa;">X:${s.xs} · 10+X:${s.tens}</div></div></div>
+      <div class="sc-half-header"><div class="sc-half-title">1st HALF (Ends 1–6)</div><div>10+X</div><div>X</div></div>
+      <table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:32px"><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sum-body-1"></tbody></table>
+      <div class="sc-half-header" style="margin-top:6px;"><div class="sc-half-title">2nd HALF (Ends 7–12)</div><div>10+X</div><div>X</div></div>
+      <table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:32px"><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sum-body-2"></tbody></table><div style="height:10px;"></div>`;
+    function sumOut(ends,s,e,bid){let html='',r=0,t=0,x=0;for(let i=s;i<e;i++){const ea=ends[i]||[];const v=ea.map(x=>getVal(x));const s1=ea.length>=3?v[0]+v[1]+v[2]:'';const s2=ea.length>=6?v[3]+v[4]+v[5]:'';const et=s2!==''?(Number(s1)||0)+s2:'';if(et!=='')r+=et;const c10=ea.filter(x=>x===10||x==='X').length,cx=ea.filter(x=>x==='X').length;if(ea.length>0){t+=c10;x+=cx;}html+=`<tr><td rowspan="2" class="sc-end-label">End ${i+1}</td>${sumCell(ea[0])}${sumCell(ea[1])}${sumCell(ea[2])}<td class="sc-sum-box">${s1}</td><td class="sc-no-entry"></td><td rowspan="2" class="sc-running">${et!==''?r:''}</td><td class="sc-stat">${ea.length>0?c10:''}</td><td class="sc-stat">${ea.length>0?cx:''}</td></tr><tr class="sc-end-sep">${sumCell(ea[3])}${sumCell(ea[4])}${sumCell(ea[5])}<td class="sc-sum-box">${s2}</td><td class="sc-end-total">${et}</td><td class="sc-stat"></td><td class="sc-stat"></td></tr>`;}html+=`<tr class="sc-half-total"><td colspan="5">HALF TOTAL</td><td>${r}</td><td></td><td>${t}</td><td>${x}</td></tr>`;document.getElementById(bid).innerHTML=html;}
+    sumOut(s.ends,0,6,'sum-body-1');sumOut(s.ends,6,12,'sum-body-2');
+  } else {
+    list.innerHTML=`<div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:11px;color:#aaa;">${a.slot} · ${a.bow} · ${a.age}</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;">${a.name}</div></div><div style="text-align:right;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:#FFD700;">${s.total}</div><div style="font-size:11px;color:#aaa;">10:${s.g1} · 9:${s.g2}</div></div></div>
+      <div class="sc-half-header"><div class="sc-half-title">1st HALF (Ends 1–10)</div><div>10</div><div>9</div></div>
+      <table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sum-body-1"></tbody></table>
+      <div class="sc-half-header" style="margin-top:6px;"><div class="sc-half-title">2nd HALF (Ends 11–20)</div><div>10</div><div>9</div></div>
+      <table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sum-body-2"></tbody></table><div style="height:10px;"></div>`;
+    function sumIn(ends,s,e,bid){let html='',r=0,t=0,n=0;for(let i=s;i<e;i++){const ea=ends[i]||[];const v=ea.map(x=>getVal(x));const et=ea.length>=3?v[0]+v[1]+v[2]:'';if(et!=='')r+=et;const c10=ea.filter(x=>x===10||x==='X').length,c9=ea.filter(x=>x===9).length;if(ea.length>0){t+=c10;n+=c9;}html+=`<tr class="sc-end-sep"><td class="sc-end-label">End ${i+1}</td>${sumCell(ea[0])}${sumCell(ea[1])}${sumCell(ea[2])}<td class="sc-end-total">${et}</td><td class="sc-running">${et!==''?r:''}</td><td class="sc-stat">${ea.length>0?c10:''}</td><td class="sc-stat">${ea.length>0?c9:''}</td></tr>`;}html+=`<tr class="sc-half-total"><td colspan="4">HALF TOTAL</td><td>${r}</td><td></td><td>${t}</td><td>${n}</td></tr>`;document.getElementById(bid).innerHTML=html;}
+    sumIn(s.ends,0,10,'sum-body-1');sumIn(s.ends,10,20,'sum-body-2');
+  }
+}
 
 window.goBackToScoring=()=>{
   document.getElementById('summary-screen').style.display='none';
   document.getElementById('scoring-screen').style.display='flex';
-  renderTabs();renderScoreList();renderPad();updateHeader();
+  renderTabs();renderScoreList();renderPad();updateQualHeader();
 };
 
-function toast(msg,type='success'){
-  const el=document.getElementById('toast');
-  el.textContent=msg;el.className=`show ${type}`;
-  setTimeout(()=>el.classList.remove('show'),2500);
+/* ══════════════════════════════════════════
+   MATCH SCORING
+══════════════════════════════════════════ */
+function getMatchSetScore(setIdx,archerIdx){
+  const s=matchSets[setIdx];
+  if(!s) return 0;
+  return archerIdx===0?s.score1||0:s.score2||0;
+}
+function getMatchArrows(setIdx,archerIdx){
+  const s=matchSets[setIdx];
+  if(!s) return [];
+  return archerIdx===0?(s.arrows1||[]):(s.arrows2||[]);
+}
+function setMatchArrows(setIdx,archerIdx,arrows){
+  if(!matchSets[setIdx]) matchSets[setIdx]={score1:0,score2:0,arrows1:[],arrows2:[]};
+  if(archerIdx===0){matchSets[setIdx].arrows1=arrows;matchSets[setIdx].score1=arrows.reduce((s,v)=>s+getVal(v),0);}
+  else{matchSets[setIdx].arrows2=arrows;matchSets[setIdx].score2=arrows.reduce((s,v)=>s+getVal(v),0);}
+}
+function calcMatchPoints(){
+  let p1=0,p2=0;
+  matchSets.forEach(s=>{
+    if(!s) return;
+    if(s.score1>s.score2) p1+=2;
+    else if(s.score2>s.score1) p2+=2;
+    else{p1+=1;p2+=1;}
+  });
+  return {p1,p2};
+}
+function getActiveMatchSet(){
+  for(let i=0;i<MAX_SETS;i++){
+    if(getMatchArrows(i,matchActiveArcher).length<ARROWS_PER_SET) return i;
+  }
+  return MAX_SETS-1;
+}
+function checkMatchDone(){
+  const {p1,p2}=calcMatchPoints();
+  if(p1>=SETS_TO_WIN||p2>=SETS_TO_WIN) return true;
+  if(matchSets.length>=MAX_SETS){
+    return matchSets.slice(0,MAX_SETS).every(s=>s&&s.arrows1.length===ARROWS_PER_SET&&s.arrows2.length===ARROWS_PER_SET);
+  }
+  return false;
 }
 
+window.startMatch=()=>{
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('match-screen').style.display='flex';
+  document.getElementById('m-comp-name').textContent=compData.name||'';
+  const rl={R1:`Round of ${(compData.elimination?.[matchCatKey]?.bracketSize||2)*2}`,QF:'Quarter Final',SF:'Semi Final',F:'🏆 Final',B:'🥉 Bronze'};
+  document.getElementById('m-match-label').textContent=rl[matchRoundKey]||matchRoundKey;
+  document.getElementById('m-format-label').textContent=matchFormat==='sets'?'Set System · First to 6 pts':'Cumulative · 15 arrows';
+  document.getElementById('sp-a1-label').textContent=matchData.archer1?.name?.split(' ')[0]||'A1';
+  document.getElementById('sp-a2-label').textContent=matchData.archer2?.name?.split(' ')[0]||'A2';
+  matchActiveArcher=0;
+  renderMatchTabs();renderMatchSets();renderMatchPad();updateMatchHeader();
+};
+
+function renderMatchTabs(){
+  const tabs=document.getElementById('match-archer-tabs');
+  tabs.innerHTML=[matchData.archer1,matchData.archer2].map((a,i)=>
+    `<button onclick="switchMatchArcher(${i})" style="flex:1;padding:8px 6px;border:none;border-radius:6px;background:${i===matchActiveArcher?'var(--blue)':'transparent'};color:${i===matchActiveArcher?'#fff':'var(--muted)'};font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">${a?.name||'Archer '+(i+1)}</button>`
+  ).join('');
+}
+
+window.switchMatchArcher=(idx)=>{matchActiveArcher=idx;renderMatchTabs();renderMatchSets();renderMatchPad();updateMatchHeader();};
+
+function updateMatchHeader(){
+  const archer=matchActiveArcher===0?matchData.archer1:matchData.archer2;
+  if(matchFormat==='sets'){
+    const {p1,p2}=calcMatchPoints();
+    document.getElementById('sp-a1').textContent=p1;
+    document.getElementById('sp-a2').textContent=p2;
+    const si=getActiveMatchSet();
+    document.getElementById('m-set-label').textContent=`SET ${si+1}`;
+    const arr=getMatchArrows(si,matchActiveArcher);
+    document.getElementById('m-arrow-count').textContent=`${arr.length}/${ARROWS_PER_SET}`;
+  } else {
+    const t1=cumArrows1.reduce((s,v)=>s+getVal(v),0);
+    const t2=cumArrows2.reduce((s,v)=>s+getVal(v),0);
+    document.getElementById('sp-a1').textContent=t1;
+    document.getElementById('sp-a2').textContent=t2;
+    const myCum=matchActiveArcher===0?cumArrows1:cumArrows2;
+    const end=Math.floor(myCum.length/CUM_ARROWS)+1;
+    document.getElementById('m-set-label').textContent=`END ${Math.min(end,CUM_ENDS)}`;
+    document.getElementById('m-arrow-count').textContent=`${myCum.length%CUM_ARROWS||0}/${CUM_ARROWS}`;
+  }
+  document.getElementById('m-archer-name').textContent=archer?.name||'—';
+}
+
+function renderMatchSets(){
+  const list=document.getElementById('sets-list');
+  let html='';
+  const activeSi=getActiveMatchSet();
+  if(matchFormat==='sets'){
+    for(let i=0;i<MAX_SETS;i++){
+      const myArr=getMatchArrows(i,matchActiveArcher);
+      const oppArr=getMatchArrows(i,1-matchActiveArcher);
+      const myScore=getMatchSetScore(i,matchActiveArcher);
+      const oppScore=getMatchSetScore(i,1-matchActiveArcher);
+      const myDone=myArr.length===ARROWS_PER_SET;
+      const oppDone=oppArr.length===ARROWS_PER_SET;
+      const bothDone=myDone&&oppDone;
+      const isActive=i===activeSi&&!myDone;
+      const cls=bothDone?'set-card complete':isActive?'set-card active-set':'set-card';
+      let resultHtml='';
+      if(bothDone){
+        const myWin=myScore>oppScore,draw=myScore===oppScore;
+        const pts=myWin?2:draw?1:0;
+        const color=myWin?'var(--green)':draw?'var(--accent)':'var(--red)';
+        resultHtml=`<span class="set-result" style="color:${color}">${myScore}–${oppScore} (${pts}pt${pts!==1?'s':''})</span>`;
+      } else if(isActive){resultHtml=`<span style="font-size:11px;color:var(--accent);">ACTIVE</span>`;}
+      else if(myDone&&!oppDone){resultHtml=`<span style="font-size:11px;color:var(--muted);">Waiting...</span>`;}
+      const chips=Array.from({length:ARROWS_PER_SET},(_,ai)=>{
+        const v=myArr[ai];
+        return v!==undefined?`<span class="arrow-chip ${chipClass(v)}">${v===0?'M':v}</span>`:`<span class="arrow-chip chip-empty">·</span>`;
+      }).join('');
+      html+=`<div class="${cls}"><div class="set-header"><div class="set-num">SET ${i+1}</div>${resultHtml}</div><div class="end-arrows">${chips}</div></div>`;
+    }
+  } else {
+    const myCum=matchActiveArcher===0?cumArrows1:cumArrows2;
+    for(let e=0;e<CUM_ENDS;e++){
+      const startIdx=e*CUM_ARROWS;
+      const endArrows=myCum.slice(startIdx,startIdx+CUM_ARROWS);
+      const isActive=e===Math.floor(myCum.length/CUM_ARROWS)&&myCum.length<CUM_ENDS*CUM_ARROWS;
+      const isComplete=endArrows.length===CUM_ARROWS;
+      const cls=isComplete?'set-card complete':isActive?'set-card active-set':'set-card';
+      const tot=endArrows.reduce((s,v)=>s+getVal(v),0);
+      const chips=Array.from({length:CUM_ARROWS},(_,ai)=>{
+        const v=endArrows[ai];
+        return v!==undefined?`<span class="arrow-chip ${chipClass(v)}">${v===0?'M':v}</span>`:`<span class="arrow-chip chip-empty">·</span>`;
+      }).join('');
+      html+=`<div class="${cls}"><div class="set-header"><div class="set-num">END ${e+1}</div>${isComplete?`<span class="set-result" style="color:var(--accent);">${tot}</span>`:''}</div><div class="end-arrows">${chips}</div></div>`;
+    }
+  }
+  list.innerHTML=html;
+  setTimeout(()=>{const a=list.querySelector('.active-set');if(a)a.scrollIntoView({behavior:'smooth',block:'center'});},50);
+}
+
+function renderMatchPad(){
+  const padScores=['X',10,9,8,7,6,5,4,3,2,1,0];
+  let isFull;
+  if(matchFormat==='sets'){isFull=getMatchArrows(getActiveMatchSet(),matchActiveArcher).length>=ARROWS_PER_SET;}
+  else{const myCum=matchActiveArcher===0?cumArrows1:cumArrows2;isFull=myCum.length>=CUM_ENDS*CUM_ARROWS;}
+  let btns=padScores.map(s=>{
+    const label=s===0?'M':s;
+    const scoreArg=s==='X'?"'X'":s;
+    return `<button class="pad-btn ${padBtnClass(s)}" onclick="handleMatchScore(${scoreArg})" ${isFull?'disabled style="opacity:0.4"':''}>${label}</button>`;
+  }).join('');
+  btns+=`<button class="pad-btn pad-back" onclick="handleMatchBack()" style="grid-column:span 2;">BACKSPACE ←</button>`;
+  const allDone=matchFormat==='sets'?checkMatchDone():(cumArrows1.length>=CUM_ENDS*CUM_ARROWS&&cumArrows2.length>=CUM_ENDS*CUM_ARROWS);
+  if(allDone) btns+=`<button class="pad-btn pad-done" onclick="submitMatch()" style="grid-column:span 2;">SUBMIT MATCH ✓</button>`;
+  const pad=document.getElementById('match-pad');
+  pad.style.gridTemplateColumns='repeat(4,1fr)';
+  pad.innerHTML=btns;
+}
+
+window.handleMatchScore=async(val)=>{
+  if(matchFormat==='sets'){
+    const si=getActiveMatchSet();
+    const arrows=[...getMatchArrows(si,matchActiveArcher)];
+    if(arrows.length>=ARROWS_PER_SET) return;
+    arrows.push(val);
+    setMatchArrows(si,matchActiveArcher,arrows);
+    await saveMatchProgress();
+    if(arrows.length===ARROWS_PER_SET){
+      const otherArr=getMatchArrows(si,1-matchActiveArcher);
+      if(otherArr.length<ARROWS_PER_SET){matchActiveArcher=1-matchActiveArcher;renderMatchTabs();}
+    }
+  } else {
+    if(matchActiveArcher===0){if(cumArrows1.length>=CUM_ENDS*CUM_ARROWS)return;cumArrows1.push(val);}
+    else{if(cumArrows2.length>=CUM_ENDS*CUM_ARROWS)return;cumArrows2.push(val);}
+    await saveMatchProgress();
+  }
+  renderMatchSets();renderMatchPad();updateMatchHeader();
+};
+
+window.handleMatchBack=()=>{
+  if(matchFormat==='sets'){
+    const si=getActiveMatchSet();
+    const arrows=[...getMatchArrows(si,matchActiveArcher)];
+    if(arrows.length>0){arrows.pop();setMatchArrows(si,matchActiveArcher,arrows);}
+  } else {
+    if(matchActiveArcher===0){if(cumArrows1.length>0)cumArrows1.pop();}
+    else{if(cumArrows2.length>0)cumArrows2.pop();}
+  }
+  renderMatchSets();renderMatchPad();updateMatchHeader();
+};
+
+async function saveMatchProgress(){
+  if(!compId||!matchCatKey||!matchRoundKey||matchIdx===null) return;
+  try{
+    const snap=await getDoc(doc(db,'competitions',compId));
+    const data=snap.data();
+    const match=data.elimination[matchCatKey].rounds[matchRoundKey][matchIdx];
+    if(matchFormat==='sets'){
+      match.sets=matchSets.map(s=>({score1:s.score1||0,score2:s.score2||0,arrows1:s.arrows1||[],arrows2:s.arrows2||[]}));
+    } else {
+      match.arrows1=cumArrows1;match.score1=cumArrows1.reduce((s,v)=>s+getVal(v),0);
+      match.arrows2=cumArrows2;match.score2=cumArrows2.reduce((s,v)=>s+getVal(v),0);
+    }
+    data.elimination[matchCatKey].rounds[matchRoundKey][matchIdx]=match;
+    await setDoc(doc(db,'competitions',compId),{elimination:data.elimination},{merge:true});
+  }catch(e){console.error('Save error:',e);}
+}
+
+window.submitMatch=async()=>{
+  await saveMatchProgress();
+  document.getElementById('match-screen').style.display='none';
+  document.getElementById('summary-screen').style.display='flex';
+  document.getElementById('summary-archer-tabs').style.display='none';
+  document.getElementById('sum-title').textContent='Match Complete';
+  const {p1,p2}=matchFormat==='sets'?calcMatchPoints():{p1:cumArrows1.reduce((s,v)=>s+getVal(v),0),p2:cumArrows2.reduce((s,v)=>s+getVal(v),0)};
+  let html=`<div style="background:#37474f;color:#fff;padding:16px;text-align:center;">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;color:#aaa;margin-bottom:6px;">MATCH RESULT</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;">${matchData.archer1?.name||'A1'}</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:var(--accent);">${p1} — ${p2}</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;">${matchData.archer2?.name||'A2'}</div>
+    </div>
+    <div style="font-size:12px;color:#aaa;margin-top:8px;">Scores saved — admin will confirm the winner</div>
+  </div>`;
+  if(matchFormat==='sets'){
+    html+='<div style="padding:12px;">';
+    matchSets.forEach((s,i)=>{
+      if(!s||(!s.arrows1.length&&!s.arrows2.length)) return;
+      const c1=s.score1>s.score2?'var(--green)':s.score1<s.score2?'var(--red)':'var(--accent)';
+      const c2=s.score2>s.score1?'var(--green)':s.score2<s.score1?'var(--red)':'var(--accent)';
+      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #eee;">
+        <span style="font-weight:700;color:${c1};font-size:16px;">${s.score1}</span>
+        <span style="color:#888;font-size:12px;">Set ${i+1}</span>
+        <span style="font-weight:700;color:${c2};font-size:16px;">${s.score2}</span>
+      </div>`;
+    });
+    html+='</div>';
+  }
+  document.getElementById('summary-list').innerHTML=html;
+  toast('Match submitted ✓','success');
+};
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
 loadCompetitions();
 </script>
 </body>
