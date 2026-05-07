@@ -813,7 +813,8 @@ function setMatchArrows(setIdx,archerIdx,arrows){
 }
 function calcMatchPoints(){
   let p1=0,p2=0;
-  matchSets.forEach(s=>{
+  // Only count first MAX_SETS sets for set points (not tiebreak)
+  matchSets.slice(0,MAX_SETS).forEach(s=>{
     if(!s) return;
     if(s.score1>s.score2) p1+=2;
     else if(s.score2>s.score1) p2+=2;
@@ -833,12 +834,11 @@ function getActiveMatchSet(){
 function checkMatchDone(){
   const {p1,p2}=calcMatchPoints();
   if(p1>=SETS_TO_WIN||p2>=SETS_TO_WIN) return true;
-  // After 5 sets check if tiebreak needed or done
   if(matchSets.length>=MAX_SETS){
     const all5done=matchSets.slice(0,MAX_SETS).every(s=>s&&s.arrows1.length===ARROWS_PER_SET&&s.arrows2.length===ARROWS_PER_SET);
     if(!all5done) return false;
     if(p1===5&&p2===5){
-      // Tiebreak set needed — 1 arrow each
+      // Need tiebreak — check if tiebreak set (index MAX_SETS) is done (1 arrow each)
       const tb=matchSets[MAX_SETS];
       if(!tb||tb.arrows1.length<1||tb.arrows2.length<1) return false;
       return true;
