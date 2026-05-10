@@ -193,10 +193,9 @@ function renderElimDisplay(elimData, discipline) {
 
         html+=`<div style="background:var(--surface);border:1px solid ${done?'var(--green)':'var(--border2)'};
           border-radius:8px;padding:10px;${rk==='F'?'border-width:2px;':''}" >
-          ${renderMatchRowDisplay(match.archer1, w1, score1)}
+          ${renderMatchRowDisplay(match.archer1, w1, score1, match.sets, 1)}
           <div style="height:3px;"></div>
-          ${renderMatchRowDisplay(match.archer2, w2, score2)}
-          ${setsHtml}
+          ${renderMatchRowDisplay(match.archer2, w2, score2, match.sets, 2)}
           ${match.tiebreak1!==null&&match.tiebreak1!==undefined?
             `<div style="font-size:10px;color:var(--muted2);margin-top:4px;">TB: ${match.tiebreak1} — ${match.tiebreak2}</div>`:''}
         </div>`;
@@ -217,13 +216,23 @@ function renderElimDisplay(elimData, discipline) {
   requestAnimationFrame(()=>{ main.scrollTop = scrollTop; });
 }
 
-function renderMatchRowDisplay(archer, won, score){
+function renderMatchRowDisplay(archer, won, score, sets, archerNum){
   if(!archer) return `<div style="padding:4px 6px;color:var(--muted);font-size:12px;">TBD</div>`;
+  // Build inline set scores
+  let setScores = '';
+  if(sets && sets.length){
+    sets.forEach(s=>{
+      const val = archerNum===1?s.score1:s.score2;
+      const isWin = archerNum===1?s.score1>s.score2:s.score2>s.score1;
+      setScores+=`<span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:${isWin?'var(--green)':'var(--muted2)'};margin-left:5px;">${val}</span>`;
+    });
+  }
   return `<div style="display:flex;align-items:center;gap:6px;padding:4px 6px;
     border-radius:5px;background:${won?'rgba(67,160,71,0.15)':'transparent'};">
     <span style="font-size:10px;color:var(--muted2);min-width:18px;">#${archer.seed||'?'}</span>
     <span style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;
       color:${won?'var(--green)':'var(--text)'};">${archer.name}</span>
+    ${setScores}
     ${score!==''&&score!==null&&score!==undefined?
       `<span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;
         color:${won?'var(--green)':'var(--accent)'};">${score}</span>`:''}
