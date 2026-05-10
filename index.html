@@ -310,7 +310,9 @@ tbody td { padding: 10px 12px; color: #111; }
             <button class="btn btn-primary" onclick="generateElimination()">⚡ GENERATE BRACKET</button>
             <button class="btn btn-success" onclick="generateAllElimination()">⚡ GENERATE ALL</button>
           </div>
-          <div id="elim-content"></div>
+          <div id="elim-wrapper" style="height:calc(100vh - 280px);overflow-y:auto;overflow-anchor:none;">
+            <div id="elim-content"></div>
+          </div>
         </div>
       </div>
 
@@ -1740,14 +1742,13 @@ function renderElimContent(){
   if(container._lastHash === newHash) return;
   container._lastHash = newHash;
 
-  // Save and synchronously restore scroll position
-  const scrollEl = document.querySelector('.content');
-  const scrollTop = scrollEl ? scrollEl.scrollTop : 0;
+  // Use the wrapper's own scroll — isolated from page scroll
+  const wrapper = document.getElementById('elim-wrapper');
+  const scrollTop = wrapper ? wrapper.scrollTop : 0;
   container.innerHTML = html;
-  // Restore scroll synchronously AND with rAF as backup
-  if(scrollEl){
-    scrollEl.scrollTop = scrollTop;
-    requestAnimationFrame(()=>{ scrollEl.scrollTop = scrollTop; });
+  if(wrapper){
+    wrapper.scrollTop = scrollTop;
+    requestAnimationFrame(()=>{ wrapper.scrollTop = scrollTop; });
   }
 }
 
