@@ -283,9 +283,13 @@ window.selectComp = (id) => {
     const toggle = document.getElementById('view-toggle');
     if(toggle) toggle.style.display = hasElim ? 'flex' : 'none';
 
-    // Debounce render to prevent jumping
-    if(_renderTimer) clearTimeout(_renderTimer);
-    _renderTimer = setTimeout(()=>renderResults(d), 400);
+    // Only re-render when data actually changed
+    const newJson = JSON.stringify({scores:d.scores, archers:d.archers, elimination:d.elimination});
+    if(newJson !== window._lastDataJson){
+      window._lastDataJson = newJson;
+      if(_renderTimer) clearTimeout(_renderTimer);
+      _renderTimer = setTimeout(()=>renderResults(d), 150);
+    }
   });
 };
 
@@ -350,8 +354,17 @@ function renderResults(data) {
     catMap[key].archers.push(a);
   });
 
-  // Sort categories
+  // Sort categories — stable sort to prevent reordering on re-render
   const cats = Object.values(catMap).sort((a,b)=>{
+    const bi=BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);
+    if(bi!==0) return bi;
+    const ai=AGE_ORDER.indexOf(a.age)-AGE_ORDER.indexOf(b.age);
+    if(ai!==0) return ai;
+    return a.gender.localeCompare(b.gender);
+  });
+
+  // Re-sort to ensure stable order every render
+  cats.sort((a,b)=>{
     const bi=BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);
     if(bi!==0) return bi;
     const ai=AGE_ORDER.indexOf(a.age)-AGE_ORDER.indexOf(b.age);
