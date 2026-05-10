@@ -139,11 +139,11 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
       <button class="login-btn" onclick="checkPhase()">CONTINUE →</button>
     </div>
 
-    <!-- Step 2a: Qualification — confirm target -->
+    <!-- Step 2a: No target assigned -->
     <div id="login-step-qual" style="display:none;">
-      <label class="login-label">Target Number</label>
-      <input type="number" id="target-input" class="login-input" placeholder="e.g. 5" min="1">
-      <button class="login-btn" onclick="loadTarget()">START SCORING →</button>
+      <div style="background:#b71c1c22;border:1px solid var(--red);color:var(--red);padding:14px;border-radius:8px;margin-bottom:16px;font-size:13px;text-align:center;">
+        ⚠️ You have no target assigned yet.<br>Please ask the admin to assign your target.
+      </div>
       <button class="login-back" onclick="backToStep1()">← BACK</button>
     </div>
 
@@ -163,7 +163,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">Confirm Archers on this Target</div>
       <div class="confirm-card" id="confirm-archers"></div>
       <button class="login-btn" onclick="startScoring()">START SCORING →</button>
-      <button class="login-back" onclick="showQualStep()">← BACK</button>
+      <button class="login-back" onclick="backToStep1()">← BACK</button>
     </div>
   </div>
 </div>
@@ -432,35 +432,12 @@ function showLoginStep(id){
 }
 
 window.backToStep1=()=>showLoginStep('login-step-1');
-window.showQualStep=()=>showLoginStep('login-step-qual');
+
 
 /* ══════════════════════════════════════════
    QUALIFICATION SCORING
 ══════════════════════════════════════════ */
-window.loadTarget=async()=>{
-  targetNum=parseInt(document.getElementById('target-input').value);
-  if(!targetNum){toast('Enter target number','error');return;}
-  const snap=await getDoc(doc(db,'competitions',compId));
-  compData=snap.data();
-  const target=(compData.targets||[]).find(t=>t.num===targetNum);
-  if(!target){toast(`Target ${targetNum} not found`,'error');return;}
-  const allArchers=compData.archers||[];
-  targetArchers=['A','B','C','D'].filter(s=>target[s]).map(s=>{
-    const sd=target[s];
-    const fa=allArchers.find(a=>String(a.id)===String(sd.id)||a.name===sd.name);
-    return {...(fa||sd),slot:s,id:fa?fa.id:sd.id};
-  });
-  if(!targetArchers.length){toast('No archers on this target','error');return;}
-  document.getElementById('confirm-archers').innerHTML=targetArchers.map(a=>`
-    <div class="confirm-archer">
-      <div class="confirm-slot">${a.slot}</div>
-      <div style="flex:1;padding:0 10px;">
-        <div class="confirm-name">${a.name}</div>
-        <div class="confirm-cat">${a.bow} · ${a.age}</div>
-      </div>
-    </div>`).join('');
-  showLoginStep('login-step-2');
-};
+
 
 window.startScoring=()=>{
   const cfg=getConfig(), existing=compData.scores||{};
