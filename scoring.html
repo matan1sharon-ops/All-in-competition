@@ -394,14 +394,35 @@ window.checkPhase = async () => {
     }
   }
 
-  // No match found — try to find target from database
-  const archer = compData.archers?.find(a=>a.id===selectedArcherId);
+  // No match found — find target from database
+  const allArchers = compData.archers||[];
+  const allTargets = compData.targets||[];
+
+  // First try: find archer by ID (with string comparison)
+  let archer = allArchers.find(a=>String(a.id)===String(selectedArcherId));
+
+  // If archer has target assigned
   if(archer?.target){
-    // Auto-load their target
     targetNum = archer.target;
-    const target = (compData.targets||[]).find(t=>t.num===targetNum);
+  } else {
+    // Second try: search directly in targets array for this archer
+    let foundTarget = null, foundSlot = null;
+    for(const t of allTargets){
+      for(const s of ['A','B','C','D']){
+        if(t[s] && String(t[s].id)===String(selectedArcherId)){
+          foundTarget = t.num;
+          foundSlot = s;
+          break;
+        }
+      }
+      if(foundTarget) break;
+    }
+    if(foundTarget) targetNum = foundTarget;
+  }
+
+  if(targetNum){
+    const target = allTargets.find(t=>t.num===targetNum);
     if(target){
-      const allArchers = compData.archers||[];
       targetArchers = ['A','B','C','D'].filter(s=>target[s]).map(s=>{
         const sd=target[s];
         const fa=allArchers.find(a=>String(a.id)===String(sd.id)||a.name===sd.name);
@@ -421,7 +442,7 @@ window.checkPhase = async () => {
       }
     }
   }
-  // No target assigned — ask for target number
+  // No target found
   showLoginStep('login-step-qual');
 };
 
