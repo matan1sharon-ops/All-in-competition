@@ -209,8 +209,12 @@ function renderElimDisplay(elimData, discipline) {
   });
 
   html+='</div>';
+  // Only update DOM if content actually changed
+  const newHash = html.replace(/\s+/g,' ');
+  if(main._lastElimHash === newHash) return;
+  main._lastElimHash = newHash;
   main.innerHTML=html;
-  main.scrollTop = scrollTop;
+  requestAnimationFrame(()=>{ main.scrollTop = scrollTop; });
 }
 
 function renderMatchRowDisplay(archer, won, score){
@@ -403,8 +407,13 @@ function renderResults(data) {
     </div>`;
   });
   html+='</div>';
-  document.getElementById('main').innerHTML=html;
-  if(main2) main2.scrollTop = scrollTop2;
+  const main3 = document.getElementById('main');
+  const newQHash = html.replace(/\s+/g,' ');
+  if(main3._lastQualHash === newQHash) return;
+  main3._lastQualHash = newQHash;
+  const st = main3.scrollTop;
+  main3.innerHTML=html;
+  requestAnimationFrame(()=>{ main3.scrollTop = st; });
 }
 
 loadComps();
