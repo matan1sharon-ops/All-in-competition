@@ -1652,7 +1652,8 @@ window.generateAllElimination = async () => {
 function renderElimContent(){
   if(!currentCompId) return;
   const container = document.getElementById('elim-content');
-  const scrollTop = container.scrollTop;
+  const scrollEl = document.querySelector('.content');
+  const scrollTop = scrollEl ? scrollEl.scrollTop : 0;
 
   // Get elimination data from scores snapshot
   const elimData = window._elimData || {};
@@ -1722,7 +1723,7 @@ function renderElimContent(){
   });
 
   container.innerHTML=html;
-  container.scrollTop = scrollTop;
+  if(scrollEl) scrollEl.scrollTop = scrollTop;
 }
 
 function renderMatchRow(archer,match,won,num){
