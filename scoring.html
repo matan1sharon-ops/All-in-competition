@@ -283,7 +283,8 @@ let scores={};
 let matchCatKey=null, matchRoundKey=null, matchIdx=null, matchData=null;
 let matchFormat='sets', matchActiveArcher=0;
 let matchSets=[], cumArrows1=[], cumArrows2=[];
-const ARROWS_PER_SET=3, MAX_SETS=5, SETS_TO_WIN=6, CUM_ENDS=5, CUM_ARROWS=3;
+const MAX_SETS=5, SETS_TO_WIN=6, CUM_ENDS=5, CUM_ARROWS=3;
+function getArrowsPerSet(){ return discipline==='3D'?2:3; }
 
 /* ══════════════════════════════════════════
    HELPERS
@@ -880,14 +881,14 @@ function calcMatchPoints(){
   // Only count first MAX_SETS sets, and only when BOTH archers have finished that set
   matchSets.slice(0,MAX_SETS).forEach((s,i)=>{
     if(!s) return;
-    if(s.arrows1.length<ARROWS_PER_SET||s.arrows2.length<ARROWS_PER_SET) return;
+    if(s.arrows1.length<getArrowsPerSet()||s.arrows2.length<getArrowsPerSet()) return;
     if(s.score1>s.score2) p1+=2;
     else if(s.score2>s.score1) p2+=2;
     else{p1+=1;p2+=1;}
   });
   return {p1,p2};
 }
-function getTBArrows(setIdx){ return setIdx===MAX_SETS ? 1 : ARROWS_PER_SET; }
+function getTBArrows(setIdx){ return setIdx===MAX_SETS ? 1 : getArrowsPerSet(); }
 
 function isMatchWon(){
   const {p1,p2}=calcMatchPoints();
@@ -906,7 +907,7 @@ function checkMatchDone(){
   const {p1,p2}=calcMatchPoints();
   if(p1>=SETS_TO_WIN||p2>=SETS_TO_WIN) return true;
   if(matchSets.length>=MAX_SETS){
-    const all5done=matchSets.slice(0,MAX_SETS).every(s=>s&&s.arrows1.length===ARROWS_PER_SET&&s.arrows2.length===ARROWS_PER_SET);
+    const all5done=matchSets.slice(0,MAX_SETS).every(s=>s&&s.arrows1.length===getArrowsPerSet()&&s.arrows2.length===getArrowsPerSet());
     if(!all5done) return false;
     if(p1===5&&p2===5){
       // Need tiebreak — check if tiebreak set (index MAX_SETS) is done (1 arrow each)
@@ -921,7 +922,7 @@ function checkMatchDone(){
 
 function isTiebreakNeeded(){
   if(matchSets.length<MAX_SETS) return false;
-  const all5done=matchSets.slice(0,MAX_SETS).every(s=>s&&s.arrows1.length===ARROWS_PER_SET&&s.arrows2.length===ARROWS_PER_SET);
+  const all5done=matchSets.slice(0,MAX_SETS).every(s=>s&&s.arrows1.length===getArrowsPerSet()&&s.arrows2.length===getArrowsPerSet());
   if(!all5done) return false;
   const {p1,p2}=calcMatchPoints();
   return p1===5&&p2===5;
@@ -1075,7 +1076,7 @@ function renderMatchSets(){
 }
 
 function renderMatchPad(){
-  const padScores=['X',10,9,8,7,6,5,4,3,2,1,0];
+  const padScores=getPadScores();
   let isFull;
   if(matchFormat==='sets'){
     const asi=getActiveMatchSet();
