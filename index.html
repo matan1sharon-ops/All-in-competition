@@ -510,7 +510,7 @@ window.selectCompetition = async (id) => {
     renderResults();
     renderDashboard();
     renderScorecards();
-    if(document.getElementById('panel-elimination')?.classList.contains('active')) renderElimContent();
+    if(document.getElementById('panel-elimination')?.classList.contains('active')) debouncedRenderElim();
   });
 };
 
@@ -2009,6 +2009,13 @@ window.saveEditArcher = async () => {
   renderAll();
   toast(`${archer.name} updated ✓`,'success');
 };
+
+/* ── DEBOUNCE ── */
+let _elimRenderTimer = null;
+function debouncedRenderElim(){
+  if(_elimRenderTimer) clearTimeout(_elimRenderTimer);
+  _elimRenderTimer = setTimeout(()=>{ renderElimContent(); }, 400);
+}
 
 /* ── INIT ── */
 loadCompetitions();
