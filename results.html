@@ -119,6 +119,8 @@ setInterval(()=>{
 
 /* ── ELIMINATION DISPLAY ── */
 function renderElimDisplay(elimData, discipline) {
+  const main = document.getElementById('main');
+  const scrollTop = main.scrollTop;
   const roundOrder = ['R1','QF','SF','F','B'];
   const roundLabels = {
     R1:'Round of 16', QF:'Quarter Finals', SF:'Semi Finals',
@@ -199,7 +201,8 @@ function renderElimDisplay(elimData, discipline) {
   });
 
   html+='</div>';
-  document.getElementById('main').innerHTML=html;
+  main.innerHTML=html;
+  main.scrollTop = scrollTop;
 }
 
 function renderMatchRowDisplay(archer, won, score){
