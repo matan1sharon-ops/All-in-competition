@@ -39,10 +39,11 @@ body { font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--te
 .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .topbar { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 56px; border-bottom: 1px solid var(--border); background: var(--surface); flex-shrink: 0; }
 .topbar-title { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: 1px; color: var(--text); }
-.content { flex: 1; overflow-y: auto; padding: 24px; overflow-anchor: none; }
-#elim-content { overflow-anchor: none; }
+.content { flex: 1; overflow-y: auto; padding: 24px; overflow-anchor: none; display: flex; flex-direction: column; }
 .panel { display: none; }
-.panel.active { display: block; }
+.panel.active { display: flex; flex-direction: column; flex: 1; }
+#elim-content { overflow-anchor: none; }
+
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
 .card-title { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted2); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
 .card-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
@@ -288,13 +289,13 @@ tbody td { padding: 10px 12px; color: #111; }
       </div>
 
       <!-- ELIMINATION -->
-      <div id="panel-elimination" class="panel">
-        <div class="card">
+      <div id="panel-elimination" class="panel" style="height:100%;display:flex;flex-direction:column;">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:0;flex-shrink:0;">
           <div class="card-title">⚔️ Elimination Rounds</div>
-          <div style="margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;">
             <button class="btn btn-secondary btn-sm" onclick="copyMatchLink()" style="margin-left:auto;">🔗 SHARE MATCH SCORING LINK</button>
           </div>
-          <div style="margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
             <div class="form-group" style="min-width:180px;">
               <label>Category</label>
               <select id="elim-cat-select" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;width:100%;"></select>
@@ -310,10 +311,8 @@ tbody td { padding: 10px 12px; color: #111; }
             <button class="btn btn-primary" onclick="generateElimination()">⚡ GENERATE BRACKET</button>
             <button class="btn btn-success" onclick="generateAllElimination()">⚡ GENERATE ALL</button>
           </div>
-          <div id="elim-wrapper" style="height:calc(100vh - 280px);overflow-y:auto;overflow-anchor:none;">
-            <div id="elim-content"></div>
-          </div>
         </div>
+        <div id="elim-content" style="flex:1;overflow-y:auto;overflow-anchor:none;margin-top:12px;"></div>
       </div>
 
     </div>
@@ -1536,9 +1535,9 @@ window.showPanel = (name) => {
   document.getElementById(`panel-${name}`).classList.add('active');
   document.querySelector(`[data-panel="${name}"]`).classList.add('active');
   document.getElementById('topbar-title').textContent={dashboard:'Dashboard',entries:'Entry List',targets:'Target Assignment',schedule:'Schedule',results:'Live Results',scorecards:'Scorecards',elimination:'Elimination'}[name]||name;
-  // When on elimination panel, disable .content scroll so only elim-wrapper scrolls
+  // Reset content overflow
   const contentEl = document.querySelector('.content');
-  if(contentEl) contentEl.style.overflow = name==='elimination' ? 'hidden' : '';
+  if(contentEl) contentEl.style.overflow = '';
   if(name==='scorecards') renderScorecards();
   if(name==='elimination') initElimination();
 };
@@ -1745,14 +1744,10 @@ function renderElimContent(){
   if(container._lastHash === newHash) return;
   container._lastHash = newHash;
 
-  // Use the wrapper's own scroll — isolated from page scroll
-  const wrapper = document.getElementById('elim-wrapper');
-  const scrollTop = wrapper ? wrapper.scrollTop : 0;
+  const scrollTop = container.scrollTop;
   container.innerHTML = html;
-  if(wrapper){
-    wrapper.scrollTop = scrollTop;
-    requestAnimationFrame(()=>{ wrapper.scrollTop = scrollTop; });
-  }
+  container.scrollTop = scrollTop;
+  requestAnimationFrame(()=>{ container.scrollTop = scrollTop; });
 }
 
 function renderMatchRow(archer,match,won,num){
