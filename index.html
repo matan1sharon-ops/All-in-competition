@@ -1714,13 +1714,21 @@ function renderElimContent(){
       matches.forEach(match=>{
         const won1 = match.winnerChoice===match.archer1?.id;
         const won2 = match.winnerChoice===match.archer2?.id;
+        const hasSets = match.sets?.length > 0;
+        const setHeaders = hasSets ? `<tr>
+          <td style="width:20px;"></td>
+          <td></td>
+          ${[1,2,3,4,5].map(i=>`<td style="text-align:center;font-size:9px;font-weight:700;color:var(--muted2);min-width:28px;">S${i}</td>`).join('')}
+          <td style="text-align:right;font-size:9px;font-weight:700;color:var(--muted2);padding-right:6px;min-width:32px;">PTS</td>
+          <td style="width:20px;"></td>
+        </tr>` : '';
         html+=`<div style="background:var(--surface2);border:1px solid ${match.winnerChoice?'var(--green)':'var(--border2)'};border-radius:8px;padding:12px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
             <span style="font-size:11px;color:var(--muted2);">Match ${match.position}</span>
             ${match.winnerChoice?`<span style="font-size:11px;color:var(--green);font-weight:700;">✓ COMPLETE</span>`:'<span style="font-size:11px;color:var(--accent);">PENDING</span>'}
           </div>
+          ${hasSets?`<table style="width:100%;border-collapse:collapse;margin-bottom:2px;">${setHeaders}</table>`:''}
           ${renderMatchRow(match.archer1,match,won1,1)}
-          <div style="height:4px;"></div>
           ${renderMatchRow(match.archer2,match,won2,2)}
           ${!match.winnerChoice?`<button class="btn btn-primary btn-sm" style="width:100%;margin-top:8px;" onclick="openMatchModal('${catKey}','${roundKey}',${match.position-1})">ENTER RESULT</button>`:''}
         </div>`;
@@ -1766,13 +1774,31 @@ function renderElimContent(){
 function renderMatchRow(archer,match,won,num){
   if(!archer && match.isBye) return `<div style="padding:6px 8px;background:var(--surface3);border-radius:6px;color:var(--accent);font-size:12px;font-weight:700;">BYE ✓</div>`;
   if(!archer) return `<div style="padding:6px 8px;background:var(--surface3);border-radius:6px;color:var(--muted);font-size:12px;">TBD</div>`;
-  const score = num===1?match.score1:match.score2;
-  return `<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:${won?'rgba(67,160,71,0.15)':'var(--surface3)'};border-radius:6px;border:1px solid ${won?'var(--green)':'transparent'};">
-    <span style="font-size:10px;color:var(--muted2);min-width:20px;">#${archer.seed||'?'}</span>
-    <span style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;${won?'color:var(--green)':''}">${archer.name}</span>
-    <span style="font-size:11px;color:var(--muted2);">Q:${archer.qualScore||0}</span>
-    ${score!==null&&score!==undefined?`<span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:${won?'var(--green)':'var(--accent)'};">${score}</span>`:''}
-    ${won?'<span style="font-size:14px;">🏆</span>':''}
+  const isSet = match.sets?.length > 0;
+  const sets = match.sets || [];
+  const pts = num===1?match.score1:match.score2;
+
+  // Build set score cells
+  let setCells = '';
+  if(isSet){
+    for(let i=0;i<5;i++){
+      const s = sets[i];
+      const val = s ? (num===1?s.score1:s.score2) : '—';
+      const isWin = s && (num===1 ? s.score1>s.score2 : s.score2>s.score1);
+      setCells += `<td style="text-align:center;padding:2px 6px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:${s?(isWin?'var(--green)':'var(--text)'):'var(--muted)'};min-width:28px;">${s?val:'—'}</td>`;
+    }
+  }
+
+  return `<div style="background:${won?'rgba(67,160,71,0.1)':'var(--surface3)'};border-radius:6px;border:1px solid ${won?'var(--green)':'transparent'};padding:4px 8px;margin-bottom:2px;">
+    <table style="width:100%;border-collapse:collapse;">
+      <tr>
+        <td style="font-size:10px;color:var(--muted2);width:20px;">#${archer.seed||'?'}</td>
+        <td style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;${won?'color:var(--green)':''};padding:2px 4px;">${archer.name}</td>
+        ${isSet?setCells:''}
+        <td style="text-align:right;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:${won?'var(--green)':'var(--accent)'};padding:2px 6px;min-width:32px;">${pts!==null&&pts!==undefined?pts:''}</td>
+        ${won?'<td style="width:20px;">🏆</td>':'<td style="width:20px;"></td>'}
+      </tr>
+    </table>
   </div>`;
 }
 
