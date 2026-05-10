@@ -366,6 +366,31 @@ tbody td { padding: 10px 12px; color: #111; }
 
 <div id="toast"></div>
 
+<div class="modal-backdrop" id="modal-edit-archer">
+  <div class="modal">
+    <div class="modal-title">✏️ Edit Archer</div>
+    <input type="hidden" id="edit-archer-id">
+    <div class="form-grid">
+      <div class="form-group"><label>First Name</label><input type="text" id="edit-fname"></div>
+      <div class="form-group"><label>Last Name</label><input type="text" id="edit-lname"></div>
+      <div class="form-group"><label>Club</label><input type="text" id="edit-club"></div>
+      <div class="form-group"><label>Bow Type</label>
+        <select id="edit-bow"><option>Recurve</option><option>Compound</option><option>Barebow</option><option>Traditional</option><option>Longbow</option></select>
+      </div>
+      <div class="form-group"><label>Age Category</label>
+        <select id="edit-age"><option>U12</option><option>U14</option><option>U18</option><option>U21</option><option>Senior</option><option>Master 50+</option><option>Master 60+</option></select>
+      </div>
+      <div class="form-group"><label>Gender</label>
+        <select id="edit-gender"><option value="M">Male</option><option value="F">Female</option></select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-edit-archer')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEditArcher()">SAVE →</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-backdrop" id="modal-move-archer">
   <div class="modal" style="max-width:460px;">
     <div class="modal-title" id="move-modal-title">Move Archer</div>
@@ -578,7 +603,10 @@ window.renderEntries = () => {
       <td style="color:#111;">${a.age}</td>
       <td><span class="tag tag-${a.gender.toLowerCase()}">${a.gender}</span></td>
       <td style="color:#1565c0;font-weight:700;">${a.target?`T${a.target}${a.slot}`:'<span style="color:#999">—</span>'}</td>
-      <td><button class="btn btn-danger btn-sm" onclick="deleteArcher('${a.id}')">✕</button></td>
+      <td style="display:flex;gap:4px;">
+        <button class="btn btn-secondary btn-sm" onclick="openEditArcher('${a.id}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteArcher('${a.id}')">✕</button>
+      </td>
     </tr>`).join('')||'<tr><td colspan="8" style="text-align:center;color:#999;padding:24px">No archers yet</td></tr>';
 };
 
@@ -1931,6 +1959,52 @@ window.deleteElimination = async (catKey) => {
   delete elim[catKey];
   await setDoc(doc(db,'competitions',currentCompId),{elimination:elim},{merge:true});
   toast('Bracket deleted','success');
+};
+
+window.openEditArcher = (id) => {
+  const archer = archers.find(a=>a.id===id);
+  if(!archer) return;
+  document.getElementById('edit-archer-id').value = id;
+  document.getElementById('edit-fname').value = archer.fname||archer.name?.split(' ')[0]||'';
+  document.getElementById('edit-lname').value = archer.lname||archer.name?.split(' ').slice(1).join(' ')||'';
+  document.getElementById('edit-club').value = archer.club||'';
+  document.getElementById('edit-bow').value = archer.bow||'Recurve';
+  document.getElementById('edit-age').value = archer.age||'Senior';
+  document.getElementById('edit-gender').value = archer.gender||'M';
+  openModal('modal-edit-archer');
+};
+
+window.saveEditArcher = async () => {
+  const id = document.getElementById('edit-archer-id').value;
+  const archer = archers.find(a=>a.id===id);
+  if(!archer) return;
+  const fname = document.getElementById('edit-fname').value.trim();
+  const lname = document.getElementById('edit-lname').value.trim();
+  if(!fname||!lname){ toast('Enter first and last name','error'); return; }
+  
+  const oldBow = archer.bow;
+  archer.fname = fname;
+  archer.lname = lname;
+  archer.name = `${fname} ${lname}`;
+  archer.club = document.getElementById('edit-club').value.trim();
+  archer.bow = document.getElementById('edit-bow').value;
+  archer.age = document.getElementById('edit-age').value;
+  archer.gender = document.getElementById('edit-gender').value;
+
+  // Update name in targets too
+  targets.forEach(t=>['A','B','C','D'].forEach(s=>{
+    if(t[s]&&t[s].id===id){
+      t[s].name=archer.name;
+      t[s].bow=archer.bow;
+      t[s].age=archer.age;
+      t[s].gender=archer.gender;
+    }
+  }));
+
+  await saveArchers(); await saveTargets();
+  closeModal('modal-edit-archer');
+  renderAll();
+  toast(`${archer.name} updated ✓`,'success');
 };
 
 /* ── INIT ── */
