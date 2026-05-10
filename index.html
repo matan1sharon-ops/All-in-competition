@@ -629,31 +629,34 @@ window.generateTargets = async () => {
     });
   }
 
+  function shuffle(arr) {
+    const a=[...arr];
+    for(let i=a.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+
   if(currentDiscipline==='3D'||currentDiscipline==='Field'){
-    // Mixed — sort by age then gender
-    assignGroup(sortByAgeGender([...archers]), 'Mixed');
+    // Fully random draw
+    assignGroup(shuffle(archers), 'Mixed');
 
   } else if(currentDiscipline==='Outdoor'){
-    // WA Outdoor order: farthest to closest distance, left to right
-    // 70m: Recurve Senior, U21
-    assignGroup(sortByAgeGender(archers.filter(a=>a.bow==='Recurve'&&['Senior','U21'].includes(a.age))), 'Recurve');
-    // 60m: Recurve U18, Master 50+, Master 60+
-    assignGroup(sortByAgeGender(archers.filter(a=>a.bow==='Recurve'&&['U18','Master 50+','Master 60+'].includes(a.age))), 'Recurve');
-    // 50m: Compound all ages
-    assignGroup(sortByAgeGender(archers.filter(a=>a.bow==='Compound')), 'Compound');
-    // 50m: Barebow all ages
-    assignGroup(sortByAgeGender(archers.filter(a=>a.bow==='Barebow')), 'Barebow');
-    // 30m: Recurve U14, U12
-    assignGroup(sortByAgeGender(archers.filter(a=>a.bow==='Recurve'&&['U14','U12'].includes(a.age))), 'Recurve');
-    // 30m: Traditional + Longbow mixed
-    assignGroup(sortByAgeGender(archers.filter(a=>a.bow==='Traditional'||a.bow==='Longbow')), 'Trad/Longbow');
+    // WA Outdoor order: farthest to closest, random within each group
+    assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['Senior','U21'].includes(a.age))), 'Recurve');
+    assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['U18','Master 50+','Master 60+'].includes(a.age))), 'Recurve');
+    assignGroup(shuffle(archers.filter(a=>a.bow==='Compound')), 'Compound');
+    assignGroup(shuffle(archers.filter(a=>a.bow==='Barebow')), 'Barebow');
+    assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['U14','U12'].includes(a.age))), 'Recurve');
+    assignGroup(shuffle(archers.filter(a=>a.bow==='Traditional'||a.bow==='Longbow')), 'Trad/Longbow');
 
   } else if(currentDiscipline==='Indoor'){
-    // Indoor order: Recurve → Compound → Barebow → Traditional/Longbow mixed
-    assignGroup(sortByAgeGender(archers.filter(a=>a.bow==='Recurve')), 'Recurve');
-    assignGroup(sortByAgeGender(archers.filter(a=>a.bow==='Compound')), 'Compound');
-    assignGroup(sortByAgeGender(archers.filter(a=>a.bow==='Barebow')), 'Barebow');
-    assignGroup(sortByAgeGender(archers.filter(a=>a.bow==='Traditional'||a.bow==='Longbow')), 'Trad/Longbow');
+    // Indoor order: Recurve → Compound → Barebow → Trad/Longbow, random within each
+    assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve')), 'Recurve');
+    assignGroup(shuffle(archers.filter(a=>a.bow==='Compound')), 'Compound');
+    assignGroup(shuffle(archers.filter(a=>a.bow==='Barebow')), 'Barebow');
+    assignGroup(shuffle(archers.filter(a=>a.bow==='Traditional'||a.bow==='Longbow')), 'Trad/Longbow');
   }
 
   await saveTargets(); await saveArchers();
