@@ -1652,10 +1652,6 @@ window.generateAllElimination = async () => {
 function renderElimContent(){
   if(!currentCompId) return;
   const container = document.getElementById('elim-content');
-  const scrollEl = document.querySelector('.content');
-  const scrollTop = scrollEl ? scrollEl.scrollTop : 0;
-
-  // Get elimination data from scores snapshot
   const elimData = window._elimData || {};
 
   if(!Object.keys(elimData).length){
@@ -1663,11 +1659,12 @@ function renderElimContent(){
     return;
   }
 
+  // Build new HTML
   let html='';
   Object.entries(elimData).forEach(([catKey,data])=>{
     const gLabel = data.gender==='M'?'Men':'Women';
     const formatLabel = data.format==='sets'?'Set System':'Cumulative';
-    html+=`<div style="margin-bottom:24px;">
+    html+=`<div data-cat="${catKey}" style="margin-bottom:24px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;">
         <div>
           <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--accent);">${data.bow} · ${data.age} · ${gLabel}</span>
@@ -1676,7 +1673,6 @@ function renderElimContent(){
         <button class="btn btn-danger btn-sm" onclick="deleteElimination('${catKey}')">✕ DELETE</button>
       </div>`;
 
-    // Show all rounds in fixed order
     const roundOrder2 = ['R1','QF','SF','F','B'];
     const sortedRounds = roundOrder2.filter(rk=>data.rounds?.[rk]?.length>0).map(rk=>[rk,data.rounds[rk]]);
     sortedRounds.forEach(([roundKey,matches])=>{
@@ -1688,7 +1684,6 @@ function renderElimContent(){
       html+=`<div style="margin-bottom:12px;">
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--muted2);margin-bottom:8px;text-transform:uppercase;">${roundLabel}</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:8px;">`;
-
       matches.forEach(match=>{
         const won1 = match.winnerChoice===match.archer1?.id;
         const won2 = match.winnerChoice===match.archer2?.id;
@@ -1706,11 +1701,9 @@ function renderElimContent(){
       html+='</div></div>';
     });
 
-    // Show advance button based on what round is complete and what comes next
     const r1done = (data.rounds?.R1||[]).length>0 && (data.rounds?.R1||[]).every(m=>m.winnerChoice);
     const qfdone = (data.rounds?.QF||[]).length>0 && (data.rounds?.QF||[]).every(m=>m.winnerChoice);
     const sfdone = (data.rounds?.SF||[]).length>0 && (data.rounds?.SF||[]).every(m=>m.winnerChoice);
-    const fdone  = (data.rounds?.F||[]).length>0  && (data.rounds?.F||[]).every(m=>m.winnerChoice);
 
     if(r1done && !data.rounds?.QF && !data.rounds?.SF && !data.rounds?.F)
       html+=`<button class="btn btn-success" style="margin-top:8px;" onclick="advanceRound('${catKey}')">⚡ ADVANCE TO QUARTER FINALS</button>`;
@@ -1722,8 +1715,16 @@ function renderElimContent(){
     html+='</div>';
   });
 
-  container.innerHTML=html;
-  if(scrollEl) scrollEl.scrollTop = scrollTop;
+  // Only update DOM if content actually changed
+  const newHash = html.replace(/\s+/g,' ');
+  if(container._lastHash === newHash) return;
+  container._lastHash = newHash;
+
+  // Save scroll of the .content panel
+  const scrollEl = document.querySelector('.content');
+  const scrollTop = scrollEl ? scrollEl.scrollTop : 0;
+  container.innerHTML = html;
+  if(scrollEl) requestAnimationFrame(()=>{ scrollEl.scrollTop = scrollTop; });
 }
 
 function renderMatchRow(archer,match,won,num){
