@@ -39,7 +39,8 @@ body { font-family: 'Barlow', sans-serif; background: var(--bg); color: var(--te
 .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .topbar { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 56px; border-bottom: 1px solid var(--border); background: var(--surface); flex-shrink: 0; }
 .topbar-title { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; letter-spacing: 1px; color: var(--text); }
-.content { flex: 1; overflow-y: auto; padding: 24px; }
+.content { flex: 1; overflow-y: auto; padding: 24px; overflow-anchor: none; }
+#elim-content { overflow-anchor: none; }
 .panel { display: none; }
 .panel.active { display: block; }
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
@@ -309,7 +310,7 @@ tbody td { padding: 10px 12px; color: #111; }
             <button class="btn btn-primary" onclick="generateElimination()">⚡ GENERATE BRACKET</button>
             <button class="btn btn-success" onclick="generateAllElimination()">⚡ GENERATE ALL</button>
           </div>
-          <div id="elim-content" style="overflow-anchor:none;"></div>
+          <div id="elim-content"></div>
         </div>
       </div>
 
@@ -1739,11 +1740,15 @@ function renderElimContent(){
   if(container._lastHash === newHash) return;
   container._lastHash = newHash;
 
-  // Save scroll of the .content panel
+  // Save and synchronously restore scroll position
   const scrollEl = document.querySelector('.content');
   const scrollTop = scrollEl ? scrollEl.scrollTop : 0;
   container.innerHTML = html;
-  if(scrollEl) requestAnimationFrame(()=>{ scrollEl.scrollTop = scrollTop; });
+  // Restore scroll synchronously AND with rAF as backup
+  if(scrollEl){
+    scrollEl.scrollTop = scrollTop;
+    requestAnimationFrame(()=>{ scrollEl.scrollTop = scrollTop; });
+  }
 }
 
 function renderMatchRow(archer,match,won,num){
