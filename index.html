@@ -510,11 +510,17 @@ window.selectCompetition = async (id) => {
     const elimChanged = newElimJson !== window._lastElimJson;
     window._lastElimJson = newElimJson;
     window._elimData   = d.elimination || {};
-    renderResults();
-    renderDashboard();
-    renderScorecards();
-    // Only re-render elimination panel if elimination data actually changed
-    if(elimChanged && document.getElementById('panel-elimination')?.classList.contains('active')){
+    const onElimPanel = document.getElementById('panel-elimination')?.classList.contains('active');
+    // When on elimination panel, skip dashboard/results renders to prevent jumping
+    if(!onElimPanel){
+      renderResults();
+      renderDashboard();
+      renderScorecards();
+    } else {
+      // Only update stats counters, don't re-render HTML
+      document.getElementById('d-scored').textContent = archers.filter(a=>(getScore(a.id)?.total||0)>0).length;
+    }
+    if(elimChanged && onElimPanel){
       renderElimContent();
     }
   });
