@@ -290,20 +290,49 @@ const ARROWS_PER_SET=3, MAX_SETS=5, SETS_TO_WIN=6, CUM_ENDS=5, CUM_ARROWS=3;
 ══════════════════════════════════════════ */
 function getVal(s){return s==='X'?10:(parseInt(s)||0);}
 function chipClass(s){
-  if(s==='X'||s===10||s===9||s===11)return 'chip-gold';
-  if(s===8||s===7)return 'chip-red';
-  if(s===6||s===5)return 'chip-blue';
-  if(s===4||s===3)return 'chip-black';
-  if(s===2||s===1)return 'chip-white';
-  if(s===0||s==='M')return 'chip-miss';
+  if(discipline==='Field'){
+    if(s===6||s===5) return 'chip-gold';
+    if(s===4||s===3||s===2||s===1) return 'chip-black';
+    if(s===0||s==='M') return 'chip-miss';
+    return 'chip-empty';
+  }
+  if(discipline==='3D'){
+    if(s===11) return 'chip-gold';
+    if(s===10) return 'chip-red';
+    if(s===8)  return 'chip-blue';
+    if(s===5)  return 'chip-black';
+    if(s===0||s==='M') return 'chip-miss';
+    return 'chip-empty';
+  }
+  // Outdoor/Indoor
+  if(s==='X'||s===10||s===9) return 'chip-gold';
+  if(s===8||s===7) return 'chip-red';
+  if(s===6||s===5) return 'chip-blue';
+  if(s===4||s===3) return 'chip-black';
+  if(s===2||s===1) return 'chip-white';
+  if(s===0||s==='M') return 'chip-miss';
   return 'chip-empty';
 }
 function padBtnClass(s){
-  if(s==='X'||s===10||s===9||s===11)return 'pad-gold';
-  if(s===8||s===7)return 'pad-red';
-  if(s===6||s===5)return 'pad-blue';
-  if(s===4||s===3)return 'pad-black';
-  if(s===2||s===1)return 'pad-white';
+  if(discipline==='Field'){
+    if(s===6||s===5) return 'pad-gold';
+    if(s===4||s===3||s===2||s===1) return 'pad-black';
+    if(s===0) return 'pad-miss'; // M = green handled separately
+    return 'pad-miss';
+  }
+  if(discipline==='3D'){
+    if(s===11) return 'pad-gold';
+    if(s===10) return 'pad-red';
+    if(s===8)  return 'pad-blue';
+    if(s===5)  return 'pad-black';
+    return 'pad-miss';
+  }
+  // Outdoor/Indoor
+  if(s==='X'||s===10||s===9||s===11) return 'pad-gold';
+  if(s===8||s===7) return 'pad-red';
+  if(s===6||s===5) return 'pad-blue';
+  if(s===4||s===3) return 'pad-black';
+  if(s===2||s===1) return 'pad-white';
   return 'pad-miss';
 }
 function getConfig(){
@@ -655,7 +684,8 @@ function renderPad(){
   let btns=padScores.map(s=>{
     const label=s===0?'M':s;
     const scoreArg=s==='X'?"'X'":s;
-    return `<button class="pad-btn ${padBtnClass(s)}" onclick="handleScore(${scoreArg})" ${isFull&&!isEditing?'disabled style="opacity:0.4"':''}>${label}</button>`;
+    const cls = s===0 ? 'pad-done' : padBtnClass(s);
+    return `<button class="pad-btn ${cls}" onclick="handleScore(${scoreArg})" ${isFull&&!isEditing?'disabled style="opacity:0.4"':''}>${label}</button>`;
   }).join('');
   btns+=`<button class="pad-btn pad-back" onclick="handleBack()" style="grid-column:span 2;">BACKSPACE ←</button>`;
   let nextLabel,nextDisabled;
@@ -1055,7 +1085,8 @@ function renderMatchPad(){
   let btns=padScores.map(s=>{
     const label=s===0?'M':s;
     const scoreArg=s==='X'?"'X'":s;
-    return `<button class="pad-btn ${padBtnClass(s)}" onclick="handleMatchScore(${scoreArg})" ${isFull?'disabled style="opacity:0.4"':''}>${label}</button>`;
+    const cls = s===0 ? 'pad-done' : padBtnClass(s);
+    return `<button class="pad-btn ${cls}" onclick="handleMatchScore(${scoreArg})" ${isFull?'disabled style="opacity:0.4"':''}>${label}</button>`;
   }).join('');
   btns+=`<button class="pad-btn pad-back" onclick="handleMatchBack()" style="grid-column:span 2;">BACKSPACE ←</button>`;
   const allDone=matchFormat==='sets'?checkMatchDone():(cumArrows1.length>=CUM_ENDS*CUM_ARROWS&&cumArrows2.length>=CUM_ENDS*CUM_ARROWS);
