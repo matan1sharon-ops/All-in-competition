@@ -264,6 +264,7 @@ window.selectComp = (id) => {
   if(unsubscribe) unsubscribe();
   if(!id) return;
 
+  let _renderTimer = null;
   unsubscribe = onSnapshot(doc(db,'competitions',id), snap=>{
     if(!snap.exists()) return;
     const d = snap.data();
@@ -278,7 +279,9 @@ window.selectComp = (id) => {
     const toggle = document.getElementById('view-toggle');
     if(toggle) toggle.style.display = hasElim ? 'flex' : 'none';
 
-    renderResults(d);
+    // Debounce render to prevent jumping
+    if(_renderTimer) clearTimeout(_renderTimer);
+    _renderTimer = setTimeout(()=>renderResults(d), 400);
   });
 };
 
