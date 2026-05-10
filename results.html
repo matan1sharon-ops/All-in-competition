@@ -118,9 +118,17 @@ setInterval(()=>{
 },1000);
 
 /* ── ELIMINATION DISPLAY ── */
+let _lastElimHash = '';
 function renderElimDisplay(elimData, discipline) {
   const main = document.getElementById('main');
+  // Only re-render if data actually changed
+  const hash = JSON.stringify(elimData);
   const scrollTop = main.scrollTop;
+  if(hash === _lastElimHash){
+    // Data unchanged, just restore scroll
+    return;
+  }
+  _lastElimHash = hash;
   const roundOrder = ['R1','QF','SF','F','B'];
   const roundLabels = {
     R1:'Round of 16', QF:'Quarter Finals', SF:'Semi Finals',
@@ -281,6 +289,7 @@ function getScore(scores, archerId) {
   return scores[key] || scores[String(archerId)] || {};
 }
 
+let _lastQualHash = '';
 function renderResults(data) {
   const archers  = data.archers  || [];
   const scores   = data.scores   || {};
@@ -289,6 +298,15 @@ function renderResults(data) {
 
   const g1label = disc==='3D'?'11':disc==='Field'?'6':disc==='Indoor'?'10':'X';
   const g2label = disc==='3D'?'10':disc==='Field'?'5':disc==='Indoor'?'9':'10';
+
+  // Only re-render if data changed
+  const qualHash = JSON.stringify({archers:data.archers, scores:data.scores});
+  const main2 = document.getElementById('main');
+  const scrollTop2 = main2 ? main2.scrollTop : 0;
+  if(qualHash === _lastQualHash && currentView==='qual'){
+    return;
+  }
+  _lastQualHash = qualHash;
 
   // Only archers with scores
   const scored = archers
@@ -383,6 +401,7 @@ function renderResults(data) {
   });
   html+='</div>';
   document.getElementById('main').innerHTML=html;
+  if(main2) main2.scrollTop = scrollTop2;
 }
 
 loadComps();
