@@ -137,7 +137,7 @@ function renderElimDisplay(elimData, discipline) {
 
   let html = '<div style="display:flex;flex-direction:column;gap:20px;">';
 
-  Object.entries(elimData).forEach(([catKey, data])=>{
+  Object.entries(elimData).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([catKey, data])=>{
     const gLabel = data.gender==='M'?'MEN':'WOMEN';
     const formatLabel = data.format==='sets'?'Set System':'Cumulative';
 
@@ -348,6 +348,14 @@ function renderResults(data) {
 
   // Group by bow + age + gender
   const catMap={};
+  // Sort scored archers first for stable category building
+  scored.sort((a,b)=>{
+    const bi=BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);
+    if(bi!==0) return bi;
+    const ai=AGE_ORDER.indexOf(a.age)-AGE_ORDER.indexOf(b.age);
+    if(ai!==0) return ai;
+    return a.gender.localeCompare(b.gender);
+  });
   scored.forEach(a=>{
     const key=`${a.bow}||${a.age}||${a.gender}`;
     if(!catMap[key]) catMap[key]={bow:a.bow,age:a.age,gender:a.gender,archers:[]};
