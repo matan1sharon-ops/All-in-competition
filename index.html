@@ -234,6 +234,7 @@ tbody td { padding: 10px 12px; color: #111; }
             <button class="btn btn-primary" onclick="generateTargets()">⚡ AUTO GENERATE FROM ENTRIES</button>
             <button class="btn btn-secondary" onclick="clearAssignments()">CLEAR ALL</button>
             <button class="btn btn-secondary" onclick="printStartList()">🖨 PRINT START LIST</button>
+            <button class="btn btn-secondary" onclick="printFieldOfPlay()">🏟 FIELD OF PLAY</button>
           </div>
         </div>
         <div id="target-grid"></div>
@@ -764,6 +765,126 @@ window.removeFromSlot = async () => {
 };
 
 /* ── PRINT START LIST ── */
+window.printFieldOfPlay = () => {
+  if(!targets.length){ toast('No targets to print','error'); return; }
+
+  // Build distance groups in order
+  const groups = [];
+  if(currentDiscipline==='Outdoor'){
+    const grpDefs = [
+      { label:'RECURVE 70m', color:'#1565c0', filter: t=>t.bow==='Recurve' && targets.indexOf(t) < targets.filter(x=>x.bow==='Recurve').length * 0.5 },
+    ];
+    // Build groups by detecting bow changes in target sequence
+    let currentBow = null, currentLabel = null, currentColor = null, currentTargets = [];
+    const bowLabels = {
+      'Recurve': null, // Will be split by distance below
+      'Compound': {label:'COMPOUND 50m', color:'#4a148c'},
+      'Barebow': {label:'BAREBOW 50m', color:'#1b5e20'},
+      'Trad/Longbow': {label:'TRAD / LONGBOW 30m', color:'#e65100'},
+      'Mixed': {label:'MIXED', color:'#546e7a'},
+    };
+
+    // For Outdoor Recurve, split by distance based on age groups
+    // We track groups by scanning targets in order
+    targets.forEach(t => {
+      let label, color;
+      if(t.bow==='Recurve'){
+        // Determine which recurve group by checking archers on this target
+        const archerAges = ['A','B','C','D'].filter(s=>t[s]).map(s=>t[s].age);
+        const has7 = archerAges.some(a=>['Senior','U21'].includes(a));
+        const has6 = archerAges.some(a=>['U18','Master 50+','Master 60+'].includes(a));
+        const has3 = archerAges.some(a=>['U14','U12'].includes(a));
+        if(has3) { label='RECURVE 30m'; color='#1976d2'; }
+        else if(has6) { label='RECURVE 60m'; color='#1565c0'; }
+        else { label='RECURVE 70m'; color='#0d47a1'; }
+      } else if(t.bow==='Compound'){ label='COMPOUND 50m'; color='#4a148c'; }
+      else if(t.bow==='Barebow'){ label='BAREBOW 50m'; color='#1b5e20'; }
+      else if(t.bow==='Trad/Longbow'){ label='TRAD/LB 30m'; color='#e65100'; }
+      else { label=t.bow.toUpperCase(); color='#546e7a'; }
+
+      if(label!==currentLabel){
+        if(currentTargets.length) groups.push({label:currentLabel, color:currentColor, targets:[...currentTargets]});
+        currentLabel=label; currentColor=color; currentTargets=[];
+      }
+      currentTargets.push(t);
+    });
+    if(currentTargets.length) groups.push({label:currentLabel, color:currentColor, targets:[...currentTargets]});
+
+  } else {
+    // Indoor / 3D / Field — just group by bow
+    let currentLabel=null, currentColor=null, currentTargets=[];
+    targets.forEach(t=>{
+      const bowMap = {
+        'Recurve':'RECURVE', 'Compound':'COMPOUND', 'Barebow':'BAREBOW',
+        'Trad/Longbow':'TRAD / LONGBOW', 'Mixed':'MIXED'
+      };
+      const colorMap = {
+        'Recurve':'#1565c0','Compound':'#4a148c','Barebow':'#1b5e20',
+        'Trad/Longbow':'#e65100','Mixed':'#546e7a'
+      };
+      const label = bowMap[t.bow]||t.bow.toUpperCase();
+      const color = colorMap[t.bow]||'#555';
+      if(label!==currentLabel){
+        if(currentTargets.length) groups.push({label:currentLabel, color:currentColor, targets:[...currentTargets]});
+        currentLabel=label; currentColor=color; currentTargets=[];
+      }
+      currentTargets.push(t);
+    });
+    if(currentTargets.length) groups.push({label:currentLabel, color:currentColor, targets:[...currentTargets]});
+  }
+
+  // Face sizes by label
+  const faceSizes = {
+    'RECURVE 70m':'122cm', 'RECURVE 60m':'122cm', 'RECURVE 30m':'80cm',
+    'COMPOUND 50m':'80cm', 'BAREBOW 50m':'122cm', 'TRAD/LB 30m':'80cm',
+    'RECURVE':'40cm', 'COMPOUND':'40cm', 'BAREBOW':'40cm', 'TRAD / LONGBOW':'40cm',
+    'MIXED':'varies',
+  };
+
+  // Build header row (group labels)
+  const headerCells = groups.map(g=>{
+    const face = faceSizes[g.label]||'';
+    return `<td colspan="${g.targets.length}" style="background:${g.color};color:#fff;text-align:center;
+      padding:8px 8px;font-family:Arial,sans-serif;font-size:13px;font-weight:700;
+      border:2px solid #fff;letter-spacing:1px;">
+      ${g.label}
+      ${face?`<div style="font-size:11px;font-weight:400;color:rgba(255,255,255,0.85);margin-top:3px;">⬤ ${face}</div>`:''}
+    </td>`;
+  }).join('');
+
+  // Build target number row
+  const targetCells = groups.map(g=>
+    g.targets.map(t=>`
+      <td style="text-align:center;padding:14px 8px;font-family:Arial,sans-serif;
+        font-size:18px;font-weight:900;border:1px solid #ccc;min-width:48px;
+        background:${g.color}18;color:#111;">
+        T${t.num}
+      </td>`).join('')
+  ).join('');
+
+  const snap = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Field of Play</title>
+  <style>
+    body{margin:16px;font-family:Arial,sans-serif;}
+    h2{margin-bottom:4px;}
+    .sub{font-size:12px;color:#666;margin-bottom:16px;}
+    table{border-collapse:collapse;width:100%;}
+    @media print{@page{size:A4 landscape;margin:8mm;}body{margin:8px;}}
+  </style>
+  </head><body>
+  <h2>🏟 Field of Play</h2>
+  <div class="sub">${currentDiscipline} · ${targets.length} targets · ${archers.length} archers</div>
+  <table>
+    <thead><tr>${headerCells}</tr></thead>
+    <tbody><tr>${targetCells}</tr></tbody>
+  </table>
+  </body></html>`;
+
+  const win=window.open('','_blank');
+  win.document.write(snap);
+  win.document.close();
+  setTimeout(()=>win.print(),400);
+};
+
 window.printStartList = () => {
   if(!targets.length){ toast('No targets to print','error'); return; }
   // Get all bow groups including Mixed
