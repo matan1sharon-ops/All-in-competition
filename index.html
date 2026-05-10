@@ -1685,7 +1685,9 @@ function renderElimContent(){
 
   // Build full HTML
   let html='';
-  Object.entries(elimData).forEach(([catKey,data])=>{
+  // Sort categories by stable key to prevent reordering on re-render
+  const sortedEntries = Object.entries(elimData).sort((a,b)=>a[0].localeCompare(b[0]));
+  sortedEntries.forEach(([catKey,data])=>{
     const gLabel = data.gender==='M'?'Men':'Women';
     const formatLabel = data.format==='sets'?'Set System':'Cumulative';
     html+=`<div data-cat="${catKey}" style="margin-bottom:24px;">
