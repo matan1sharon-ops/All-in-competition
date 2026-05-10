@@ -1536,6 +1536,9 @@ window.showPanel = (name) => {
   document.getElementById(`panel-${name}`).classList.add('active');
   document.querySelector(`[data-panel="${name}"]`).classList.add('active');
   document.getElementById('topbar-title').textContent={dashboard:'Dashboard',entries:'Entry List',targets:'Target Assignment',schedule:'Schedule',results:'Live Results',scorecards:'Scorecards',elimination:'Elimination'}[name]||name;
+  // When on elimination panel, disable .content scroll so only elim-wrapper scrolls
+  const contentEl = document.querySelector('.content');
+  if(contentEl) contentEl.style.overflow = name==='elimination' ? 'hidden' : '';
   if(name==='scorecards') renderScorecards();
   if(name==='elimination') initElimination();
 };
