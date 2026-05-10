@@ -1683,7 +1683,7 @@ function renderElimContent(){
     return;
   }
 
-  // Build new HTML
+  // Build full HTML
   let html='';
   Object.entries(elimData).forEach(([catKey,data])=>{
     const gLabel = data.gender==='M'?'Men':'Women';
@@ -1739,15 +1739,25 @@ function renderElimContent(){
     html+='</div>';
   });
 
-  // Only update DOM if content actually changed
+  // SMART UPDATE: only replace if hash changed, and use position:sticky trick
   const newHash = html.replace(/\s+/g,' ');
   if(container._lastHash === newHash) return;
   container._lastHash = newHash;
 
-  const scrollTop = container.scrollTop;
+  // Use a temporary off-screen render to avoid reflow
+  const temp = document.createElement('div');
+  temp.style.cssText = 'position:fixed;top:-9999px;left:-9999px;visibility:hidden;';
+  temp.innerHTML = html;
+  document.body.appendChild(temp);
+
+  // Swap innerHTML without touching scroll
+  const st = container.scrollTop;
+  container.style.overflow = 'hidden';
   container.innerHTML = html;
-  container.scrollTop = scrollTop;
-  requestAnimationFrame(()=>{ container.scrollTop = scrollTop; });
+  container.style.overflow = '';
+  container.scrollTop = st;
+
+  document.body.removeChild(temp);
 }
 
 function renderMatchRow(archer,match,won,num){
