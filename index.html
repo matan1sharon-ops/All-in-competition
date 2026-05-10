@@ -1043,7 +1043,7 @@ window.renderResults = () => {
     catMap[key].archers.push(a);
   });
 
-  // Sort categories by BOW_ORDER then AGE_ORDER then gender
+  // Sort categories by BOW_ORDER then AGE_ORDER then gender — stable sort
   const sortedCats = Object.values(catMap).sort((a,b)=>{
     const bi = BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);
     if(bi!==0) return bi;
@@ -1052,7 +1052,8 @@ window.renderResults = () => {
     return a.gender.localeCompare(b.gender);
   });
 
-  // Build HTML
+  // Build HTML with stable category key to prevent reordering
+  const catKey = c => `${c.bow}||${c.age}||${c.gender}`;
   let html='';
   sortedCats.forEach(cat=>{
     // Sort archers within category by score
