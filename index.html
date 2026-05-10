@@ -1652,6 +1652,7 @@ window.generateAllElimination = async () => {
 function renderElimContent(){
   if(!currentCompId) return;
   const container = document.getElementById('elim-content');
+  const scrollTop = container.scrollTop;
 
   // Get elimination data from scores snapshot
   const elimData = window._elimData || {};
@@ -1721,6 +1722,7 @@ function renderElimContent(){
   });
 
   container.innerHTML=html;
+  container.scrollTop = scrollTop;
 }
 
 function renderMatchRow(archer,match,won,num){
