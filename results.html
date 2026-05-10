@@ -218,24 +218,30 @@ function renderElimDisplay(elimData, discipline) {
 
 function renderMatchRowDisplay(archer, won, score, sets, archerNum){
   if(!archer) return `<div style="padding:4px 6px;color:var(--muted);font-size:12px;">TBD</div>`;
-  // Build inline set scores
+  // Fixed 5 set columns
   let setScores = '';
-  if(sets && sets.length){
-    sets.forEach(s=>{
-      const val = archerNum===1?s.score1:s.score2;
-      const isWin = archerNum===1?s.score1>s.score2:s.score2>s.score1;
-      setScores+=`<span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:${isWin?'var(--green)':'var(--muted2)'};margin-left:5px;">${val}</span>`;
-    });
+  if(sets !== undefined){
+    const s = sets||[];
+    for(let i=0;i<5;i++){
+      const set = s[i];
+      const bothDone = set && set.score1!==null && set.score1!==undefined;
+      const val = set && bothDone ? (archerNum===1?set.score1:set.score2) : null;
+      const otherVal = set && bothDone ? (archerNum===1?set.score2:set.score1) : null;
+      const isWin = val!==null && otherVal!==null && val>otherVal;
+      setScores+=`<span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;
+        color:${val!==null?(isWin?'var(--green)':'var(--muted2)'):'var(--muted)'};
+        min-width:24px;text-align:center;display:inline-block;">${val!==null?val:'—'}</span>`;
+    }
   }
-  return `<div style="display:flex;align-items:center;gap:6px;padding:4px 6px;
+  const showTotal = score!==''&&score!==null&&score!==undefined;
+  return `<div style="display:flex;align-items:center;gap:4px;padding:4px 6px;
     border-radius:5px;background:${won?'rgba(67,160,71,0.15)':'transparent'};">
     <span style="font-size:10px;color:var(--muted2);min-width:18px;">#${archer.seed||'?'}</span>
-    <span style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;
+    <span style="min-width:110px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;
       color:${won?'var(--green)':'var(--text)'};">${archer.name}</span>
     ${setScores}
-    ${score!==''&&score!==null&&score!==undefined?
-      `<span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;
-        color:${won?'var(--green)':'var(--accent)'};">${score}</span>`:''}
+    ${showTotal?`<span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;min-width:24px;text-align:right;
+        color:${won?'var(--green)':'var(--accent)'};">${score}</span>`:'<span style="min-width:24px;"></span>'}
     ${won?'<span style="font-size:12px;">🏆</span>':''}
   </div>`;
 }
