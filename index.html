@@ -309,7 +309,7 @@ tbody td { padding: 10px 12px; color: #111; }
             <button class="btn btn-primary" onclick="generateElimination()">⚡ GENERATE BRACKET</button>
             <button class="btn btn-success" onclick="generateAllElimination()">⚡ GENERATE ALL</button>
           </div>
-          <div id="elim-content"></div>
+          <div id="elim-content" style="overflow-anchor:none;"></div>
         </div>
       </div>
 
@@ -506,11 +506,17 @@ window.selectCompetition = async (id) => {
     archers           = d.archers   || [];
     currentDiscipline = d.discipline || 'Outdoor';
     window._scorecards = d.scorecards || {};
+    const newElimJson = JSON.stringify(d.elimination||{});
+    const elimChanged = newElimJson !== window._lastElimJson;
+    window._lastElimJson = newElimJson;
     window._elimData   = d.elimination || {};
     renderResults();
     renderDashboard();
     renderScorecards();
-    if(document.getElementById('panel-elimination')?.classList.contains('active')) debouncedRenderElim();
+    // Only re-render elimination panel if elimination data actually changed
+    if(elimChanged && document.getElementById('panel-elimination')?.classList.contains('active')){
+      renderElimContent();
+    }
   });
 };
 
@@ -1080,7 +1086,14 @@ window.renderResults = () => {
     </div>`;
   });
 
+  // Only update if content changed
+  const newHash = html.length + html.slice(0,200);
+  if(container._lastHash === newHash) return;
+  container._lastHash = newHash;
+  const scrollEl = document.querySelector('.content');
+  const st = scrollEl ? scrollEl.scrollTop : 0;
   container.innerHTML = html;
+  if(scrollEl) requestAnimationFrame(()=>{ scrollEl.scrollTop = st; });
 };
 
 function getArcherEnds(archerId) {
