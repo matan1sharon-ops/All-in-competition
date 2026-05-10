@@ -72,6 +72,10 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
   <select id="comp-select" onchange="selectComp(this.value)">
     <option value="">— Select —</option>
   </select>
+  <div id="view-toggle" style="display:none;gap:6px;display:flex;">
+    <button id="btn-qual" onclick="setView('qual')" style="padding:6px 14px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">🏹 QUALIFICATION</button>
+    <button id="btn-elim" onclick="setView('elim')" style="padding:6px 14px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--muted2);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">⚔️ ELIMINATION</button>
+  </div>
   <span class="refresh-badge" id="last-update"></span>
 </div>
 
@@ -227,6 +231,24 @@ async function loadComps() {
   if(compId){ sel.value=compId; selectComp(compId); }
 }
 
+let currentView = 'qual'; // 'qual' or 'elim'
+let lastData = null;
+
+window.setView = (view) => {
+  currentView = view;
+  const btnQual = document.getElementById('btn-qual');
+  const btnElim = document.getElementById('btn-elim');
+  if(btnQual && btnElim){
+    btnQual.style.background = view==='qual'?'var(--accent)':'transparent';
+    btnQual.style.color = view==='qual'?'#000':'var(--muted2)';
+    btnQual.style.borderColor = view==='qual'?'var(--accent)':'var(--border2)';
+    btnElim.style.background = view==='elim'?'var(--accent)':'transparent';
+    btnElim.style.color = view==='elim'?'#000':'var(--muted2)';
+    btnElim.style.borderColor = view==='elim'?'var(--accent)':'var(--border2)';
+  }
+  if(lastData) renderResults(lastData);
+};
+
 window.selectComp = (id) => {
   if(unsubscribe) unsubscribe();
   if(!id) return;
@@ -234,10 +256,17 @@ window.selectComp = (id) => {
   unsubscribe = onSnapshot(doc(db,'competitions',id), snap=>{
     if(!snap.exists()) return;
     const d = snap.data();
+    lastData = d;
     document.getElementById('comp-name').textContent =
       `${d.name||''}${d.discipline?' · '+d.discipline:''}${d.date?' · '+d.date:''}`;
     document.getElementById('last-update').textContent =
       'Updated ' + new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+
+    // Show toggle if elimination exists
+    const hasElim = Object.keys(d.elimination||{}).length > 0;
+    const toggle = document.getElementById('view-toggle');
+    if(toggle) toggle.style.display = hasElim ? 'flex' : 'none';
+
     renderResults(d);
   });
 };
@@ -270,7 +299,8 @@ function renderResults(data) {
   const elimData = data.elimination || {};
   const hasElim = Object.keys(elimData).length > 0;
 
-  if(hasElim){
+  // Show based on current view toggle
+  if(hasElim && currentView==='elim'){
     renderElimDisplay(elimData, data.discipline||'Outdoor');
     return;
   }
