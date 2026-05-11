@@ -746,7 +746,7 @@ function renderTargets() {
     const distLabel = getDistanceLabel(bow, currentDiscipline);
     html+=`<div style="margin-bottom:24px;">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px 14px;background:${color}22;border:1px solid ${color}44;border-radius:8px;">
-        <span style="font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:900;letter-spacing:2px;color:${color};">${bow==='Mixed'?'🎯 MIXED (3D/FIELD)':bow==='Trad/Longbow'?'🏹 TRAD / LONGBOW':bow.toUpperCase()}</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:2px;color:${color};">${bow==='Mixed'?'🎯 MIXED (3D/FIELD)':bow==='Trad/Longbow'?'🏹 TRAD / LONGBOW':bow.toUpperCase()}</span>
         ${distLabel?`<span style="font-size:12px;font-weight:700;color:var(--accent);background:rgba(255,215,0,0.15);padding:2px 8px;border-radius:4px;">${distLabel}</span>`:''}
         <span style="font-size:11px;color:#888;">${archerCount} archers · ${group.length} target${group.length!==1?'s':''} (${tRange})</span>
       </div><div class="target-grid">`;
@@ -1064,7 +1064,7 @@ window.renderResults = () => {
     // Category header
     html+=`<div style="margin-bottom:20px;">
       <div style="display:flex;align-items:center;gap:10px;padding:8px 14px;background:${color}22;border:1px solid ${color}44;border-radius:8px;margin-bottom:8px;">
-        <span style="font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:900;letter-spacing:1px;color:${color};">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:1px;color:${color};">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</span>
         <span style="font-size:11px;color:var(--muted2);">${ranked.length} archer${ranked.length!==1?'s':''}</span>
       </div>
       <div class="table-wrap">
@@ -1268,7 +1268,7 @@ function renderScorecards() {
     const color = BOW_COLORS[bow]||'#555';
     html+=`<div style="margin-bottom:20px;">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:8px 14px;background:${color}22;border:1px solid ${color}44;border-radius:8px;">
-        <span style="font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:900;letter-spacing:2px;color:${color};">${bow.toUpperCase()}</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:2px;color:${color};">${bow.toUpperCase()}</span>
         <span style="font-size:11px;color:var(--muted2);">${group.length} archer${group.length!==1?'s':''}</span>
       </div>`;
     group.sort((a,b)=>(getScore(b.id)?.total||0)-(getScore(a.id)?.total||0));
@@ -1282,7 +1282,7 @@ function renderScorecards() {
             <div style="font-size:14px;font-weight:700;">${archer.name}</div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;">
-            <div style="font-family:Barlow Condensed,sans-serif;font-size:24px;font-weight:900;color:var(--accent);">${s?.total||'—'}</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:var(--accent);">${s?.total||'—'}</div>
             <button class="btn btn-secondary btn-sm" onclick="viewScorecard('${archer.id}')">VIEW 📄</button>
             <button class="btn btn-primary btn-sm" onclick="printScorecard('${archer.id}')">🖨 PRINT</button>
           </div>
@@ -1408,7 +1408,7 @@ window.openMoveModal = (archerId, fromTi, fromSlot) => {
   document.getElementById('move-modal-body').innerHTML=`
     <div style="margin-bottom:12px;padding:10px;background:var(--surface2);border-radius:8px;">
       <div style="font-size:11px;color:var(--muted2);margin-bottom:4px;">CURRENT POSITION</div>
-      <div style="font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:700;color:var(--accent);">T${targets[fromTi].num}${fromSlot}</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--accent);">T${targets[fromTi].num}${fromSlot}</div>
       <div style="font-size:12px;color:var(--muted2);">${archer.bow} · ${archer.age} · ${archer.gender==='M'?'Male':'Female'}</div>
     </div>
     <div style="font-size:11px;color:var(--muted2);margin-bottom:8px;font-weight:700;">MOVE TO:</div>
@@ -1416,7 +1416,7 @@ window.openMoveModal = (archerId, fromTi, fromSlot) => {
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:6px;max-height:300px;overflow-y:auto;">
       ${validTargets.map(v=>`
         <button onclick="moveArcherTo('${archerId}',${fromTi},'${fromSlot}',${v.ti},'${v.slot}')"
-          style="padding:10px 6px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:700;cursor:pointer;">
+          style="padding:10px 6px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">
           ${v.label}
         </button>`).join('')}
     </div>`:'<div style="color:var(--muted2);text-align:center;padding:20px;">No available slots for this archer&#39;s category.</div>'}
@@ -1695,7 +1695,7 @@ function renderElimContent(){
     html+=`<div data-cat="${catKey}" style="margin-bottom:24px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;">
         <div>
-          <span style="font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:900;color:var(--accent);">${data.bow} · ${data.age} · ${gLabel}</span>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--accent);">${data.bow} · ${data.age} · ${gLabel}</span>
           <span style="font-size:11px;color:var(--muted2);margin-left:12px;">1/${data.bracketSize} · ${formatLabel}</span>
         </div>
         <button class="btn btn-danger btn-sm" onclick="deleteElimination('${catKey}')">✕ DELETE</button>
@@ -1710,7 +1710,7 @@ function renderElimContent(){
                          roundKey==='F'?'🏆 Final':
                          roundKey==='B'?'🥉 Bronze Medal':'Round';
       html+=`<div style="margin-bottom:12px;">
-        <div style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--muted2);margin-bottom:8px;text-transform:uppercase;">${roundLabel}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--muted2);margin-bottom:8px;text-transform:uppercase;">${roundLabel}</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:8px;">`;
       matches.forEach(match=>{
         const won1 = match.winnerChoice===match.archer1?.id;
@@ -1728,7 +1728,9 @@ function renderElimContent(){
             <span style="font-size:11px;color:var(--muted2);">Match ${match.position}</span>
             ${match.winnerChoice?`<span style="font-size:11px;color:var(--green);font-weight:700;">✓ COMPLETE</span>`:'<span style="font-size:11px;color:var(--accent);">PENDING</span>'}
           </div>
-          ${renderMatchBlock(match, data)}
+          ${renderMatchRow(match.archer1,match,won1,1)}
+          <div style="height:4px;"></div>
+          ${renderMatchRow(match.archer2,match,won2,2)}
           ${!match.winnerChoice?`<button class="btn btn-primary btn-sm" style="width:100%;margin-top:8px;" onclick="openMatchModal('${catKey}','${roundKey}',${match.position-1})">ENTER RESULT</button>`:''}
         </div>`;
       });
@@ -1770,78 +1772,41 @@ function renderElimContent(){
   document.body.removeChild(temp);
 }
 
-function renderMatchBlock(match, data){
-  const isCum = data.format==='cumulative';
-  const a1=match.archer1, a2=match.archer2;
-  if(!a1) return '';
-  const won1=match.winnerChoice===a1.id, won2=a2&&match.winnerChoice===a2.id;
-  const sets=match.sets||[];
-  const hasTB = match.tiebreak1!==null&&match.tiebreak1!==undefined;
-
-  const C='text-align:center;padding:2px 4px;font-size:13px;font-weight:700;';
-  const H='text-align:center;padding:1px 4px;font-size:10px;font-weight:700;color:var(--muted2);';
-  const W = isCum?'38px':'32px';
-
-  if(isCum){
-    const t1=match.score1, t2=match.score2;
-    const cols1=[], cols2=[];
-    let r1=0, r2=0;
-    for(let i=0;i<4;i++){
-      const s=sets[i];
-      if(s&&s.score1!==null&&s.score1!==undefined){r1+=s.score1;cols1.push(r1);}
-      else cols1.push(null);
-      if(s&&s.score2!==null&&s.score2!==undefined){r2+=s.score2;cols2.push(r2);}
-      else cols2.push(null);
-    }
-    const tdH = `style="width:${W};${H}"`;
-    const tdC = (v,extra='')=>`<td style="width:${W};${C}${extra}">${v!==null&&v!==undefined?v:'—'}</td>`;
-    const row = (a,cols,tb,tot,won)=>`<tr style="background:${won?'rgba(67,160,71,0.15)':'var(--surface3)'};">
-      <td style="font-size:10px;color:var(--muted2);padding:4px 2px;width:22px;">#${a.seed||'?'}</td>
-      <td style="font-size:14px;font-weight:700;${won?'color:var(--green)':''};padding:4px 4px;">${a.name}</td>
-      ${cols.map(v=>tdC(v,`color:${v!==null?'var(--text)':'var(--muted)'};`)).join('')}
-      ${hasTB?tdC(tb,'color:var(--accent);'):''}
-      <td style="width:${W};${C}font-size:15px;color:${won?'var(--green)':'var(--accent)'};">${tot!==null&&tot!==undefined?tot:''}</td>
-      <td style="width:20px;font-size:14px;">${won?'🏆':''}</td>
-    </tr>`;
-    return `<table style="width:100%;border-collapse:collapse;">
-      <tr>
-        <td style="width:22px;"></td><td></td>
-        <td ${tdH}>T1</td><td ${tdH}>T2</td><td ${tdH}>T3</td><td ${tdH}>T4</td>
-        ${hasTB?`<td ${tdH}>TB</td>`:''}
-        <td ${tdH}>Total</td><td style="width:20px;"></td>
-      </tr>
-      ${row(a1,cols1,match.tiebreak1,t1,won1)}
-      ${a2?row(a2,cols2,match.tiebreak2,t2,won2):''}
-    </table>`;
-  } else {
-    const pts1=match.score1, pts2=match.score2;
-    const sVal=(i,n)=>{ const s=sets[i]; if(!s||s.score1===null||s.score1===undefined) return null; return n===1?s.score1:s.score2; };
-    const sWin=(i,n)=>{ const s=sets[i]; if(!s||s.score1===null) return false; return n===1?s.score1>s.score2:s.score2>s.score1; };
-    const tdH = `style="width:${W};${H}"`;
-    const tdS=(i,n)=>{ const v=sVal(i,n),w=sWin(i,n); return `<td style="width:${W};${C}color:${v!==null?(w?'var(--green)':'var(--muted2)'):'var(--muted)'};">${v!==null?v:'—'}</td>`; };
-    const row=(a,n,pts,won)=>`<tr style="background:${won?'rgba(67,160,71,0.15)':'var(--surface3)'};">
-      <td style="font-size:10px;color:var(--muted2);padding:4px 2px;width:22px;">#${a.seed||'?'}</td>
-      <td style="font-size:14px;font-weight:700;${won?'color:var(--green)':''};padding:4px 4px;">${a.name}</td>
-      ${[0,1,2,3,4].map(i=>tdS(i,n)).join('')}
-      <td style="width:${W};${C}font-size:15px;color:${won?'var(--green)':'var(--accent)'};">${pts!==null&&pts!==undefined?pts:''}</td>
-      <td style="width:20px;font-size:14px;">${won?'🏆':''}</td>
-    </tr>`;
-    return `<table style="width:100%;border-collapse:collapse;">
-      <tr>
-        <td style="width:22px;"></td><td></td>
-        ${[1,2,3,4,5].map(i=>`<td ${tdH}>S${i}</td>`).join('')}
-        <td ${tdH}>PTS</td><td style="width:20px;"></td>
-      </tr>
-      ${row(a1,1,pts1,won1)}
-      ${a2?row(a2,2,pts2,won2):''}
-    </table>`;
-  }
-}
-
 function renderMatchRow(archer,match,won,num){
   if(!archer && match.isBye) return `<div style="padding:6px 8px;background:var(--surface3);border-radius:6px;color:var(--accent);font-size:12px;font-weight:700;">BYE ✓</div>`;
   if(!archer) return `<div style="padding:6px 8px;background:var(--surface3);border-radius:6px;color:var(--muted);font-size:12px;">TBD</div>`;
-  return '';
+  const score = num===1?match.score1:match.score2;
+  const sets = match.sets||[];
+  const isSetFormat = sets.length>0 || match.score1===null;
+
+  // Fixed 5 set columns — always render all 5 slots
+  let setScores='';
+  if(isSetFormat && match.sets!==undefined){
+    for(let i=0;i<5;i++){
+      const s = sets[i];
+      const bothDone = s && s.arrows1?.length>=3 && s.arrows2?.length>=3 || (s && s.score1!==undefined && s.score2!==undefined && s.score1!==null);
+      const val = s && bothDone ? (num===1?s.score1:s.score2) : null;
+      const otherVal = s && bothDone ? (num===1?s.score2:s.score1) : null;
+      const isWin = val!==null && otherVal!==null && val>otherVal;
+      setScores+=`<span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;
+        color:${val!==null?(isWin?'var(--green)':'var(--muted2)'):'var(--muted)'};
+        min-width:26px;text-align:center;display:inline-block;">
+        ${val!==null?val:'—'}
+      </span>`;
+    }
+  }
+
+  // Total only shows after both archers have finished (winnerChoice set or score exists)
+  const showTotal = score!==null && score!==undefined;
+
+  return `<div style="display:flex;align-items:center;gap:4px;padding:6px 8px;background:${won?'rgba(67,160,71,0.15)':'var(--surface3)'};border-radius:6px;border:1px solid ${won?'var(--green)':'transparent'};">
+    <span style="font-size:10px;color:var(--muted2);min-width:20px;">#${archer.seed||'?'}</span>
+    <span style="min-width:120px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;${won?'color:var(--green)':''}">${archer.name}</span>
+    ${setScores}
+    <span style="font-size:10px;color:var(--muted2);margin-left:4px;min-width:32px;">Q:${archer.qualScore||0}</span>
+    ${showTotal?`<span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;min-width:24px;text-align:right;color:${won?'var(--green)':'var(--accent)'};">${score}</span>`:'<span style="min-width:24px;"></span>'}
+    ${won?'<span style="font-size:14px;">🏆</span>':''}
+  </div>`;
 }
 
 /* ── MATCH RESULT MODAL ── */
@@ -1868,7 +1833,7 @@ window.openMatchModal = (catKey,roundKey,matchIdx) => {
     });
     setsHtml=`<div style="margin-bottom:12px;">
       <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-        <span id="set-points-display" style="font-family:Barlow Condensed,sans-serif;font-weight:700;">Set Points: ${sp1} — ${sp2}</span>
+        <span id="set-points-display" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;">Set Points: ${sp1} — ${sp2}</span>
         <span style="font-size:11px;color:var(--muted2);">(First to 6 wins)</span>
       </div>`;
     for(let i=0;i<5;i++){
@@ -1910,10 +1875,10 @@ window.openMatchModal = (catKey,roundKey,matchIdx) => {
     <div style="background:var(--surface2);border:1px solid var(--accent);border-radius:8px;padding:12px;">
       <div style="font-size:11px;color:var(--accent);margin-bottom:10px;font-weight:700;">WINNER ✓ (required)</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        <button id="winner-btn-1" onclick="selectWinner(1)" style="padding:12px;border-radius:8px;border:2px solid ${match.winnerChoice===match.archer1?.id?'var(--green)':'var(--border2)'};background:${match.winnerChoice===match.archer1?.id?'rgba(67,160,71,0.2)':'var(--surface3)'};color:${match.winnerChoice===match.archer1?.id?'var(--green)':'var(--text)'};font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:700;cursor:pointer;">
+        <button id="winner-btn-1" onclick="selectWinner(1)" style="padding:12px;border-radius:8px;border:2px solid ${match.winnerChoice===match.archer1?.id?'var(--green)':'var(--border2)'};background:${match.winnerChoice===match.archer1?.id?'rgba(67,160,71,0.2)':'var(--surface3)'};color:${match.winnerChoice===match.archer1?.id?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">
           ${match.archer1?.name||'Archer 1'}
         </button>
-        <button id="winner-btn-2" onclick="selectWinner(2)" style="padding:12px;border-radius:8px;border:2px solid ${match.winnerChoice===match.archer2?.id?'var(--green)':'var(--border2)'};background:${match.winnerChoice===match.archer2?.id?'rgba(67,160,71,0.2)':'var(--surface3)'};color:${match.winnerChoice===match.archer2?.id?'var(--green)':'var(--text)'};font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:700;cursor:pointer;">
+        <button id="winner-btn-2" onclick="selectWinner(2)" style="padding:12px;border-radius:8px;border:2px solid ${match.winnerChoice===match.archer2?.id?'var(--green)':'var(--border2)'};background:${match.winnerChoice===match.archer2?.id?'rgba(67,160,71,0.2)':'var(--surface3)'};color:${match.winnerChoice===match.archer2?.id?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">
           ${match.archer2?.name||'Archer 2'}
         </button>
       </div>
