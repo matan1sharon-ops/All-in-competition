@@ -315,7 +315,10 @@ window.setView = (view) => {
     btnElim.style.color = view==='elim'?'#000':'var(--muted2)';
     btnElim.style.borderColor = view==='elim'?'var(--accent)':'var(--border2)';
   }
-  _lastQualHash = ''; // force re-render on view switch
+  _lastQualHash = '';   // force re-render on view switch
+  _lastElimHash = '';   // force elim re-render too
+  const main = document.getElementById('main');
+  if(main) main.innerHTML = ''; // clear current view
   if(lastData) renderResults(lastData);
 };
 
