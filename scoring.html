@@ -283,7 +283,7 @@ let scores={};
 let matchCatKey=null, matchRoundKey=null, matchIdx=null, matchData=null;
 let matchFormat='sets', matchActiveArcher=0;
 let matchSets=[], cumArrows1=[], cumArrows2=[];
-const MAX_SETS=5, SETS_TO_WIN=6, CUM_ENDS=5, CUM_ARROWS=3;
+const MAX_SETS=5, SETS_TO_WIN=6, CUM_ENDS=5;
 function getArrowsPerSet(){ return discipline==='3D'?2:3; }
 
 /* ══════════════════════════════════════════
@@ -966,9 +966,9 @@ function updateMatchHeader(){
     document.getElementById('sp-a1').textContent=t1;
     document.getElementById('sp-a2').textContent=t2;
     const myCum=matchActiveArcher===0?cumArrows1:cumArrows2;
-    const end=Math.floor(myCum.length/CUM_ARROWS)+1;
+    const end=Math.floor(myCum.length/getArrowsPerSet())+1;
     document.getElementById('m-set-label').textContent=`END ${Math.min(end,CUM_ENDS)}`;
-    document.getElementById('m-arrow-count').textContent=`${myCum.length%CUM_ARROWS||0}/${CUM_ARROWS}`;
+    document.getElementById('m-arrow-count').textContent=`${myCum.length%getArrowsPerSet()||0}/${getArrowsPerSet()}`;
   }
   document.getElementById('m-archer-name').textContent=archer?.name||'—';
 }
@@ -1050,15 +1050,15 @@ function renderMatchSets(){
       <div style="text-align:right;">${a2?.name||'A2'}</div>
     </div>`;
     for(let e=0;e<CUM_ENDS;e++){
-      const si=e*CUM_ARROWS;
-      const ea1=cumArrows1.slice(si,si+CUM_ARROWS), ea2=cumArrows2.slice(si,si+CUM_ARROWS);
+      const si=e*getArrowsPerSet();
+      const ea1=cumArrows1.slice(si,si+getArrowsPerSet()), ea2=cumArrows2.slice(si,si+getArrowsPerSet());
       const t1=ea1.reduce((s,v)=>s+getVal(v),0), t2=ea2.reduce((s,v)=>s+getVal(v),0);
-      const d1=ea1.length===CUM_ARROWS, d2=ea2.length===CUM_ARROWS;
-      const isActive1=matchActiveArcher===0&&e===Math.floor(cumArrows1.length/CUM_ARROWS)&&!d1;
-      const isActive2=matchActiveArcher===1&&e===Math.floor(cumArrows2.length/CUM_ARROWS)&&!d2;
+      const d1=ea1.length===getArrowsPerSet(), d2=ea2.length===getArrowsPerSet();
+      const isActive1=matchActiveArcher===0&&e===Math.floor(cumArrows1.length/getArrowsPerSet())&&!d1;
+      const isActive2=matchActiveArcher===1&&e===Math.floor(cumArrows2.length/getArrowsPerSet())&&!d2;
       const borderCol=isActive1||isActive2?'var(--accent)':d1&&d2?'var(--green)':'var(--border)';
-      const chips1=Array.from({length:CUM_ARROWS},(_,ai)=>arrowChip(ea1[ai],isActive1&&ai===ea1.length)).join('');
-      const chips2=Array.from({length:CUM_ARROWS},(_,ai)=>arrowChip(ea2[ai],isActive2&&ai===ea2.length)).join('');
+      const chips1=Array.from({length:getArrowsPerSet()},(_,ai)=>arrowChip(ea1[ai],isActive1&&ai===ea1.length)).join('');
+      const chips2=Array.from({length:getArrowsPerSet()},(_,ai)=>arrowChip(ea2[ai],isActive2&&ai===ea2.length)).join('');
       html+=`<div style="display:grid;grid-template-columns:1fr auto auto auto 1fr;gap:4px;align-items:center;padding:6px 8px;margin-bottom:4px;border:1px solid ${borderCol};border-radius:8px;">
         <div style="display:flex;gap:3px;">${chips1}</div>
         <div style="min-width:34px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;color:var(--accent);">${d1?t1:''}</div>
@@ -1082,7 +1082,7 @@ function renderMatchPad(){
     const asi=getActiveMatchSet();
     isFull = asi===-1 || isMatchWon() || getMatchArrows(asi,matchActiveArcher).length>=getTBArrows(asi);
   }
-  else{const myCum=matchActiveArcher===0?cumArrows1:cumArrows2;isFull=myCum.length>=CUM_ENDS*CUM_ARROWS;}
+  else{const myCum=matchActiveArcher===0?cumArrows1:cumArrows2;isFull=myCum.length>=CUM_ENDS*getArrowsPerSet();}
   let btns=padScores.map(s=>{
     const label=s===0?'M':s;
     const scoreArg=s==='X'?"'X'":s;
@@ -1090,7 +1090,7 @@ function renderMatchPad(){
     return `<button class="pad-btn ${cls}" onclick="handleMatchScore(${scoreArg})" ${isFull?'disabled style="opacity:0.4"':''}>${label}</button>`;
   }).join('');
   btns+=`<button class="pad-btn pad-back" onclick="handleMatchBack()" style="grid-column:span 2;">BACKSPACE ←</button>`;
-  const allDone=matchFormat==='sets'?checkMatchDone():(cumArrows1.length>=CUM_ENDS*CUM_ARROWS&&cumArrows2.length>=CUM_ENDS*CUM_ARROWS);
+  const allDone=matchFormat==='sets'?checkMatchDone():(cumArrows1.length>=CUM_ENDS*getArrowsPerSet()&&cumArrows2.length>=CUM_ENDS*getArrowsPerSet());
   const tbTied = matchSets[MAX_SETS]&&matchSets[MAX_SETS].score1===matchSets[MAX_SETS].score2&&matchSets[MAX_SETS].arrows1.length>=1&&matchSets[MAX_SETS].arrows2.length>=1;
   const canSubmit = allDone && (!tbTied || window._tbWinner!==null);
   if(canSubmit) btns+=`<button class="pad-btn pad-done" onclick="submitMatch()" style="grid-column:span 2;">SUBMIT MATCH ✓</button>`;
@@ -1123,9 +1123,27 @@ window.handleMatchScore=async(val)=>{
       }
     }
   } else {
-    if(matchActiveArcher===0){if(cumArrows1.length>=CUM_ENDS*CUM_ARROWS)return;cumArrows1.push(val);}
-    else{if(cumArrows2.length>=CUM_ENDS*CUM_ARROWS)return;cumArrows2.push(val);}
+    // Cumulative: alternate per target (T1 archer1 → T1 archer2 → T2 archer1 ...)
+    const aPerT = getArrowsPerSet();
+    const myCum = matchActiveArcher===0?cumArrows1:cumArrows2;
+    if(myCum.length>=CUM_ENDS*aPerT) return;
+    myCum.push(val);
     await saveMatchProgress();
+    // Check if archer just completed a target
+    if(myCum.length % aPerT === 0){
+      const targetDone = myCum.length / aPerT; // which target just finished (1-based)
+      const otherCum = matchActiveArcher===0?cumArrows2:cumArrows1;
+      const otherTargetDone = Math.floor(otherCum.length / aPerT);
+      if(otherTargetDone < targetDone){
+        // Other archer hasn't done this target yet — switch to them
+        matchActiveArcher = 1 - matchActiveArcher;
+        renderMatchTabs();
+      } else if(targetDone < CUM_ENDS){
+        // Both done this target, go to archer 0 for next target
+        matchActiveArcher = 0;
+        renderMatchTabs();
+      }
+    }
   }
   renderMatchSets();renderMatchPad();updateMatchHeader();
 };
@@ -1136,8 +1154,19 @@ window.handleMatchBack=()=>{
     const arrows=[...getMatchArrows(si,matchActiveArcher)];
     if(arrows.length>0){arrows.pop();setMatchArrows(si,matchActiveArcher,arrows);}
   } else {
-    if(matchActiveArcher===0){if(cumArrows1.length>0)cumArrows1.pop();}
-    else{if(cumArrows2.length>0)cumArrows2.pop();}
+    // On back: if current archer has no arrows in this target, switch back to other archer
+    const aPerT = getArrowsPerSet();
+    const myCum = matchActiveArcher===0?cumArrows1:cumArrows2;
+    const otherCum = matchActiveArcher===0?cumArrows2:cumArrows1;
+    if(myCum.length>0){
+      myCum.pop();
+    } else if(otherCum.length>0){
+      // Switch to other archer and pop their last arrow
+      matchActiveArcher = 1-matchActiveArcher;
+      otherCum.pop();
+      renderMatchTabs();
+    }
+    await saveMatchProgress();
   }
   renderMatchSets();renderMatchPad();updateMatchHeader();
 };
