@@ -369,9 +369,12 @@ function renderResults(data) {
   const qualHash = JSON.stringify({archers:data.archers, scores:data.scores});
   const main2 = document.getElementById('main');
   const scrollTop2 = main2 ? main2.scrollTop : 0;
-  if(qualHash === _lastQualHash && currentView==='qual' && document.getElementById('main').innerHTML.includes('cat-block')){
+  // Only re-render qual if data changed OR we just switched to qual view
+  if(currentView==='elim'){
+    renderElimDisplay(elimData, data.discipline||'Outdoor');
     return;
   }
+  // qual view - always render if we got here
   _lastQualHash = qualHash;
 
   // Only archers with scores
@@ -385,12 +388,6 @@ function renderResults(data) {
   // Check for elimination data
   const elimData = data.elimination || {};
   const hasElim = Object.keys(elimData).length > 0;
-
-  // Show based on current view toggle
-  if(hasElim && currentView==='elim'){
-    renderElimDisplay(elimData, data.discipline||'Outdoor');
-    return;
-  }
 
   if(!scored.length){
     document.getElementById('main').innerHTML=`
