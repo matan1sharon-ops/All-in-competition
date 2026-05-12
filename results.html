@@ -317,8 +317,6 @@ window.setView = (view) => {
   }
   _lastQualHash = '';   // force re-render on view switch
   _lastElimHash = '';   // force elim re-render too
-  const main = document.getElementById('main');
-  if(main) main.innerHTML = ''; // clear current view
   if(lastData) renderResults(lastData);
 };
 
