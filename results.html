@@ -259,10 +259,10 @@ function renderMatchRowDisplay(archer, won, score, sets, archerNum, fmt, slots, 
     <span style="font-size:10px;color:var(--muted2);width:20px;flex-shrink:0;">#${archer.seed||'?'}</span>
     <span style="min-width:110px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;flex-shrink:0;
       color:${won?'var(--green)':'var(--text)'};">${archer.name}</span>
-    <span style="flex:1;display:flex;gap:2px;align-items:center;">${setScores}</span>
+    <span style="display:flex;gap:2px;align-items:center;margin-right:auto;">${setScores}</span>
     ${showTotal?`<span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;width:28px;text-align:right;flex-shrink:0;
         color:${won?'var(--green)':'var(--accent)'};">${score}</span>`:'<span style="width:28px;"></span>'}
-    <span style="width:18px;text-align:center;flex-shrink:0;font-size:13px;">${won?'🏆':''}</span>
+    <span style="width:18px;text-align:center;flex-shrink:0;font-size:14px;">${won?'🏆':''}</span>
   </div>`;
 }
 
