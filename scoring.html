@@ -939,7 +939,7 @@ window.startMatch=()=>{
   document.getElementById('sp-a1-label').textContent=matchData.archer1?.name?.split(' ')[0]||'A1';
   document.getElementById('sp-a2-label').textContent=matchData.archer2?.name?.split(' ')[0]||'A2';
   matchActiveArcher=0;
-  cumTB1=null; cumTB2=null;
+  cumTB1=null; cumTB2=null; window._cumTBWinner=null;
   renderMatchTabs();renderMatchSets();renderMatchPad();updateMatchHeader();
 };
 
@@ -1081,6 +1081,7 @@ function renderMatchSets(){
       const tbActive2=matchActiveArcher===1&&tb2===null;
       const tbBorder=tbActive1||tbActive2?'var(--accent)':tb1!==null&&tb2!==null?'var(--green)':'var(--border)';
       if(tied){
+        const tbStillTied = tb1!==null && tb2!==null && getVal(tb1)===getVal(tb2);
         html+=`<div style="display:grid;grid-template-columns:1fr auto auto auto 1fr;gap:4px;align-items:center;padding:6px 8px;margin-bottom:4px;border:1px solid ${tbBorder};border-radius:8px;background:#1a1500;">
           <div style="display:flex;gap:3px;">${arrowChip(tb1,tbActive1)}</div>
           <div style="min-width:34px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;color:var(--accent);">${tb1!==null?getVal(tb1):''}</div>
@@ -1088,6 +1089,15 @@ function renderMatchSets(){
           <div style="min-width:34px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;color:var(--accent);">${tb2!==null?getVal(tb2):''}</div>
           <div style="display:flex;gap:3px;justify-content:flex-end;">${arrowChip(tb2,tbActive2)}</div>
         </div>`;
+        if(tbStillTied){
+          html+=`<div style="background:#1a1500;border:1px solid var(--accent);border-radius:8px;padding:10px;margin-bottom:4px;text-align:center;">
+            <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:8px;letter-spacing:1px;">CLOSER TO CENTER?</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <button onclick="setCumTBWinner(0)" style="padding:10px;border-radius:8px;border:2px solid ${window._cumTBWinner===0?'var(--green)':'var(--border)'};background:${window._cumTBWinner===0?'rgba(67,160,71,0.2)':'var(--surface2)'};color:${window._cumTBWinner===0?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">${matchData.archer1?.name||'A1'}</button>
+              <button onclick="setCumTBWinner(1)" style="padding:10px;border-radius:8px;border:2px solid ${window._cumTBWinner===1?'var(--green)':'var(--border)'};background:${window._cumTBWinner===1?'rgba(67,160,71,0.2)':'var(--surface2)'};color:${window._cumTBWinner===1?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">${matchData.archer2?.name||'A2'}</button>
+            </div>
+          </div>`;
+        }
       }
     }
     list.innerHTML=html;
@@ -1128,7 +1138,9 @@ function renderMatchPad(){
   const allCumDoneCheck=cumArrows1.length>=getCumEnds()*aPerT2&&cumArrows2.length>=getCumEnds()*aPerT2;
   const cumTot1=cumArrows1.reduce((s,v)=>s+getVal(v),0),cumTot2=cumArrows2.reduce((s,v)=>s+getVal(v),0);
   const cumNeedsTB=allCumDoneCheck&&cumTot1===cumTot2;
-  const cumTBDone=cumNeedsTB?(cumTB1!==null&&cumTB2!==null):true;
+  const cumTBBothDone=cumTB1!==null&&cumTB2!==null;
+  const cumTBStillTied=cumTBBothDone&&getVal(cumTB1)===getVal(cumTB2);
+  const cumTBDone=cumNeedsTB?(cumTBBothDone&&(!cumTBStillTied||window._cumTBWinner!==null)):true;
   const allDone=matchFormat==='sets'?checkMatchDone():(allCumDoneCheck&&cumTBDone);
   const tbTied = matchSets[MAX_SETS]&&matchSets[MAX_SETS].score1===matchSets[MAX_SETS].score2&&matchSets[MAX_SETS].arrows1.length>=1&&matchSets[MAX_SETS].arrows2.length>=1;
   const canSubmit = allDone && (!tbTied || window._tbWinner!==null);
@@ -1257,6 +1269,13 @@ window.setTBWinner = (idx) => {
   renderMatchPad();
 };
 
+window._cumTBWinner = null;
+window.setCumTBWinner = (idx) => {
+  window._cumTBWinner = idx;
+  renderMatchSets();
+  renderMatchPad();
+};
+
 window.submitMatch=async()=>{
   // Auto-calculate winner
   let winnerId=null, winnerName='', loserName='';
@@ -1282,6 +1301,8 @@ window.submitMatch=async()=>{
       const tb1v=getVal(cumTB1),tb2v=getVal(cumTB2);
       if(tb1v>tb2v){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';loserName=matchData.archer2?.name||'A2';}
       else if(tb2v>tb1v){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';loserName=matchData.archer1?.name||'A1';}
+      else if(window._cumTBWinner===0){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';loserName=matchData.archer2?.name||'A2';}
+      else if(window._cumTBWinner===1){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';loserName=matchData.archer1?.name||'A1';}
     }
   }
 
