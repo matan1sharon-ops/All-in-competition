@@ -162,8 +162,8 @@ function renderElimDisplay(elimData, discipline) {
 
       matches.forEach(match=>{
         const done = !!match.winnerChoice;
-        const w1 = match.winnerChoice===match.archer1?.id;
-        const w2 = match.winnerChoice===match.archer2?.id;
+        const w1 = match.winnerChoice && String(match.winnerChoice)===String(match.archer1?.id);
+        const w2 = match.winnerChoice && String(match.winnerChoice)===String(match.archer2?.id);
         const isSet = data.format==='sets';
         const slots = (discipline==='3D'||discipline==='Field')?4:5;
 
