@@ -597,7 +597,7 @@ function renderMatchRow(archer,match,won,num,fmt,slots,hasTB){
     <span style="font-size:10px;color:var(--muted2);width:20px;">#${archer.seed||'?'}</span>
     <span style="width:130px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;${won?'color:var(--green)':''};">${archer.name}</span>
     ${scoreCells}${tbCell}${totalCell}
-    ${won?'<span style="margin-left:4px;font-size:14px;">🏆</span>':''}
+    <span style="width:20px;text-align:center;font-size:13px;">${won?'🏆':''}</span>
   </div>`;
 }
 
