@@ -1153,6 +1153,16 @@ async function saveMatchProgress(){
     } else {
       match.arrows1=cumArrows1;match.score1=cumArrows1.reduce((s,v)=>s+getVal(v),0);
       match.arrows2=cumArrows2;match.score2=cumArrows2.reduce((s,v)=>s+getVal(v),0);
+      // Build sets[] per target so T1-T4 show live in admin/results
+      const arrowsPerTarget=getArrowsPerSet();
+      match.sets=[];
+      for(let t=0;t<CUM_ENDS;t++){
+        const a1=cumArrows1.slice(t*arrowsPerTarget,(t+1)*arrowsPerTarget);
+        const a2=cumArrows2.slice(t*arrowsPerTarget,(t+1)*arrowsPerTarget);
+        if(a1.length>0||a2.length>0){
+          match.sets.push({score1:a1.reduce((s,v)=>s+getVal(v),0),score2:a2.reduce((s,v)=>s+getVal(v),0)});
+        }
+      }
     }
     data.elimination[matchCatKey].rounds[matchRoundKey][matchIdx]=match;
     await setDoc(doc(db,'competitions',compId),{elimination:data.elimination},{merge:true});
