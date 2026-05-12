@@ -2,693 +2,813 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>ALL IN — Match Scoring</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALL IN — Competition Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#111;--surface:#1e1e1e;--surface2:#2a2a2a;--border:#333;--accent:#FFD700;--red:#e53935;--green:#43a047;--blue:#1e88e5;--text:#f0f0f0;--muted:#888;--radius:12px;}
+:root{--bg:#0a0a0a;--surface:#141414;--surface2:#1e1e1e;--surface3:#252525;--border:#2a2a2a;--border2:#333;--accent:#FFD700;--accent2:#FFA500;--red:#e53935;--blue:#1e88e5;--green:#43a047;--purple:#7b1fa2;--text:#f0f0f0;--muted:#666;--muted2:#888;--radius:10px;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);height:100dvh;overflow:hidden;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);}
-
-/* LOGIN */
-#login-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
-.login-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 24px;width:100%;max-width:360px;}
-.login-logo{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;letter-spacing:4px;color:var(--accent);text-align:center;margin-bottom:4px;}
-.login-sub{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:24px;}
-.login-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;display:block;}
-.login-select{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:12px 14px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:15px;outline:none;margin-bottom:12px;cursor:pointer;}
-.login-btn{width:100%;padding:16px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;letter-spacing:1px;cursor:pointer;margin-top:8px;}
-.login-btn:active{filter:brightness(0.9);}
-.error-msg{background:#b71c1c22;border:1px solid var(--red);color:var(--red);padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none;}
-
-/* MATCH SCREEN */
-#match-screen{flex:1;display:none;flex-direction:column;overflow:hidden;}
-.match-header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;}
-.match-header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
-.comp-name{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
-.match-label{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--accent);}
-.vs-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border);flex-shrink:0;}
-.vs-archer{flex:1;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;}
-.vs-archer.me{color:var(--accent);}
-.vs-archer.opp{color:var(--text);text-align:right;}
-.vs-sep{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--muted);}
-.sp-bar{display:flex;align-items:center;justify-content:center;gap:16px;padding:8px 14px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;}
-.sp-val{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:var(--accent);}
-.sp-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;text-align:center;}
-.sp-sep{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:var(--muted2);}
-
-/* SETS LIST */
-#sets-list{flex:1;overflow-y:auto;padding:10px;}
-.set-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;}
-.set-card.active-set{border-color:var(--accent);background:#1a1500;}
-.set-card.complete{border-color:var(--green);background:#0a1a0a;}
-.set-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
-.set-num{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
-.set-result{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;}
-.set-arrows{display:flex;gap:4px;}
-.arrow-chip{padding:4px 10px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;}
-.chip-gold{background:#fff9c4;color:#5d4037;}
-.chip-red{background:#ffebee;color:#c62828;}
-.chip-blue{background:#e3f2fd;color:#1565c0;}
-.chip-black{background:#333;color:#fff;}
-.chip-white{background:#f5f5f5;color:#111;border:1px solid #ccc;}
-.chip-miss{background:#424242;color:#aaa;}
-.chip-empty{background:var(--surface2);color:var(--muted);border:1px dashed var(--border);}
-
-/* PAD */
-.match-footer{background:var(--surface);border-top:1px solid var(--border);padding:10px;flex-shrink:0;}
-.current-set-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--surface2);border-radius:8px;margin-bottom:8px;}
-.current-set-label{font-size:11px;color:var(--muted);}
-.current-set-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;}
-.pad{display:grid;gap:5px;}
-.pad-btn{height:52px;border:none;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,0.35);transition:transform 0.08s,box-shadow 0.08s;}
-.pad-btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,0.35);}
-.pad-gold{background:#FFD700;color:#3e2000;}.pad-red{background:#e53935;color:#fff;}
-.pad-blue{background:#1e88e5;color:#fff;}.pad-black{background:#2d2d2d;color:#fff;border:1px solid #555;}
-.pad-white{background:#f5f5f5;color:#111;border:1px solid #ccc;}.pad-miss{background:#757575;color:#fff;}
-.pad-back{background:#333;color:#aaa;font-size:16px;}
-.pad-done{background:var(--green);color:#fff;font-size:15px;}
-
-/* COMPLETE */
-#complete-screen{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;}
-.complete-icon{font-size:64px;margin-bottom:16px;}
-.complete-title{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;letter-spacing:1px;margin-bottom:8px;}
-.complete-sub{font-size:14px;color:var(--muted);line-height:1.6;}
-.result-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin:16px 0;width:100%;max-width:300px;}
-
-#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 20px;font-size:13px;font-weight:600;z-index:999;transition:transform 0.3s ease;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.5);}
-#toast.show{transform:translateX(-50%) translateY(0);}
+body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.app{display:flex;height:100vh;overflow:hidden;}
+.sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:0;overflow:hidden;}
+.sidebar-logo{padding:20px 16px 16px;border-bottom:1px solid var(--border);}
+.sidebar-logo .brand{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;letter-spacing:4px;color:var(--accent);}
+.sidebar-logo .sub{font-size:9px;font-weight:600;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+.comp-selector{padding:12px;border-bottom:1px solid var(--border);}
+.comp-selector select{width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:6px;font-family:'Barlow',sans-serif;font-size:12px;outline:none;cursor:pointer;}
+.new-comp-btn{width:100%;margin-top:6px;padding:8px;background:var(--accent);color:#000;border:none;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;cursor:pointer;}
+.new-comp-btn:hover{filter:brightness(1.1);}
+.nav{flex:1;padding:8px;overflow-y:auto;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted2);transition:all 0.15s;margin-bottom:2px;border:1px solid transparent;}
+.nav-item:hover{background:var(--surface2);color:var(--text);}
+.nav-item.active{background:var(--surface3);color:var(--accent);border-color:var(--border2);}
+.nav-item .icon{font-size:16px;width:20px;text-align:center;}
+.nav-item .badge{margin-left:auto;background:var(--accent);color:#000;font-size:9px;font-weight:900;padding:1px 5px;border-radius:8px;}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);text-align:center;}
+.lang-toggle{display:flex;gap:4px;justify-content:center;margin-bottom:6px;}
+.lang-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--muted2);padding:3px 10px;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;}
+.lang-btn.active{background:var(--accent);color:#000;border-color:var(--accent);}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+.topbar-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;letter-spacing:1px;color:var(--text);}
+.content{flex:1;overflow-y:auto;padding:24px;overflow-anchor:none;display:flex;flex-direction:column;}
+.panel{display:none;}
+.panel.active{display:flex;flex-direction:column;flex:1;}
+#elim-content{overflow-anchor:none;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;}
+.card-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted2);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.card-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group label{font-size:10px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:0.5px;}
+.form-group input,.form-group select,.form-group textarea{background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:14px;outline:none;transition:border-color 0.15s;}
+.form-group input:focus,.form-group select:focus{border-color:var(--accent);}
+.form-group select option{background:var(--surface2);}
+.btn{padding:10px 18px;border-radius:8px;border:none;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.5px;cursor:pointer;transition:filter 0.15s,transform 0.1s;}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:var(--accent);color:#000;}
+.btn-primary:hover{filter:brightness(1.1);}
+.btn-secondary{background:var(--surface3);color:var(--text);border:1px solid var(--border2);}
+.btn-secondary:hover{border-color:var(--muted2);}
+.btn-danger{background:var(--red);color:#fff;}
+.btn-success{background:var(--green);color:#fff;}
+.btn-sm{padding:6px 12px;font-size:11px;}
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead tr{background:var(--surface2);}
+thead th{padding:10px 12px;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted2);border-bottom:1px solid var(--border2);}
+tbody tr{border-bottom:1px solid var(--border);transition:background 0.1s;background:#fff;}
+tbody tr:hover{background:#f5f5f5;}
+tbody td{padding:10px 12px;color:#111;}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px;}
+.tag-recurve{background:#1565c0;color:#fff;}
+.tag-compound{background:#4a148c;color:#fff;}
+.tag-barebow{background:#1b5e20;color:#fff;}
+.tag-traditional{background:#e65100;color:#fff;}
+.tag-longbow{background:#37474f;color:#fff;}
+.tag-m{background:#1565c0;color:#fff;}
+.tag-f{background:#880e4f;color:#fff;}
+.target-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+.target-card{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:12px;}
+.target-card .target-num{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--accent);margin-bottom:4px;}
+.target-slot{background:var(--surface3);border:1px dashed var(--border2);border-radius:6px;padding:8px 10px;margin-bottom:4px;min-height:36px;cursor:pointer;transition:border-color 0.15s;}
+.target-slot:hover{border-color:var(--muted2);}
+.target-slot.filled{border-style:solid;border-color:var(--border2);background:var(--surface);}
+.target-slot .slot-label{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:1px;margin-bottom:3px;}
+.target-slot .slot-name{font-size:12px;font-weight:600;color:var(--text);}
+.target-slot .slot-cat{font-size:10px;color:var(--muted2);}
+.target-slot.empty .slot-name{color:var(--muted);font-style:italic;font-size:11px;}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:20px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;}
+.stat-val{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:var(--accent);}
+.stat-label{font-size:10px;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;}
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;align-items:center;justify-content:center;}
+.modal-backdrop.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:24px;width:90%;max-width:520px;max-height:90vh;overflow-y:auto;}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;letter-spacing:1px;color:var(--accent);margin-bottom:20px;}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted2);}
+.empty-state .empty-icon{font-size:48px;margin-bottom:12px;}
+.empty-state p{font-size:14px;line-height:1.6;}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;}
+.status-live{background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+#toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:12px 18px;font-size:13px;font-weight:600;z-index:999;transform:translateY(80px);transition:transform 0.3s ease;box-shadow:0 8px 32px rgba(0,0,0,0.5);}
+#toast.show{transform:translateY(0);}
 #toast.success{border-color:var(--green);color:var(--green);}
 #toast.error{border-color:var(--red);color:var(--red);}
+.session-block{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:16px;}
+.session-time{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--accent);min-width:60px;}
+.session-info{flex:1;}
+.session-name{font-size:14px;font-weight:600;}
+.session-sub{font-size:11px;color:var(--muted2);margin-top:2px;}
+@media(max-width:768px){.sidebar{width:60px;}.sidebar-logo .brand,.sidebar-logo .sub,.nav-item span:not(.icon),.comp-selector,.sidebar-footer{display:none;}.nav-item{justify-content:center;padding:12px;}}
 </style>
 </head>
 <body>
-
-<!-- LOGIN -->
-<div id="login-screen">
-  <div class="login-card">
-    <div class="login-logo">ALL IN</div>
-    <div class="login-sub">Match Scoring</div>
-    <div class="error-msg" id="error-msg"></div>
-    <label class="login-label">Competition</label>
-    <select id="comp-select" class="login-select"><option value="">Loading...</option></select>
-    <label class="login-label">Category</label>
-    <select id="cat-select" class="login-select"><option value="">— Select competition first —</option></select>
-    <label class="login-label">Round</label>
-    <select id="round-select" class="login-select"><option value="">— Select category first —</option></select>
-    <label class="login-label">Match</label>
-    <select id="match-select" class="login-select"><option value="">— Select round first —</option></select>
-    <button class="login-btn" onclick="loadMatch()">LOAD MATCH →</button>
-  </div>
-</div>
-
-<!-- MATCH SCREEN -->
-<div id="match-screen">
-  <div class="match-header">
-    <div class="match-header-top">
-      <div class="comp-name" id="m-comp-name"></div>
-      <div class="match-label" id="m-match-label">SEMI FINAL</div>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><div class="brand">ALL IN</div><div class="sub">Competition Admin</div></div>
+    <div class="comp-selector">
+      <select id="comp-select" onchange="selectCompetition(this.value)"><option value="">— Select Competition —</option></select>
+      <button class="new-comp-btn" onclick="openNewCompModal()">+ NEW COMPETITION</button>
     </div>
-    <div style="font-size:11px;color:var(--muted)" id="m-format-label">Set System · First to 6 pts</div>
-  </div>
-  <div id="archer-tabs" style="display:flex;gap:4px;padding:8px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;"></div>
-  <div class="sp-bar">
-    <div style="text-align:center;">
-      <div class="sp-label" id="sp-my-label">A1 PTS</div>
-      <div class="sp-val" id="sp-my">0</div>
+    <nav class="nav">
+      <div class="nav-item active" onclick="showPanel('dashboard')" data-panel="dashboard"><span class="icon">📊</span><span>Dashboard</span></div>
+      <div class="nav-item" onclick="showPanel('entries')" data-panel="entries"><span class="icon">🏹</span><span>Entry List</span><span class="badge" id="entry-badge">0</span></div>
+      <div class="nav-item" onclick="showPanel('targets')" data-panel="targets"><span class="icon">🎯</span><span>Target Assignment</span></div>
+      <div class="nav-item" onclick="showPanel('schedule')" data-panel="schedule"><span class="icon">⏰</span><span>Schedule</span></div>
+      <div class="nav-item" onclick="showPanel('results')" data-panel="results"><span class="icon">📋</span><span>Live Results</span></div>
+      <div class="nav-item" onclick="showPanel('scorecards')" data-panel="scorecards"><span class="icon">📄</span><span>Scorecards</span></div>
+      <div class="nav-item" onclick="showPanel('elimination')" data-panel="elimination"><span class="icon">⚔️</span><span>Elimination</span></div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="lang-toggle"><button class="lang-btn active" onclick="setLang('en')">EN</button><button class="lang-btn" onclick="setLang('he')">עב</button></div>
+      <div id="conn-status">🔴 Not connected</div>
     </div>
-    <div class="sp-sep">—</div>
-    <div style="text-align:center;">
-      <div class="sp-label" id="sp-opp-label">A2 PTS</div>
-      <div class="sp-val" id="sp-opp">0</div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div id="topbar-actions"><button class="btn btn-danger btn-sm" id="btn-delete-comp" onclick="deleteCompetition()" style="display:none;">🗑 DELETE COMPETITION</button></div>
     </div>
-  </div>
-  <div id="sets-list"></div>
-  <div class="match-footer">
-    <div class="current-set-bar">
-      <div>
-        <div class="current-set-label" id="m-set-label">SET 1</div>
-        <div class="current-set-name" id="m-archer-name">—</div>
+    <div class="content">
+      <div id="panel-dashboard" class="panel active">
+        <div id="no-comp-msg" class="empty-state"><div class="empty-icon">🏆</div><p>No competition selected.<br>Create a new competition or select an existing one.</p><br><button class="btn btn-primary" onclick="openNewCompModal()">+ CREATE COMPETITION</button></div>
+        <div id="dash-content" style="display:none;">
+          <div class="stats-row">
+            <div class="stat-card"><div class="stat-val" id="d-total">0</div><div class="stat-label">Total Archers</div></div>
+            <div class="stat-card"><div class="stat-val" id="d-assigned">0</div><div class="stat-label">Assigned</div></div>
+            <div class="stat-card"><div class="stat-val" id="d-targets">0</div><div class="stat-label">Targets</div></div>
+            <div class="stat-card"><div class="stat-val" id="d-scored">0</div><div class="stat-label">Scored</div></div>
+          </div>
+          <div class="card"><div class="card-title">Competition Info</div><div class="form-grid" id="comp-info-grid"></div></div>
+          <div class="card"><div class="card-title">Categories Breakdown</div><div class="table-wrap"><table><thead><tr><th>Bow</th><th>Age</th><th>M</th><th>F</th><th>Total</th><th>Targets Needed</th></tr></thead><tbody id="cat-breakdown"></tbody></table></div></div>
+        </div>
       </div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--accent);" id="m-arrow-count">0/3</div>
+      <div id="panel-entries" class="panel">
+        <div class="card">
+          <div class="card-title">Add Archer</div>
+          <div class="form-grid">
+            <div class="form-group"><label>First Name</label><input type="text" id="e-fname" placeholder="First name"></div>
+            <div class="form-group"><label>Last Name</label><input type="text" id="e-lname" placeholder="Last name"></div>
+            <div class="form-group"><label>Club</label><input type="text" id="e-club" placeholder="Club name"></div>
+            <div class="form-group"><label>Bow Type</label><select id="e-bow"><option>Recurve</option><option>Compound</option><option>Barebow</option><option>Traditional</option><option>Longbow</option></select></div>
+            <div class="form-group"><label>Age Category</label><select id="e-age"><option>U12</option><option>U14</option><option>U18</option><option>U21</option><option>Senior</option><option>Master 50+</option><option>Master 60+</option></select></div>
+            <div class="form-group"><label>Gender</label><select id="e-gender"><option value="M">Male</option><option value="F">Female</option></select></div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="addArcher()">+ ADD ARCHER</button>
+            <button class="btn btn-secondary" onclick="openImportModal()">📥 IMPORT CSV</button>
+            <button class="btn btn-secondary" onclick="copyRegLink()">🔗 REGISTRATION LINK</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Entry List <span id="entry-count" style="color:var(--accent);margin-left:8px;">0 archers</span></div>
+          <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;">
+            <input type="text" id="search-archer" placeholder="🔍 Search..." style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;flex:1;min-width:160px;" oninput="renderEntries()">
+            <select id="filter-bow" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;" onchange="renderEntries()">
+              <option value="">All Bows</option><option>Recurve</option><option>Compound</option><option>Barebow</option><option>Traditional</option><option>Longbow</option>
+            </select>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>#</th><th>Name</th><th>Club</th><th>Bow</th><th>Age</th><th>Gender</th><th>Target</th><th></th></tr></thead><tbody id="entries-table"></tbody></table></div>
+        </div>
+      </div>
+      <div id="panel-targets" class="panel">
+        <div class="card">
+          <div class="card-title">Target Assignment</div>
+          <p style="font-size:13px;color:var(--muted2);margin-bottom:16px;">Targets are generated automatically from the entry list — 4 slots per target (A/B/C/D).</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="generateTargets()">⚡ AUTO GENERATE FROM ENTRIES</button>
+            <button class="btn btn-secondary" onclick="clearAssignments()">CLEAR ALL</button>
+            <button class="btn btn-secondary" onclick="printStartList()">🖨 PRINT START LIST</button>
+            <button class="btn btn-secondary" onclick="printFieldOfPlay()">🏟 FIELD OF PLAY</button>
+          </div>
+        </div>
+        <div id="target-grid"></div>
+      </div>
+      <div id="panel-schedule" class="panel">
+        <div class="card">
+          <div class="card-title">Add Session</div>
+          <div class="form-grid">
+            <div class="form-group"><label>Session Name</label><input type="text" id="s-name" placeholder="e.g. Qualification Round 1"></div>
+            <div class="form-group"><label>Date</label><input type="date" id="s-date"></div>
+            <div class="form-group"><label>Start Time</label><input type="time" id="s-time"></div>
+            <div class="form-group"><label>Distance</label><select id="s-dist"><option>70m</option><option>60m</option><option>50m</option><option>30m</option><option>18m</option><option>25m</option><option>3D</option><option>Field</option></select></div>
+            <div class="form-group"><label>Ends</label><input type="number" id="s-ends" value="12" min="1" max="30"></div>
+            <div class="form-group"><label>Arrows/End</label><input type="number" id="s-arrows" value="6" min="1" max="6"></div>
+          </div>
+          <div style="margin-top:14px;"><button class="btn btn-primary" onclick="addSession()">+ ADD SESSION</button></div>
+        </div>
+        <div id="sessions-list"></div>
+      </div>
+      <div id="panel-results" class="panel">
+        <div class="card">
+          <div class="card-title"><span class="status-dot status-live"></span> Live Results</div>
+          <div style="margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-secondary btn-sm" onclick="exportResultsPDF()">📄 EXPORT PDF</button>
+            <button class="btn btn-secondary btn-sm" onclick="openDisplayScreen()">🖥 DISPLAY SCREEN</button>
+            <button class="btn btn-secondary btn-sm" onclick="copyResultsLink()">🔗 SHARE RESULTS</button>
+          </div>
+          <div id="results-by-category"></div>
+        </div>
+      </div>
+      <div id="panel-scorecards" class="panel">
+        <div class="card">
+          <div class="card-title">📄 Scorecards</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+            <button class="btn btn-primary" onclick="printAllScorecards()">🖨 PRINT ALL</button>
+            <select id="sc-filter-bow" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;" onchange="renderScorecards()">
+              <option value="">All Bows</option><option>Recurve</option><option>Compound</option><option>Barebow</option><option>Traditional</option><option>Longbow</option>
+            </select>
+          </div>
+          <div id="scorecards-list"></div>
+        </div>
+      </div>
+      <div id="panel-elimination" class="panel" style="height:100%;display:flex;flex-direction:column;">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:0;flex-shrink:0;">
+          <div class="card-title">⚔️ Elimination Rounds</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;">
+            <button class="btn btn-secondary btn-sm" onclick="copyMatchLink()" style="margin-left:auto;">🔗 SHARE MATCH SCORING LINK</button>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+            <div class="form-group" style="min-width:180px;"><label>Category</label><select id="elim-cat-select" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;width:100%;"></select></div>
+            <div class="form-group" style="min-width:140px;"><label>Bracket</label><select id="elim-bracket" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;width:100%;"><option value="8">1/8 — Top 16</option><option value="4">1/4 — Top 8</option><option value="2">1/2 — Top 4</option></select></div>
+            <button class="btn btn-primary" onclick="generateElimination()">⚡ GENERATE BRACKET</button>
+            <button class="btn btn-success" onclick="generateAllElimination()">⚡ GENERATE ALL</button>
+          </div>
+        </div>
+        <div id="elim-content" style="flex:1;overflow-y:auto;overflow-anchor:none;margin-top:12px;"></div>
+      </div>
     </div>
-    <div class="pad" id="match-pad"></div>
   </div>
 </div>
-
-<!-- COMPLETE -->
-<div id="complete-screen">
-  <div class="complete-icon" id="complete-icon">🏆</div>
-  <div class="complete-title" id="complete-title">MATCH COMPLETE</div>
-  <div class="complete-sub" id="complete-sub"></div>
-  <div class="result-box" id="result-box"></div>
-</div>
-
+<!-- MODALS -->
+<div class="modal-backdrop" id="modal-new-comp"><div class="modal"><div class="modal-title">🏆 New Competition</div><div class="form-grid"><div class="form-group" style="grid-column:1/-1"><label>Competition Name</label><input type="text" id="nc-name" placeholder="e.g. National Championship 2025"></div><div class="form-group"><label>Date</label><input type="date" id="nc-date"></div><div class="form-group"><label>Location</label><input type="text" id="nc-location" placeholder="Venue / City"></div><div class="form-group"><label>Discipline</label><select id="nc-discipline"><option>Outdoor</option><option>Indoor</option><option>3D</option><option>Field</option></select></div><div class="form-group"><label>Organizer</label><input type="text" id="nc-organizer" placeholder="Club / Federation"></div></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-new-comp')">Cancel</button><button class="btn btn-primary" onclick="createCompetition()">CREATE →</button></div></div></div>
+<div class="modal-backdrop" id="modal-assign"><div class="modal"><div class="modal-title" id="assign-modal-title">Assign Archer</div><div class="form-group"><label>Select Archer</label><select id="assign-archer-select" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:14px;outline:none;width:100%;"></select></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-assign')">Cancel</button><button class="btn btn-danger btn-sm" onclick="removeFromSlot()" id="btn-remove-slot" style="display:none;">Remove</button><button class="btn btn-primary" onclick="confirmAssign()">ASSIGN →</button></div></div></div>
+<div class="modal-backdrop" id="modal-import"><div class="modal"><div class="modal-title">📥 Import Archers (CSV)</div><p style="font-size:13px;color:var(--muted2);margin-bottom:12px;">Format: FirstName, LastName, Club, Bow, AgeCategory, Gender (M/F)</p><textarea id="import-csv" rows="8" style="width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:12px;border-radius:8px;font-family:monospace;font-size:12px;outline:none;resize:vertical;" placeholder="John,Smith,City Archers,Recurve,Senior,M&#10;Jane,Doe,National Club,Compound,U21,F"></textarea><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-import')">Cancel</button><button class="btn btn-primary" onclick="importCSV()">IMPORT →</button></div></div></div>
 <div id="toast"></div>
-
+<div class="modal-backdrop" id="modal-edit-archer"><div class="modal"><div class="modal-title">✏️ Edit Archer</div><input type="hidden" id="edit-archer-id"><div class="form-grid"><div class="form-group"><label>First Name</label><input type="text" id="edit-fname"></div><div class="form-group"><label>Last Name</label><input type="text" id="edit-lname"></div><div class="form-group"><label>Club</label><input type="text" id="edit-club"></div><div class="form-group"><label>Bow Type</label><select id="edit-bow"><option>Recurve</option><option>Compound</option><option>Barebow</option><option>Traditional</option><option>Longbow</option></select></div><div class="form-group"><label>Age Category</label><select id="edit-age"><option>U12</option><option>U14</option><option>U18</option><option>U21</option><option>Senior</option><option>Master 50+</option><option>Master 60+</option></select></div><div class="form-group"><label>Gender</label><select id="edit-gender"><option value="M">Male</option><option value="F">Female</option></select></div></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-edit-archer')">Cancel</button><button class="btn btn-primary" onclick="saveEditArcher()">SAVE →</button></div></div></div>
+<div class="modal-backdrop" id="modal-move-archer"><div class="modal" style="max-width:460px;"><div class="modal-title" id="move-modal-title">Move Archer</div><div id="move-modal-body"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-move-archer')">Cancel</button></div></div></div>
+<div class="modal-backdrop" id="modal-match"><div class="modal" style="max-width:460px;"><div class="modal-title" id="match-modal-title">Match Result</div><div id="match-modal-body"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-match')">Cancel</button><button class="btn btn-primary" onclick="saveMatchResult()">SAVE RESULT →</button></div></div></div>
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, doc, getDoc, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getFirestore,collection,doc,addDoc,setDoc,getDoc,getDocs,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig={apiKey:"AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To",authDomain:"all-in-competition.firebaseapp.com",projectId:"all-in-competition",storageBucket:"all-in-competition.firebasestorage.app",messagingSenderId:"620146958631",appId:"1:620146958631:web:1e88019d1436372689c902"};
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+let currentCompId=null,currentDiscipline='Outdoor',archers=[],targets=[],sessions=[],scores={};
+let assignPending={ti:null,slot:null},lang='en';
+const BOW_ORDER=['Recurve','Compound','Barebow','Traditional','Longbow'];
+const AGE_ORDER=['U12','U14','U18','U21','Senior','Master 50+','Master 60+'];
+const BOW_COLORS={Recurve:'#1565c0',Compound:'#4a148c',Barebow:'#1b5e20',Traditional:'#e65100',Longbow:'#37474f','Trad/Longbow':'#e65100',Mixed:'#546e7a'};
+function getGoldLabels(){if(currentDiscipline==='3D')return{g1:'11',g2:'10'};if(currentDiscipline==='Field')return{g1:'6',g2:'5'};if(currentDiscipline==='Indoor')return{g1:'10',g2:'9'};return{g1:'X',g2:'10'};}
+async function saveArchers(){if(currentCompId)await setDoc(doc(db,'competitions',currentCompId),{archers},{merge:true});}
+async function saveTargets(){if(currentCompId)await setDoc(doc(db,'competitions',currentCompId),{targets},{merge:true});}
+async function saveSessions(){if(currentCompId)await setDoc(doc(db,'competitions',currentCompId),{sessions},{merge:true});}
+async function loadCompetitions(){const snap=await getDocs(collection(db,'competitions'));const sel=document.getElementById('comp-select');sel.innerHTML='<option value="">— Select Competition —</option>';snap.docs.forEach(d=>{const c=d.data();const o=document.createElement('option');o.value=d.id;o.textContent=c.name+(c.date?` (${c.date})`:'')+' ';sel.appendChild(o);});}
+window.openNewCompModal=()=>{document.getElementById('nc-date').value=new Date().toISOString().split('T')[0];openModal('modal-new-comp');};
+window.createCompetition=async()=>{const name=document.getElementById('nc-name').value.trim();const date=document.getElementById('nc-date').value;const location=document.getElementById('nc-location').value.trim();const discipline=document.getElementById('nc-discipline').value;const organizer=document.getElementById('nc-organizer').value.trim();if(!name){toast('Enter a competition name','error');return;}const ref=await addDoc(collection(db,'competitions'),{name,date,location,discipline,organizer,createdAt:Date.now(),archers:[],targets:[],sessions:[]});closeModal('modal-new-comp');toast('Competition created! ✓','success');await loadCompetitions();document.getElementById('comp-select').value=ref.id;selectCompetition(ref.id);};
+window.selectCompetition=async(id)=>{if(!id){currentCompId=null;document.getElementById('no-comp-msg').style.display='block';document.getElementById('dash-content').style.display='none';return;}currentCompId=id;const snap=await getDoc(doc(db,'competitions',id));if(!snap.exists())return;const data=snap.data();archers=data.archers||[];targets=data.targets||[];sessions=data.sessions||[];scores=data.scores||{};currentDiscipline=data.discipline||'Outdoor';document.getElementById('no-comp-msg').style.display='none';document.getElementById('dash-content').style.display='block';document.getElementById('conn-status').textContent='🟢 Connected';document.getElementById('btn-delete-comp').style.display='inline-block';renderAll();onSnapshot(doc(db,'competitions',id),snap=>{const d=snap.data();scores=d.scores||{};archers=d.archers||[];currentDiscipline=d.discipline||'Outdoor';window._scorecards=d.scorecards||{};const newElimJson=JSON.stringify(d.elimination||{});const elimChanged=newElimJson!==window._lastElimJson;window._lastElimJson=newElimJson;window._elimData=d.elimination||{};const onElimPanel=document.getElementById('panel-elimination')?.classList.contains('active');if(!onElimPanel){renderResults();renderDashboard();renderScorecards();}else{document.getElementById('d-scored').textContent=archers.filter(a=>(getScore(a.id)?.total||0)>0).length;}if(elimChanged&&onElimPanel){renderElimContent();}});};
+function getScore(archerId){const key=String(archerId).replace(/\./g,'_');return scores[key]||scores[String(archerId)]||{};}
+function getDistanceLabel(bow,discipline){if(discipline==='Outdoor'){if(bow==='Recurve')return '70m / 60m / 30m';if(bow==='Compound')return '50m';if(bow==='Barebow')return '50m';if(bow==='Trad/Longbow')return '30m';}return '';}
+function renderAll(){renderDashboard();renderEntries();renderTargets();renderSessions();renderResults();renderScorecards();}
+function renderDashboard(){if(!currentCompId)return;document.getElementById('d-total').textContent=archers.length;document.getElementById('d-assigned').textContent=archers.filter(a=>a.target).length;document.getElementById('d-targets').textContent=targets.length;document.getElementById('d-scored').textContent=archers.filter(a=>(getScore(a.id)?.total||0)>0).length;document.getElementById('entry-badge').textContent=archers.length;document.getElementById('entry-count').textContent=archers.length+' archers';getDoc(doc(db,'competitions',currentCompId)).then(s=>{const d=s.data();document.getElementById('comp-info-grid').innerHTML=`<div class="form-group"><label>Name</label><input value="${d.name||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label>Date</label><input value="${d.date||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label>Location</label><input value="${d.location||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label>Discipline</label><input value="${d.discipline||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label>Organizer</label><input value="${d.organizer||''}" readonly style="opacity:0.7;"></div>`;});const cats={};archers.forEach(a=>{const k=`${a.bow}|${a.age}`;if(!cats[k])cats[k]={bow:a.bow,age:a.age,M:0,F:0};cats[k][a.gender]++;});document.getElementById('cat-breakdown').innerHTML=BOW_ORDER.flatMap(bow=>AGE_ORDER.map(age=>{const c=cats[`${bow}|${age}`];if(!c)return'';const total=(c.M||0)+(c.F||0);const tgts=Math.ceil(total/4);return`<tr><td><span class="tag tag-${bow.toLowerCase()}">${bow}</span></td><td>${age}</td><td>${c.M||0}</td><td>${c.F||0}</td><td><strong>${total}</strong></td><td style="color:var(--accent)">${tgts}</td></tr>`;})).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">No archers yet</td></tr>';}
+window.addArcher=async()=>{if(!currentCompId){toast('Select a competition first','error');return;}const fname=document.getElementById('e-fname').value.trim();const lname=document.getElementById('e-lname').value.trim();if(!fname||!lname){toast('Enter first and last name','error');return;}archers.push({id:String(Date.now()),fname,lname,name:`${fname} ${lname}`,club:document.getElementById('e-club').value.trim(),bow:document.getElementById('e-bow').value,age:document.getElementById('e-age').value,gender:document.getElementById('e-gender').value,target:null,slot:null});await saveArchers();document.getElementById('e-fname').value='';document.getElementById('e-lname').value='';renderAll();toast(`${fname} ${lname} added ✓`,'success');};
+window.deleteArcher=async(id)=>{if(!confirm('Remove this archer?'))return;archers=archers.filter(a=>a.id!==id);targets.forEach(t=>['A','B','C','D'].forEach(s=>{if(t[s]?.id===id)t[s]=null;}));await saveArchers();await saveTargets();renderAll();toast('Archer removed','success');};
+window.renderEntries=()=>{const search=(document.getElementById('search-archer')?.value||'').toLowerCase();const bowF=document.getElementById('filter-bow')?.value||'';const filtered=archers.filter(a=>(a.name.toLowerCase().includes(search)||(a.club||'').toLowerCase().includes(search))&&(!bowF||a.bow===bowF));document.getElementById('entry-count').textContent=archers.length+' archers';document.getElementById('entry-badge').textContent=archers.length;document.getElementById('entries-table').innerHTML=filtered.map((a)=>`<tr><td style="color:#999;">${archers.indexOf(a)+1}</td><td style="color:#111;font-weight:600;">${a.fname} ${a.lname}</td><td style="color:#555;">${a.club||'—'}</td><td><span class="tag tag-${a.bow.toLowerCase()}">${a.bow}</span></td><td style="color:#111;">${a.age}</td><td><span class="tag tag-${a.gender.toLowerCase()}">${a.gender}</span></td><td style="color:#1565c0;font-weight:700;">${a.target?`T${a.target}${a.slot}`:'<span style="color:#999">—</span>'}</td><td style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="openEditArcher('${a.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteArcher('${a.id}')">✕</button></td></tr>`).join('')||'<tr><td colspan="8" style="text-align:center;color:#999;padding:24px">No archers yet</td></tr>';};
+window.openImportModal=()=>openModal('modal-import');
+window.importCSV=async()=>{if(!currentCompId){toast('Select a competition first','error');return;}const lines=document.getElementById('import-csv').value.trim().split('\n').filter(l=>l.trim());let added=0;lines.forEach(line=>{const[fname,lname,club,bow,age,gender='M']=line.split(',').map(p=>p.trim());if(!fname||!lname)return;const bowNorm=BOW_ORDER.find(b=>b.toLowerCase()===bow?.toLowerCase())||'Recurve';archers.push({id:String(Date.now()+added),fname,lname,name:`${fname} ${lname}`,club,bow:bowNorm,age:age||'Senior',gender:(gender||'M').toUpperCase(),target:null,slot:null});added++;});await saveArchers();closeModal('modal-import');renderAll();toast(`${added} archers imported ✓`,'success');};
+window.generateTargets=async()=>{if(!currentCompId){toast('Select a competition first','error');return;}if(!archers.length){toast('Add archers first','error');return;}targets=[];archers.forEach(a=>{a.target=null;a.slot=null;});const slots=['A','B','C','D'];let targetNum=1;function assignGroup(group,bowLabel){if(!group.length)return;let cur=null,si=0;group.forEach(archer=>{if(si===0){cur={num:targetNum++,bow:bowLabel,A:null,B:null,C:null,D:null};targets.push(cur);}cur[slots[si]]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};const orig=archers.find(a=>a.id===archer.id);if(orig){orig.target=cur.num;orig.slot=slots[si];}si++;if(si>=4)si=0;});}function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}if(currentDiscipline==='3D'||currentDiscipline==='Field'){assignGroup(shuffle(archers),'Mixed');}else if(currentDiscipline==='Outdoor'){assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['Senior','U21'].includes(a.age))),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['U18','Master 50+','Master 60+'].includes(a.age))),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Compound')),'Compound');assignGroup(shuffle(archers.filter(a=>a.bow==='Barebow')),'Barebow');assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['U14','U12'].includes(a.age))),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Traditional'||a.bow==='Longbow')),'Trad/Longbow');}else if(currentDiscipline==='Indoor'){assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve')),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Compound')),'Compound');assignGroup(shuffle(archers.filter(a=>a.bow==='Barebow')),'Barebow');assignGroup(shuffle(archers.filter(a=>a.bow==='Traditional'||a.bow==='Longbow')),'Trad/Longbow');}await saveTargets();await saveArchers();renderAll();toast(`${targets.length} targets generated ✓`,'success');};
+window.deleteCompetition=async()=>{if(!currentCompId)return;const snap=await getDoc(doc(db,'competitions',currentCompId));const name=snap.data()?.name||'this competition';if(!confirm(`DELETE "${name}"?\n\nThis cannot be undone.`))return;const{deleteDoc}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");await deleteDoc(doc(db,'competitions',currentCompId));currentCompId=null;archers=[];targets=[];sessions=[];scores={};document.getElementById('no-comp-msg').style.display='block';document.getElementById('dash-content').style.display='none';document.getElementById('btn-delete-comp').style.display='none';await loadCompetitions();document.getElementById('comp-select').value='';toast('Competition deleted','success');};
+window.clearAssignments=async()=>{if(!confirm('Clear all target assignments?'))return;targets=[];archers.forEach(a=>{a.target=null;a.slot=null;});await saveTargets();await saveArchers();renderAll();toast('Assignments cleared','success');};
+function renderTargets(){const grid=document.getElementById('target-grid');if(!targets.length){grid.innerHTML='<div class="empty-state"><div class="empty-icon">🎯</div><p>No targets yet.<br>Add archers then click <strong>AUTO GENERATE FROM ENTRIES</strong>.</p></div>';return;}const allBows=[...new Set(targets.map(t=>t.bow))];let html='';allBows.forEach(bow=>{const group=targets.filter(t=>t.bow===bow);const color=BOW_COLORS[bow]||'#555';const archerCount=group.reduce((n,t)=>n+['A','B','C','D'].filter(s=>t[s]).length,0);const tRange=group.length>1?`T${group[0].num}–T${group[group.length-1].num}`:`T${group[0].num}`;const distLabel=getDistanceLabel(bow,currentDiscipline);html+=`<div style="margin-bottom:24px;"><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px 14px;background:${color}22;border:1px solid ${color}44;border-radius:8px;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:2px;color:${color};">${bow==='Mixed'?'🎯 MIXED (3D/FIELD)':bow==='Trad/Longbow'?'🏹 TRAD / LONGBOW':bow.toUpperCase()}</span>${distLabel?`<span style="font-size:12px;font-weight:700;color:var(--accent);background:rgba(255,215,0,0.15);padding:2px 8px;border-radius:4px;">${distLabel}</span>`:''}<span style="font-size:11px;color:#888;">${archerCount} archers · ${group.length} target${group.length!==1?'s':''} (${tRange})</span></div><div class="target-grid">`;group.forEach(t=>{const globalTi=targets.indexOf(t);const slotsHtml=['A','B','C','D'].map(s=>{const archer=t[s];return`<div class="target-slot ${archer?'filled':'empty'}" onclick="${archer?`openMoveModal('${archer.id}',${globalTi},'${s}')`:`openAssignModal(${globalTi},'${s}')`}"><div class="slot-label">${s}</div>${archer?`<div class="slot-name" style="cursor:pointer;">${archer.name} <span style="font-size:9px;color:var(--accent);">✦ MOVE</span></div><div class="slot-cat">${archer.age} · ${archer.gender}</div>`:`<div class="slot-name">Tap to assign</div>`}</div>`;}).join('');html+=`<div class="target-card"><div class="target-num">T${t.num}</div>${slotsHtml}</div>`;});html+='</div></div>';});grid.innerHTML=html;}
+window.openAssignModal=(ti,slot)=>{assignPending={ti,slot};const t=targets[ti];document.getElementById('assign-modal-title').textContent=`Target ${t.num} — Slot ${slot}`;const unassigned=archers.filter(a=>!a.target||(a.target===t.num&&a.slot===slot));document.getElementById('assign-archer-select').innerHTML='<option value="">— Unassign —</option>'+unassigned.map(a=>`<option value="${a.id}" ${t[slot]?.id===a.id?'selected':''}>${a.name} (${a.bow} · ${a.age})</option>`).join('');document.getElementById('btn-remove-slot').style.display=t[slot]?'block':'none';openModal('modal-assign');};
+window.confirmAssign=async()=>{const{ti,slot}=assignPending;const archerId=document.getElementById('assign-archer-select').value;const t=targets[ti];if(t[slot]){const old=archers.find(a=>a.id===t[slot].id);if(old){old.target=null;old.slot=null;}}if(archerId){const archer=archers.find(a=>a.id===archerId);if(archer){if(archer.target){const oldT=targets.find(x=>x.num===archer.target);if(oldT)oldT[archer.slot]=null;}t[slot]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};archer.target=t.num;archer.slot=slot;}}else{t[slot]=null;}await saveTargets();await saveArchers();closeModal('modal-assign');renderTargets();renderEntries();toast('Assignment saved ✓','success');};
+window.removeFromSlot=async()=>{const{ti,slot}=assignPending;const t=targets[ti];if(t[slot]){const old=archers.find(a=>a.id===t[slot].id);if(old){old.target=null;old.slot=null;}t[slot]=null;}await saveTargets();await saveArchers();closeModal('modal-assign');renderTargets();renderEntries();toast('Removed ✓','success');};
+window.printFieldOfPlay=()=>{if(!targets.length){toast('No targets to print','error');return;}const groups=[];const genGroups=(fn)=>{let cl=null,cc=null,ct=[];targets.forEach(t=>{const{label,color}=fn(t);if(label!==cl){if(ct.length)groups.push({label:cl,color:cc,targets:[...ct]});cl=label;cc=color;ct=[];}ct.push(t);});if(ct.length)groups.push({label:cl,color:cc,targets:[...ct]});};if(currentDiscipline==='Outdoor'){genGroups(t=>{if(t.bow==='Recurve'){const ages=['A','B','C','D'].filter(s=>t[s]).map(s=>t[s].age);const has3=ages.some(a=>['U14','U12'].includes(a));const has6=ages.some(a=>['U18','Master 50+','Master 60+'].includes(a));if(has3)return{label:'RECURVE 30m',color:'#1976d2'};if(has6)return{label:'RECURVE 60m',color:'#1565c0'};return{label:'RECURVE 70m',color:'#0d47a1'};}const m={'Compound':{label:'COMPOUND 50m',color:'#4a148c'},'Barebow':{label:'BAREBOW 50m',color:'#1b5e20'},'Trad/Longbow':{label:'TRAD/LB 30m',color:'#e65100'}};return m[t.bow]||{label:t.bow.toUpperCase(),color:'#546e7a'};});}else{genGroups(t=>{const bm={'Recurve':'RECURVE','Compound':'COMPOUND','Barebow':'BAREBOW','Trad/Longbow':'TRAD / LONGBOW','Mixed':'MIXED'};const cm={'Recurve':'#1565c0','Compound':'#4a148c','Barebow':'#1b5e20','Trad/Longbow':'#e65100','Mixed':'#546e7a'};return{label:bm[t.bow]||t.bow.toUpperCase(),color:cm[t.bow]||'#555'};});}const fz={'RECURVE 70m':'122cm','RECURVE 60m':'122cm','RECURVE 30m':'80cm','COMPOUND 50m':'80cm (10-6)','BAREBOW 50m':'122cm','TRAD/LB 30m':'80cm','RECURVE':'40cm','COMPOUND':'40cm (10-6)','BAREBOW':'40cm','TRAD / LONGBOW':'40cm','MIXED':'varies'};const hc=groups.map(g=>`<td colspan="${g.targets.length}" style="background:${g.color};color:#fff;text-align:center;padding:8px;font-family:Arial,sans-serif;font-size:13px;font-weight:700;border:2px solid #fff;">${g.label}${fz[g.label]?`<div style="font-size:11px;font-weight:400;color:rgba(255,255,255,0.85);margin-top:3px;">⬤ ${fz[g.label]}</div>`:''}</td>`).join('');const tc=groups.map(g=>g.targets.map(t=>`<td style="text-align:center;padding:14px 8px;font-family:Arial,sans-serif;font-size:18px;font-weight:900;border:1px solid #ccc;min-width:48px;background:${g.color}18;color:#111;">T${t.num}</td>`).join('')).join('');const win=window.open('','_blank');win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Field of Play</title><style>body{margin:16px;font-family:Arial,sans-serif;}table{border-collapse:collapse;width:100%;}@media print{@page{size:A4 landscape;margin:8mm;}body{margin:8px;}}</style></head><body><h2>🏟 Field of Play</h2><div style="font-size:12px;color:#666;margin-bottom:16px;">${currentDiscipline} · ${targets.length} targets · ${archers.length} archers</div><table><thead><tr>${hc}</tr></thead><tbody><tr>${tc}</tr></tbody></table></body></html>`);win.document.close();setTimeout(()=>win.print(),400);};
+window.printStartList=()=>{if(!targets.length){toast('No targets to print','error');return;}const allBows=[...new Set(targets.map(t=>t.bow))];allBows.sort((a,b)=>{const ai=BOW_ORDER.indexOf(a),bi=BOW_ORDER.indexOf(b);if(ai===-1&&bi===-1)return 0;if(ai===-1)return 1;if(bi===-1)return -1;return ai-bi;});let rows='';allBows.forEach(bow=>{const group=targets.filter(t=>t.bow===bow);if(!group.length)return;rows+=`<tr style="background:#37474f;color:#fff;"><td colspan="5"><strong>${bow.toUpperCase()}</strong></td></tr>`;group.forEach(t=>{['A','B','C','D'].forEach(s=>{const a=t[s];if(!a&&!['A','B','C','D'].some(sl=>t[sl]))return;rows+=`<tr><td style="font-weight:700;color:#1565c0;">T${t.num}${s}</td><td style="font-weight:600;">${a?a.name:'—'}</td><td>${a?a.age:'—'}</td><td>${a?a.gender:'—'}</td><td>${a?a.bow:'—'}</td></tr>`;});});});const win=window.open('','_blank');win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Start List</title><style>body{font-family:Arial,sans-serif;margin:20px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ccc;padding:8px 12px;font-size:13px;}thead{background:#37474f;color:#fff;}tbody tr:nth-child(even){background:#f9f9f9;}@media print{@page{size:A4 portrait;margin:10mm;}}</style></head><body><h2>🏹 Start List</h2><div style="font-size:12px;color:#666;margin-bottom:16px;">${currentDiscipline} · ${targets.length} targets · ${archers.length} archers</div><table><thead><tr><th>Target</th><th>Name</th><th>Age</th><th>Gender</th><th>Bow</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);win.document.close();setTimeout(()=>win.print(),400);};
+window.addSession=async()=>{if(!currentCompId){toast('Select a competition first','error');return;}const name=document.getElementById('s-name').value.trim();if(!name){toast('Enter session name','error');return;}sessions.push({id:Date.now(),name,date:document.getElementById('s-date').value,time:document.getElementById('s-time').value,dist:document.getElementById('s-dist').value,ends:parseInt(document.getElementById('s-ends').value),arrows:parseInt(document.getElementById('s-arrows').value)});await saveSessions();renderSessions();toast('Session added ✓','success');};
+window.deleteSession=async(id)=>{sessions=sessions.filter(s=>s.id!==id);await saveSessions();renderSessions();};
+function renderSessions(){const list=document.getElementById('sessions-list');list.innerHTML=sessions.length?sessions.map(s=>`<div class="session-block"><div class="session-time">${s.time||'--:--'}</div><div class="session-info"><div class="session-name">${s.name}</div><div class="session-sub">${s.date||''} · ${s.dist} · ${s.ends} ends × ${s.arrows} arrows</div></div><button class="btn btn-danger btn-sm" onclick="deleteSession(${s.id})">✕</button></div>`).join(''):'<div class="empty-state"><div class="empty-icon">⏰</div><p>No sessions yet.</p></div>';}
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To",
-  authDomain: "all-in-competition.firebaseapp.com",
-  projectId: "all-in-competition",
-  storageBucket: "all-in-competition.firebasestorage.app",
-  messagingSenderId: "620146958631",
-  appId: "1:620146958631:web:1e88019d1436372689c902"
+window.renderResults=()=>{const container=document.getElementById('results-by-category');if(!container)return;if(!archers.length){container.innerHTML='<p style="color:var(--muted2)">No archers yet.</p>';return;}const labels=getGoldLabels();const showHalves=currentDiscipline==='Outdoor'||currentDiscipline==='Indoor';const scoredArchers=archers.filter(a=>(getScore(a.id)?.total||0)>0).map(a=>{const s=getScore(a.id);return{...a,total:s.total||0,g1:s.g1||0,g2:s.g2||0,h1:s.h1||0,h2:s.h2||0};});if(!scoredArchers.length){container.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted2);">No scores yet.<br>Results will appear here as archers complete their rounds.</div>';return;}const catMap={};scoredArchers.sort((a,b)=>{const bi=BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);if(bi!==0)return bi;const ai=AGE_ORDER.indexOf(a.age)-AGE_ORDER.indexOf(b.age);if(ai!==0)return ai;return a.gender.localeCompare(b.gender);});scoredArchers.forEach(a=>{const key=`${a.bow}||${a.age}||${a.gender}`;if(!catMap[key])catMap[key]={bow:a.bow,age:a.age,gender:a.gender,archers:[]};catMap[key].archers.push(a);});const sortedCats=Object.values(catMap).sort((a,b)=>{const bi=BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);if(bi!==0)return bi;const ai=AGE_ORDER.indexOf(a.age)-AGE_ORDER.indexOf(b.age);if(ai!==0)return ai;return a.gender.localeCompare(b.gender);});let html='';sortedCats.forEach(cat=>{const ranked=[...cat.archers].sort((a,b)=>b.total-a.total||b.g1-a.g1||b.g2-a.g2);const color=BOW_COLORS[cat.bow]||'#555';const gLabel=cat.gender==='M'?'Men':'Women';html+=`<div style="margin-bottom:20px;"><div style="display:flex;align-items:center;gap:10px;padding:8px 14px;background:${color}22;border:1px solid ${color}44;border-radius:8px;margin-bottom:8px;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:1px;color:${color};">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</span><span style="font-size:11px;color:var(--muted2);">${ranked.length} archer${ranked.length!==1?'s':''}</span></div><div class="table-wrap"><table><thead><tr><th style="width:40px;">Rank</th><th>Name</th><th>Score</th>${showHalves?'<th>H1</th><th>H2</th>':''}<th>${labels.g1}</th><th>${labels.g2}</th></tr></thead><tbody>${ranked.map((a,i)=>`<tr><td style="color:#FFD700;font-weight:900;text-align:center;">${i+1}</td><td style="color:#111;font-weight:600;">${a.name}</td><td style="font-weight:900;font-size:16px;color:#111;">${a.total}</td>${showHalves?`<td style="color:#555;">${a.h1||'—'}</td><td style="color:#555;">${a.h2||'—'}</td>`:''}<td style="color:#111;">${a.g1||'—'}</td><td style="color:#111;">${a.g2||'—'}</td></tr>`).join('')}</tbody></table></div></div>`;});const newHash=html.length+html.slice(0,200);if(container._lastHash===newHash)return;container._lastHash=newHash;const scrollEl=document.querySelector('.content');const st=scrollEl?scrollEl.scrollTop:0;container.innerHTML=html;if(scrollEl)requestAnimationFrame(()=>{scrollEl.scrollTop=st;});};
+function getArcherEnds(archerId){const s=getScore(archerId);if(!s||!s.ends)return null;const cfg_ends=currentDiscipline==='Outdoor'?12:currentDiscipline==='Indoor'?20:24;const endsArr=Array.from({length:cfg_ends},()=>[]);Object.keys(s.ends).forEach(i=>{endsArr[parseInt(i)]=s.ends[i]||[];});return endsArr;}
+function getVal(v){return v==='X'?10:(parseInt(v)||0);}
+function buildAdminScorecard(archer){const s=getScore(archer.id);if(!s||!s.total)return null;const ends=getArcherEnds(archer.id);if(!ends)return null;const isOut=currentDiscipline==='Outdoor';const isIn=currentDiscipline==='Indoor';function cellStyle(val){return(val==='X'||val===10||val===9||val===11)?'background:#fff9c4;color:#5d4037;font-weight:700;':'';}function d(ea,i){return ea[i]===0?'M':(ea[i]===undefined||ea[i]===''?'':ea[i]);}let tableHtml='';if(isOut){function buildHalfOut(startEnd,endEnd){let rows='',running=0,tens=0,xs=0;for(let e=startEnd;e<endEnd;e++){const ea=ends[e]||[];const v=ea.map(x=>getVal(x));const s1=ea.length>=3?v[0]+v[1]+v[2]:'';const s2=ea.length>=6?v[3]+v[4]+v[5]:'';const et=s2!==''?(Number(s1)||0)+s2:'';if(et!=='')running+=et;const c10=ea.filter(x=>x===10||x==='X').length,cx=ea.filter(x=>x==='X').length;if(ea.length>0){tens+=c10;xs+=cx;}rows+=`<tr><td rowspan="2" style="background:#f0f0f0;font-weight:700;font-size:10px;border-right:2px solid #999;width:42px;">End ${e+1}</td><td style="${cellStyle(ea[0])}">${d(ea,0)}</td><td style="${cellStyle(ea[1])}">${d(ea,1)}</td><td style="${cellStyle(ea[2])}">${d(ea,2)}</td><td style="background:#f5f5f5;font-size:11px;width:30px;">${s1}</td><td style="background:#eee;width:32px;"></td><td rowspan="2" style="background:#fff8e1;font-weight:700;color:#c62828;border-left:2px solid #999;border-right:2px solid #999;width:42px;">${et!==''?running:''}</td><td style="font-size:11px;color:#555;width:26px;">${ea.length>0?c10:''}</td><td style="font-size:11px;color:#555;width:26px;">${ea.length>0?cx:''}</td></tr><tr style="border-bottom:1.5px solid #aaa;"><td style="${cellStyle(ea[3])}">${d(ea,3)}</td><td style="${cellStyle(ea[4])}">${d(ea,4)}</td><td style="${cellStyle(ea[5])}">${d(ea,5)}</td><td style="background:#f5f5f5;font-size:11px;">${s2}</td><td style="background:#e3f2fd;font-weight:700;color:#1565c0;border-left:2px solid #999;">${et}</td><td></td><td></td></tr>`;}rows+=`<tr style="background:#37474f;color:#fff;font-weight:700;"><td colspan="5">HALF TOTAL</td><td>${running}</td><td></td><td>${tens}</td><td>${xs}</td></tr>`;return rows;}const cols='<colgroup><col style="width:42px"><col><col><col><col style="width:30px"><col style="width:32px"><col style="width:42px"><col style="width:26px"><col style="width:26px"></colgroup>';const thead='<tr style="background:#555;color:#fff;font-size:10px;font-weight:700;"><th colspan="4" style="text-align:left;padding:3px 6px;">ARROWS</th><th>SUB</th><th>END</th><th>RUNNING</th><th>10+X</th><th>X</th></tr>';tableHtml=`<div style="background:#37474f;color:#fff;padding:2px 6px;font-size:10px;font-weight:700;">1st HALF (Ends 1–6)</div><table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:12px;">${cols}<tbody>${thead}${buildHalfOut(0,6)}</tbody></table><div style="background:#37474f;color:#fff;padding:2px 6px;font-size:10px;font-weight:700;margin-top:4px;">2nd HALF (Ends 7–12)</div><table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:12px;">${cols}<tbody>${thead}${buildHalfOut(6,12)}</tbody></table>`;}else if(isIn){function buildHalfIn(startEnd,endEnd){let rows='',running=0,tens=0,nines=0;for(let e=startEnd;e<endEnd;e++){const ea=ends[e]||[];const v=ea.map(x=>getVal(x));const et=ea.length>=3?v[0]+v[1]+v[2]:'';if(et!=='')running+=et;const c10=ea.filter(x=>x===10||x==='X').length,c9=ea.filter(x=>x===9).length;if(ea.length>0){tens+=c10;nines+=c9;}rows+=`<tr style="border-bottom:1px solid #ccc;"><td style="background:#f0f0f0;font-weight:700;font-size:10px;border-right:2px solid #999;width:42px;">End ${e+1}</td><td style="${cellStyle(ea[0])}">${d(ea,0)}</td><td style="${cellStyle(ea[1])}">${d(ea,1)}</td><td style="${cellStyle(ea[2])}">${d(ea,2)}</td><td style="background:#e3f2fd;font-weight:700;color:#1565c0;border-left:2px solid #999;width:36px;">${et}</td><td style="background:#fff8e1;font-weight:700;color:#c62828;border-left:2px solid #999;border-right:2px solid #999;width:42px;">${et!==''?running:''}</td><td style="font-size:11px;color:#555;width:26px;">${ea.length>0?c10:''}</td><td style="font-size:11px;color:#555;width:26px;">${ea.length>0?c9:''}</td></tr>`;}rows+=`<tr style="background:#37474f;color:#fff;font-weight:700;"><td colspan="4">HALF TOTAL</td><td>${running}</td><td></td><td>${tens}</td><td>${nines}</td></tr>`;return rows;}const cols='<colgroup><col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:26px"><col style="width:26px"></colgroup>';const thead='<tr style="background:#555;color:#fff;font-size:10px;font-weight:700;"><th colspan="4" style="text-align:left;padding:3px 6px;">ARROWS</th><th>END</th><th>RUNNING</th><th>10</th><th>9</th></tr>';tableHtml=`<div style="background:#37474f;color:#fff;padding:2px 6px;font-size:10px;font-weight:700;">1st HALF (Ends 1–10)</div><table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:12px;">${cols}<tbody>${thead}${buildHalfIn(0,10)}</tbody></table><div style="background:#37474f;color:#fff;padding:2px 6px;font-size:10px;font-weight:700;margin-top:4px;">2nd HALF (Ends 11–20)</div><table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:12px;">${cols}<tbody>${thead}${buildHalfIn(10,20)}</tbody></table>`;}else{let rows='',running=0;const label=currentDiscipline==='3D'?'Station':'Target';ends.forEach((ea,i)=>{const tot=ea.reduce((x,v)=>x+getVal(v),0);if(ea.length>0)running+=tot;const cells=ea.map(v=>`<td>${v===0?'M':v}</td>`).join('');rows+=`<tr style="border-bottom:1px solid #ccc;"><td style="background:#f0f0f0;font-size:10px;font-weight:700;width:52px;">${label} ${i+1}</td>${cells}<td style="background:#e3f2fd;font-weight:700;color:#1565c0;">${ea.length>0?tot:''}</td><td style="background:#fff8e1;font-weight:700;color:#c62828;">${ea.length>0?running:''}</td></tr>`;});tableHtml=`<table style="width:100%;border-collapse:collapse;border:1.5px solid #999;font-size:12px;"><tbody>${rows}</tbody></table>`;}const tgt=getTarget(archer);return`<div style="background:#37474f;color:#fff;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><div><div style="font-size:10px;color:#aaa;">${currentDiscipline} · ${tgt} · ${archer.bow} · ${archer.age} · ${archer.gender}</div><div style="font-size:16px;font-weight:700;">${archer.name}</div></div><div style="text-align:right;"><div style="font-size:28px;font-weight:900;color:#FFD700;">${s.total}</div><div style="font-size:10px;color:#aaa;">H1:${s.h1||0} · H2:${s.h2||0}</div></div></div>${tableHtml}`;}
+function getTarget(a){if(a.target&&a.slot)return`T${a.target}${a.slot}`;for(const t of targets){for(const s of['A','B','C','D']){if(t[s]&&String(t[s].id)===String(a.id))return`T${t.num}${s}`;}}return'—';}
+function renderScorecards(){const list=document.getElementById('scorecards-list');if(!list)return;if(!currentCompId){list.innerHTML='<p style="color:var(--muted2)">Select a competition first.</p>';return;}if(!archers.length){list.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted2);">No archers yet.</div>';return;}const bowF=document.getElementById('sc-filter-bow')?.value||'';const filtered=archers.filter(a=>(!bowF||a.bow===bowF)&&(getScore(a.id)?.total||0)>0);if(!filtered.length){list.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted2);">No scores yet.</div>';return;}const grouped={};BOW_ORDER.forEach(bow=>{const group=filtered.filter(a=>a.bow===bow);if(group.length)grouped[bow]=group;});const mixed=filtered.filter(a=>!BOW_ORDER.includes(a.bow));if(mixed.length)grouped['Mixed']=mixed;let html='';Object.entries(grouped).forEach(([bow,group])=>{const color=BOW_COLORS[bow]||'#555';html+=`<div style="margin-bottom:20px;"><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:8px 14px;background:${color}22;border:1px solid ${color}44;border-radius:8px;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:2px;color:${color};">${bow.toUpperCase()}</span><span style="font-size:11px;color:var(--muted2);">${group.length} archer${group.length!==1?'s':''}</span></div>`;group.sort((a,b)=>(getScore(b.id)?.total||0)-(getScore(a.id)?.total||0));group.forEach(archer=>{const s=getScore(archer.id);const tgt=getTarget(archer);html+=`<div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;margin-bottom:8px;overflow:hidden;"><div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;"><div><div style="font-size:11px;color:var(--muted2);">${tgt} · ${archer.age} · ${archer.gender}</div><div style="font-size:14px;font-weight:700;">${archer.name}</div></div><div style="display:flex;align-items:center;gap:10px;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:var(--accent);">${s?.total||'—'}</div><button class="btn btn-secondary btn-sm" onclick="viewScorecard('${archer.id}')">VIEW 📄</button><button class="btn btn-primary btn-sm" onclick="printScorecard('${archer.id}')">🖨 PRINT</button></div></div></div>`;});html+='</div>';});list.innerHTML=html;}
+window.viewScorecard=(archerId)=>{const archer=archers.find(a=>a.id===archerId);if(!archer)return;const html=buildAdminScorecard(archer);if(!html){toast('No score data yet','error');return;}const win=window.open('','_blank');win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${archer.name}</title><style>body{margin:12px;font-family:Arial,sans-serif;color:#111;}td,th{border:1px solid #ccc;text-align:center;height:22px;padding:0 2px;}</style></head><body>${html}</body></html>`);win.document.close();};
+window.printScorecard=(archerId)=>{const archer=archers.find(a=>a.id===archerId);if(!archer)return;const html=buildAdminScorecard(archer);if(!html){toast('No score data yet','error');return;}const win=window.open('','_blank');win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${archer.name}</title><style>body{margin:8px;font-family:Arial,sans-serif;color:#111;}td,th{border:1px solid #ccc;text-align:center;height:22px;padding:0 2px;}@media print{@page{size:A4 portrait;margin:8mm;}}</style></head><body>${html}</body></html>`);win.document.close();setTimeout(()=>win.print(),400);};
+window.printAllScorecards=()=>{if(!archers.length){toast('No archers','error');return;}const bowF=document.getElementById('sc-filter-bow')?.value||'';const filtered=archers.filter(a=>(!bowF||a.bow===bowF)&&(getScore(a.id)?.total||0)>0);if(!filtered.length){toast('No scores yet','error');return;}const sorted=[...filtered].sort((a,b)=>{const bi=BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);if(bi!==0)return bi;return(getScore(b.id)?.total||0)-(getScore(a.id)?.total||0);});const sections=sorted.map((archer,i)=>{const html=buildAdminScorecard(archer);if(!html)return'';const pageBreak=i<sorted.length-1?'page-break-after:always;':'';return`<div style="${pageBreak}">${html}</div>`;}).join('');const win=window.open('','_blank');win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>All Scorecards</title><style>body{margin:8px;font-family:Arial,sans-serif;color:#111;}td,th{border:1px solid #ccc;text-align:center;height:22px;padding:0 2px;}@media print{@page{size:A4 portrait;margin:8mm;}}</style></head><body>${sections}</body></html>`);win.document.close();setTimeout(()=>win.print(),400);};
+window.copyRegLink=()=>{if(!currentCompId){toast('Select a competition first','error');return;}const url=`https://matan1sharon-ops.github.io/All-in-competition/register.html?comp=${currentCompId}`;navigator.clipboard.writeText(url).then(()=>toast('Registration link copied! ✓','success')).catch(()=>prompt('Copy this registration link:',url));};
+window.copyResultsLink=()=>{if(!currentCompId){toast('Select a competition first','error');return;}const url=`https://matan1sharon-ops.github.io/All-in-competition/results.html?comp=${currentCompId}`;navigator.clipboard.writeText(url).then(()=>toast('Results link copied! ✓','success')).catch(()=>prompt('Copy this results link:',url));};
+window.copyMatchLink=()=>{if(!currentCompId){toast('Select a competition first','error');return;}const url=`https://matan1sharon-ops.github.io/All-in-competition/matches.html`;navigator.clipboard.writeText(url).then(()=>toast('Match scoring link copied! ✓','success')).catch(()=>prompt('Copy this link:',url));};
+window.openDisplayScreen=()=>{if(!currentCompId){toast('Select a competition first','error');return;}window.open(`https://matan1sharon-ops.github.io/All-in-competition/results.html?comp=${currentCompId}`,'_blank');};
+window.exportResultsPDF=()=>{const labels=getGoldLabels();const showHalves=currentDiscipline==='Outdoor'||currentDiscipline==='Indoor';const scoredArchers=archers.filter(a=>(getScore(a.id)?.total||0)>0).map(a=>{const s=getScore(a.id);return{...a,total:s.total||0,g1:s.g1||0,g2:s.g2||0,h1:s.h1||0,h2:s.h2||0};});if(!scoredArchers.length){toast('No scores yet','error');return;}const catMap={};scoredArchers.forEach(a=>{const key=`${a.bow}||${a.age}||${a.gender}`;if(!catMap[key])catMap[key]={bow:a.bow,age:a.age,gender:a.gender,archers:[]};catMap[key].archers.push(a);});const sortedCats=Object.values(catMap).sort((a,b)=>{const bi=BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);if(bi!==0)return bi;const ai=AGE_ORDER.indexOf(a.age)-AGE_ORDER.indexOf(b.age);if(ai!==0)return ai;return a.gender.localeCompare(b.gender);});let sections='';sortedCats.forEach(cat=>{const ranked=[...cat.archers].sort((a,b)=>b.total-a.total||b.g1-a.g1||b.g2-a.g2);const gLabel=cat.gender==='M'?'Men':'Women';const rows=ranked.map((a,i)=>`<tr><td style="text-align:center;font-weight:700;">${i+1}</td><td style="font-weight:600;">${a.name}</td><td style="font-weight:700;font-size:14px;">${a.total}</td>${showHalves?`<td>${a.h1||'—'}</td><td>${a.h2||'—'}</td>`:''}<td>${a.g1||'—'}</td><td>${a.g2||'—'}</td></tr>`).join('');sections+=`<h3 style="margin:16px 0 6px;color:#37474f;">${cat.bow} · ${cat.age} · ${gLabel}</h3><table style="width:100%;border-collapse:collapse;margin-bottom:8px;"><thead style="background:#37474f;color:#fff;"><tr><th style="padding:6px 8px;width:40px;">Rank</th><th style="padding:6px 8px;">Name</th><th style="padding:6px 8px;">Score</th>${showHalves?'<th style="padding:6px 8px;">H1</th><th style="padding:6px 8px;">H2</th>':''}<th style="padding:6px 8px;">${labels.g1}</th><th style="padding:6px 8px;">${labels.g2}</th></tr></thead><tbody>${rows}</tbody></table>`;});const win=window.open('','_blank');win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Results</title><style>body{font-family:Arial,sans-serif;margin:20px;}td,th{border:1px solid #ccc;padding:5px 8px;}tbody tr:nth-child(even){background:#f9f9f9;}@media print{@page{size:A4 portrait;margin:10mm;}}</style></head><body><h2 style="margin-bottom:4px;">🏹 Results — ${currentDiscipline}</h2>${sections}</body></html>`);win.document.close();setTimeout(()=>win.print(),400);};
+window.openMoveModal=(archerId,fromTi,fromSlot)=>{const archer=archers.find(a=>a.id===archerId);if(!archer)return;const is3DField=currentDiscipline==='3D'||currentDiscipline==='Field';const validTargets=[];targets.forEach((t,ti)=>{const bowMatch=is3DField||t.bow===archer.bow||t.bow==='Trad/Longbow'&&(archer.bow==='Traditional'||archer.bow==='Longbow');if(!bowMatch)return;['A','B','C','D'].forEach(s=>{if(!t[s])validTargets.push({ti,t,slot:s,label:`T${t.num}${s}`});});});document.getElementById('move-modal-title').textContent=`Move ${archer.name}`;document.getElementById('move-modal-body').innerHTML=`<div style="margin-bottom:12px;padding:10px;background:var(--surface2);border-radius:8px;"><div style="font-size:11px;color:var(--muted2);margin-bottom:4px;">CURRENT POSITION</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--accent);">T${targets[fromTi].num}${fromSlot}</div><div style="font-size:12px;color:var(--muted2);">${archer.bow} · ${archer.age} · ${archer.gender==='M'?'Male':'Female'}</div></div><div style="font-size:11px;color:var(--muted2);margin-bottom:8px;font-weight:700;">MOVE TO:</div>${validTargets.length?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:6px;max-height:300px;overflow-y:auto;">${validTargets.map(v=>`<button onclick="moveArcherTo('${archerId}',${fromTi},'${fromSlot}',${v.ti},'${v.slot}')" style="padding:10px 6px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">${v.label}</button>`).join('')}</div>`:'<div style="color:var(--muted2);text-align:center;padding:20px;">No available slots for this archer\'s category.</div>'}<div style="margin-top:12px;"><button class="btn btn-danger btn-sm" onclick="removeArcherFromTarget('${archerId}',${fromTi},'${fromSlot}')">Remove from target</button></div>`;openModal('modal-move-archer');};
+window.moveArcherTo=async(archerId,fromTi,fromSlot,toTi,toSlot)=>{const archer=archers.find(a=>a.id===archerId);if(!archer)return;if(targets[fromTi])targets[fromTi][fromSlot]=null;const destArcher=targets[toTi]?.[toSlot];if(destArcher){const da=archers.find(a=>a.id===destArcher.id);if(da){da.target=targets[fromTi].num;da.slot=fromSlot;}targets[fromTi][fromSlot]=destArcher;}targets[toTi][toSlot]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};archer.target=targets[toTi].num;archer.slot=toSlot;await saveTargets();await saveArchers();closeModal('modal-move-archer');renderTargets();renderEntries();toast(`${archer.name} moved to T${targets[toTi].num}${toSlot} ✓`,'success');};
+window.removeArcherFromTarget=async(archerId,fromTi,fromSlot)=>{const archer=archers.find(a=>a.id===archerId);if(archer){archer.target=null;archer.slot=null;}if(targets[fromTi])targets[fromTi][fromSlot]=null;await saveTargets();await saveArchers();closeModal('modal-move-archer');renderTargets();renderEntries();toast('Archer removed from target ✓','success');};
+window.openEditArcher=(id)=>{const archer=archers.find(a=>a.id===id);if(!archer)return;document.getElementById('edit-archer-id').value=id;document.getElementById('edit-fname').value=archer.fname||archer.name?.split(' ')[0]||'';document.getElementById('edit-lname').value=archer.lname||archer.name?.split(' ').slice(1).join(' ')||'';document.getElementById('edit-club').value=archer.club||'';document.getElementById('edit-bow').value=archer.bow||'Recurve';document.getElementById('edit-age').value=archer.age||'Senior';document.getElementById('edit-gender').value=archer.gender||'M';openModal('modal-edit-archer');};
+window.saveEditArcher=async()=>{const id=document.getElementById('edit-archer-id').value;const archer=archers.find(a=>a.id===id);if(!archer)return;const fname=document.getElementById('edit-fname').value.trim();const lname=document.getElementById('edit-lname').value.trim();if(!fname||!lname){toast('Enter first and last name','error');return;}archer.fname=fname;archer.lname=lname;archer.name=`${fname} ${lname}`;archer.club=document.getElementById('edit-club').value.trim();archer.bow=document.getElementById('edit-bow').value;archer.age=document.getElementById('edit-age').value;archer.gender=document.getElementById('edit-gender').value;targets.forEach(t=>['A','B','C','D'].forEach(s=>{if(t[s]&&t[s].id===id){t[s].name=archer.name;t[s].bow=archer.bow;t[s].age=archer.age;t[s].gender=archer.gender;}}));await saveArchers();await saveTargets();closeModal('modal-edit-archer');renderAll();toast(`${archer.name} updated ✓`,'success');};
+window.showPanel=(name)=>{document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById(`panel-${name}`).classList.add('active');document.querySelector(`[data-panel="${name}"]`).classList.add('active');document.getElementById('topbar-title').textContent={dashboard:'Dashboard',entries:'Entry List',targets:'Target Assignment',schedule:'Schedule',results:'Live Results',scorecards:'Scorecards',elimination:'Elimination'}[name]||name;if(name==='scorecards')renderScorecards();if(name==='elimination')initElimination();};
+function openModal(id){document.getElementById(id).classList.add('open');}
+window.closeModal=(id)=>{document.getElementById(id).classList.remove('open');};
+function toast(msg,type='success'){const el=document.getElementById('toast');el.textContent=(type==='success'?'✓ ':'✕ ')+msg;el.className=`show ${type}`;setTimeout(()=>el.classList.remove('show'),3000);}
+window.setLang=(l)=>{lang=l;document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent.trim()===(l==='en'?'EN':'עב')));};
+
+/* ── ELIMINATION ── */
+
+function getElimFormat(bow){
+  if(currentDiscipline==='3D'||currentDiscipline==='Field') return 'cumulative';
+  if(bow==='Compound') return 'cumulative';
+  return 'sets';
+}
+
+function getMatchSlots(){
+  if(currentDiscipline==='3D'||currentDiscipline==='Field') return 4;
+  return 5;
+}
+
+function initElimination(){
+  if(!currentCompId){ document.getElementById('elim-content').innerHTML='<p style="color:var(--muted2)">Select a competition first.</p>'; return; }
+  const scored = archers.filter(a=>(getScore(a.id)?.total||0)>0);
+  const catMap={};
+  scored.forEach(a=>{
+    const key=`${a.bow}||${a.age}||${a.gender}`;
+    if(!catMap[key]) catMap[key]={bow:a.bow,age:a.age,gender:a.gender,count:0};
+    catMap[key].count++;
+  });
+  const cats = Object.entries(catMap).filter(([k,v])=>v.count>=3);
+  const sel = document.getElementById('elim-cat-select');
+  sel.innerHTML = '<option value="">— Select Category —</option>' +
+    cats.map(([k,v])=>`<option value="${k}">${v.bow} · ${v.age} · ${v.gender==='M'?'Men':'Women'} (${v.count})</option>`).join('');
+  renderElimContent();
+}
+
+function getActualBracketSize(archerCount, maxBracket){
+  if(archerCount < 3) return null;
+  if(archerCount <= 4) return 2;
+  if(archerCount <= 8) return Math.min(maxBracket, 4);
+  return Math.min(maxBracket, 8);
+}
+
+function buildBracketMatches(seeds, bracketSize, firstRound){
+  const totalSlots = bracketSize * 2;
+  const matches = [];
+  const slots = Array.from({length:totalSlots}, (_,i) => seeds[i] || null);
+  for(let i=0;i<totalSlots/2;i++){
+    const a1 = slots[i];
+    const a2 = slots[totalSlots-1-i];
+    const isBye = a1 && !a2;
+    if(isBye){
+      matches.push({
+        id:`${firstRound}_m${i+1}`, round:firstRound, position:i+1,
+        archer1:{id:a1.id,name:a1.name,seed:i+1,qualScore:a1.qualScore},
+        archer2:null, isBye:true,
+        sets:[],score1:null,score2:null,tiebreak1:null,tiebreak2:null,
+        winnerChoice:a1.id
+      });
+    } else {
+      matches.push({
+        id:`${firstRound}_m${i+1}`, round:firstRound, position:i+1,
+        archer1:{id:a1.id,name:a1.name,seed:i+1,qualScore:a1.qualScore},
+        archer2:{id:a2.id,name:a2.name,seed:totalSlots-i,qualScore:a2.qualScore},
+        sets:[],score1:null,score2:null,tiebreak1:null,tiebreak2:null,winnerChoice:null
+      });
+    }
+  }
+  return matches;
+}
+
+async function generateBracketForCategory(catKey, maxBracket){
+  const [bow,age,gender] = catKey.split('||');
+  const format = getElimFormat(bow);
+  const catArchers = archers
+    .filter(a=>a.bow===bow&&a.age===age&&a.gender===gender&&(getScore(a.id)?.total||0)>0)
+    .map(a=>({...a,qualScore:getScore(a.id)?.total||0,g1:getScore(a.id)?.g1||0,g2:getScore(a.id)?.g2||0}))
+    .sort((a,b)=>b.qualScore-a.qualScore||b.g1-a.g1||b.g2-a.g2);
+  if(catArchers.length < 3) return null;
+  const bracketSize = getActualBracketSize(catArchers.length, maxBracket);
+  if(!bracketSize) return null;
+  const firstRound = bracketSize===8?'R1':bracketSize===4?'QF':'SF';
+  const totalSlots = bracketSize * 2;
+  const seeds = catArchers.slice(0, totalSlots);
+  const matches = buildBracketMatches(seeds, bracketSize, firstRound);
+  return { catKey, bow, age, gender, format, bracketSize, rounds:{[firstRound]:matches}, currentRound:firstRound, createdAt:Date.now() };
+}
+
+window.generateElimination = async () => {
+  const catKey = document.getElementById('elim-cat-select').value;
+  const maxBracket = parseInt(document.getElementById('elim-bracket').value);
+  if(!catKey){ toast('Select a category','error'); return; }
+  const elimData = await generateBracketForCategory(catKey, maxBracket);
+  if(!elimData){ toast('Not enough archers (minimum 3)','error'); return; }
+  await setDoc(doc(db,'competitions',currentCompId),{elimination:{[catKey]:elimData}},{merge:true});
+  const slots=elimData.bracketSize*2;
+  const actual=archers.filter(a=>{const[b,ag,g]=catKey.split('||');return a.bow===b&&a.age===ag&&a.gender===g&&(getScore(a.id)?.total||0)>0;}).length;
+  const byes=slots-Math.min(actual,slots);
+  toast(`Bracket generated! ${Math.min(actual,slots)} archers${byes>0?`, ${byes} bye${byes>1?'s':''}`:''}  ✓`,'success');
+  renderElimContent();
 };
 
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
-
-let compId=null, compData=null;
-let myArcher=null, oppArcher=null, amArcher1=false;
-let matchData=null, catKey=null, roundKey=null, matchIdx=null;
-let format='sets'; // 'sets' or 'cumulative'
-let sets=[], currentSet=0;
-let cumArrows=[];
-
-const ARROWS_PER_SET = 3;
-const MAX_SETS = 5;
-const SETS_TO_WIN = 6;
-const CUM_ENDS = 5;
-const CUM_ARROWS = 3;
-
-function getVal(v){ return v==='X'?10:(parseInt(v)||0); }
-
-function chipClass(s){
-  if(s==='X'||s===10||s===9||s===11) return 'chip-gold';
-  if(s===8||s===7) return 'chip-red';
-  if(s===6||s===5) return 'chip-blue';
-  if(s===4||s===3) return 'chip-black';
-  if(s===2||s===1) return 'chip-white';
-  if(s===0||s==='M') return 'chip-miss';
-  return 'chip-empty';
-}
-
-function padBtnClass(s){
-  if(s==='X'||s===10||s===9) return 'pad-gold';
-  if(s===8||s===7) return 'pad-red';
-  if(s===6||s===5) return 'pad-blue';
-  if(s===4||s===3) return 'pad-black';
-  if(s===2||s===1) return 'pad-white';
-  return 'pad-miss';
-}
-
-// ── STATE ──
-let activeArcherIdx = 0; // 0 = archer1, 1 = archer2
-// sets: array of {score1, score2, arrows1, arrows2}
-// cumArrows1, cumArrows2: arrays for cumulative
-
-let sets = [];
-let cumArrows1 = [], cumArrows2 = [];
-
-function getMyArrows(idx, setIdx){
-  return idx===0 ? (sets[setIdx]?.arrows1||[]) : (sets[setIdx]?.arrows2||[]);
-}
-function setMyArrows(idx, setIdx, arrows){
-  if(!sets[setIdx]) sets[setIdx]={score1:0,score2:0,arrows1:[],arrows2:[]};
-  if(idx===0){ sets[setIdx].arrows1=arrows; sets[setIdx].score1=arrows.reduce((s,v)=>s+getVal(v),0); }
-  else        { sets[setIdx].arrows2=arrows; sets[setIdx].score2=arrows.reduce((s,v)=>s+getVal(v),0); }
-}
-
-function getActiveSet(){
-  // Current set = first set where active archer hasn't finished
-  for(let i=0;i<MAX_SETS;i++){
-    const arrows = getMyArrows(activeArcherIdx, i);
-    if(arrows.length < ARROWS_PER_SET) return i;
+window.generateAllElimination = async () => {
+  const maxBracket = parseInt(document.getElementById('elim-bracket').value);
+  if(!currentCompId){ toast('Select a competition first','error'); return; }
+  const scored = archers.filter(a=>(getScore(a.id)?.total||0)>0);
+  const catMap={};
+  scored.forEach(a=>{
+    const key=`${a.bow}||${a.age}||${a.gender}`;
+    if(!catMap[key]) catMap[key]=0;
+    catMap[key]++;
+  });
+  const eligible = Object.entries(catMap).filter(([k,n])=>n>=3);
+  if(!eligible.length){ toast('No categories with 3+ scored archers','error'); return; }
+  const existing = window._elimData||{};
+  let generated=0, skipped=0;
+  const newElim = {...existing};
+  for(const [catKey] of eligible){
+    if(existing[catKey]){ skipped++; continue; }
+    const data = await generateBracketForCategory(catKey, maxBracket);
+    if(data){ newElim[catKey]=data; generated++; }
   }
-  return MAX_SETS-1;
-}
-
-function calcSetPoints(){
-  let p1=0,p2=0;
-  sets.forEach(s=>{
-    if(s.score1>s.score2){p1+=2;}
-    else if(s.score2>s.score1){p2+=2;}
-    else{p1+=1;p2+=1;}
-  });
-  return {p1,p2};
-}
-
-function checkSetComplete(setIdx){
-  const s=sets[setIdx];
-  return s&&s.arrows1.length===ARROWS_PER_SET&&s.arrows2.length===ARROWS_PER_SET;
-}
-
-function checkMatchDone(){
-  const {p1,p2}=calcSetPoints();
-  if(p1>=SETS_TO_WIN||p2>=SETS_TO_WIN) return true;
-  // All 5 sets complete
-  if(sets.length>=MAX_SETS){
-    const lastComplete = sets.slice(0,MAX_SETS).every(s=>
-      s&&s.arrows1.length===ARROWS_PER_SET&&s.arrows2.length===ARROWS_PER_SET);
-    if(lastComplete) return true;
-  }
-  return false;
-}
-
-async function loadComps() {
-  try {
-    const snap = await getDocs(collection(db,'competitions'));
-    const sel = document.getElementById('comp-select');
-    sel.innerHTML = '<option value="">— Select Competition —</option>';
-    snap.docs.forEach(d=>{
-      const c=d.data(), o=document.createElement('option');
-      o.value=d.id; o.textContent=c.name+(c.date?` (${c.date})`:'');
-      sel.appendChild(o);
-    });
-    sel.onchange = () => loadCategories(sel.value);
-  } catch(e){ showError('Connection error'); }
-}
-
-async function loadCategories(id) {
-  if(!id) return;
-  compId = id;
-  const snap = await getDoc(doc(db,'competitions',id));
-  if(!snap.exists()) return;
-  compData = snap.data();
-  const elim = compData.elimination||{};
-  const catSel = document.getElementById('cat-select');
-  catSel.innerHTML = '<option value="">— Select Category —</option>';
-  Object.entries(elim).forEach(([ck,data])=>{
-    const gLabel=data.gender==='M'?'Men':'Women';
-    const o=document.createElement('option');
-    o.value=ck; o.textContent=`${data.bow} · ${data.age} · ${gLabel}`;
-    catSel.appendChild(o);
-  });
-  catSel.onchange = () => loadRounds(catSel.value);
-  document.getElementById('round-select').innerHTML='<option value="">— Select category first —</option>';
-  document.getElementById('match-select').innerHTML='<option value="">— Select round first —</option>';
-}
-
-function loadRounds(ck) {
-  if(!ck) return;
-  catKey = ck;
-  const data = compData.elimination[ck];
-  const roundOrder=['R1','QF','SF','F','B'];
-  const roundLabels={R1:'Round of 16',QF:'Quarter Finals',SF:'Semi Finals',F:'Final',B:'Bronze Medal'};
-  const roundSel = document.getElementById('round-select');
-  roundSel.innerHTML = '<option value="">— Select Round —</option>';
-  roundOrder.forEach(rk=>{
-    const matches = data.rounds?.[rk]||[];
-    if(!matches.length) return;
-    const pending = matches.filter(m=>!m.winnerChoice).length;
-    if(!pending) return;
-    const o=document.createElement('option');
-    o.value=rk; o.textContent=`${roundLabels[rk]||rk} (${pending} pending)`;
-    roundSel.appendChild(o);
-  });
-  roundSel.onchange = () => loadMatches(ck, roundSel.value);
-  document.getElementById('match-select').innerHTML='<option value="">— Select round first —</option>';
-}
-
-function loadMatches(ck, rk) {
-  if(!rk) return;
-  roundKey = rk;
-  const matches = compData.elimination[ck].rounds[rk]||[];
-  const matchSel = document.getElementById('match-select');
-  matchSel.innerHTML = '<option value="">— Select Match —</option>';
-  matches.forEach((m,i)=>{
-    if(m.winnerChoice) return;
-    const o=document.createElement('option');
-    o.value=i;
-    o.textContent=`Match ${m.position}: ${m.archer1?.name||'?'} vs ${m.archer2?.name||'?'}`;
-    matchSel.appendChild(o);
-  });
-}
-
-function showError(msg){
-  const el=document.getElementById('error-msg');
-  el.textContent=msg; el.style.display='block';
-}
-
-window.loadMatch = async () => {
-  const mi = document.getElementById('match-select').value;
-  if(!compId){ showError('Select a competition'); return; }
-  if(!catKey){ showError('Select a category'); return; }
-  if(!roundKey){ showError('Select a round'); return; }
-  if(mi===''){ showError('Select a match'); return; }
-  document.getElementById('error-msg').style.display='none';
-
-  // Reload fresh data
-  const snap = await getDoc(doc(db,'competitions',compId));
-  compData = snap.data();
-  const data = compData.elimination[catKey];
-  matchIdx = parseInt(mi);
-  matchData = data.rounds[roundKey][matchIdx];
-  format = data.format;
-
-  myArcher = matchData.archer1;
-  oppArcher = matchData.archer2;
-
-  // Load existing scores
-  if(format==='sets'){
-    sets = (matchData.sets||[]).map(s=>({
-      score1:s.score1||0, score2:s.score2||0,
-      arrows1:s.arrows1||[], arrows2:s.arrows2||[]
-    }));
-  } else {
-    cumArrows1 = matchData.arrows1||[];
-    cumArrows2 = matchData.arrows2||[];
-  }
-
-  activeArcherIdx = 0;
-  startMatch(data.bow, data.age, data.gender, data.bracketSize, roundKey);
+  if(!generated){ toast(`No new brackets — ${skipped} already exist`,'error'); return; }
+  await setDoc(doc(db,'competitions',currentCompId),{elimination:newElim},{merge:true});
+  toast(`${generated} bracket${generated>1?'s':''} generated!${skipped>0?` (${skipped} skipped)`:''}  ✓`,'success');
+  renderElimContent();
 };
 
-function switchArcher(idx){
-  activeArcherIdx=idx;
-  renderTabs(); renderSets(); renderPad(); updateHeader();
-}
+function renderElimContent(){
+  if(!currentCompId) return;
+  const container = document.getElementById('elim-content');
+  const elimData = window._elimData || {};
 
-function renderTabs(){
-  const tabs = document.getElementById('archer-tabs');
-  const a1 = myArcher?.name||'Archer 1';
-  const a2 = oppArcher?.name||'Archer 2';
-  // Check done status
-  const a1done = format==='sets'
-    ? sets.slice(0,MAX_SETS).filter(s=>s&&s.arrows1.length===ARROWS_PER_SET).length === (checkMatchDone()?sets.length:0)
-    : cumArrows1.length>=CUM_ENDS*CUM_ARROWS;
-  const a2done = format==='sets'
-    ? sets.slice(0,MAX_SETS).filter(s=>s&&s.arrows2.length===ARROWS_PER_SET).length === (checkMatchDone()?sets.length:0)
-    : cumArrows2.length>=CUM_ENDS*CUM_ARROWS;
-  tabs.innerHTML=[a1,a2].map((name,i)=>`
-    <button onclick="switchArcher(${i})" style="flex:1;padding:8px 6px;border:none;border-radius:6px;
-      background:${i===activeArcherIdx?'var(--blue)':'transparent'};
-      color:${i===activeArcherIdx?'#fff':'var(--muted)'};
-      font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">
-      ${name}
-    </button>`).join('');
-}
-
-function getRoundLabel(rk, bracketSize){
-  if(rk==='R1') return `Round of ${bracketSize*2}`;
-  if(rk==='QF') return 'Quarter Final';
-  if(rk==='SF') return 'Semi Final';
-  if(rk==='F')  return '🏆 Final';
-  if(rk==='B')  return '🥉 Bronze Medal';
-  return rk;
-}
-
-function startMatch(bow, age, gender, bracketSize, rk){
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('match-screen').style.display='flex';
-  document.getElementById('m-comp-name').textContent = compData.name||'';
-  document.getElementById('m-match-label').textContent = getRoundLabel(rk, bracketSize);
-
-  if(format==='sets'){
-    document.getElementById('m-format-label').textContent = 'Set System · First to 6 pts';
-    document.getElementById('sp-my-label').textContent = `${myArcher?.name?.split(' ')[0]||'A1'} PTS`;
-    document.getElementById('sp-opp-label').textContent = `${oppArcher?.name?.split(' ')[0]||'A2'} PTS`;
-  } else {
-    document.getElementById('m-format-label').textContent = 'Cumulative · 15 arrows total';
-    document.getElementById('sp-my-label').textContent = myArcher?.name?.split(' ')[0]||'A1';
-    document.getElementById('sp-opp-label').textContent = oppArcher?.name?.split(' ')[0]||'A2';
+  if(!Object.keys(elimData).length){
+    container.innerHTML='<p style="color:var(--muted2);text-align:center;padding:20px;">No elimination brackets yet. Select a category and generate a bracket above.</p>';
+    return;
   }
 
-  renderTabs();
-  renderSets();
-  renderPad();
-  updateHeader();
-}
-
-function calcSetPoints(){
-  let my=0, opp=0;
-  sets.forEach(s=>{
-    if(s.myScore>s.oppScore) my+=2;
-    else if(s.oppScore>s.myScore) opp+=2;
-    else{my+=1;opp+=1;}
-  });
-  return {my,opp};
-}
-
-function updateHeader(){
-  const archer = activeArcherIdx===0?myArcher:oppArcher;
-  if(format==='sets'){
-    const {p1,p2}=calcSetPoints();
-    document.getElementById('sp-my').textContent=p1;
-    document.getElementById('sp-opp').textContent=p2;
-    const setIdx=getActiveSet();
-    document.getElementById('m-set-label').textContent=`SET ${setIdx+1}`;
-    const curArrows=getMyArrows(activeArcherIdx,setIdx);
-    document.getElementById('m-arrow-count').textContent=`${curArrows.length}/${ARROWS_PER_SET}`;
-  } else {
-    const t1=cumArrows1.reduce((s,v)=>s+getVal(v),0);
-    const t2=cumArrows2.reduce((s,v)=>s+getVal(v),0);
-    document.getElementById('sp-my').textContent=t1;
-    document.getElementById('sp-opp').textContent=t2;
-    const myCum=activeArcherIdx===0?cumArrows1:cumArrows2;
-    const end=Math.floor(myCum.length/CUM_ARROWS)+1;
-    document.getElementById('m-set-label').textContent=`END ${Math.min(end,CUM_ENDS)}`;
-    document.getElementById('m-arrow-count').textContent=`${myCum.length%CUM_ARROWS||0}/${CUM_ARROWS}`;
-  }
-  document.getElementById('m-archer-name').textContent=archer?.name||'—';
-}
-
-function renderSets(){
-  const list=document.getElementById('sets-list');
   let html='';
-  const activeSetIdx=getActiveSet();
+  const sortedEntries = Object.entries(elimData).sort((a,b)=>a[0].localeCompare(b[0]));
+  sortedEntries.forEach(([catKey,data])=>{
+    const gLabel = data.gender==='M'?'Men':'Women';
+    const fmt = data.format||'sets';
+    const slots = (currentDiscipline==='3D'||currentDiscipline==='Field')?4:5;
+    const isCum = fmt==='cumulative';
+    const slotLabels = isCum
+      ? Array.from({length:slots},(_,i)=>`T${i+1}`)
+      : Array.from({length:slots},(_,i)=>`S${i+1}`);
+    const totalLabel = isCum?'Total':'PTS';
+    const formatLabel = isCum?'Cumulative':'Set System';
 
-  if(format==='sets'){
-    for(let i=0;i<MAX_SETS;i++){
-      const s=sets[i];
-      const myArrows=getMyArrows(activeArcherIdx,i);
-      const oppArrows=getMyArrows(1-activeArcherIdx,i);
-      const myScore=(s?(activeArcherIdx===0?s.score1:s.score2):0)||0;
-      const oppScore=(s?(activeArcherIdx===0?s.score2:s.score1):0)||0;
-      const myDone=myArrows.length===ARROWS_PER_SET;
-      const oppDone=oppArrows.length===ARROWS_PER_SET;
-      const bothDone=myDone&&oppDone;
-      const isActive=i===activeSetIdx&&!myDone;
-      const cls=bothDone?'set-card complete':isActive?'set-card active-set':'set-card';
-
-      let resultHtml='';
-      if(bothDone){
-        const myWin=myScore>oppScore, draw=myScore===oppScore;
-        const pts=myWin?2:draw?1:0;
-        const color=myWin?'var(--green)':draw?'var(--accent)':'var(--red)';
-        resultHtml=`<span class="set-result" style="color:${color}">${myScore}–${oppScore} (${pts}pt${pts!==1?'s':''})</span>`;
-      } else if(isActive){
-        resultHtml=`<span style="font-size:11px;color:var(--accent);">ACTIVE</span>`;
-      } else if(myDone&&!oppDone){
-        resultHtml=`<span style="font-size:11px;color:var(--muted);">Waiting for opp...</span>`;
-      }
-
-      const chips=Array.from({length:ARROWS_PER_SET},(_,ai)=>{
-        const v=myArrows[ai];
-        return v!==undefined
-          ?`<span class="arrow-chip ${chipClass(v)}">${v===0?'M':v}</span>`
-          :`<span class="arrow-chip chip-empty">·</span>`;
-      }).join('');
-
-      html+=`<div class="${cls}">
-        <div class="set-header">
-          <div class="set-num">SET ${i+1}</div>
-          ${resultHtml}
+    html+=`<div data-cat="${catKey}" style="margin-bottom:24px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;">
+        <div>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--accent);">${data.bow} · ${data.age} · ${gLabel}</span>
+          <span style="font-size:11px;color:var(--muted2);margin-left:12px;">1/${data.bracketSize} · ${formatLabel}</span>
         </div>
-        <div class="set-arrows">${chips}</div>
+        <button class="btn btn-danger btn-sm" onclick="deleteElimination('${catKey}')">✕ DELETE</button>
       </div>`;
-    }
-  } else {
-    const myCum=activeArcherIdx===0?cumArrows1:cumArrows2;
-    for(let e=0;e<CUM_ENDS;e++){
-      const startIdx=e*CUM_ARROWS;
-      const endArrows=myCum.slice(startIdx,startIdx+CUM_ARROWS);
-      const isActive=e===Math.floor(myCum.length/CUM_ARROWS)&&myCum.length<CUM_ENDS*CUM_ARROWS;
-      const isComplete=endArrows.length===CUM_ARROWS;
-      const cls=isComplete?'set-card complete':isActive?'set-card active-set':'set-card';
-      const tot=endArrows.reduce((s,v)=>s+getVal(v),0);
-      const chips=Array.from({length:CUM_ARROWS},(_,ai)=>{
-        const v=endArrows[ai];
-        return v!==undefined
-          ?`<span class="arrow-chip ${chipClass(v)}">${v===0?'M':v}</span>`
-          :`<span class="arrow-chip chip-empty">·</span>`;
-      }).join('');
-      html+=`<div class="${cls}">
-        <div class="set-header">
-          <div class="set-num">END ${e+1}</div>
-          ${isComplete?`<span class="set-result" style="color:var(--accent);">${tot}</span>`:''}
-        </div>
-        <div class="set-arrows">${chips}</div>
-      </div>`;
-    }
-  }
 
-  list.innerHTML=html;
-  setTimeout(()=>{
-    const a=list.querySelector('.active-set');
-    if(a) a.scrollIntoView({behavior:'smooth',block:'center'});
-  },50);
-}
+    const roundOrder2 = ['R1','QF','SF','F','B'];
+    const sortedRounds = roundOrder2.filter(rk=>data.rounds?.[rk]?.length>0).map(rk=>[rk,data.rounds[rk]]);
+    sortedRounds.forEach(([roundKey,matches])=>{
+      const roundLabel = roundKey==='R1'?`Round of ${data.bracketSize*2}`:
+                         roundKey==='QF'?(data.bracketSize===4?`Round of ${data.bracketSize*2}`:'Quarter Finals'):
+                         roundKey==='SF'?'Semi Finals':
+                         roundKey==='F'?'🏆 Final':
+                         roundKey==='B'?'🥉 Bronze Medal':'Round';
 
-function renderPad(){
-  const padScores = ['X',10,9,8,7,6,5,4,3,2,1,0];
-  let isFull;
-  if(format==='sets'){
-    const setIdx=getActiveSet();
-    isFull=getMyArrows(activeArcherIdx,setIdx).length>=ARROWS_PER_SET;
-  } else {
-    const myCum=activeArcherIdx===0?cumArrows1:cumArrows2;
-    isFull=myCum.length>=CUM_ENDS*CUM_ARROWS;
-  }
+      html+=`<div style="margin-bottom:12px;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--muted2);margin-bottom:8px;text-transform:uppercase;">${roundLabel}</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:8px;">`;
 
-  let btns = padScores.map(s=>{
-    const label=s===0?'M':s;
-    const scoreArg=s==='X'?"'X'":s;
-    return `<button class="pad-btn ${padBtnClass(s)}" onclick="handleScore(${scoreArg})" ${isFull?'disabled style="opacity:0.4"':''}>${label}</button>`;
-  }).join('');
+      matches.forEach(match=>{
+        const won1 = match.winnerChoice===match.archer1?.id;
+        const won2 = match.winnerChoice===match.archer2?.id;
+        const hasTB = match.tiebreak1!==null&&match.tiebreak1!==undefined;
 
-  btns+=`<button class="pad-btn pad-back" onclick="handleBack()" style="grid-column:span 2;">BACKSPACE ←</button>`;
+        // Column headers for this match
+        const headerCols = slotLabels.map(l=>`<span style="display:inline-block;width:30px;text-align:center;font-size:9px;font-weight:700;color:var(--muted2);">${l}</span>`).join('');
+        const tbHeaderCol = hasTB?`<span style="display:inline-block;width:26px;text-align:center;font-size:9px;font-weight:700;color:var(--muted2);">TB</span>`:'';
+        const totalHeaderCol = `<span style="display:inline-block;min-width:28px;text-align:right;font-size:9px;font-weight:700;color:var(--muted2);">${totalLabel}</span>`;
 
-  // Both archers done?
-  const a1done = format==='sets'
-    ? checkMatchDone()
-    : cumArrows1.length>=CUM_ENDS*CUM_ARROWS&&cumArrows2.length>=CUM_ENDS*CUM_ARROWS;
-
-  if(a1done){
-    btns+=`<button class="pad-btn pad-done" onclick="submitMatch()" style="grid-column:span 2;">SUBMIT MATCH ✓</button>`;
-  }
-
-  const pad=document.getElementById('match-pad');
-  pad.style.gridTemplateColumns='repeat(4,1fr)';
-  pad.innerHTML=btns;
-}
-
-function checkMatchDone(){
-  const {my,opp}=calcSetPoints();
-  if(my>=SETS_TO_WIN||opp>=SETS_TO_WIN) return true;
-  if(sets.length>=MAX_SETS&&sets[MAX_SETS-1]?.arrows.length===ARROWS_PER_SET) return true;
-  return false;
-}
-
-window.handleScore = (val) => {
-  if(format==='sets'){
-    const setIdx=getActiveSet();
-    const arrows=[...getMyArrows(activeArcherIdx,setIdx)];
-    if(arrows.length>=ARROWS_PER_SET) return;
-    arrows.push(val);
-    setMyArrows(activeArcherIdx,setIdx,arrows);
-    saveProgress();
-    // Auto-switch to other archer if this set is done but other archer hasn't scored
-    if(arrows.length===ARROWS_PER_SET){
-      const otherArrows=getMyArrows(1-activeArcherIdx,setIdx);
-      if(otherArrows.length<ARROWS_PER_SET){
-        activeArcherIdx=1-activeArcherIdx;
-        renderTabs();
-      }
-    }
-  } else {
-    if(activeArcherIdx===0){
-      if(cumArrows1.length>=CUM_ENDS*CUM_ARROWS) return;
-      cumArrows1.push(val);
-    } else {
-      if(cumArrows2.length>=CUM_ENDS*CUM_ARROWS) return;
-      cumArrows2.push(val);
-    }
-    saveProgress();
-  }
-  renderSets(); renderPad(); updateHeader();
-};
-
-window.handleBack = () => {
-  if(format==='sets'){
-    const setIdx=getActiveSet();
-    const arrows=[...getMyArrows(activeArcherIdx,setIdx)];
-    if(arrows.length>0){
-      arrows.pop();
-      setMyArrows(activeArcherIdx,setIdx,arrows);
-    }
-  } else {
-    if(activeArcherIdx===0){ if(cumArrows1.length>0) cumArrows1.pop(); }
-    else                    { if(cumArrows2.length>0) cumArrows2.pop(); }
-    saveProgress();
-  }
-  renderSets(); renderPad(); updateHeader();
-};
-
-async function saveProgress(){
-  if(!compId||!catKey||!roundKey||matchIdx===null) return;
-  try {
-    const snap = await getDoc(doc(db,'competitions',compId));
-    const data = snap.data();
-    const match = data.elimination[catKey].rounds[roundKey][matchIdx];
-
-    if(format==='sets'){
-      match.sets = sets.map(s=>({
-        score1:s.score1||0, score2:s.score2||0,
-        arrows1:s.arrows1||[], arrows2:s.arrows2||[]
-      }));
-    } else {
-      match.arrows1=cumArrows1;
-      match.score1=cumArrows1.reduce((s,v)=>s+getVal(v),0);
-      match.arrows2=cumArrows2;
-      match.score2=cumArrows2.reduce((s,v)=>s+getVal(v),0);
-      // Build sets array: group arrows into per-target totals for live display
-      const numTargets = CUM_ENDS;
-      match.sets = [];
-      for(let t=0;t<numTargets;t++){
-        const a1=cumArrows1.slice(t*CUM_ARROWS,(t+1)*CUM_ARROWS);
-        const a2=cumArrows2.slice(t*CUM_ARROWS,(t+1)*CUM_ARROWS);
-        if(a1.length>0||a2.length>0){
-          match.sets.push({
-            score1:a1.reduce((s,v)=>s+getVal(v),0),
-            score2:a2.reduce((s,v)=>s+getVal(v),0)
-          });
-        }
-      }
-    }
-
-    data.elimination[catKey].rounds[roundKey][matchIdx]=match;
-    await setDoc(doc(db,'competitions',compId),{elimination:data.elimination},{merge:true});
-  } catch(e){ console.error('Save error:',e); }
-}
-
-window.submitMatch = async () => {
-  await saveProgress();
-  document.getElementById('match-screen').style.display='none';
-  document.getElementById('complete-screen').style.display='flex';
-
-  const {p1,p2}=format==='sets'?calcSetPoints():{
-    p1:cumArrows1.reduce((s,v)=>s+getVal(v),0),
-    p2:cumArrows2.reduce((s,v)=>s+getVal(v),0)
-  };
-
-  document.getElementById('complete-icon').textContent='🏆';
-  document.getElementById('complete-title').textContent='MATCH COMPLETE';
-  document.getElementById('complete-sub').textContent='Scores saved! The admin will confirm the winner.';
-
-  let resultHtml=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-    <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;">${myArcher?.name||'A1'}</span>
-    <span style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:var(--accent);">${p1}–${p2}</span>
-    <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;">${oppArcher?.name||'A2'}</span>
-  </div>`;
-  if(format==='sets'){
-    sets.forEach((s,i)=>{
-      const color1=s.score1>s.score2?'var(--green)':s.score1<s.score2?'var(--red)':'var(--accent)';
-      const color2=s.score2>s.score1?'var(--green)':s.score2<s.score1?'var(--red)':'var(--accent)';
-      resultHtml+=`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);">
-        <span style="font-weight:700;color:${color1};">${s.score1}</span>
-        <span style="color:var(--muted2);font-size:12px;">Set ${i+1}</span>
-        <span style="font-weight:700;color:${color2};">${s.score2}</span>
-      </div>`;
+        html+=`<div style="background:var(--surface2);border:1px solid ${match.winnerChoice?'var(--green)':'var(--border2)'};border-radius:8px;padding:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <span style="font-size:11px;color:var(--muted2);">Match ${match.position}</span>
+            ${match.winnerChoice?`<span style="font-size:11px;color:var(--green);font-weight:700;">✓ COMPLETE</span>`:'<span style="font-size:11px;color:var(--accent);">PENDING</span>'}
+          </div>
+          <div style="display:flex;padding:1px 8px 3px;margin-bottom:1px;">
+            <span style="width:20px;"></span>
+            <span style="width:130px;"></span>
+            ${headerCols}${tbHeaderCol}${totalHeaderCol}
+          </div>
+          ${renderMatchRow(match.archer1,match,won1,1,fmt,slots,hasTB)}
+          <div style="height:2px;"></div>
+          ${renderMatchRow(match.archer2,match,won2,2,fmt,slots,hasTB)}
+          ${!match.winnerChoice?`<button class="btn btn-primary btn-sm" style="width:100%;margin-top:8px;" onclick="openMatchModal('${catKey}','${roundKey}',${match.position-1})">ENTER RESULT</button>`:''}
+        </div>`;
+      });
+      html+='</div></div>';
     });
-  }
-  document.getElementById('result-box').innerHTML=resultHtml;
-  toast('Scores submitted ✓','success');
-};
 
-function toast(msg,type='success'){
-  const el=document.getElementById('toast');
-  el.textContent=msg; el.className=`show ${type}`;
-  setTimeout(()=>el.classList.remove('show'),2500);
+    const r1done = (data.rounds?.R1||[]).length>0 && (data.rounds?.R1||[]).every(m=>m.winnerChoice);
+    const qfdone = (data.rounds?.QF||[]).length>0 && (data.rounds?.QF||[]).every(m=>m.winnerChoice);
+    const sfdone = (data.rounds?.SF||[]).length>0 && (data.rounds?.SF||[]).every(m=>m.winnerChoice);
+    if(r1done && !data.rounds?.QF && !data.rounds?.SF && !data.rounds?.F)
+      html+=`<button class="btn btn-success" style="margin-top:8px;" onclick="advanceRound('${catKey}')">⚡ ADVANCE TO QUARTER FINALS</button>`;
+    else if(qfdone && !data.rounds?.SF && !data.rounds?.F)
+      html+=`<button class="btn btn-success" style="margin-top:8px;" onclick="advanceRound('${catKey}')">⚡ ADVANCE TO SEMI FINALS</button>`;
+    else if(sfdone && !data.rounds?.F)
+      html+=`<button class="btn btn-success" style="margin-top:8px;" onclick="advanceRound('${catKey}')">⚡ GENERATE FINAL + BRONZE</button>`;
+    html+='</div>';
+  });
+
+  const newHash = html.replace(/\s+/g,' ');
+  if(container._lastHash === newHash) return;
+  container._lastHash = newHash;
+  const st = container.scrollTop;
+  container.style.overflow = 'hidden';
+  container.innerHTML = html;
+  container.style.overflow = '';
+  container.scrollTop = st;
 }
 
-loadComps();
+/* ── NEW renderMatchRow — fixed-width columns, no Q score ── */
+function renderMatchRow(archer,match,won,num,fmt,slots,hasTB){
+  if(!archer && match.isBye) return `<div style="padding:6px 8px;background:var(--surface3);border-radius:6px;color:var(--accent);font-size:12px;font-weight:700;">BYE ✓</div>`;
+  if(!archer) return `<div style="padding:6px 8px;background:var(--surface3);border-radius:6px;color:var(--muted);font-size:12px;">TBD</div>`;
+  const score = num===1?match.score1:match.score2;
+  const sets = match.sets||[];
+  const isCum = fmt==='cumulative';
+
+  let scoreCells='';
+  for(let i=0;i<slots;i++){
+    const s=sets[i];
+    const val=s?(num===1?s.score1:s.score2):null;
+    const otherVal=s?(num===1?s.score2:s.score1):null;
+    const isWin=!isCum&&val!==null&&otherVal!==null&&val>otherVal;
+    const color=val!==null?(isWin?'var(--green)':'var(--muted2)'):'var(--muted)';
+    scoreCells+=`<span style="display:inline-block;width:30px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:${color};">${val!==null?val:'—'}</span>`;
+  }
+
+  let tbCell='';
+  if(hasTB){
+    const tbVal=num===1?match.tiebreak1:match.tiebreak2;
+    tbCell=`<span style="display:inline-block;width:26px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--accent);">${tbVal!==null&&tbVal!==undefined?tbVal:'—'}</span>`;
+  }
+
+  const totalCell=score!==null&&score!==undefined
+    ?`<span style="display:inline-block;min-width:28px;text-align:right;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:${won?'var(--green)':'var(--accent)'};">${score}</span>`
+    :`<span style="display:inline-block;min-width:28px;"></span>`;
+
+  return `<div style="display:flex;align-items:center;padding:5px 8px;background:${won?'rgba(67,160,71,0.15)':'var(--surface3)'};border-radius:6px;border:1px solid ${won?'var(--green)':'transparent'};">
+    <span style="font-size:10px;color:var(--muted2);width:20px;">#${archer.seed||'?'}</span>
+    <span style="width:130px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;${won?'color:var(--green)':''};">${archer.name}</span>
+    ${scoreCells}${tbCell}${totalCell}
+    ${won?'<span style="margin-left:4px;font-size:14px;">🏆</span>':''}
+  </div>`;
+}
+
+/* ── MATCH RESULT MODAL ── */
+let pendingMatch = null;
+
+window.openMatchModal = (catKey,roundKey,matchIdx) => {
+  const data = (window._elimData||{})[catKey];
+  if(!data) return;
+  const match = data.rounds[roundKey][matchIdx];
+  pendingMatch = {catKey,roundKey,matchIdx,match,data};
+
+  const fmt = data.format;
+  const isSet = fmt==='sets';
+  const slots = (currentDiscipline==='3D'||currentDiscipline==='Field')?4:5;
+  const slotLabel = i => (currentDiscipline==='3D'||currentDiscipline==='Field')?`TARGET ${i+1}`:`SET ${i+1}`;
+
+  let setsHtml='';
+  if(isSet){
+    let sp1=0,sp2=0;
+    (match.sets||[]).forEach(s=>{
+      if(s.score1>s.score2) sp1+=2;
+      else if(s.score2>s.score1) sp2+=2;
+      else{sp1+=1;sp2+=1;}
+    });
+    setsHtml=`<div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+        <span id="set-points-display" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;">Set Points: ${sp1} — ${sp2}</span>
+        <span style="font-size:11px;color:var(--muted2);">(First to 6 wins)</span>
+      </div>`;
+    for(let i=0;i<slots;i++){
+      const s = match.sets?.[i]||{};
+      setsHtml+=`<div style="display:grid;grid-template-columns:1fr auto auto 1fr;gap:8px;align-items:center;margin-bottom:6px;">
+        <input type="number" id="ms1_${i}" value="${s.score1||''}" min="0" max="30" oninput="calcSetPoints()" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:6px;font-size:14px;outline:none;text-align:center;">
+        <span style="color:var(--muted2);font-size:12px;">${slotLabel(i)}</span>
+        <span style="color:var(--muted2);">—</span>
+        <input type="number" id="ms2_${i}" value="${s.score2||''}" min="0" max="30" oninput="calcSetPoints()" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:6px;font-size:14px;outline:none;text-align:center;">
+      </div>`;
+    }
+    setsHtml+='</div>';
+  } else {
+    setsHtml=`<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:12px;">
+      <div>
+        <label style="font-size:10px;color:var(--muted2);display:block;margin-bottom:4px;">${match.archer1?.name||'Archer 1'}</label>
+        <input type="number" id="cum_score1" value="${match.score1||''}" min="0" max="500" style="width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px;border-radius:6px;font-size:18px;outline:none;text-align:center;">
+      </div>
+      <span style="color:var(--muted2);font-size:18px;">—</span>
+      <div>
+        <label style="font-size:10px;color:var(--muted2);display:block;margin-bottom:4px;">${match.archer2?.name||'Archer 2'}</label>
+        <input type="number" id="cum_score2" value="${match.score2||''}" min="0" max="500" style="width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px;border-radius:6px;font-size:18px;outline:none;text-align:center;">
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('match-modal-title').textContent=`Match ${match.position} — ${match.archer1?.name||'?'} vs ${match.archer2?.name||'?'}`;
+  document.getElementById('match-modal-body').innerHTML=`
+    ${setsHtml}
+    <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:12px;margin-bottom:12px;">
+      <div style="font-size:11px;color:var(--muted2);margin-bottom:8px;font-weight:700;">TIEBREAK ARROW (if needed)</div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;">
+        <input type="number" id="tb1" value="${match.tiebreak1||''}" min="0" max="10" placeholder="Score" style="background:var(--surface3);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:6px;font-size:14px;outline:none;text-align:center;">
+        <span style="color:var(--muted2);">—</span>
+        <input type="number" id="tb2" value="${match.tiebreak2||''}" min="0" max="10" placeholder="Score" style="background:var(--surface3);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:6px;font-size:14px;outline:none;text-align:center;">
+      </div>
+    </div>
+    <div style="background:var(--surface2);border:1px solid var(--accent);border-radius:8px;padding:12px;">
+      <div style="font-size:11px;color:var(--accent);margin-bottom:10px;font-weight:700;">WINNER ✓ (required)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <button id="winner-btn-1" onclick="selectWinner(1)" style="padding:12px;border-radius:8px;border:2px solid ${match.winnerChoice===match.archer1?.id?'var(--green)':'var(--border2)'};background:${match.winnerChoice===match.archer1?.id?'rgba(67,160,71,0.2)':'var(--surface3)'};color:${match.winnerChoice===match.archer1?.id?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">
+          ${match.archer1?.name||'Archer 1'}
+        </button>
+        <button id="winner-btn-2" onclick="selectWinner(2)" style="padding:12px;border-radius:8px;border:2px solid ${match.winnerChoice===match.archer2?.id?'var(--green)':'var(--border2)'};background:${match.winnerChoice===match.archer2?.id?'rgba(67,160,71,0.2)':'var(--surface3)'};color:${match.winnerChoice===match.archer2?.id?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">
+          ${match.archer2?.name||'Archer 2'}
+        </button>
+      </div>
+    </div>`;
+  openModal('modal-match');
+};
+
+let selectedWinner = null;
+window.selectWinner = (num) => {
+  const match = pendingMatch?.match;
+  if(!match) return;
+  selectedWinner = num===1 ? match.archer1?.id : match.archer2?.id;
+  const btn1 = document.getElementById('winner-btn-1');
+  const btn2 = document.getElementById('winner-btn-2');
+  if(btn1&&btn2){
+    btn1.style.borderColor = num===1?'var(--green)':'var(--border2)';
+    btn1.style.background  = num===1?'rgba(67,160,71,0.2)':'var(--surface3)';
+    btn1.style.color       = num===1?'var(--green)':'var(--text)';
+    btn2.style.borderColor = num===2?'var(--green)':'var(--border2)';
+    btn2.style.background  = num===2?'rgba(67,160,71,0.2)':'var(--surface3)';
+    btn2.style.color       = num===2?'var(--green)':'var(--text)';
+  }
+};
+
+window.calcSetPoints = () => {
+  const slots = (currentDiscipline==='3D'||currentDiscipline==='Field')?4:5;
+  let sp1=0, sp2=0;
+  for(let i=0;i<slots;i++){
+    const v1 = document.getElementById(`ms1_${i}`)?.value;
+    const v2 = document.getElementById(`ms2_${i}`)?.value;
+    if(v1===''||v2===''||v1===null||v2===null) continue;
+    const s1=parseInt(v1)||0, s2=parseInt(v2)||0;
+    if(s1>s2) sp1+=2;
+    else if(s2>s1) sp2+=2;
+    else{sp1+=1;sp2+=1;}
+  }
+  const el = document.getElementById('set-points-display');
+  if(el){
+    el.textContent=`Set Points: ${sp1} — ${sp2}`;
+    el.style.color = sp1>=6?'var(--green)':sp2>=6?'var(--red)':'var(--text)';
+  }
+};
+
+window.saveMatchResult = async () => {
+  if(!pendingMatch){ closeModal('modal-match'); return; }
+  if(!selectedWinner && !pendingMatch.match.winnerChoice){ toast('Select a winner','error'); return; }
+  const {catKey,roundKey,matchIdx,match,data} = pendingMatch;
+  const isSet = data.format==='sets';
+  const winner = selectedWinner || match.winnerChoice;
+  const slots = (currentDiscipline==='3D'||currentDiscipline==='Field')?4:5;
+
+  let score1=null,score2=null,sets=[];
+  if(isSet){
+    for(let i=0;i<slots;i++){
+      const v1=document.getElementById(`ms1_${i}`)?.value;
+      const v2=document.getElementById(`ms2_${i}`)?.value;
+      if(v1!==''&&v2!=='') sets.push({score1:parseInt(v1)||0,score2:parseInt(v2)||0});
+    }
+    let sp1=0,sp2=0;
+    sets.forEach(s=>{
+      if(s.score1>s.score2) sp1+=2;
+      else if(s.score2>s.score1) sp2+=2;
+      else{sp1+=1;sp2+=1;}
+    });
+    score1=sp1; score2=sp2;
+  } else {
+    score1=parseInt(document.getElementById('cum_score1')?.value)||null;
+    score2=parseInt(document.getElementById('cum_score2')?.value)||null;
+  }
+
+  const tb1=document.getElementById('tb1')?.value;
+  const tb2=document.getElementById('tb2')?.value;
+
+  const updatedMatch={...match,sets,score1,score2,
+    tiebreak1:tb1?parseInt(tb1):null,
+    tiebreak2:tb2?parseInt(tb2):null,
+    winnerChoice:winner};
+
+  const updatedData = JSON.parse(JSON.stringify(data));
+  updatedData.rounds[roundKey][matchIdx]=updatedMatch;
+
+  await setDoc(doc(db,'competitions',currentCompId),{
+    elimination:{[catKey]:updatedData}
+  },{merge:true});
+
+  closeModal('modal-match');
+  selectedWinner=null;
+  toast('Result saved ✓','success');
+};
+
+window.advanceRound = async (catKey) => {
+  const data = (window._elimData||{})[catKey];
+  if(!data) return;
+  const roundOrder = ['R1','QF','SF'];
+  let lastRound=null, finalNext=false;
+  for(let i=0;i<roundOrder.length;i++){
+    const r=roundOrder[i];
+    if(data.rounds[r]&&data.rounds[r].length>0&&data.rounds[r].every(m=>m.winnerChoice)){
+      lastRound=r;
+      if(r==='SF') finalNext=true;
+    }
+  }
+  if(!lastRound){ toast('No completed round found','error'); return; }
+  const winners = (data.rounds[lastRound]||[]).map(m=>m.winnerChoice===m.archer1.id?m.archer1:m.archer2);
+  const losers  = (data.rounds[lastRound]||[]).map(m=>m.winnerChoice===m.archer1.id?m.archer2:m.archer1);
+  let newMatches=[];
+  if(finalNext || lastRound==='SF'){
+    newMatches=[{id:'f_m1',round:'F',position:1,archer1:winners[0],archer2:winners[1],sets:[],winner:null,score1:null,score2:null,tiebreak1:null,tiebreak2:null,winnerChoice:null}];
+    const bronzeMatches=[{id:'b_m1',round:'B',position:1,archer1:losers[0],archer2:losers[1],sets:[],winner:null,score1:null,score2:null,tiebreak1:null,tiebreak2:null,winnerChoice:null}];
+    data.rounds['F']=newMatches;
+    data.rounds['B']=bronzeMatches;
+  } else {
+    const nextRound = lastRound==='R1'?'QF':lastRound==='QF'?'SF':'SF';
+    for(let i=0;i<winners.length;i+=2){
+      newMatches.push({id:`${nextRound}_m${i/2+1}`,round:nextRound,position:i/2+1,archer1:winners[i],archer2:winners[i+1]||null,sets:[],winner:null,score1:null,score2:null,tiebreak1:null,tiebreak2:null,winnerChoice:null});
+    }
+    data.rounds[nextRound]=newMatches;
+  }
+  await setDoc(doc(db,'competitions',currentCompId),{elimination:{[catKey]:data}},{merge:true});
+  toast('Next round generated ✓','success');
+};
+
+window.deleteElimination = async (catKey) => {
+  if(!confirm('Delete this bracket?')) return;
+  const elim = {...(window._elimData||{})};
+  delete elim[catKey];
+  await setDoc(doc(db,'competitions',currentCompId),{elimination:elim},{merge:true});
+  toast('Bracket deleted','success');
+};
+
+window.openEditArcher = (id) => {
+  const archer = archers.find(a=>a.id===id);
+  if(!archer) return;
+  document.getElementById('edit-archer-id').value = id;
+  document.getElementById('edit-fname').value = archer.fname||archer.name?.split(' ')[0]||'';
+  document.getElementById('edit-lname').value = archer.lname||archer.name?.split(' ').slice(1).join(' ')||'';
+  document.getElementById('edit-club').value = archer.club||'';
+  document.getElementById('edit-bow').value = archer.bow||'Recurve';
+  document.getElementById('edit-age').value = archer.age||'Senior';
+  document.getElementById('edit-gender').value = archer.gender||'M';
+  openModal('modal-edit-archer');
+};
+
+window.saveEditArcher = async () => {
+  const id = document.getElementById('edit-archer-id').value;
+  const archer = archers.find(a=>a.id===id);
+  if(!archer) return;
+  const fname = document.getElementById('edit-fname').value.trim();
+  const lname = document.getElementById('edit-lname').value.trim();
+  if(!fname||!lname){ toast('Enter first and last name','error'); return; }
+  archer.fname=fname; archer.lname=lname; archer.name=`${fname} ${lname}`;
+  archer.club=document.getElementById('edit-club').value.trim();
+  archer.bow=document.getElementById('edit-bow').value;
+  archer.age=document.getElementById('edit-age').value;
+  archer.gender=document.getElementById('edit-gender').value;
+  targets.forEach(t=>['A','B','C','D'].forEach(s=>{
+    if(t[s]&&t[s].id===id){t[s].name=archer.name;t[s].bow=archer.bow;t[s].age=archer.age;t[s].gender=archer.gender;}
+  }));
+  await saveArchers(); await saveTargets();
+  closeModal('modal-edit-archer');
+  renderAll();
+  toast(`${archer.name} updated ✓`,'success');
+};
+
+/* ── INIT ── */
+loadCompetitions();
+document.getElementById('conn-status').textContent='🟡 Connecting...';
+setTimeout(()=>{if(!currentCompId)document.getElementById('conn-status').textContent='🟢 Firebase ready';},1500);
+document.querySelectorAll('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 </script>
 </body>
 </html>
