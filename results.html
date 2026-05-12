@@ -193,7 +193,7 @@ function renderElimDisplay(elimData, discipline) {
         }
 
         html+=`<div style="background:var(--surface);border:1px solid ${done?'var(--green)':'var(--border2)'};
-          border-radius:8px;padding:10px;${rk==='F'?'border-width:2px;':''}" >
+          border-radius:8px;padding:6px;overflow:hidden;${rk==='F'?'border-width:2px;':''}" >
           ${renderMatchRowDisplay(match.archer1, w1, score1, match.sets, 1, data.format, slots, match)}
           <div style="height:3px;"></div>
           ${renderMatchRowDisplay(match.archer2, w2, score2, match.sets, 2, data.format, slots, match)}
@@ -254,15 +254,15 @@ function renderMatchRowDisplay(archer, won, score, sets, archerNum, fmt, slots, 
     }
   }
   const showTotal = score!==''&&score!==null&&score!==undefined;
-  return `<div style="display:flex;align-items:center;gap:4px;padding:4px 6px;width:100%;
-    border-radius:5px;background:${won?'rgba(67,160,71,0.15)':'transparent'};border:1px solid ${won?'var(--green)':'transparent'};">
-    <span style="font-size:10px;color:var(--muted2);min-width:18px;">#${archer.seed||'?'}</span>
-    <span style="min-width:110px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;
+  return `<div style="display:flex;align-items:center;gap:4px;padding:5px 8px;width:100%;box-sizing:border-box;
+    border-radius:6px;background:${won?'rgba(67,160,71,0.15)':'transparent'};border:1px solid ${won?'var(--green)':'transparent'};">
+    <span style="font-size:10px;color:var(--muted2);width:20px;flex-shrink:0;">#${archer.seed||'?'}</span>
+    <span style="min-width:110px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;flex-shrink:0;
       color:${won?'var(--green)':'var(--text)'};">${archer.name}</span>
-    ${setScores}
-    ${showTotal?`<span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;min-width:24px;text-align:right;
-        color:${won?'var(--green)':'var(--accent)'};">${score}</span>`:'<span style="min-width:24px;"></span>'}
-    ${won?'<span style="font-size:12px;margin-left:2px;">🏆</span>':'<span style="width:16px;"></span>'}
+    <span style="flex:1;display:flex;gap:2px;align-items:center;">${setScores}</span>
+    ${showTotal?`<span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;width:28px;text-align:right;flex-shrink:0;
+        color:${won?'var(--green)':'var(--accent)'};">${score}</span>`:'<span style="width:28px;"></span>'}
+    <span style="width:18px;text-align:center;flex-shrink:0;font-size:13px;">${won?'🏆':''}</span>
   </div>`;
 }
 
