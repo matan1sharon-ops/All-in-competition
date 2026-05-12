@@ -175,8 +175,24 @@ function renderElimDisplay(elimData, discipline) {
           else{sp1+=1;sp2+=1;}
         });
 
-        const score1 = isSet ? (done||sp1>0?sp1:'') : (match.score1??'');
-        const score2 = isSet ? (done||sp2>0?sp2:'') : (match.score2??'');
+        // For cumulative: calculate live from sets array if match.score1 not yet set
+        let score1, score2;
+        if(isSet){
+          score1 = (done||sp1>0) ? sp1 : '';
+          score2 = (done||sp2>0) ? sp2 : '';
+        } else {
+          const cumSets = match.sets||[];
+          const liveTot1 = cumSets.reduce((t,s)=>t+(s.score1||0),0);
+          const liveTot2 = cumSets.reduce((t,s)=>t+(s.score2||0),0);
+          const hasCumData = cumSets.length>0;
+          score1 = hasCumData ? liveTot1 : (match.score1??'');
+          score2 = hasCumData ? liveTot2 : (match.score2??'');
+          // Add TB
+          if(match.tiebreak1!==null&&match.tiebreak1!==undefined){
+            score1 = (hasCumData?liveTot1:(match.score1||0));
+            score2 = (hasCumData?liveTot2:(match.score2||0));
+          }
+        }
 
         // Set scores per end
         let setsHtml='';
@@ -254,15 +270,18 @@ function renderMatchRowDisplay(archer, won, score, sets, archerNum, fmt, slots, 
     }
   }
   const showTotal = score!==''&&score!==null&&score!==undefined;
-  return `<div style="display:flex;align-items:center;gap:4px;padding:5px 8px;width:100%;box-sizing:border-box;
-    border-radius:6px;background:${won?'rgba(67,160,71,0.15)':'transparent'};border:1px solid ${won?'var(--green)':'transparent'};">
+  const isWinner = won===true;
+  const bg = isWinner?'rgba(67,160,71,0.15)':'transparent';
+  const bd = isWinner?'1px solid var(--green)':'1px solid transparent';
+  const nameColor = isWinner?'var(--green)':'var(--text)';
+  const totalColor = isWinner?'var(--green)':'var(--accent)';
+  const trophy = isWinner?'🏆':'';
+  return `<div style="display:flex;align-items:center;gap:4px;padding:5px 8px;width:100%;box-sizing:border-box;border-radius:6px;background:${bg};border:${bd};">
     <span style="font-size:10px;color:var(--muted2);width:20px;flex-shrink:0;">#${archer.seed||'?'}</span>
-    <span style="min-width:110px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;flex-shrink:0;
-      color:${won?'var(--green)':'var(--text)'};">${archer.name}</span>
-    <span style="display:flex;gap:2px;align-items:center;margin-right:auto;">${setScores}</span>
-    ${showTotal?`<span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;width:28px;text-align:right;flex-shrink:0;
-        color:${won?'var(--green)':'var(--accent)'};">${score}</span>`:'<span style="width:28px;"></span>'}
-    <span style="width:18px;text-align:center;flex-shrink:0;font-size:14px;">${won?'🏆':''}</span>
+    <span style="min-width:100px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;flex-shrink:0;color:${nameColor};">${archer.name}</span>
+    <span style="display:flex;gap:2px;align-items:center;flex:1;">${setScores}</span>
+    <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;width:26px;text-align:right;flex-shrink:0;color:${totalColor};">${showTotal?score:''}</span>
+    <span style="width:18px;text-align:center;flex-shrink:0;font-size:14px;">${trophy}</span>
   </div>`;
 }
 
