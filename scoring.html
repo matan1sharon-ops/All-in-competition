@@ -1154,19 +1154,17 @@ window.handleMatchBack=()=>{
     const arrows=[...getMatchArrows(si,matchActiveArcher)];
     if(arrows.length>0){arrows.pop();setMatchArrows(si,matchActiveArcher,arrows);}
   } else {
-    // On back: if current archer has no arrows in this target, switch back to other archer
     const aPerT = getArrowsPerSet();
     const myCum = matchActiveArcher===0?cumArrows1:cumArrows2;
     const otherCum = matchActiveArcher===0?cumArrows2:cumArrows1;
     if(myCum.length>0){
       myCum.pop();
     } else if(otherCum.length>0){
-      // Switch to other archer and pop their last arrow
       matchActiveArcher = 1-matchActiveArcher;
       otherCum.pop();
       renderMatchTabs();
     }
-    await saveMatchProgress();
+    saveMatchProgress(); // fire and forget - no await needed
   }
   renderMatchSets();renderMatchPad();updateMatchHeader();
 };
