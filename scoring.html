@@ -249,7 +249,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, doc, getDoc, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To",
@@ -262,7 +262,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
-const storage = getStorage(app);
+
 
 /* ══════════════════════════════════════════
    SHARED STATE
