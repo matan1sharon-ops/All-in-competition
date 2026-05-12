@@ -254,15 +254,15 @@ function renderMatchRowDisplay(archer, won, score, sets, archerNum, fmt, slots, 
     }
   }
   const showTotal = score!==''&&score!==null&&score!==undefined;
-  return `<div style="display:flex;align-items:center;gap:4px;padding:4px 6px;
-    border-radius:5px;background:${won?'rgba(67,160,71,0.15)':'transparent'};">
+  return `<div style="display:flex;align-items:center;gap:4px;padding:4px 6px;width:100%;
+    border-radius:5px;background:${won?'rgba(67,160,71,0.15)':'transparent'};border:1px solid ${won?'var(--green)':'transparent'};">
     <span style="font-size:10px;color:var(--muted2);min-width:18px;">#${archer.seed||'?'}</span>
     <span style="min-width:110px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;
       color:${won?'var(--green)':'var(--text)'};">${archer.name}</span>
     ${setScores}
     ${showTotal?`<span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;min-width:24px;text-align:right;
         color:${won?'var(--green)':'var(--accent)'};">${score}</span>`:'<span style="min-width:24px;"></span>'}
-    ${won?'<span style="font-size:12px;">🏆</span>':''}
+    ${won?'<span style="font-size:12px;margin-left:2px;">🏆</span>':'<span style="width:16px;"></span>'}
   </div>`;
 }
 
