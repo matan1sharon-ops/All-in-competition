@@ -315,6 +315,7 @@ window.setView = (view) => {
     btnElim.style.color = view==='elim'?'#000':'var(--muted2)';
     btnElim.style.borderColor = view==='elim'?'var(--accent)':'var(--border2)';
   }
+  _lastQualHash = ''; // force re-render on view switch
   if(lastData) renderResults(lastData);
 };
 
@@ -368,7 +369,7 @@ function renderResults(data) {
   const qualHash = JSON.stringify({archers:data.archers, scores:data.scores});
   const main2 = document.getElementById('main');
   const scrollTop2 = main2 ? main2.scrollTop : 0;
-  if(qualHash === _lastQualHash && currentView==='qual'){
+  if(qualHash === _lastQualHash && currentView==='qual' && document.getElementById('main').innerHTML.includes('cat-block')){
     return;
   }
   _lastQualHash = qualHash;
