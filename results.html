@@ -154,7 +154,7 @@ function renderElimDisplay(elimData, discipline) {
       if(!matches||!matches.length) return;
       const label = roundLabels[rk]||rk;
 
-      html+=`<div style="flex:1;min-width:200px;max-width:320px;">
+      html+=`<div style="flex:1;min-width:280px;max-width:480px;">
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;
           letter-spacing:1px;color:var(--muted2);text-transform:uppercase;margin-bottom:8px;
           padding-bottom:4px;border-bottom:1px solid var(--border2);">${label}</div>
@@ -260,13 +260,13 @@ function renderMatchRowDisplay(archer, won, score, sets, archerNum, fmt, slots, 
         color=rawVal>rawOther?'var(--green)':rawVal<rawOther?'var(--muted2)':'var(--accent)';
       }
       setScores+=`<span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;
-        color:${color};min-width:24px;text-align:center;display:inline-block;">${displayVal!==null?displayVal:'—'}</span>`;
+        color:${color};width:22px;text-align:center;display:inline-block;flex-shrink:0;">${displayVal!==null?displayVal:'—'}</span>`;
     }
     // TB column
     if(hasTB){
       const tbColor = tbVal!==null?'var(--accent)':'var(--muted)';
       setScores+=`<span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;
-        color:${tbColor};min-width:24px;text-align:center;display:inline-block;">${tbVal!==null?tbVal:'—'}</span>`;
+        color:${tbColor};width:22px;text-align:center;display:inline-block;flex-shrink:0;">${tbVal!==null?tbVal:'—'}</span>`;
     }
   }
   const showTotal = score!==''&&score!==null&&score!==undefined;
@@ -278,7 +278,7 @@ function renderMatchRowDisplay(archer, won, score, sets, archerNum, fmt, slots, 
   const trophy = isWinner?'🏆':'';
   return `<div style="display:flex;align-items:center;gap:4px;padding:5px 8px;width:100%;box-sizing:border-box;border-radius:6px;background:${bg};border:${bd};">
     <span style="font-size:10px;color:var(--muted2);width:20px;flex-shrink:0;">#${archer.seed||'?'}</span>
-    <span style="min-width:100px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;flex-shrink:0;color:${nameColor};">${archer.name}</span>
+    <span style="width:90px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${nameColor};">${archer.name}</span>
     <span style="display:flex;gap:2px;align-items:center;flex:1;">${setScores}</span>
     <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;width:26px;text-align:right;flex-shrink:0;color:${totalColor};">${showTotal?score:''}</span>
     <span style="width:18px;text-align:center;flex-shrink:0;font-size:14px;">${trophy}</span>
