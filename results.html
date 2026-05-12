@@ -369,12 +369,15 @@ function renderResults(data) {
   const qualHash = JSON.stringify({archers:data.archers, scores:data.scores});
   const main2 = document.getElementById('main');
   const scrollTop2 = main2 ? main2.scrollTop : 0;
-  // Only re-render qual if data changed OR we just switched to qual view
+  // Check for elimination data
+  const elimData = data.elimination || {};
+  const hasElim = Object.keys(elimData).length > 0;
+
   if(currentView==='elim'){
     renderElimDisplay(elimData, data.discipline||'Outdoor');
     return;
   }
-  // qual view - always render if we got here
+  // qual view - always render
   _lastQualHash = qualHash;
 
   // Only archers with scores
@@ -384,10 +387,6 @@ function renderResults(data) {
       const s=getScore(scores,a.id);
       return {...a, total:s.total||0, g1:s.g1||0, g2:s.g2||0, h1:s.h1||0, h2:s.h2||0};
     });
-
-  // Check for elimination data
-  const elimData = data.elimination || {};
-  const hasElim = Object.keys(elimData).length > 0;
 
   if(!scored.length){
     document.getElementById('main').innerHTML=`
