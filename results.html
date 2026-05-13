@@ -79,7 +79,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
   <span class="refresh-badge" id="last-update"></span>
 </div>
 
-<div class="main" id="main">
+<div class="main" id="main"><div id="qual-content"></div><div id="elim-content" style="display:none;"></div>
   <div class="no-comp">
     <div class="icon">🏆</div>
     <p>Select a competition above<br>to show live results.</p>
@@ -120,7 +120,7 @@ setInterval(()=>{
 /* ── ELIMINATION DISPLAY ── */
 let _lastElimHash = '';
 function renderElimDisplay(elimData, discipline) {
-  const main = document.getElementById('main');
+  const main = document.getElementById('elim-content');
   // Only re-render if data actually changed
   const scrollTop = main.scrollTop;
   const roundOrder = ['R1','QF','SF','F','B'];
@@ -299,6 +299,7 @@ let lastData = null;
 
 window.setView = (view) => {
   currentView = view;
+  // Update button styles
   const btnQual = document.getElementById('btn-qual');
   const btnElim = document.getElementById('btn-elim');
   if(btnQual && btnElim){
@@ -309,9 +310,18 @@ window.setView = (view) => {
     btnElim.style.color = view==='elim'?'#000':'var(--muted2)';
     btnElim.style.borderColor = view==='elim'?'var(--accent)':'var(--border2)';
   }
-  _lastQualHash = '';
-  _lastElimHash = '';
-  if(lastData) renderResults(lastData);
+  // Show/hide the two content divs directly
+  const qualDiv = document.getElementById('qual-content');
+  const elimDiv = document.getElementById('elim-content');
+  if(qualDiv && elimDiv){
+    qualDiv.style.display = view==='qual'?'block':'none';
+    elimDiv.style.display = view==='elim'?'block':'none';
+  } else {
+    // Fallback: re-render
+    _lastQualHash = '';
+    _lastElimHash = '';
+    if(lastData) renderResults(lastData);
+  }
 };
 
 window.selectComp = (id) => {
@@ -358,18 +368,14 @@ function renderResults(data) {
 
   // Only re-render if data changed
   const qualHash = JSON.stringify({archers:data.archers, scores:data.scores});
-  const main2 = document.getElementById('main');
-  const scrollTop2 = main2 ? main2.scrollTop : 0;
+  const scrollTop2 = 0;
   // Check for elimination data
   const elimData = data.elimination || {};
   const hasElim = Object.keys(elimData).length > 0;
 
-  if(currentView==='elim'){
-    renderElimDisplay(elimData, data.discipline||'Outdoor');
-    return;
-  }
-  // qual view - always render
-  _lastQualHash = qualHash;
+  // Always render both views into their own divs
+  renderElimDisplay(elimData, data.discipline||'Outdoor');
+  // qual view below
 
   // Only archers with scores
   const scored = archers
@@ -380,7 +386,7 @@ function renderResults(data) {
     });
 
   if(!scored.length){
-    document.getElementById('main').innerHTML=`
+    document.getElementById('qual-content').innerHTML=`
       <div class="no-comp">
         <div class="icon">⏳</div>
         <p>No scores yet.<br>Results will appear here as archers complete their rounds.</p>
@@ -470,13 +476,8 @@ function renderResults(data) {
     </div>`;
   });
   html+='</div>';
-  const main3 = document.getElementById('main');
-  const newQHash = html.replace(/\s+/g,' ');
-  // Always render when switching views; skip only if same view and same data
-  _lastQualHash = newQHash;
-  const st = main3.scrollTop;
-  main3.innerHTML=html;
-  requestAnimationFrame(()=>{ main3.scrollTop = st; });
+  const main3 = document.getElementById('qual-content');
+  if(main3) main3.innerHTML=html;
 }
 
 loadComps();
