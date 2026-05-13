@@ -333,13 +333,9 @@ window.selectComp = (id) => {
     const toggle = document.getElementById('view-toggle');
     if(toggle) toggle.style.display = hasElim ? 'flex' : 'none';
 
-    // Only re-render when data actually changed
-    const newJson = JSON.stringify({scores:d.scores, archers:d.archers, elimination:d.elimination});
-    if(newJson !== window._lastDataJson){
-      window._lastDataJson = newJson;
-      if(_renderTimer) clearTimeout(_renderTimer);
-      _renderTimer = setTimeout(()=>renderResults(d), 150);
-    }
+    // Re-render on data change (debounced)
+    if(_renderTimer) clearTimeout(_renderTimer);
+    _renderTimer = setTimeout(()=>renderResults(d), 150);
   });
 };
 
