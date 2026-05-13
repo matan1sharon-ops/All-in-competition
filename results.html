@@ -315,8 +315,8 @@ window.setView = (view) => {
     btnElim.style.color = view==='elim'?'#000':'var(--muted2)';
     btnElim.style.borderColor = view==='elim'?'var(--accent)':'var(--border2)';
   }
-  _lastQualHash = '';   // force re-render on view switch
-  _lastElimHash = '';   // force elim re-render too
+  _lastQualHash = '__force__';  // force re-render on view switch
+  _lastElimHash = '__force__';  // force elim re-render too
   if(lastData) renderResults(lastData);
 };
 
@@ -482,8 +482,9 @@ function renderResults(data) {
   html+='</div>';
   const main3 = document.getElementById('main');
   const newQHash = html.replace(/\s+/g,' ');
-  if(main3._lastQualHash === newQHash) return;
-  main3._lastQualHash = newQHash;
+  // Always render when switching views; skip only if same view and same data
+  if(_lastQualHash === newQHash && currentView === 'qual') return;
+  _lastQualHash = newQHash;
   const st = main3.scrollTop;
   main3.innerHTML=html;
   requestAnimationFrame(()=>{ main3.scrollTop = st; });
