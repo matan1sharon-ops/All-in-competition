@@ -301,7 +301,7 @@ window.addSession=async()=>{if(!currentCompId){toast('Select a competition first
 window.deleteSession=async(id)=>{sessions=sessions.filter(s=>s.id!==id);await saveSessions();renderSessions();};
 function renderSessions(){const list=document.getElementById('sessions-list');list.innerHTML=sessions.length?sessions.map(s=>`<div class="session-block"><div class="session-time">${s.time||'--:--'}</div><div class="session-info"><div class="session-name">${s.name}</div><div class="session-sub">${s.date||''} · ${s.dist} · ${s.ends} ends × ${s.arrows} arrows</div></div><button class="btn btn-danger btn-sm" onclick="deleteSession(${s.id})">✕</button></div>`).join(''):'<div class="empty-state"><div class="empty-icon">⏰</div><p>No sessions yet.</p></div>';}
 
-/* ── RESULTS — side-by-side grid layout ── */
+/* ── RESULTS — balanced columns + medals ── */
 window.renderResults=()=>{
   const container=document.getElementById('results-by-category');
   if(!container)return;
@@ -314,36 +314,41 @@ window.renderResults=()=>{
   scoredArchers.forEach(a=>{const key=`${a.bow}||${a.age}||${a.gender}`;if(!catMap[key])catMap[key]={bow:a.bow,age:a.age,gender:a.gender,archers:[]};catMap[key].archers.push(a);});
   const sortedCats=Object.values(catMap).sort((a,b)=>{const bi=BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);if(bi!==0)return bi;const ai=AGE_ORDER.indexOf(a.age)-AGE_ORDER.indexOf(b.age);if(ai!==0)return ai;return a.gender.localeCompare(b.gender);});
 
-  /* ── build each category as a card ── */
+  /* ── pick balanced column count based on number of categories ── */
+  const n=sortedCats.length;
+  const cols=n<=1?1:n===2?2:n<=4?2:n<=6?3:n<=9?3:4;
+
+  const medal=i=>i===0?'🥇':i===1?'🥈':i===2?'🥉':`<span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--muted2);">${i+1}</span>`;
+
   let catCards='';
   sortedCats.forEach(cat=>{
     const ranked=[...cat.archers].sort((a,b)=>b.total-a.total||b.g1-a.g1||b.g2-a.g2);
     const color=BOW_COLORS[cat.bow]||'#555';
     const gLabel=cat.gender==='M'?'Men':'Women';
     catCards+=`
-      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;min-width:0;">
         <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${color}22;border-bottom:1px solid ${color}44;">
-          <span style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;letter-spacing:1px;color:${color};">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</span>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:1px;color:${color};">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</span>
           <span style="font-size:11px;color:var(--muted2);margin-left:auto;">${ranked.length} archer${ranked.length!==1?'s':''}</span>
         </div>
         <div class="table-wrap">
           <table>
             <thead><tr>
-              <th style="width:32px;">Rank</th>
+              <th style="width:36px;text-align:center;"></th>
               <th>Name</th>
-              <th>Score</th>
-              ${showHalves?'<th>H1</th><th>H2</th>':''}
-              <th>${labels.g1}</th>
-              <th>${labels.g2}</th>
+              <th style="text-align:center;">Score</th>
+              ${showHalves?'<th style="text-align:center;">H1</th><th style="text-align:center;">H2</th>':''}
+              <th style="text-align:center;">${labels.g1}</th>
+              <th style="text-align:center;">${labels.g2}</th>
             </tr></thead>
             <tbody>
-              ${ranked.map((a,i)=>`<tr>
-                <td style="color:#FFD700;font-weight:900;text-align:center;">${i+1}</td>
-                <td style="color:#111;font-weight:600;">${a.name}</td>
-                <td style="font-weight:900;font-size:15px;color:#111;">${a.total}</td>
-                ${showHalves?`<td style="color:#555;">${a.h1||'—'}</td><td style="color:#555;">${a.h2||'—'}</td>`:''}
-                <td style="color:#111;">${a.g1||'—'}</td>
-                <td style="color:#111;">${a.g2||'—'}</td>
+              ${ranked.map((a,i)=>`<tr style="${i===0?'background:#fffde7;':i===1?'background:#f9f9f9;':i===2?'background:#fff8f0;':''}">
+                <td style="text-align:center;font-size:16px;padding:8px 4px;">${medal(i)}</td>
+                <td style="color:#111;font-weight:${i<3?'700':'600'};font-size:${i===0?'14px':'13px'};">${a.name}</td>
+                <td style="font-weight:900;font-size:${i===0?'16px':'14px'};color:${i===0?'#c62828':i===1?'#37474f':i===2?'#bf360c':'#111'};text-align:center;">${a.total}</td>
+                ${showHalves?`<td style="color:#555;text-align:center;font-size:12px;">${a.h1||'—'}</td><td style="color:#555;text-align:center;font-size:12px;">${a.h2||'—'}</td>`:''}
+                <td style="color:#111;text-align:center;font-size:12px;">${a.g1||'—'}</td>
+                <td style="color:#111;text-align:center;font-size:12px;">${a.g2||'—'}</td>
               </tr>`).join('')}
             </tbody>
           </table>
@@ -351,7 +356,7 @@ window.renderResults=()=>{
       </div>`;
   });
 
-  const html=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:16px;">${catCards}</div>`;
+  const html=`<div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:14px;">${catCards}</div>`;
   const newHash=html.length+html.slice(0,200);
   if(container._lastHash===newHash)return;
   container._lastHash=newHash;
