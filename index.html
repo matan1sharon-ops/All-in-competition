@@ -234,19 +234,11 @@ tbody td{padding:10px 12px;color:#111;}
       </div>
       <!-- ELIMINATION -->
       <div id="panel-elimination" class="panel" style="height:100%;display:flex;flex-direction:column;">
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:0;flex-shrink:0;">
-          <div class="card-title">⚔️ Elimination Rounds</div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;">
-            <button class="btn btn-secondary btn-sm" onclick="copyMatchLink()" style="margin-left:auto;">🔗 SHARE MATCH SCORING LINK</button>
-          </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
-            <div class="form-group" style="min-width:180px;"><label>Category</label><select id="elim-cat-select" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;width:100%;"></select></div>
-            <div class="form-group" style="min-width:140px;"><label>Bracket</label><select id="elim-bracket" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;width:100%;"><option value="8">1/8 — Top 16</option><option value="4">1/4 — Top 8</option><option value="2">1/2 — Top 4</option></select></div>
-            <button class="btn btn-primary" onclick="generateElimination()">⚡ GENERATE BRACKET</button>
-            <button class="btn btn-success" onclick="generateAllElimination()">⚡ GENERATE ALL</button>
-          </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 20px;margin-bottom:0;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;">
+          <div class="card-title" style="margin-bottom:0;">⚔️ Elimination Rounds</div>
+          <button class="btn btn-secondary btn-sm" onclick="copyMatchLink()">🔗 SHARE MATCH SCORING LINK</button>
         </div>
-        <div id="elim-content" style="flex:1;overflow-y:auto;overflow-anchor:none;margin-top:12px;"></div>
+                <div id="elim-content" style="flex:1;overflow-y:auto;overflow-anchor:none;margin-top:12px;"></div>
       </div>
     </div>
   </div>
