@@ -14,8 +14,6 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
-
-/* HEADER */
 .header{background:var(--surface);border-bottom:2px solid var(--accent);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 .header-logo{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;letter-spacing:4px;color:var(--accent);}
 .header-comp{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:var(--text);letter-spacing:1px;}
@@ -24,14 +22,10 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 .live-label{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--green);letter-spacing:1px;}
 .header-time{font-size:13px;color:var(--muted2);}
-
-/* MAIN */
 .main{flex:1;padding:20px;overflow:hidden;}
 .no-comp{text-align:center;padding:80px 20px;color:var(--muted2);}
 .no-comp .icon{font-size:64px;margin-bottom:16px;}
 .no-comp p{font-size:16px;line-height:1.8;}
-
-/* CATEGORIES GRID — side by side */
 .categories-grid{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;}
 .cat-block{background:var(--surface);border:1px solid var(--border2);border-radius:12px;overflow:hidden;flex:1;min-width:220px;max-width:340px;}
 .cat-header{padding:10px 14px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;letter-spacing:1px;border-bottom:1px solid var(--border2);}
@@ -39,17 +33,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
 .cat-table tr{border-bottom:1px solid var(--border);}
 .cat-table tr:last-child{border-bottom:none;}
 .cat-table td{padding:8px 12px;font-size:15px;}
-.rank{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;width:32px;text-align:center;}
-.rank-1{color:#FFD700;}
-.rank-2{color:#C0C0C0;}
-.rank-3{color:#CD7F32;}
-.rank-n{color:var(--muted2);}
-.archer-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;}
-.archer-score{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--accent);text-align:right;min-width:46px;}
-.archer-half{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--muted2);text-align:right;min-width:38px;}
-.archer-stat{font-size:12px;color:var(--muted2);text-align:right;min-width:36px;white-space:nowrap;}
-
-/* SELECTOR */
+.rank-1{color:#FFD700;} .rank-2{color:#C0C0C0;} .rank-3{color:#CD7F32;} .rank-n{color:var(--muted2);}
 .selector-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
 .selector-bar label{font-size:12px;color:var(--muted2);font-weight:600;}
 .selector-bar select{background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:6px 10px;border-radius:6px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;}
@@ -79,7 +63,9 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
   <span class="refresh-badge" id="last-update"></span>
 </div>
 
-<div class="main" id="main"><div id="qual-content"></div><div id="elim-content" style="display:none;"></div>
+<div class="main" id="main">
+  <div id="qual-content"></div>
+  <div id="elim-content" style="display:none;"></div>
   <div class="no-comp">
     <div class="icon">🏆</div>
     <p>Select a competition above<br>to show live results.</p>
@@ -87,190 +73,97 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, doc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getFirestore,collection,doc,getDocs,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To",
-  authDomain: "all-in-competition.firebaseapp.com",
-  projectId: "all-in-competition",
-  storageBucket: "all-in-competition.firebasestorage.app",
-  messagingSenderId: "620146958631",
-  appId: "1:620146958631:web:1e88019d1436372689c902"
-};
+const firebaseConfig={apiKey:"AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To",authDomain:"all-in-competition.firebaseapp.com",projectId:"all-in-competition",storageBucket:"all-in-competition.firebasestorage.app",messagingSenderId:"620146958631",appId:"1:620146958631:web:1e88019d1436372689c902"};
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
 
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
+const BOW_ORDER=['Recurve','Compound','Barebow','Traditional','Longbow'];
+const AGE_ORDER=['U12','U14','U18','U21','Senior','Master 50+','Master 60+'];
+const BOW_COLORS={Recurve:'#1565c0',Compound:'#4a148c',Barebow:'#1b5e20',Traditional:'#e65100',Longbow:'#37474f'};
 
-const BOW_ORDER = ['Recurve','Compound','Barebow','Traditional','Longbow'];
-const AGE_ORDER = ['U12','U14','U18','U21','Senior','Master 50+','Master 60+'];
-const BOW_COLORS = {
-  Recurve:'#1565c0', Compound:'#4a148c', Barebow:'#1b5e20',
-  Traditional:'#e65100', Longbow:'#37474f'
-};
+let unsubscribe=null;
 
-let unsubscribe = null;
-
-// Clock
-setInterval(()=>{
-  document.getElementById('clock').textContent =
-    new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-},1000);
+setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});},1000);
 
 /* ── ELIMINATION DISPLAY ── */
-let _lastElimHash = '';
-function renderElimDisplay(elimData, discipline) {
-  const main = document.getElementById('elim-content');
-  // Only re-render if data actually changed
-  const scrollTop = main.scrollTop;
-  const roundOrder = ['R1','QF','SF','F','B'];
-  const roundLabels = {
-    R1:'Round of 16', QF:'Quarter Finals', SF:'Semi Finals',
-    F:'🏆 Final', B:'🥉 Bronze Medal'
-  };
-
-  let html = '<div style="display:flex;flex-direction:column;gap:20px;">';
-
-  Object.entries(elimData).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([catKey, data])=>{
-    const gLabel = data.gender==='M'?'MEN':'WOMEN';
-    const formatLabel = data.format==='sets'?'Set System':'Cumulative';
-
-    html += `<div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;
-        letter-spacing:2px;color:var(--accent);padding:8px 0 12px;">
-        ${data.bow.toUpperCase()} · ${data.age} · ${gLabel}
-        <span style="font-size:12px;color:var(--muted2);font-weight:400;margin-left:12px;">${formatLabel}</span>
-      </div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;">`;
-
+function renderElimDisplay(elimData,discipline){
+  const main=document.getElementById('elim-content');
+  const scrollTop=main.scrollTop;
+  const roundOrder=['R1','QF','SF','F','B'];
+  const roundLabels={R1:'Round of 16',QF:'Quarter Finals',SF:'Semi Finals',F:'🏆 Final',B:'🥉 Bronze Medal'};
+  let html='<div style="display:flex;flex-direction:column;gap:20px;">';
+  Object.entries(elimData).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([catKey,data])=>{
+    const gLabel=data.gender==='M'?'MEN':'WOMEN';
+    const formatLabel=data.format==='sets'?'Set System':'Cumulative';
+    html+=`<div><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;letter-spacing:2px;color:var(--accent);padding:8px 0 12px;">${data.bow.toUpperCase()} · ${data.age} · ${gLabel}<span style="font-size:12px;color:var(--muted2);font-weight:400;margin-left:12px;">${formatLabel}</span></div><div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;">`;
     roundOrder.forEach(rk=>{
-      const matches = data.rounds?.[rk];
-      if(!matches||!matches.length) return;
-      const label = roundLabels[rk]||rk;
-
-      html+=`<div style="flex:1;min-width:240px;max-width:380px;">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;
-          letter-spacing:1px;color:var(--muted2);text-transform:uppercase;margin-bottom:8px;
-          padding-bottom:4px;border-bottom:1px solid var(--border2);">${label}</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">`;
-
+      const matches=data.rounds?.[rk];
+      if(!matches||!matches.length)return;
+      const label=roundLabels[rk]||rk;
+      html+=`<div style="flex:1;min-width:240px;max-width:380px;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:var(--muted2);text-transform:uppercase;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border2);">${label}</div><div style="display:flex;flex-direction:column;gap:8px;">`;
       matches.forEach(match=>{
-        const done = !!match.winnerChoice;
-        const w1 = match.winnerChoice && String(match.winnerChoice)===String(match.archer1?.id);
-        const w2 = match.winnerChoice && String(match.winnerChoice)===String(match.archer2?.id);
-        const isSet = data.format==='sets';
-        const slots = (discipline==='3D'||discipline==='Field')?4:5;
-
-        // Calculate set points
+        const done=!!match.winnerChoice;
+        const w1=match.winnerChoice&&String(match.winnerChoice)===String(match.archer1?.id);
+        const w2=match.winnerChoice&&String(match.winnerChoice)===String(match.archer2?.id);
+        const isSet=data.format==='sets';
+        const slots=(discipline==='3D'||discipline==='Field')?4:5;
         let sp1=0,sp2=0;
-        (match.sets||[]).forEach(s=>{
-          if(s.score1>s.score2) sp1+=2;
-          else if(s.score2>s.score1) sp2+=2;
-          else{sp1+=1;sp2+=1;}
-        });
-
-        // For cumulative: calculate live from sets array if match.score1 not yet set
-        let score1, score2;
-        if(isSet){
-          score1 = (done||sp1>0) ? sp1 : '';
-          score2 = (done||sp2>0) ? sp2 : '';
-        } else {
-          const cumSets = match.sets||[];
-          const liveTot1 = cumSets.reduce((t,s)=>t+(s.score1||0),0);
-          const liveTot2 = cumSets.reduce((t,s)=>t+(s.score2||0),0);
-          const hasCumData = cumSets.length>0;
-          score1 = hasCumData ? liveTot1 : (match.score1??'');
-          score2 = hasCumData ? liveTot2 : (match.score2??'');
-          // Add TB
-          if(match.tiebreak1!==null&&match.tiebreak1!==undefined){
-            score1 = (hasCumData?liveTot1:(match.score1||0));
-            score2 = (hasCumData?liveTot2:(match.score2||0));
-          }
-        }
-
-        // Set scores per end
-        let setsHtml='';
-        if(isSet && match.sets?.length){
-          setsHtml=`<div style="display:flex;gap:3px;margin-top:4px;flex-wrap:wrap;">`;
-          match.sets.forEach((s,i)=>{
-            const c1 = s.score1>s.score2?'var(--green)':s.score1<s.score2?'var(--red)':'var(--muted2)';
-            const c2 = s.score2>s.score1?'var(--green)':s.score2<s.score1?'var(--red)':'var(--muted2)';
-            setsHtml+=`<div style="font-size:10px;background:var(--surface3);border-radius:4px;padding:2px 5px;color:var(--muted2);">
-              S${i+1}: <span style="color:${c1}">${s.score1}</span>–<span style="color:${c2}">${s.score2}</span>
-            </div>`;
-          });
-          setsHtml+='</div>';
-        }
-
-        html+=`<div style="background:var(--surface);border:1px solid ${done?'var(--green)':'var(--border2)'};
-          border-radius:8px;padding:6px;overflow:hidden;${rk==='F'?'border-width:2px;':''}" >
-          ${renderMatchRowDisplay(match.archer1, w1, score1, match.sets, 1, data.format, slots, match)}
+        (match.sets||[]).forEach(s=>{if(s.score1>s.score2)sp1+=2;else if(s.score2>s.score1)sp2+=2;else{sp1+=1;sp2+=1;}});
+        let score1,score2;
+        if(isSet){score1=(done||sp1>0)?sp1:'';score2=(done||sp2>0)?sp2:'';}
+        else{const cumSets=match.sets||[];const liveTot1=cumSets.reduce((t,s)=>t+(s.score1||0),0);const liveTot2=cumSets.reduce((t,s)=>t+(s.score2||0),0);const hasCumData=cumSets.length>0;score1=hasCumData?liveTot1:(match.score1??'');score2=hasCumData?liveTot2:(match.score2??'');}
+        html+=`<div style="background:var(--surface);border:1px solid ${done?'var(--green)':'var(--border2)'};border-radius:8px;padding:6px;overflow:hidden;${rk==='F'?'border-width:2px;':''}">
+          ${renderMatchRowDisplay(match.archer1,w1,score1,match.sets,1,data.format,slots,match)}
           <div style="height:3px;"></div>
-          ${renderMatchRowDisplay(match.archer2, w2, score2, match.sets, 2, data.format, slots, match)}
+          ${renderMatchRowDisplay(match.archer2,w2,score2,match.sets,2,data.format,slots,match)}
         </div>`;
       });
-
       html+='</div></div>';
     });
-
     html+='</div></div>';
   });
-
   html+='</div>';
-  // Only update DOM if content actually changed
-  const newHash = html.replace(/\s+/g,' ');
-  if(main._lastElimHash === newHash) return;
-  main._lastElimHash = newHash;
+  const newHash=html.replace(/\s+/g,' ');
+  if(main._lastElimHash===newHash)return;
+  main._lastElimHash=newHash;
   main.innerHTML=html;
-  requestAnimationFrame(()=>{ main.scrollTop = scrollTop; });
+  requestAnimationFrame(()=>{main.scrollTop=scrollTop;});
 }
 
-function renderMatchRowDisplay(archer, won, score, sets, archerNum, fmt, slots, match){
-  if(!archer) return `<div style="padding:4px 6px;color:var(--muted);font-size:12px;">TBD</div>`;
-  const isCum = fmt==='cumulative';
-  const numSlots = slots||5;
-  const hasCumTB = match && match.tiebreak1!==null && match.tiebreak1!==undefined;
-  const hasSetTB = match && match.sets && match.sets[5] && (match.sets[5].score1>0||match.sets[5].score2>0);
-  const hasTB = hasCumTB || hasSetTB;
-  let tbVal = null;
-  if(hasCumTB) tbVal = archerNum===1?match.tiebreak1:match.tiebreak2;
-  else if(hasSetTB) tbVal = archerNum===1?match.sets[5].score1:match.sets[5].score2;
-
-  let setScores = '';
-  if(sets !== undefined){
-    const s = sets||[];
+function renderMatchRowDisplay(archer,won,score,sets,archerNum,fmt,slots,match){
+  if(!archer)return`<div style="padding:4px 6px;color:var(--muted);font-size:12px;">TBD</div>`;
+  const isCum=fmt==='cumulative';
+  const numSlots=slots||5;
+  const hasCumTB=match&&match.tiebreak1!==null&&match.tiebreak1!==undefined;
+  const hasSetTB=match&&match.sets&&match.sets[5]&&(match.sets[5].score1>0||match.sets[5].score2>0);
+  const hasTB=hasCumTB||hasSetTB;
+  let tbVal=null;
+  if(hasCumTB)tbVal=archerNum===1?match.tiebreak1:match.tiebreak2;
+  else if(hasSetTB)tbVal=archerNum===1?match.sets[5].score1:match.sets[5].score2;
+  let setScores='';
+  if(sets!==undefined){
+    const s=sets||[];
     for(let i=0;i<numSlots;i++){
-      const set = s[i];
-      const rawVal = set!=null?(archerNum===1?set.score1:set.score2):null;
-      const rawOther = set!=null?(archerNum===1?set.score2:set.score1):null;
-      const hasArrows = set!=null&&((set.arrows1&&set.arrows1.length>0)||(set.arrows2&&set.arrows2.length>0)||rawVal>0||rawOther>0);
-      let displayVal, color;
-      if(!hasArrows){ displayVal=null; color='var(--muted)'; }
-      else if(isCum){
-        displayVal=rawVal;
-        color=rawVal>rawOther?'var(--green)':rawVal<rawOther?'var(--muted2)':'var(--accent)';
-      } else {
-        displayVal=rawVal;
-        color=rawVal>rawOther?'var(--green)':rawVal<rawOther?'var(--muted2)':'var(--accent)';
-      }
-      setScores+=`<span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;
-        color:${color};width:22px;text-align:center;display:inline-block;flex-shrink:0;">${displayVal!==null?displayVal:'—'}</span>`;
+      const set=s[i];const rawVal=set!=null?(archerNum===1?set.score1:set.score2):null;const rawOther=set!=null?(archerNum===1?set.score2:set.score1):null;
+      const hasArrows=set!=null&&((set.arrows1&&set.arrows1.length>0)||(set.arrows2&&set.arrows2.length>0)||rawVal>0||rawOther>0);
+      let displayVal,color;
+      if(!hasArrows){displayVal=null;color='var(--muted)';}
+      else{displayVal=rawVal;color=rawVal>rawOther?'var(--green)':rawVal<rawOther?'var(--muted2)':'var(--accent)';}
+      setScores+=`<span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:${color};width:22px;text-align:center;display:inline-block;flex-shrink:0;">${displayVal!==null?displayVal:'—'}</span>`;
     }
-    // TB column
-    if(hasTB){
-      const tbColor = tbVal!==null?'var(--accent)':'var(--muted)';
-      setScores+=`<span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;
-        color:${tbColor};width:22px;text-align:center;display:inline-block;flex-shrink:0;">${tbVal!==null?tbVal:'—'}</span>`;
-    }
+    if(hasTB){const tbColor=tbVal!==null?'var(--accent)':'var(--muted)';setScores+=`<span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:${tbColor};width:22px;text-align:center;display:inline-block;flex-shrink:0;">${tbVal!==null?tbVal:'—'}</span>`;}
   }
-  const showTotal = score!==''&&score!==null&&score!==undefined;
-  const isWinner = won===true;
-  const bg = isWinner?'rgba(67,160,71,0.15)':'transparent';
-  const bd = isWinner?'1px solid var(--green)':'1px solid transparent';
-  const nameColor = isWinner?'var(--green)':'var(--text)';
-  const totalColor = isWinner?'var(--green)':'var(--accent)';
-  const trophy = isWinner?'🏆':'';
-  return `<div style="display:flex;align-items:center;gap:4px;padding:5px 8px;width:100%;box-sizing:border-box;border-radius:6px;background:${bg};border:${bd};">
+  const showTotal=score!==''&&score!==null&&score!==undefined;
+  const isWinner=won===true;
+  const bg=isWinner?'rgba(67,160,71,0.15)':'transparent';
+  const bd=isWinner?'1px solid var(--green)':'1px solid transparent';
+  const nameColor=isWinner?'var(--green)':'var(--text)';
+  const totalColor=isWinner?'var(--green)':'var(--accent)';
+  const trophy=isWinner?'🏆':'';
+  return`<div style="display:flex;align-items:center;gap:4px;padding:5px 8px;width:100%;box-sizing:border-box;border-radius:6px;background:${bg};border:${bd};">
     <span style="font-size:10px;color:var(--muted2);width:20px;flex-shrink:0;">#${archer.seed||'?'}</span>
     <span style="width:90px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${nameColor};">${archer.name}</span>
     <span style="display:flex;gap:2px;align-items:center;flex:1;">${setScores}</span>
@@ -279,195 +172,150 @@ function renderMatchRowDisplay(archer, won, score, sets, archerNum, fmt, slots, 
   </div>`;
 }
 
-// Load competitions
-async function loadComps() {
-  const snap = await getDocs(collection(db,'competitions'));
-  const sel = document.getElementById('comp-select');
-  snap.docs.forEach(d=>{
-    const c=d.data(), o=document.createElement('option');
-    o.value=d.id; o.textContent=c.name+(c.date?` (${c.date})`:'');
-    sel.appendChild(o);
-  });
-  // Auto-select if ?comp= in URL
-  const params = new URLSearchParams(window.location.search);
-  const compId = params.get('comp');
-  if(compId){ sel.value=compId; selectComp(compId); }
+async function loadComps(){
+  const snap=await getDocs(collection(db,'competitions'));
+  const sel=document.getElementById('comp-select');
+  snap.docs.forEach(d=>{const c=d.data(),o=document.createElement('option');o.value=d.id;o.textContent=c.name+(c.date?` (${c.date})`:'');sel.appendChild(o);});
+  const params=new URLSearchParams(window.location.search);
+  const compId=params.get('comp');
+  if(compId){sel.value=compId;selectComp(compId);}
 }
 
-let currentView = 'qual'; // 'qual' or 'elim'
-let lastData = null;
+let currentView='qual',lastData=null;
 
-window.setView = (view) => {
-  currentView = view;
-  // Update button styles
-  const btnQual = document.getElementById('btn-qual');
-  const btnElim = document.getElementById('btn-elim');
-  if(btnQual && btnElim){
-    btnQual.style.background = view==='qual'?'var(--accent)':'transparent';
-    btnQual.style.color = view==='qual'?'#000':'var(--muted2)';
-    btnQual.style.borderColor = view==='qual'?'var(--accent)':'var(--border2)';
-    btnElim.style.background = view==='elim'?'var(--accent)':'transparent';
-    btnElim.style.color = view==='elim'?'#000':'var(--muted2)';
-    btnElim.style.borderColor = view==='elim'?'var(--accent)':'var(--border2)';
+window.setView=(view)=>{
+  currentView=view;
+  const btnQual=document.getElementById('btn-qual');
+  const btnElim=document.getElementById('btn-elim');
+  if(btnQual&&btnElim){
+    btnQual.style.background=view==='qual'?'var(--accent)':'transparent';
+    btnQual.style.color=view==='qual'?'#000':'var(--muted2)';
+    btnQual.style.borderColor=view==='qual'?'var(--accent)':'var(--border2)';
+    btnElim.style.background=view==='elim'?'var(--accent)':'transparent';
+    btnElim.style.color=view==='elim'?'#000':'var(--muted2)';
+    btnElim.style.borderColor=view==='elim'?'var(--accent)':'var(--border2)';
   }
-  // Show/hide the two content divs directly
-  const qualDiv = document.getElementById('qual-content');
-  const elimDiv = document.getElementById('elim-content');
-  if(qualDiv && elimDiv){
-    qualDiv.style.display = view==='qual'?'block':'none';
-    elimDiv.style.display = view==='elim'?'block':'none';
-  } else {
-    // Fallback: re-render
-    _lastQualHash = '';
-    _lastElimHash = '';
-    if(lastData) renderResults(lastData);
+  const qualDiv=document.getElementById('qual-content');
+  const elimDiv=document.getElementById('elim-content');
+  if(qualDiv&&elimDiv){
+    qualDiv.style.display=view==='qual'?'block':'none';
+    elimDiv.style.display=view==='elim'?'block':'none';
   }
 };
 
-window.selectComp = (id) => {
-  if(unsubscribe) unsubscribe();
-  if(!id) return;
-
-  let _renderTimer = null;
-  unsubscribe = onSnapshot(doc(db,'competitions',id), snap=>{
-    if(!snap.exists()) return;
-    const d = snap.data();
-    lastData = d;
-    document.getElementById('comp-name').textContent =
-      `${d.name||''}${d.discipline?' · '+d.discipline:''}${d.date?' · '+d.date:''}`;
-    document.getElementById('last-update').textContent =
-      'Updated ' + new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-
-    // Show toggle if elimination exists
-    const hasElim = Object.keys(d.elimination||{}).length > 0;
-    const toggle = document.getElementById('view-toggle');
-    if(toggle) toggle.style.display = hasElim ? 'flex' : 'none';
-
-    // Re-render on data change (debounced)
-    if(_renderTimer) clearTimeout(_renderTimer);
-    _renderTimer = setTimeout(()=>renderResults(d), 150);
+window.selectComp=(id)=>{
+  if(unsubscribe)unsubscribe();
+  if(!id)return;
+  let _renderTimer=null;
+  unsubscribe=onSnapshot(doc(db,'competitions',id),snap=>{
+    if(!snap.exists())return;
+    const d=snap.data();
+    lastData=d;
+    document.getElementById('comp-name').textContent=`${d.name||''}${d.discipline?' · '+d.discipline:''}${d.date?' · '+d.date:''}`;
+    document.getElementById('last-update').textContent='Updated '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    const hasElim=Object.keys(d.elimination||{}).length>0;
+    const toggle=document.getElementById('view-toggle');
+    if(toggle)toggle.style.display=hasElim?'flex':'none';
+    if(_renderTimer)clearTimeout(_renderTimer);
+    _renderTimer=setTimeout(()=>renderResults(d),150);
   });
 };
 
-function getVal(v){ return v==='X'?10:(parseInt(v)||0); }
+function getScore(scores,archerId){const key=String(archerId).replace(/\./g,'_');return scores[key]||scores[String(archerId)]||{};}
 
-function getScore(scores, archerId) {
-  const key = String(archerId).replace(/\./g,'_');
-  return scores[key] || scores[String(archerId)] || {};
-}
+function renderResults(data){
+  const archers=data.archers||[];
+  const scores=data.scores||{};
+  const disc=data.discipline||'Outdoor';
+  const showHalves=disc==='Outdoor'||disc==='Indoor';
+  const g1label=disc==='3D'?'11':disc==='Field'?'6':disc==='Indoor'?'10':'X';
+  const g2label=disc==='3D'?'10':disc==='Field'?'5':disc==='Indoor'?'9':'10';
 
-let _lastQualHash = '';
-function renderResults(data) {
-  const archers  = data.archers  || [];
-  const scores   = data.scores   || {};
-  const disc     = data.discipline || 'Outdoor';
-  const showHalves = disc==='Outdoor'||disc==='Indoor';
+  const elimData=data.elimination||{};
+  renderElimDisplay(elimData,disc);
 
-  const g1label = disc==='3D'?'11':disc==='Field'?'6':disc==='Indoor'?'10':'X';
-  const g2label = disc==='3D'?'10':disc==='Field'?'5':disc==='Indoor'?'9':'10';
-
-  // Only re-render if data changed
-  const qualHash = JSON.stringify({archers:data.archers, scores:data.scores});
-  const scrollTop2 = 0;
-  // Check for elimination data
-  const elimData = data.elimination || {};
-  const hasElim = Object.keys(elimData).length > 0;
-
-  // Always render both views into their own divs
-  renderElimDisplay(elimData, data.discipline||'Outdoor');
-  // qual view below
-
-  // Only archers with scores
-  const scored = archers
+  // Include xs and tens in scored archers for tiebreak
+  const scored=archers
     .filter(a=>(getScore(scores,a.id)?.total||0)>0)
     .map(a=>{
       const s=getScore(scores,a.id);
-      return {...a, total:s.total||0, g1:s.g1||0, g2:s.g2||0, h1:s.h1||0, h2:s.h2||0};
+      return{
+        ...a,
+        total:s.total||0,
+        g1:s.g1||0,
+        g2:s.g2||0,
+        h1:s.h1||0,
+        h2:s.h2||0,
+        xs:s.xs||0,
+        tens:s.tens||0
+      };
     });
 
   if(!scored.length){
-    document.getElementById('qual-content').innerHTML=`
-      <div class="no-comp">
-        <div class="icon">⏳</div>
-        <p>No scores yet.<br>Results will appear here as archers complete their rounds.</p>
-      </div>`;
+    document.getElementById('qual-content').innerHTML=`<div class="no-comp"><div class="icon">⏳</div><p>No scores yet.<br>Results will appear here as archers complete their rounds.</p></div>`;
     return;
   }
 
   // Group by bow + age + gender
   const catMap={};
-  // Sort scored archers first for stable category building
-  scored.sort((a,b)=>{
-    const bi=BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);
-    if(bi!==0) return bi;
-    const ai=AGE_ORDER.indexOf(a.age)-AGE_ORDER.indexOf(b.age);
-    if(ai!==0) return ai;
-    return a.gender.localeCompare(b.gender);
-  });
   scored.forEach(a=>{
     const key=`${a.bow}||${a.age}||${a.gender}`;
-    if(!catMap[key]) catMap[key]={bow:a.bow,age:a.age,gender:a.gender,archers:[]};
+    if(!catMap[key])catMap[key]={bow:a.bow,age:a.age,gender:a.gender,archers:[]};
     catMap[key].archers.push(a);
   });
 
-  // Sort categories — stable sort to prevent reordering on re-render
-  const cats = Object.values(catMap).sort((a,b)=>{
-    const bi=BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);
-    if(bi!==0) return bi;
-    const ai=AGE_ORDER.indexOf(a.age)-AGE_ORDER.indexOf(b.age);
-    if(ai!==0) return ai;
-    return a.gender.localeCompare(b.gender);
-  });
-
-  // Re-sort to ensure stable order every render
-  cats.sort((a,b)=>{
-    const bi=BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);
-    if(bi!==0) return bi;
-    const ai=AGE_ORDER.indexOf(a.age)-AGE_ORDER.indexOf(b.age);
-    if(ai!==0) return ai;
+  const cats=Object.values(catMap).sort((a,b)=>{
+    const bi=BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);if(bi!==0)return bi;
+    const ai=AGE_ORDER.indexOf(a.age)-AGE_ORDER.indexOf(b.age);if(ai!==0)return ai;
     return a.gender.localeCompare(b.gender);
   });
 
   let html='<div class="categories-grid">';
   cats.forEach(cat=>{
-    const ranked=[...cat.archers].sort((a,b)=>b.total-a.total||b.g1-a.g1||b.g2-a.g2);
-    const color = BOW_COLORS[cat.bow]||'#555';
-    const gLabel = cat.gender==='M'?'MEN':'WOMEN';
+    // ── TIEBREAK: total → X count → 10 count ──
+    const ranked=[...cat.archers].sort((a,b)=>
+      b.total-a.total ||
+      (b.xs||0)-(a.xs||0) ||
+      (b.tens||0)-(a.tens||0)
+    );
+    const color=BOW_COLORS[cat.bow]||'#555';
+    const gLabel=cat.gender==='M'?'MEN':'WOMEN';
 
-    const rows = ranked.map((a,i)=>{
-      const rankClass = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-n';
-      const rankLabel = i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
-      const h1h2 = showHalves
-        ? `<td style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted2);text-align:center;padding:6px 4px;min-width:32px;">${a.h1||0}</td>
-           <td style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted2);text-align:center;padding:6px 4px;min-width:32px;">${a.h2||0}</td>`
-        : '';
-      return `<tr>
+    const rows=ranked.map((a,i)=>{
+      const rankClass=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-n';
+      const rankLabel=i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
+      const h1h2=showHalves
+        ?`<td style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted2);text-align:center;padding:6px 4px;min-width:32px;">${a.h1||0}</td>
+          <td style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted2);text-align:center;padding:6px 4px;min-width:32px;">${a.h2||0}</td>`
+        :'';
+      return`<tr>
         <td style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;text-align:center;padding:6px 6px;width:32px;" class="${rankClass}">${rankLabel}</td>
         <td style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;padding:6px 8px;white-space:nowrap;">${a.name}</td>
         ${h1h2}
         <td style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;color:var(--accent);text-align:center;padding:6px 8px;min-width:46px;">${a.total}</td>
-        <td style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted2);text-align:center;padding:6px 4px;min-width:32px;">${a.g1}</td>
-        <td style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted2);text-align:center;padding:6px 4px;min-width:32px;">${a.g2}</td>
+        <td style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted2);text-align:center;padding:6px 4px;min-width:32px;">${a.xs}</td>
+        <td style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted2);text-align:center;padding:6px 4px;min-width:32px;">${a.tens}</td>
       </tr>`;
     }).join('');
 
-    const colHeaders = showHalves
-      ? `<tr style="border-bottom:1px solid var(--border2);">
+    const colHeaders=showHalves
+      ?`<tr style="border-bottom:1px solid var(--border2);">
           <td style="width:36px;"></td>
           <td style="font-size:10px;color:var(--muted);padding:3px 10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px;">NAME</td>
           <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">H1</td>
           <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">H2</td>
           <td style="font-size:10px;color:var(--muted);padding:3px 10px;text-align:center;font-family:'Barlow Condensed',sans-serif;">SCORE</td>
-          <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${g1label}</td>
-          <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${g2label}</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">X</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">10</td>
         </tr>`
-      : `<tr style="border-bottom:1px solid var(--border2);">
+      :`<tr style="border-bottom:1px solid var(--border2);">
           <td style="width:36px;"></td>
           <td style="font-size:10px;color:var(--muted);padding:3px 10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px;">NAME</td>
           <td style="font-size:10px;color:var(--muted);padding:3px 10px;text-align:center;font-family:'Barlow Condensed',sans-serif;">SCORE</td>
-          <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${g1label}</td>
-          <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${g2label}</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">X</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">10</td>
         </tr>`;
+
     html+=`<div class="cat-block">
       <div class="cat-header" style="background:${color}33;color:${color};border-bottom:2px solid ${color}44;">
         ${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}
@@ -476,8 +324,9 @@ function renderResults(data) {
     </div>`;
   });
   html+='</div>';
-  const main3 = document.getElementById('qual-content');
-  if(main3) main3.innerHTML=html;
+
+  const qualContent=document.getElementById('qual-content');
+  if(qualContent)qualContent.innerHTML=html;
 }
 
 loadComps();
