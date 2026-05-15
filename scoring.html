@@ -901,29 +901,40 @@ function renderSummaryScorecard(idx){
   const a=targetArchers[idx],s=scores[a.id],list=document.getElementById('summary-list');
 
   if(discipline==='Custom'){
+    const grey='background-image:repeating-linear-gradient(135deg,transparent,transparent 4px,#e0e0e0 4px,#e0e0e0 5px);';
     let running=0;
-    const endRows=s.ends.map((end,i)=>{
+    let rows='';
+    s.ends.forEach((end,i)=>{
       const tc=getCustomTargetConfig(i);
+      const arrows=tc.arrows||3;
       const tot=end.reduce((x,v)=>x+getVal(v),0);
       if(end.length>0)running+=tot;
       const typeColor=tc.type==='Kill'?'#c62828':tc.type==='3D'?'#4a148c':'#1565c0';
-      const typeLabel=tc.type;
-      const chips=end.map(v=>{
-        const label=tc.type==='Kill'?valueToLabel(v,i):(v===0?'M':v);
-        const chipCls=tc.type==='Kill'?(v===tc.kill?'chip-kill':v===tc.body?'chip-body':'chip-miss'):chipClass(v,i);
-        return`<span class="arrow-chip ${chipCls}" style="font-size:12px;padding:2px 7px;">${label}</span>`;
-      }).join('');
-      return`<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #eee;">
-        <div style="min-width:80px;">
-          <div style="font-size:11px;color:#888;">T${i+1}</div>
-          <div style="font-size:10px;font-weight:700;color:${typeColor};">${typeLabel} · ${tc.arrows}↑</div>
-        </div>
-        <div style="display:flex;gap:3px;flex:1;">${chips}</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#1565c0;min-width:28px;text-align:right;">${end.length>0?tot:''}</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#c62828;min-width:32px;text-align:right;">${end.length>0?running:''}</div>
-      </div>`;
-    }).join('');
-    list.innerHTML=`<div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:11px;color:#aaa;">${a.slot} · ${a.bow} · ${a.age} · Custom</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;">${a.name}</div></div><div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:var(--accent);">${s.total}</div></div><div>${endRows}</div>`;
+      const typeShort=tc.type==='Kill'?`Kill\n${tc.kill}/${tc.body}/${tc.miss}`:tc.type==='3D'?'3D':'Field';
+      function arrowCell(idx){
+        if(idx>=arrows) return`<td style="${grey}width:36px;border:1px solid #ccc;"></td>`;
+        const v=end[idx];
+        const display=v===undefined||v===''?'':(v===0?'M':(tc.type==='Kill'?valueToLabel(v,i):v));
+        const bg=tc.type==='Kill'&&v===tc.kill?'background:#c8e6c9;color:#1b5e20;font-weight:700;':
+                 tc.type==='Kill'&&v===tc.body?'background:#fff3e0;color:#e65100;font-weight:700;':'';
+        return`<td style="${bg}width:36px;text-align:center;border:1px solid #ccc;">${display}</td>`;
+      }
+      rows+=`<tr style="border-bottom:1px solid #ccc;">
+        <td style="background:#f0f0f0;font-weight:700;font-size:11px;width:40px;text-align:center;border-right:1.5px solid #999;">T${i+1}</td>
+        <td style="font-size:9px;font-weight:700;color:${typeColor};width:48px;text-align:center;white-space:pre-line;line-height:1.3;border:1px solid #ccc;">${typeShort}</td>
+        ${arrowCell(0)}${arrowCell(1)}${arrowCell(2)}
+        <td style="background:#e3f2fd;font-weight:700;color:#1565c0;text-align:center;width:40px;border-left:1.5px solid #999;border:1px solid #ccc;">${end.length>0?tot:''}</td>
+        <td style="background:#fff8e1;font-weight:700;color:#c62828;text-align:center;width:46px;border-left:1.5px solid #999;border:1px solid #ccc;">${end.length>0?running:''}</td>
+      </tr>`;
+    });
+    const tableHtml=`<table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:13px;">
+      <colgroup><col style="width:40px"><col style="width:48px"><col style="width:36px"><col style="width:36px"><col style="width:36px"><col style="width:40px"><col style="width:46px"></colgroup>
+      <thead><tr style="background:#555;color:#fff;font-size:10px;font-weight:700;height:24px;">
+        <th>Target</th><th>Type</th><th>A1</th><th>A2</th><th>A3</th><th>End</th><th>Running</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+    list.innerHTML=`<div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:11px;color:#aaa;">${a.slot} · ${a.bow} · ${a.age} · Custom</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;">${a.name}</div></div><div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:var(--accent);">${s.total}</div></div>${tableHtml}`;
     return;
   }
 
