@@ -376,6 +376,12 @@ window.renderTargetSetupGrid=()=>{
 
 window.updateTargetRow=(i)=>{
   const type=document.getElementById(`ts-type-${i}`)?.value;
+  const arrowsSel=document.getElementById(`ts-arrows-${i}`);
+  if(arrowsSel){
+    if(type==='3D') arrowsSel.value='2';
+    else if(type==='Kill') arrowsSel.value='1';
+    else if(type==='Field') arrowsSel.value='3';
+  }
   const killDiv=document.getElementById(`ts-kill-${i}`);
   const infoDiv=document.getElementById(`ts-info-${i}`);
   const row=document.getElementById(`ts-row-${i}`);
@@ -387,7 +393,6 @@ window.updateTargetRow=(i)=>{
   }
   if(row)row.style.borderLeftColor=typeColors[type]||'#555';
 };
-
 window.applyAllType=()=>{
   const type=document.getElementById('ts-apply-type')?.value;
   if(!type)return;
