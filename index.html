@@ -520,25 +520,7 @@ function renderScorecards(){const list=document.getElementById('scorecards-list'
 window.viewScorecard=(archerId)=>{const archer=archers.find(a=>a.id===archerId);if(!archer)return;const html=buildAdminScorecard(archer);if(!html){toast('No score data yet','error');return;}const win=window.open('','_blank');win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${archer.name}</title><style>body{margin:12px;font-family:Arial,sans-serif;color:#111;}td,th{border:1px solid #ccc;text-align:center;height:22px;padding:0 2px;}</style></head><body>${html}</body></html>`);win.document.close();};
 window.printScorecard=(archerId)=>{const archer=archers.find(a=>a.id===archerId);if(!archer)return;const html=buildAdminScorecard(archer);if(!html){toast('No score data yet','error');return;}const win=window.open('','_blank');win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${archer.name}</title><style>body{margin:8px;font-family:Arial,sans-serif;color:#111;}td,th{border:1px solid #ccc;text-align:center;height:22px;padding:0 2px;}@media print{@page{size:A4 portrait;margin:8mm;}}</style></head><body>${html}</body></html>`);win.document.close();setTimeout(()=>win.print(),400);};
 window.printAllScorecards=()=>{if(!archers.length){toast('No archers','error');return;}const bowF=document.getElementById('sc-filter-bow')?.value||'';const filtered=archers.filter(a=>(!bowF||a.bow===bowF)&&(getScore(a.id)?.total||0)>0);if(!filtered.length){toast('No scores yet','error');return;}const sorted=[...filtered].sort((a,b)=>{const bi=BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);if(bi!==0)return bi;return(getScore(b.id)?.total||0)-(getScore(a.id)?.total||0);});const sections=sorted.map((archer,i)=>{const html=buildAdminScorecard(archer);if(!html)return'';const pageBreak=i<sorted.length-1?'page-break-after:always;':'';return`<div style="${pageBreak}">${html}</div>`;}).join('');const win=window.open('','_blank');win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>All Scorecards</title><style>body{margin:8px;font-family:Arial,sans-serif;color:#111;}td,th{border:1px solid #ccc;text-align:center;height:22px;padding:0 2px;}@media print{@page{size:A4 portrait;margin:8mm;}}</style></head><body>${sections}</body></html>`);win.document.close();setTimeout(()=>win.print(),400);};
-window.downloadCSVTemplate=()=>{
-  const rows=[
-    ['FirstName','LastName','Club','Bow','Age','Gender'],
-    ['','','','Recurve / Compound / Barebow / Traditional / Longbow','U12 / U14 / U18 / U21 / Senior / Master 50+ / Master 60+','M / F'],
-    ['John','Smith','City Archers','Recurve','Senior','M'],
-    ['Jane','Doe','National Club','Compound','U21','F'],
-    ['David','Cohen','Maccabi','Barebow','Senior','M'],
-    ['Sara','Levi','Hapoel','Traditional','U18','F'],
-  ];
-  const csv=rows.map(r=>r.map(c=>`"${c}"`).join(',')).join('
-');
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;a.download='archers_template.csv';
-  document.body.appendChild(a);a.click();
-  document.body.removeChild(a);URL.revokeObjectURL(url);
-  toast('Template downloaded ✓','success');
-};
+window.downloadCSVTemplate=()=>{const rows=[['FirstName','LastName','Club','Bow','Age','Gender'],['','','','Recurve / Compound / Barebow / Traditional / Longbow','U12 / U14 / U18 / U21 / Senior / Master 50+ / Master 60+','M / F'],['John','Smith','City Archers','Recurve','Senior','M'],['Jane','Doe','National Club','Compound','U21','F'],['David','Cohen','Maccabi','Barebow','Senior','M'],['Sara','Levi','Hapoel','Traditional','U18','F']];const csv=rows.map(r=>'"'+r.join('","')+'"').join('\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='archers_template.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);toast('Template downloaded ✓','success');};
 window.copyRegLink=()=>{if(!currentCompId){toast('Select a competition first','error');return;}const url=`https://matan1sharon-ops.github.io/All-in-competition/register.html?comp=${currentCompId}`;navigator.clipboard.writeText(url).then(()=>toast('Registration link copied! ✓','success')).catch(()=>prompt('Copy this registration link:',url));};
 window.copyResultsLink=()=>{if(!currentCompId){toast('Select a competition first','error');return;}const url=`https://matan1sharon-ops.github.io/All-in-competition/results.html?comp=${currentCompId}`;navigator.clipboard.writeText(url).then(()=>toast('Results link copied! ✓','success')).catch(()=>prompt('Copy this results link:',url));};
 window.copyMatchLink=()=>{if(!currentCompId){toast('Select a competition first','error');return;}const url=`https://matan1sharon-ops.github.io/All-in-competition/matches.html`;navigator.clipboard.writeText(url).then(()=>toast('Match scoring link copied! ✓','success')).catch(()=>prompt('Copy this link:',url));};
