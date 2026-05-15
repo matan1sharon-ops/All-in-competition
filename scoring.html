@@ -11,8 +11,6 @@
 :root{--bg:#111;--surface:#1e1e1e;--surface2:#2a2a2a;--border:#333;--accent:#FFD700;--red:#e53935;--green:#43a047;--blue:#1e88e5;--text:#f0f0f0;--muted:#888;--radius:12px;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);height:100dvh;overflow:hidden;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);}
-
-/* ── LOGIN ── */
 #login-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
 .login-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 24px;width:100%;max-width:360px;}
 .login-logo{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;letter-spacing:4px;color:var(--accent);text-align:center;margin-bottom:4px;}
@@ -31,8 +29,6 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 .confirm-name{flex:1;font-size:14px;font-weight:600;}
 .confirm-cat{font-size:11px;color:var(--muted);}
 .error-msg{background:#b71c1c22;border:1px solid var(--red);color:var(--red);padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none;}
-
-/* ── QUALIFICATION SCORING ── */
 #scoring-screen{flex:1;display:none;flex-direction:column;overflow:hidden;}
 .score-header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;}
 .score-header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
@@ -76,14 +72,14 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 .chip-black{background:#333;color:#fff;}
 .chip-white{background:#f5f5f5;color:#111;border:1px solid #ccc;}
 .chip-miss{background:#424242;color:#aaa;}
+.chip-kill{background:#1b5e20;color:#fff;}
+.chip-body{background:#f57f17;color:#fff;}
 .chip-empty{background:var(--surface2);color:var(--muted);border:1px dashed var(--border);}
 .score-footer{background:var(--surface);border-top:1px solid var(--border);padding:10px;flex-shrink:0;}
 .current-archer-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--surface2);border-radius:8px;margin-bottom:8px;}
 .current-archer-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--text);}
 .current-archer-slot{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--accent);}
 .current-end-label{font-size:11px;color:var(--muted);}
-
-/* ── MATCH SCORING ── */
 #match-screen{flex:1;display:none;flex-direction:column;overflow:hidden;}
 .match-header{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 14px;flex-shrink:0;}
 .match-header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
@@ -99,22 +95,23 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 .set-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
 .set-num{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
 .set-result{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;}
-
-/* ── SUMMARY ── */
 #summary-screen{flex:1;display:none;flex-direction:column;overflow:hidden;}
 .summary-header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
 .summary-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--accent);letter-spacing:1px;}
-
-/* ── PAD ── */
 .pad{display:grid;gap:5px;}
 .pad-btn{height:52px;border:none;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,0.35);transition:transform 0.08s,box-shadow 0.08s;}
 .pad-btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,0.35);}
-.pad-gold{background:#FFD700;color:#3e2000;}.pad-red{background:#e53935;color:#fff;}.pad-blue{background:#1e88e5;color:#fff;}
-.pad-black{background:#2d2d2d;color:#fff;border:1px solid #555;}.pad-white{background:#f5f5f5;color:#111;border:1px solid #ccc;}.pad-miss{background:#757575;color:#fff;}
+.pad-gold{background:#FFD700;color:#3e2000;}
+.pad-red{background:#e53935;color:#fff;}
+.pad-blue{background:#1e88e5;color:#fff;}
+.pad-black{background:#2d2d2d;color:#fff;border:1px solid #555;}
+.pad-white{background:#f5f5f5;color:#111;border:1px solid #ccc;}
+.pad-miss{background:#757575;color:#fff;}
+.pad-kill{background:#1b5e20;color:#fff;font-size:16px;}
+.pad-body{background:#f57f17;color:#fff;font-size:16px;}
 .pad-back{background:#333;color:#aaa;font-size:16px;}
 .pad-next{background:var(--accent);color:#000;font-size:15px;}
 .pad-done{background:var(--green);color:#fff;font-size:15px;}
-
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 20px;font-size:13px;font-weight:600;z-index:999;transition:transform 0.3s ease;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.5);}
 #toast.show{transform:translateX(-50%) translateY(0);}
 #toast.success{border-color:var(--green);color:var(--green);}
@@ -123,13 +120,11 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 </head>
 <body>
 
-<!-- ── LOGIN ── -->
+<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo">ALL IN</div>
     <div class="login-sub">Scoring</div>
-
-    <!-- Step 1: Select competition + name -->
     <div id="login-step-1">
       <div class="error-msg" id="error-msg"></div>
       <label class="login-label">Competition</label>
@@ -138,16 +133,12 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
       <select id="archer-select" class="login-select"><option value="">— Select competition first —</option></select>
       <button class="login-btn" onclick="checkPhase()">CONTINUE →</button>
     </div>
-
-    <!-- Step 2a: No target assigned -->
     <div id="login-step-qual" style="display:none;">
       <div style="background:#b71c1c22;border:1px solid var(--red);color:var(--red);padding:14px;border-radius:8px;margin-bottom:16px;font-size:13px;text-align:center;">
         ⚠️ You have no target assigned yet.<br>Please ask the admin to assign your target.
       </div>
       <button class="login-back" onclick="backToStep1()">← BACK</button>
     </div>
-
-    <!-- Step 2b: Match found — confirm -->
     <div id="login-step-match" style="display:none;">
       <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;">
         <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">ACTIVE MATCH FOUND</div>
@@ -157,8 +148,6 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
       <button class="login-btn" onclick="startMatch()">START MATCH →</button>
       <button class="login-back" onclick="backToStep1()">← BACK</button>
     </div>
-
-    <!-- Step 2c: Confirm qualification archers -->
     <div id="login-step-2" style="display:none;">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">Confirm Archers on this Target</div>
       <div class="confirm-card" id="confirm-archers"></div>
@@ -168,11 +157,14 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
   </div>
 </div>
 
-<!-- ── QUALIFICATION SCORING ── -->
+<!-- QUALIFICATION SCORING -->
 <div id="scoring-screen">
   <div class="score-header">
     <div class="score-header-top">
-      <div><div class="comp-name" id="s-comp-name"></div><div class="target-label" id="s-target-label"></div></div>
+      <div>
+        <div class="comp-name" id="s-comp-name"></div>
+        <div class="target-label" id="s-target-label"></div>
+      </div>
       <div style="display:flex;gap:12px;align-items:flex-end;">
         <div style="text-align:right;">
           <div style="font-size:11px;color:var(--muted);" id="s-g1-label">X</div>
@@ -194,14 +186,14 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
   <div id="score-list"></div>
   <div class="score-footer">
     <div class="current-archer-bar">
-      <div><div class="current-end-label" id="s-end-label">END 1</div><div class="current-archer-name" id="s-archer-name">—</div></div>
+      <div><div class="current-end-label" id="s-end-label">TARGET 1</div><div class="current-archer-name" id="s-archer-name">—</div></div>
       <div class="current-archer-slot" id="s-archer-slot">A</div>
     </div>
     <div class="pad" id="score-pad"></div>
   </div>
 </div>
 
-<!-- ── MATCH SCORING ── -->
+<!-- MATCH SCORING -->
 <div id="match-screen">
   <div class="match-header">
     <div class="match-header-top">
@@ -212,15 +204,9 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
   </div>
   <div id="match-archer-tabs" style="display:flex;gap:4px;padding:8px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;"></div>
   <div class="sp-bar">
-    <div style="text-align:center;">
-      <div class="sp-label" id="sp-a1-label">A1</div>
-      <div class="sp-val" id="sp-a1">0</div>
-    </div>
+    <div style="text-align:center;"><div class="sp-label" id="sp-a1-label">A1</div><div class="sp-val" id="sp-a1">0</div></div>
     <div class="sp-sep">—</div>
-    <div style="text-align:center;">
-      <div class="sp-label" id="sp-a2-label">A2</div>
-      <div class="sp-val" id="sp-a2">0</div>
-    </div>
+    <div style="text-align:center;"><div class="sp-label" id="sp-a2-label">A2</div><div class="sp-val" id="sp-a2">0</div></div>
   </div>
   <div id="sets-list"></div>
   <div class="score-footer">
@@ -232,7 +218,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
   </div>
 </div>
 
-<!-- ── SUMMARY ── -->
+<!-- SUMMARY -->
 <div id="summary-screen">
   <div class="summary-header">
     <div class="summary-title" id="sum-title">Complete</div>
@@ -247,79 +233,91 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 <div id="toast"></div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, doc, getDoc, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getFirestore,collection,doc,getDoc,getDocs,setDoc}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+const firebaseConfig={apiKey:"AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To",authDomain:"all-in-competition.firebaseapp.com",projectId:"all-in-competition",storageBucket:"all-in-competition.firebasestorage.app",messagingSenderId:"620146958631",appId:"1:620146958631:web:1e88019d1436372689c902"};
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To",
-  authDomain: "all-in-competition.firebaseapp.com",
-  projectId: "all-in-competition",
-  storageBucket: "all-in-competition.firebasestorage.app",
-  messagingSenderId: "620146958631",
-  appId: "1:620146958631:web:1e88019d1436372689c902"
-};
+/* ── SHARED STATE ── */
+let compId=null,compData=null,selectedArcherId=null,discipline='Outdoor';
+let targetConfig=[]; // Custom discipline target config
 
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
-
-
-/* ══════════════════════════════════════════
-   SHARED STATE
-══════════════════════════════════════════ */
-let compId=null, compData=null;
-let selectedArcherId=null;
-let discipline='Outdoor';
-
-/* ══════════════════════════════════════════
-   QUALIFICATION STATE
-══════════════════════════════════════════ */
-let targetNum=null, targetArchers=[], activeArcherIdx=0, editingEnd=null;
+/* ── QUALIFICATION STATE ── */
+let targetNum=null,targetArchers=[],activeArcherIdx=0,editingEnd=null;
 let scores={};
 
-/* ══════════════════════════════════════════
-   MATCH STATE
-══════════════════════════════════════════ */
-let matchCatKey=null, matchRoundKey=null, matchIdx=null, matchData=null;
-let matchFormat='sets', matchActiveArcher=0;
-let matchSets=[], cumArrows1=[], cumArrows2=[], cumTB1=null, cumTB2=null;
-const MAX_SETS=5, SETS_TO_WIN=6;
-function getCumEnds(){ return (discipline==='3D'||discipline==='Field')?4:5; }
-function getArrowsPerSet(){ return discipline==='3D'?2:3; }
+/* ── MATCH STATE ── */
+let matchCatKey=null,matchRoundKey=null,matchIdx=null,matchData=null;
+let matchFormat='sets',matchActiveArcher=0;
+let matchSets=[],cumArrows1=[],cumArrows2=[],cumTB1=null,cumTB2=null;
+const MAX_SETS=5,SETS_TO_WIN=6;
+function getCumEnds(){return(discipline==='3D'||discipline==='Field'||discipline==='Custom')?4:5;}
+function getArrowsPerSet(){return discipline==='3D'?2:3;}
 
-/* ══════════════════════════════════════════
-   HELPERS
-══════════════════════════════════════════ */
+/* ── CUSTOM HELPERS ── */
+function getCustomTargetConfig(endIdx){
+  // endIdx is 0-based
+  return targetConfig[endIdx]||{type:'Field',arrows:3,kill:10,body:5,miss:0};
+}
+function getCustomArrowsForEnd(endIdx){
+  if(discipline!=='Custom') return getConfig().arrows;
+  return getCustomTargetConfig(endIdx).arrows||3;
+}
+function getTotalCustomEnds(){
+  return targetConfig.length||24;
+}
+
+/* ── HELPERS ── */
 function getVal(s){return s==='X'?10:(parseInt(s)||0);}
-function chipClass(s){
+
+function chipClass(s,endIdx){
+  if(discipline==='Custom'){
+    const tc=getCustomTargetConfig(endIdx||0);
+    if(tc.type==='Kill'){
+      if(s==='Kill'||s===tc.kill) return 'chip-kill';
+      if(s==='Body'||s===tc.body) return 'chip-body';
+      return 'chip-miss';
+    }
+    if(tc.type==='3D'){
+      if(s===11) return 'chip-gold';
+      if(s===10) return 'chip-red';
+      if(s===8)  return 'chip-blue';
+      if(s===5)  return 'chip-black';
+      return 'chip-miss';
+    }
+    // Field
+    if(s===6||s===5) return 'chip-gold';
+    if(s===4||s===3||s===2||s===1) return 'chip-black';
+    return 'chip-miss';
+  }
   if(discipline==='Field'){
     if(s===6||s===5) return 'chip-gold';
     if(s===4||s===3||s===2||s===1) return 'chip-black';
-    if(s===0||s==='M') return 'chip-miss';
-    return 'chip-empty';
+    return 'chip-miss';
   }
   if(discipline==='3D'){
     if(s===11) return 'chip-gold';
     if(s===10) return 'chip-red';
     if(s===8)  return 'chip-blue';
     if(s===5)  return 'chip-black';
-    if(s===0||s==='M') return 'chip-miss';
-    return 'chip-empty';
+    return 'chip-miss';
   }
-  // Outdoor/Indoor
   if(s==='X'||s===10||s===9) return 'chip-gold';
   if(s===8||s===7) return 'chip-red';
   if(s===6||s===5) return 'chip-blue';
   if(s===4||s===3) return 'chip-black';
   if(s===2||s===1) return 'chip-white';
-  if(s===0||s==='M') return 'chip-miss';
-  return 'chip-empty';
+  return 'chip-miss';
 }
+
 function padBtnClass(s){
+  if(s==='Kill') return 'pad-kill';
+  if(s==='Body') return 'pad-body';
   if(discipline==='Field'){
     if(s===6||s===5) return 'pad-gold';
     if(s===4||s===3||s===2||s===1) return 'pad-black';
-    if(s===0) return 'pad-miss'; // M = green handled separately
     return 'pad-miss';
   }
   if(discipline==='3D'){
@@ -329,7 +327,6 @@ function padBtnClass(s){
     if(s===5)  return 'pad-black';
     return 'pad-miss';
   }
-  // Outdoor/Indoor
   if(s==='X'||s===10||s===9||s===11) return 'pad-gold';
   if(s===8||s===7) return 'pad-red';
   if(s===6||s===5) return 'pad-blue';
@@ -337,162 +334,139 @@ function padBtnClass(s){
   if(s===2||s===1) return 'pad-white';
   return 'pad-miss';
 }
+
 function getConfig(){
-  if(discipline==='3D')    return {arrows:2,ends:24,label:'Station'};
-  if(discipline==='Field') return {arrows:3,ends:24,label:'Target'};
-  if(discipline==='Indoor')return {arrows:3,ends:20,label:'End'};
-  return {arrows:6,ends:12,label:'End'};
-}
-function getPadScores(){
-  if(discipline==='3D')    return [11,10,8,5,0];
-  if(discipline==='Field') return [6,5,4,3,2,1,0];
-  if(discipline==='Indoor')return [10,9,8,7,6,5,4,3,2,1,0];
-  return ['X',10,9,8,7,6,5,4,3,2,1,0];
-}
-function showError(msg){
-  const el=document.getElementById('error-msg');
-  el.textContent=msg; el.style.display='block';
-}
-function toast(msg,type='success'){
-  const el=document.getElementById('toast');
-  el.textContent=msg; el.className=`show ${type}`;
-  setTimeout(()=>el.classList.remove('show'),2500);
+  if(discipline==='3D')    return{arrows:2,ends:24,label:'Station'};
+  if(discipline==='Field') return{arrows:3,ends:24,label:'Target'};
+  if(discipline==='Indoor')return{arrows:3,ends:20,label:'End'};
+  if(discipline==='Custom')return{arrows:3,ends:getTotalCustomEnds(),label:'Target'};
+  return{arrows:6,ends:12,label:'End'};
 }
 
-/* ══════════════════════════════════════════
-   LOGIN FLOW
-══════════════════════════════════════════ */
+function getPadScores(endIdx){
+  if(discipline==='Custom'){
+    const tc=getCustomTargetConfig(endIdx);
+    if(tc.type==='Kill') return ['Kill','Body','Miss'];
+    if(tc.type==='3D')   return [11,10,8,5,0];
+    return [6,5,4,3,2,1,0]; // Field
+  }
+  if(discipline==='3D')    return[11,10,8,5,0];
+  if(discipline==='Field') return[6,5,4,3,2,1,0];
+  if(discipline==='Indoor')return[10,9,8,7,6,5,4,3,2,1,0];
+  return['X',10,9,8,7,6,5,4,3,2,1,0];
+}
+
+// Convert Kill/Body/Miss labels to point values for storage
+function scoreToValue(s,endIdx){
+  if(discipline==='Custom'){
+    const tc=getCustomTargetConfig(endIdx);
+    if(s==='Kill') return tc.kill;
+    if(s==='Body') return tc.body;
+    if(s==='Miss') return tc.miss;
+  }
+  return s;
+}
+
+// Convert stored value back to display label for Custom Kill targets
+function valueToLabel(v,endIdx){
+  if(discipline==='Custom'){
+    const tc=getCustomTargetConfig(endIdx);
+    if(tc.type==='Kill'){
+      if(v===tc.kill) return 'Kill';
+      if(v===tc.body) return 'Body';
+      return 'Miss';
+    }
+  }
+  return v;
+}
+
+function showError(msg){const el=document.getElementById('error-msg');el.textContent=msg;el.style.display='block';}
+function toast(msg,type='success'){const el=document.getElementById('toast');el.textContent=msg;el.className=`show ${type}`;setTimeout(()=>el.classList.remove('show'),2500);}
+
+/* ── LOGIN FLOW ── */
 async function loadCompetitions(){
   try{
     const snap=await getDocs(collection(db,'competitions'));
     const sel=document.getElementById('comp-select');
     sel.innerHTML='<option value="">— Select Competition —</option>';
-    snap.docs.forEach(d=>{
-      const c=d.data(), o=document.createElement('option');
-      o.value=d.id; o.textContent=c.name+(c.date?` (${c.date})`:'');
-      sel.appendChild(o);
-    });
-    if(!snap.docs.length) sel.innerHTML='<option value="">No competitions found</option>';
+    snap.docs.forEach(d=>{const c=d.data(),o=document.createElement('option');o.value=d.id;o.textContent=c.name+(c.date?` (${c.date})`:'');sel.appendChild(o);});
+    if(!snap.docs.length)sel.innerHTML='<option value="">No competitions found</option>';
     sel.onchange=()=>loadArchers(sel.value);
   }catch(e){showError('Connection error');}
 }
 
 async function loadArchers(id){
-  if(!id) return;
+  if(!id)return;
   compId=id;
   const snap=await getDoc(doc(db,'competitions',id));
-  if(!snap.exists()) return;
+  if(!snap.exists())return;
   compData=snap.data();
   discipline=compData.discipline||'Outdoor';
+  targetConfig=compData.targetConfig||[];
   const archers=compData.archers||[];
   const sel=document.getElementById('archer-select');
-  sel.innerHTML='<option value="">— Select your name —</option>'+
-    archers.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
+  sel.innerHTML='<option value="">— Select your name —</option>'+archers.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
 }
 
-window.checkPhase = async () => {
+window.checkPhase=async()=>{
   selectedArcherId=document.getElementById('archer-select').value;
   if(!compId){showError('Select a competition');return;}
   if(!selectedArcherId){showError('Select your name');return;}
   document.getElementById('error-msg').style.display='none';
-
-  // Reload fresh data
   const snap=await getDoc(doc(db,'competitions',compId));
   compData=snap.data();
   discipline=compData.discipline||'Outdoor';
-
-  // Check for active elimination match
+  targetConfig=compData.targetConfig||[];
   const elim=compData.elimination||{};
   const roundOrder=['R1','QF','SF','F','B'];
-  for(const [ck,data] of Object.entries(elim)){
+  for(const[ck,data]of Object.entries(elim)){
     for(const rk of roundOrder){
       const matches=data.rounds?.[rk]||[];
       for(let mi=0;mi<matches.length;mi++){
         const m=matches[mi];
         if((m.archer1?.id===selectedArcherId||m.archer2?.id===selectedArcherId)&&!m.winnerChoice&&!m.isBye){
-          // Found active match!
-          matchCatKey=ck; matchRoundKey=rk; matchIdx=mi; matchData=m; matchFormat=data.format;
+          matchCatKey=ck;matchRoundKey=rk;matchIdx=mi;matchData=m;matchFormat=data.format;
           matchSets=(m.sets||[]).map(s=>({score1:s.score1||0,score2:s.score2||0,arrows1:s.arrows1||[],arrows2:s.arrows2||[]}));
-          cumArrows1=m.arrows1||[]; cumArrows2=m.arrows2||[];
+          cumArrows1=m.arrows1||[];cumArrows2=m.arrows2||[];
           const rl={R1:`Round of ${data.bracketSize*2}`,QF:'Quarter Final',SF:'Semi Final',F:'Final',B:'Bronze Medal'};
           document.getElementById('match-confirm-label').textContent=rl[rk]||rk;
-          document.getElementById('match-confirm-vs').innerHTML=
-            `<strong>${m.archer1?.name||'?'}</strong> vs <strong>${m.archer2?.name||'?'}</strong>`;
+          document.getElementById('match-confirm-vs').innerHTML=`<strong>${m.archer1?.name||'?'}</strong> vs <strong>${m.archer2?.name||'?'}</strong>`;
           showLoginStep('login-step-match');
           return;
         }
       }
     }
   }
-
-  // No match found — find target from database
-  const allArchers = compData.archers||[];
-  const allTargets = compData.targets||[];
-
-  // First try: find archer by ID (with string comparison)
-  let archer = allArchers.find(a=>String(a.id)===String(selectedArcherId));
-
-  // If archer has target assigned
-  if(archer?.target){
-    targetNum = archer.target;
-  } else {
-    // Second try: search directly in targets array for this archer
-    let foundTarget = null, foundSlot = null;
-    for(const t of allTargets){
-      for(const s of ['A','B','C','D']){
-        if(t[s] && String(t[s].id)===String(selectedArcherId)){
-          foundTarget = t.num;
-          foundSlot = s;
-          break;
-        }
-      }
-      if(foundTarget) break;
-    }
-    if(foundTarget) targetNum = foundTarget;
+  const allArchers=compData.archers||[];
+  const allTargets=compData.targets||[];
+  let archer=allArchers.find(a=>String(a.id)===String(selectedArcherId));
+  if(archer?.target){targetNum=archer.target;}
+  else{
+    let foundTarget=null;
+    for(const t of allTargets){for(const s of['A','B','C','D']){if(t[s]&&String(t[s].id)===String(selectedArcherId)){foundTarget=t.num;break;}}if(foundTarget)break;}
+    if(foundTarget)targetNum=foundTarget;
   }
-
   if(targetNum){
-    const target = allTargets.find(t=>t.num===targetNum);
+    const target=allTargets.find(t=>t.num===targetNum);
     if(target){
-      targetArchers = ['A','B','C','D'].filter(s=>target[s]).map(s=>{
-        const sd=target[s];
-        const fa=allArchers.find(a=>String(a.id)===String(sd.id)||a.name===sd.name);
-        return {...(fa||sd),slot:s,id:fa?fa.id:sd.id};
-      });
+      targetArchers=['A','B','C','D'].filter(s=>target[s]).map(s=>{const sd=target[s];const fa=allArchers.find(a=>String(a.id)===String(sd.id)||a.name===sd.name);return{...(fa||sd),slot:s,id:fa?fa.id:sd.id};});
       if(targetArchers.length){
-        document.getElementById('confirm-archers').innerHTML=targetArchers.map(a=>`
-          <div class="confirm-archer">
-            <div class="confirm-slot">${a.slot}</div>
-            <div style="flex:1;padding:0 10px;">
-              <div class="confirm-name">${a.name}</div>
-              <div class="confirm-cat">${a.bow} · ${a.age}</div>
-            </div>
-          </div>`).join('');
-        showLoginStep('login-step-2');
-        return;
+        document.getElementById('confirm-archers').innerHTML=targetArchers.map(a=>`<div class="confirm-archer"><div class="confirm-slot">${a.slot}</div><div style="flex:1;padding:0 10px;"><div class="confirm-name">${a.name}</div><div class="confirm-cat">${a.bow} · ${a.age}</div></div></div>`).join('');
+        showLoginStep('login-step-2');return;
       }
     }
   }
-  // No target found
   showLoginStep('login-step-qual');
 };
 
 function showLoginStep(id){
-  ['login-step-1','login-step-qual','login-step-match','login-step-2'].forEach(s=>{
-    document.getElementById(s).style.display=s===id?'block':'none';
-  });
+  ['login-step-1','login-step-qual','login-step-match','login-step-2'].forEach(s=>{document.getElementById(s).style.display=s===id?'block':'none';});
 }
-
 window.backToStep1=()=>showLoginStep('login-step-1');
 
-
-/* ══════════════════════════════════════════
-   QUALIFICATION SCORING
-══════════════════════════════════════════ */
-
-
+/* ── QUALIFICATION SCORING ── */
 window.startScoring=()=>{
-  const cfg=getConfig(), existing=compData.scores||{};
+  const cfg=getConfig(),existing=compData.scores||{};
   targetArchers.forEach(a=>{
     const key=String(a.id).replace(/\./g,'_');
     const raw=existing[key]||existing[String(a.id)];
@@ -501,27 +475,37 @@ window.startScoring=()=>{
       if(Array.isArray(raw.ends)){endsArr=raw.ends;}
       else{endsArr=Array.from({length:cfg.ends},()=>[]);Object.keys(raw.ends||{}).forEach(i=>{endsArr[parseInt(i)]=raw.ends[i]||[];});}
       scores[a.id]={total:raw.total||0,tens:raw.tens||0,xs:raw.xs||0,g1:raw.g1||0,g2:raw.g2||0,h1:raw.h1||0,h2:raw.h2||0,ends:endsArr};
-    } else {
+    }else{
       scores[a.id]={ends:Array.from({length:cfg.ends},()=>[]),total:0,tens:0,xs:0,g1:0,g2:0,h1:0,h2:0};
     }
   });
   targetArchers.forEach(a=>recalcStats(a.id));
-  activeArcherIdx=0; editingEnd=null;
+  activeArcherIdx=0;editingEnd=null;
   document.getElementById('s-comp-name').textContent=compData.name||'';
   document.getElementById('s-target-label').textContent=`TARGET ${targetNum}`;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('scoring-screen').style.display='flex';
-  renderTabs(); renderScoreList(); renderPad(); updateHeader();
+  renderTabs();renderScoreList();renderPad();updateHeader();
 };
 
 function getCurrentArcher(){return targetArchers[activeArcherIdx];}
 
-function renderTabs(){
+function isEndComplete(archerId,endIdx){
+  const arrows=getCustomArrowsForEnd(endIdx);
+  return(scores[archerId].ends[endIdx]||[]).length>=arrows;
+}
+
+function isArcherDone(archerId){
   const cfg=getConfig();
+  for(let e=0;e<cfg.ends;e++){if(!isEndComplete(archerId,e))return false;}
+  return true;
+}
+
+function renderTabs(){
   document.getElementById('archer-tabs').innerHTML=targetArchers.map((a,i)=>{
-    const done=scores[a.id].ends.filter(e=>e.length===cfg.arrows).length===cfg.ends;
+    const done=isArcherDone(a.id);
     const cls=done?'done':(i===activeArcherIdx?'active':'');
-    return `<button class="archer-tab ${cls}" onclick="switchArcher(${i})">${a.slot} · ${a.name.split(' ')[0]}${done?'<span class="tab-check">✓</span>':''}</button>`;
+    return`<button class="archer-tab ${cls}" onclick="switchArcher(${i})">${a.slot} · ${a.name.split(' ')[0]}${done?'<span class="tab-check">✓</span>':''}</button>`;
   }).join('');
 }
 
@@ -532,16 +516,73 @@ function scCellHtml(val,isActive,isEditing,endIdx){
   if(val==='X'||val===10||val===9||val===11) classes.push('sc-gold');
   if(isEditing) classes.push('sc-editing');
   else if(isActive) classes.push('sc-active');
-  const display=val===0||val==='M'?'M':(val===undefined||val===''?'':val);
-  return `<td class="${classes.join(' ')}" onclick="editEnd(${endIdx})">${display}</td>`;
+  let display;
+  if(val===0||val==='M') display='M';
+  else if(val===undefined||val==='') display='';
+  else if(discipline==='Custom') display=valueToLabel(val,endIdx);
+  else display=val;
+  return`<td class="${classes.join(' ')}" onclick="editEnd(${endIdx})">${display}</td>`;
+}
+
+function getNextIncompleteEnd(){
+  const cfg=getConfig();
+  const archer=getCurrentArcher();
+  for(let e=0;e<cfg.ends;e++){if(!isEndComplete(archer.id,e))return e;}
+  return cfg.ends-1;
 }
 
 function renderScoreList(){
-  const cfg=getConfig(), archer=getCurrentArcher(), ends=scores[archer.id].ends;
-  let archerNextEnd=0;
-  for(let e=0;e<cfg.ends;e++){if((ends[e]||[]).length<cfg.arrows){archerNextEnd=e;break;}}
-  const curEnd=editingEnd!==null?editingEnd.endIdx:archerNextEnd;
+  const cfg=getConfig(),archer=getCurrentArcher(),ends=scores[archer.id].ends;
+  const curEnd=editingEnd!==null?editingEnd.endIdx:getNextIncompleteEnd();
   const list=document.getElementById('score-list');
+
+  if(discipline==='Custom'){
+    let html='';
+    let running=0;
+    for(let i=0;i<cfg.ends;i++){
+      const ea=ends[i]||[];
+      const tc=getCustomTargetConfig(i);
+      const arrowsForEnd=tc.arrows||3;
+      const isActive=i===curEnd&&editingEnd===null;
+      const isEditing=editingEnd!==null&&editingEnd.endIdx===i;
+      const tot=ea.reduce((s,v)=>s+getVal(v),0);
+      if(ea.length>0) running+=tot;
+
+      // Type badge colors
+      const typeColor=tc.type==='Kill'?'#c62828':tc.type==='3D'?'#4a148c':'#1565c0';
+      const typeLabel=tc.type==='Kill'?`🎯 Kill(${tc.kill})/Body(${tc.body})/M(${tc.miss})`:tc.type==='3D'?'🦌 3D':'🌄 Field';
+      const cls=isEditing?'end-card editing':isActive?'end-card active-end':'end-card';
+
+      // Arrow chips - variable count per target
+      const chips=Array.from({length:arrowsForEnd},(_,ai)=>{
+        const v=ea[ai];
+        if(v!==undefined){
+          const label=tc.type==='Kill'?valueToLabel(v,i):(v===0?'M':v);
+          const chipCls=tc.type==='Kill'?(v===tc.kill?'chip-kill':v===tc.body?'chip-body':'chip-miss'):chipClass(v,i);
+          return`<span class="arrow-chip ${chipCls}">${label}</span>`;
+        }
+        return`<span class="arrow-chip chip-empty">·</span>`;
+      }).join('');
+
+      html+=`<div class="${cls}" onclick="editEnd(${i})">
+        <div class="end-header">
+          <div>
+            <div class="end-num">T${i+1} — <span style="color:${typeColor};font-size:10px;">${typeLabel}</span>${isEditing?' (EDITING)':isActive?' (ACTIVE)':''}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="font-size:11px;color:var(--muted);">${ea.length}/${arrowsForEnd} arrows</div>
+            <div class="end-total">${ea.length>0?tot:'—'}</div>
+            ${ea.length>0?`<div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:var(--muted);">${running}</div>`:''}
+          </div>
+        </div>
+        <div class="end-arrows">${chips}</div>
+      </div>`;
+    }
+    list.innerHTML='<div style="padding:10px;">'+html+'</div>';
+    setTimeout(()=>{const a=list.querySelector('.active-end,.editing');if(a)a.scrollIntoView({behavior:'smooth',block:'center'});},50);
+    return;
+  }
+
   if(discipline==='3D'||discipline==='Field'){
     let html='';
     for(let i=0;i<cfg.ends;i++){
@@ -550,16 +591,14 @@ function renderScoreList(){
       const isEditing=editingEnd!==null&&editingEnd.endIdx===i;
       const tot=ea.reduce((s,v)=>s+getVal(v),0);
       const cls=isEditing?'end-card editing':isActive?'end-card active-end':'end-card';
-      const chips=Array.from({length:cfg.arrows},(_,ai)=>{
-        const v=ea[ai];
-        return v!==undefined?`<span class="arrow-chip ${chipClass(v)}">${v===0?'M':v}</span>`:`<span class="arrow-chip chip-empty">·</span>`;
-      }).join('');
+      const chips=Array.from({length:cfg.arrows},(_,ai)=>{const v=ea[ai];return v!==undefined?`<span class="arrow-chip ${chipClass(v,i)}">${v===0?'M':v}</span>`:`<span class="arrow-chip chip-empty">·</span>`;}).join('');
       html+=`<div class="${cls}" onclick="editEnd(${i})"><div class="end-header"><div class="end-num">${cfg.label} ${i+1}${isEditing?' (EDITING)':isActive?' (ACTIVE)':''}</div><div class="end-total">${ea.length===cfg.arrows?tot:ea.length?tot:'—'}</div></div><div class="end-arrows">${chips}</div></div>`;
     }
     list.innerHTML='<div style="padding:10px;">'+html+'</div>';
     setTimeout(()=>{const a=list.querySelector('.active-end,.editing');if(a)a.scrollIntoView({behavior:'smooth',block:'center'});},50);
     return;
   }
+
   if(discipline==='Outdoor'){
     list.innerHTML=`
       <div class="sc-half-header"><div class="sc-half-title">1st HALF (Ends 1–6)</div><div>10+X</div><div>X</div></div>
@@ -569,7 +608,7 @@ function renderScoreList(){
       <div style="height:10px;"></div>`;
     renderScOutdoor(ends,0,6,'sc-body-1',curEnd);
     renderScOutdoor(ends,6,12,'sc-body-2',curEnd);
-  } else {
+  }else{
     list.innerHTML=`
       <div class="sc-half-header"><div class="sc-half-title">1st HALF (Ends 1–10)</div><div>10</div><div>9</div></div>
       <table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sc-body-1"></tbody></table>
@@ -592,7 +631,7 @@ function renderScOutdoor(ends,startEnd,endEnd,bodyId,curEnd){
     const s1=(ea.length>=3)?v[0]+v[1]+v[2]:'';
     const s2=(ea.length>=6)?v[3]+v[4]+v[5]:'';
     const et=s2!==''?(Number(s1)||0)+s2:'';
-    if(et!=='') running+=et;
+    if(et!=='')running+=et;
     const c10=ea.filter(x=>x===10||x==='X').length,cx=ea.filter(x=>x==='X').length;
     if(ea.length>0){tens+=c10;xs+=cx;}
     const ra=(isActive||isEditing)&&ea.length<3;
@@ -620,7 +659,7 @@ function renderScIndoor(ends,startEnd,endEnd,bodyId,curEnd){
     const isEditing=editingEnd!==null&&editingEnd.endIdx===e;
     const v=ea.map(x=>getVal(x));
     const et=(ea.length>=3)?v[0]+v[1]+v[2]:'';
-    if(et!=='') running+=et;
+    if(et!=='')running+=et;
     const c10=ea.filter(x=>x===10||x==='X').length,c9=ea.filter(x=>x===9).length;
     if(ea.length>0){tens+=c10;nines+=c9;}
     html+=`<tr class="sc-end-sep"><td class="sc-end-label" onclick="editEnd(${e})">End ${e+1}${isActive?' ▶':isEditing?' ✏':''}</td>
@@ -635,90 +674,126 @@ function renderScIndoor(ends,startEnd,endEnd,bodyId,curEnd){
 
 window.editEnd=(endIdx)=>{
   const archer=getCurrentArcher(),ea=scores[archer.id].ends[endIdx]||[];
-  if(ea.length===0&&endIdx!==getGlobalEnd()) return;
+  if(ea.length===0&&endIdx!==getNextIncompleteEnd())return;
   editingEnd={endIdx,originalArrows:[...ea]};
   scores[archer.id].ends[endIdx]=[...ea];
   renderScoreList();renderPad();updateQualHeader();
 };
 
-function getGlobalEnd(){
-  const cfg=getConfig();
-  for(let e=0;e<cfg.ends;e++){if(targetArchers.some(a=>(scores[a.id].ends[e]||[]).length<cfg.arrows))return e;}
-  return cfg.ends-1;
-}
-
 function updateHeader(){updateQualHeader();}
 
 function updateQualHeader(){
   const cfg=getConfig(),archer=getCurrentArcher();
-  const archerEnds=scores[archer.id].ends;
-  let next=0;
-  for(let e=0;e<cfg.ends;e++){if((archerEnds[e]||[]).length<cfg.arrows){next=e;break;}}
-  const eIdx=editingEnd!==null?editingEnd.endIdx:next;
-  document.getElementById('s-end-label').textContent=`${cfg.label.toUpperCase()} ${eIdx+1}${editingEnd?' — EDITING':''}`;
+  const endIdx=editingEnd!==null?editingEnd.endIdx:getNextIncompleteEnd();
+
+  let endLabel;
+  if(discipline==='Custom'){
+    const tc=getCustomTargetConfig(endIdx);
+    const typeStr=tc.type==='Kill'?` — 🎯 Kill`:tc.type==='3D'?` — 🦌 3D`:` — 🌄 Field`;
+    endLabel=`TARGET ${endIdx+1}${typeStr}${editingEnd?' — EDITING':''}`;
+  }else{
+    endLabel=`${cfg.label.toUpperCase()} ${endIdx+1}${editingEnd?' — EDITING':''}`;
+  }
+
+  document.getElementById('s-end-label').textContent=endLabel;
   document.getElementById('s-archer-name').textContent=archer.name;
   document.getElementById('s-archer-slot').textContent=archer.slot;
   const s=scores[archer.id]||{};
   let g1l,g2l;
-  if(discipline==='3D'){g1l='11';g2l='10';}else if(discipline==='Field'){g1l='6';g2l='5';}else if(discipline==='Indoor'){g1l='10';g2l='9';}else{g1l='X';g2l='10';}
+  if(discipline==='3D'){g1l='11';g2l='10';}
+  else if(discipline==='Field'){g1l='6';g2l='5';}
+  else if(discipline==='Indoor'){g1l='10';g2l='9';}
+  else if(discipline==='Custom'){g1l='Best';g2l='';}
+  else{g1l='X';g2l='10';}
   document.getElementById('s-grand-total').textContent=s.total||0;
   document.getElementById('s-g1').textContent=s.g1||0;
   document.getElementById('s-g2').textContent=s.g2||0;
   document.getElementById('s-g1-label').textContent=g1l;
   document.getElementById('s-g2-label').textContent=g2l;
-  const total=cfg.ends*targetArchers.length;
-  const done=targetArchers.reduce((s,a)=>s+scores[a.id].ends.filter(e=>e.length===cfg.arrows).length,0);
+
+  // Progress: for Custom, count completed ends (each with their own arrow count)
+  let total=0,done=0;
+  if(discipline==='Custom'){
+    const numEnds=getTotalCustomEnds();
+    total=numEnds*targetArchers.length;
+    targetArchers.forEach(a=>{for(let e=0;e<numEnds;e++){if(isEndComplete(a.id,e))done++;}});
+  }else{
+    total=cfg.ends*targetArchers.length;
+    done=targetArchers.reduce((s,a)=>s+scores[a.id].ends.filter(e=>e.length===cfg.arrows).length,0);
+  }
   document.getElementById('s-progress').style.width=(total>0?done/total*100:0)+'%';
 }
 
 function renderPad(){
-  const cfg=getConfig(),archer=getCurrentArcher();
-  const archerEnds=scores[archer.id].ends;
-  let next=0;
-  for(let e=0;e<cfg.ends;e++){if((archerEnds[e]||[]).length<cfg.arrows){next=e;break;}}
-  const endIdx=editingEnd!==null?editingEnd.endIdx:next;
+  const archer=getCurrentArcher();
+  const endIdx=editingEnd!==null?editingEnd.endIdx:getNextIncompleteEnd();
+  const arrowsForEnd=getCustomArrowsForEnd(endIdx);
   const curArrows=scores[archer.id].ends[endIdx]||[];
-  const padScores=getPadScores();
-  const isFull=curArrows.length>=cfg.arrows;
+  const padScores=getPadScores(endIdx);
+  const isFull=curArrows.length>=arrowsForEnd;
   const isEditing=editingEnd!==null;
-  const allDone=targetArchers.every(a=>scores[a.id].ends.filter(e=>e.length===cfg.arrows).length===cfg.ends);
-  const cols=padScores.length<=5?'repeat(3,1fr)':'repeat(4,1fr)';
+  const allDone=targetArchers.every(a=>isArcherDone(a.id));
+
+  // Layout: Kill pad = 3 big buttons, Field = 4 cols, 3D = 3 cols, Outdoor = 4 cols
+  let cols;
+  if(discipline==='Custom'){
+    const tc=getCustomTargetConfig(endIdx);
+    cols=tc.type==='Kill'?'repeat(3,1fr)':tc.type==='3D'?'repeat(3,1fr)':'repeat(4,1fr)';
+  }else{
+    cols=padScores.length<=5?'repeat(3,1fr)':'repeat(4,1fr)';
+  }
+
   let btns=padScores.map(s=>{
-    const label=s===0?'M':s;
-    const scoreArg=s==='X'?"'X'":s;
-    const cls = s===0 ? 'pad-done' : padBtnClass(s);
-    return `<button class="pad-btn ${cls}" onclick="handleScore(${scoreArg})" ${isFull&&!isEditing?'disabled style="opacity:0.4"':''}>${label}</button>`;
+    let label,scoreArg,cls;
+    if(s==='Kill'||s==='Body'||s==='Miss'){
+      const tc=getCustomTargetConfig(endIdx);
+      const pts=s==='Kill'?tc.kill:s==='Body'?tc.body:tc.miss;
+      label=`${s}\n${pts}pts`;
+      scoreArg=`'${s}'`;
+      cls=s==='Kill'?'pad-kill':s==='Body'?'pad-body':'pad-miss';
+    }else{
+      label=s===0?'M':s;
+      scoreArg=s==='X'?"'X'":s;
+      cls=s===0?'pad-done':padBtnClass(s);
+    }
+    return`<button class="pad-btn ${cls}" onclick="handleScore(${scoreArg})" ${isFull&&!isEditing?'disabled style="opacity:0.4"':''} style="white-space:pre-line;font-size:${s==='Kill'||s==='Body'||s==='Miss'?'14px':'20px'};">${label}</button>`;
   }).join('');
+
   btns+=`<button class="pad-btn pad-back" onclick="handleBack()" style="grid-column:span 2;">BACKSPACE ←</button>`;
+
   let nextLabel,nextDisabled;
   if(isEditing){nextLabel='DONE EDITING ✓';nextDisabled=false;}
   else if(allDone){nextLabel='VIEW SUMMARY 🏆';nextDisabled=false;}
-  else{nextLabel=`${curArrows.length}/${cfg.arrows}`;nextDisabled=true;}
-  if(!nextDisabled) btns+=`<button class="pad-btn pad-next" onclick="handleNext()" style="grid-column:span 2;">${nextLabel}</button>`;
+  else{nextLabel=`${curArrows.length}/${arrowsForEnd}`;nextDisabled=true;}
+  if(!nextDisabled)btns+=`<button class="pad-btn pad-next" onclick="handleNext()" style="grid-column:span 2;">${nextLabel}</button>`;
+
   const pad=document.getElementById('score-pad');
   pad.style.gridTemplateColumns=cols;
   pad.innerHTML=btns;
 }
 
 window.handleScore=async(val)=>{
-  const cfg=getConfig(),archer=getCurrentArcher();
-  const archerEnds=scores[archer.id].ends;
-  let next=0;
-  for(let e=0;e<cfg.ends;e++){if((archerEnds[e]||[]).length<cfg.arrows){next=e;break;}}
-  const endIdx=editingEnd!==null?editingEnd.endIdx:next;
+  const archer=getCurrentArcher();
+  const endIdx=editingEnd!==null?editingEnd.endIdx:getNextIncompleteEnd();
+  const arrowsForEnd=getCustomArrowsForEnd(endIdx);
   const end=scores[archer.id].ends[endIdx]||[];
-  if(end.length>=cfg.arrows) return;
-  end.push(val);
+  if(end.length>=arrowsForEnd)return;
+
+  // Convert Kill/Body/Miss label to point value for storage
+  const storedVal=scoreToValue(val,endIdx);
+  end.push(storedVal);
   scores[archer.id].ends[endIdx]=end;
   recalcStats(archer.id);
-  if(!editingEnd&&end.length===cfg.arrows){
-    const myFull=scores[archer.id].ends.filter(e=>e.length===cfg.arrows).length;
-    const allDone=targetArchers.every(a=>scores[a.id].ends.filter(e=>e.length===cfg.arrows).length===cfg.ends);
+
+  if(!editingEnd&&end.length>=arrowsForEnd){
+    const allDone=targetArchers.every(a=>isArcherDone(a.id));
     if(allDone){await saveQualScores();renderTabs();renderScoreList();renderPad();updateQualHeader();showQualSummary();return;}
+    // Find next archer who needs scoring
+    const myDone=countDoneEnds(archer.id);
     let nextIdx=-1;
-    for(let i=activeArcherIdx+1;i<targetArchers.length;i++){if(scores[targetArchers[i].id].ends.filter(e=>e.length===cfg.arrows).length<myFull){nextIdx=i;break;}}
-    if(nextIdx===-1){for(let i=0;i<activeArcherIdx;i++){if(scores[targetArchers[i].id].ends.filter(e=>e.length===cfg.arrows).length<myFull){nextIdx=i;break;}}}
-    if(nextIdx===-1) nextIdx=0;
+    for(let i=activeArcherIdx+1;i<targetArchers.length;i++){if(countDoneEnds(targetArchers[i].id)<myDone){nextIdx=i;break;}}
+    if(nextIdx===-1){for(let i=0;i<activeArcherIdx;i++){if(countDoneEnds(targetArchers[i].id)<myDone){nextIdx=i;break;}}}
+    if(nextIdx===-1)nextIdx=0;
     activeArcherIdx=nextIdx;
     await saveQualScores();
     renderTabs();renderScoreList();renderPad();updateQualHeader();
@@ -727,24 +802,30 @@ window.handleScore=async(val)=>{
   renderScoreList();renderPad();updateQualHeader();
 };
 
+function countDoneEnds(archerId){
+  const cfg=getConfig();
+  let count=0;
+  for(let e=0;e<cfg.ends;e++){if(isEndComplete(archerId,e))count++;}
+  return count;
+}
+
 window.handleBack=()=>{
   const archer=getCurrentArcher();
-  const endIdx=editingEnd!==null?editingEnd.endIdx:getGlobalEnd();
+  const endIdx=editingEnd!==null?editingEnd.endIdx:getNextIncompleteEnd();
   const end=scores[archer.id].ends[endIdx]||[];
   if(end.length>0){end.pop();scores[archer.id].ends[endIdx]=end;recalcStats(archer.id);renderScoreList();renderPad();updateQualHeader();}
 };
 
 window.handleNext=async()=>{
-  const cfg=getConfig();
   if(editingEnd!==null){editingEnd=null;await saveQualScores();renderTabs();renderScoreList();renderPad();updateQualHeader();toast('Scores saved ✓','success');return;}
-  const allDone=targetArchers.every(a=>scores[a.id].ends.filter(e=>e.length===cfg.arrows).length===cfg.ends);
+  const allDone=targetArchers.every(a=>isArcherDone(a.id));
   if(allDone){showQualSummary();return;}
-  const myFull=scores[getCurrentArcher().id].ends.filter(e=>e.length===cfg.arrows).length;
+  const myDone=countDoneEnds(getCurrentArcher().id);
   let nextIdx=-1;
-  for(let i=activeArcherIdx+1;i<targetArchers.length;i++){if(scores[targetArchers[i].id].ends.filter(e=>e.length===cfg.arrows).length<myFull){nextIdx=i;break;}}
-  if(nextIdx===-1){for(let i=0;i<activeArcherIdx;i++){if(scores[targetArchers[i].id].ends.filter(e=>e.length===cfg.arrows).length<myFull){nextIdx=i;break;}}}
-  if(nextIdx===-1) nextIdx=0;
-  activeArcherIdx=nextIdx; editingEnd=null;
+  for(let i=activeArcherIdx+1;i<targetArchers.length;i++){if(countDoneEnds(targetArchers[i].id)<myDone){nextIdx=i;break;}}
+  if(nextIdx===-1){for(let i=0;i<activeArcherIdx;i++){if(countDoneEnds(targetArchers[i].id)<myDone){nextIdx=i;break;}}}
+  if(nextIdx===-1)nextIdx=0;
+  activeArcherIdx=nextIdx;editingEnd=null;
   await saveQualScores();
   renderTabs();renderScoreList();renderPad();updateQualHeader();
 };
@@ -768,15 +849,19 @@ function recalcStats(archerId){
     scores[archerId].h1=0;scores[archerId].h2=0;
     scores[archerId].g1=all.filter(v=>v===11).length;
     scores[archerId].g2=all.filter(v=>v===10).length;
-  }else{
+  }else if(discipline==='Field'){
     scores[archerId].h1=0;scores[archerId].h2=0;
     scores[archerId].g1=all.filter(v=>v===6).length;
     scores[archerId].g2=all.filter(v=>v===5).length;
+  }else if(discipline==='Custom'){
+    scores[archerId].h1=0;scores[archerId].h2=0;
+    scores[archerId].g1=scores[archerId].total; // best score
+    scores[archerId].g2=0;
   }
 }
 
 async function saveQualScores(){
-  if(!compId) return;
+  if(!compId)return;
   try{
     const payload={scores:{}};
     targetArchers.forEach(a=>{
@@ -814,17 +899,46 @@ window.switchSummaryArcher=(idx)=>{summaryArcherIdx=idx;renderSummaryTabs();rend
 
 function renderSummaryScorecard(idx){
   const a=targetArchers[idx],s=scores[a.id],list=document.getElementById('summary-list');
+
+  if(discipline==='Custom'){
+    let running=0;
+    const endRows=s.ends.map((end,i)=>{
+      const tc=getCustomTargetConfig(i);
+      const tot=end.reduce((x,v)=>x+getVal(v),0);
+      if(end.length>0)running+=tot;
+      const typeColor=tc.type==='Kill'?'#c62828':tc.type==='3D'?'#4a148c':'#1565c0';
+      const typeLabel=tc.type;
+      const chips=end.map(v=>{
+        const label=tc.type==='Kill'?valueToLabel(v,i):(v===0?'M':v);
+        const chipCls=tc.type==='Kill'?(v===tc.kill?'chip-kill':v===tc.body?'chip-body':'chip-miss'):chipClass(v,i);
+        return`<span class="arrow-chip ${chipCls}" style="font-size:12px;padding:2px 7px;">${label}</span>`;
+      }).join('');
+      return`<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #eee;">
+        <div style="min-width:80px;">
+          <div style="font-size:11px;color:#888;">T${i+1}</div>
+          <div style="font-size:10px;font-weight:700;color:${typeColor};">${typeLabel} · ${tc.arrows}↑</div>
+        </div>
+        <div style="display:flex;gap:3px;flex:1;">${chips}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#1565c0;min-width:28px;text-align:right;">${end.length>0?tot:''}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#c62828;min-width:32px;text-align:right;">${end.length>0?running:''}</div>
+      </div>`;
+    }).join('');
+    list.innerHTML=`<div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:11px;color:#aaa;">${a.slot} · ${a.bow} · ${a.age} · Custom</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;">${a.name}</div></div><div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:var(--accent);">${s.total}</div></div><div>${endRows}</div>`;
+    return;
+  }
+
   if(discipline==='3D'||discipline==='Field'){
     const cfg=getConfig();
     const endRows=s.ends.map((end,i)=>{
       const tot=end.reduce((x,v)=>x+getVal(v),0);
-      const chips=end.map(v=>`<span class="arrow-chip ${chipClass(v)}" style="font-size:12px;padding:2px 7px;">${v===0?'M':v}</span>`).join('');
-      return `<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #eee;"><div style="font-size:11px;color:#888;width:70px;">${cfg.label} ${i+1}</div><div style="display:flex;gap:3px;flex:1;">${chips}</div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#1565c0;">${tot}</div></div>`;
+      const chips=end.map(v=>`<span class="arrow-chip ${chipClass(v,i)}" style="font-size:12px;padding:2px 7px;">${v===0?'M':v}</span>`).join('');
+      return`<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #eee;"><div style="font-size:11px;color:#888;width:70px;">${cfg.label} ${i+1}</div><div style="display:flex;gap:3px;flex:1;">${chips}</div><div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#1565c0;">${tot}</div></div>`;
     }).join('');
     list.innerHTML=`<div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:11px;color:#aaa;">${a.slot} · ${a.bow} · ${a.age}</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;">${a.name}</div></div><div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:var(--accent);">${s.total}</div></div><div>${endRows}</div>`;
     return;
   }
-  function sumCell(val){const v=val===undefined||val===''?'':(val===0?'M':val);const cls=(val==='X'||val===10||val===9||val===11)?'sc-gold':'';return `<td class="${cls}">${v}</td>`;}
+
+  function sumCell(val){const v=val===undefined||val===''?'':(val===0?'M':val);const cls=(val==='X'||val===10||val===9||val===11)?'sc-gold':'';return`<td class="${cls}">${v}</td>`;}
   if(discipline==='Outdoor'){
     list.innerHTML=`<div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:11px;color:#aaa;">${a.slot} · ${a.bow} · ${a.age}</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;">${a.name}</div></div><div style="text-align:right;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:#FFD700;">${s.total}</div><div style="font-size:11px;color:#aaa;">X:${s.xs} · 10+X:${s.tens}</div></div></div>
       <div class="sc-half-header"><div class="sc-half-title">1st HALF (Ends 1–6)</div><div>10+X</div><div>X</div></div>
@@ -833,7 +947,7 @@ function renderSummaryScorecard(idx){
       <table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:32px"><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sum-body-2"></tbody></table><div style="height:10px;"></div>`;
     function sumOut(ends,s,e,bid){let html='',r=0,t=0,x=0;for(let i=s;i<e;i++){const ea=ends[i]||[];const v=ea.map(x=>getVal(x));const s1=ea.length>=3?v[0]+v[1]+v[2]:'';const s2=ea.length>=6?v[3]+v[4]+v[5]:'';const et=s2!==''?(Number(s1)||0)+s2:'';if(et!=='')r+=et;const c10=ea.filter(x=>x===10||x==='X').length,cx=ea.filter(x=>x==='X').length;if(ea.length>0){t+=c10;x+=cx;}html+=`<tr><td rowspan="2" class="sc-end-label">End ${i+1}</td>${sumCell(ea[0])}${sumCell(ea[1])}${sumCell(ea[2])}<td class="sc-sum-box">${s1}</td><td class="sc-no-entry"></td><td rowspan="2" class="sc-running">${et!==''?r:''}</td><td class="sc-stat">${ea.length>0?c10:''}</td><td class="sc-stat">${ea.length>0?cx:''}</td></tr><tr class="sc-end-sep">${sumCell(ea[3])}${sumCell(ea[4])}${sumCell(ea[5])}<td class="sc-sum-box">${s2}</td><td class="sc-end-total">${et}</td><td class="sc-stat"></td><td class="sc-stat"></td></tr>`;}html+=`<tr class="sc-half-total"><td colspan="5">HALF TOTAL</td><td>${r}</td><td></td><td>${t}</td><td>${x}</td></tr>`;document.getElementById(bid).innerHTML=html;}
     sumOut(s.ends,0,6,'sum-body-1');sumOut(s.ends,6,12,'sum-body-2');
-  } else {
+  }else{
     list.innerHTML=`<div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:11px;color:#aaa;">${a.slot} · ${a.bow} · ${a.age}</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;">${a.name}</div></div><div style="text-align:right;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;color:#FFD700;">${s.total}</div><div style="font-size:11px;color:#aaa;">10:${s.g1} · 9:${s.g2}</div></div></div>
       <div class="sc-half-header"><div class="sc-half-title">1st HALF (Ends 1–10)</div><div>10</div><div>9</div></div>
       <table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sum-body-1"></tbody></table>
@@ -846,88 +960,27 @@ function renderSummaryScorecard(idx){
 
 window.goBackToScoring=()=>{
   document.getElementById('summary-screen').style.display='none';
-  // If we came from a match, go back to login. Otherwise go back to qual scoring.
   if(matchData){
     document.getElementById('login-screen').style.display='flex';
-    // Reset match state
-    matchData=null; matchCatKey=null; matchRoundKey=null; matchIdx=null;
-    matchSets=[]; cumArrows1=[]; cumArrows2=[]; window._tbWinner=null;
+    matchData=null;matchCatKey=null;matchRoundKey=null;matchIdx=null;
+    matchSets=[];cumArrows1=[];cumArrows2=[];window._tbWinner=null;
     showLoginStep('login-step-1');
-  } else {
+  }else{
     document.getElementById('scoring-screen').style.display='flex';
     renderTabs();renderScoreList();renderPad();updateQualHeader();
   }
 };
 
-/* ══════════════════════════════════════════
-   MATCH SCORING
-══════════════════════════════════════════ */
-function getMatchSetScore(setIdx,archerIdx){
-  const s=matchSets[setIdx];
-  if(!s) return 0;
-  return archerIdx===0?s.score1||0:s.score2||0;
-}
-function getMatchArrows(setIdx,archerIdx){
-  const s=matchSets[setIdx];
-  if(!s) return [];
-  return archerIdx===0?(s.arrows1||[]):(s.arrows2||[]);
-}
-function setMatchArrows(setIdx,archerIdx,arrows){
-  if(!matchSets[setIdx]) matchSets[setIdx]={score1:0,score2:0,arrows1:[],arrows2:[]};
-  if(archerIdx===0){matchSets[setIdx].arrows1=arrows;matchSets[setIdx].score1=arrows.reduce((s,v)=>s+getVal(v),0);}
-  else{matchSets[setIdx].arrows2=arrows;matchSets[setIdx].score2=arrows.reduce((s,v)=>s+getVal(v),0);}
-}
-function calcMatchPoints(){
-  let p1=0,p2=0;
-  // Only count first MAX_SETS sets, and only when BOTH archers have finished that set
-  matchSets.slice(0,MAX_SETS).forEach((s,i)=>{
-    if(!s) return;
-    if(s.arrows1.length<getArrowsPerSet()||s.arrows2.length<getArrowsPerSet()) return;
-    if(s.score1>s.score2) p1+=2;
-    else if(s.score2>s.score1) p2+=2;
-    else{p1+=1;p2+=1;}
-  });
-  return {p1,p2};
-}
-function getTBArrows(setIdx){ return setIdx===MAX_SETS ? 1 : getArrowsPerSet(); }
-
-function isMatchWon(){
-  const {p1,p2}=calcMatchPoints();
-  return p1>=SETS_TO_WIN||p2>=SETS_TO_WIN;
-}
-
-function getActiveMatchSet(){
-  if(isMatchWon()) return -1; // match over, no active set
-  const maxSets = isTiebreakNeeded() ? MAX_SETS+1 : MAX_SETS;
-  for(let i=0;i<maxSets;i++){
-    if(getMatchArrows(i,matchActiveArcher).length < getTBArrows(i)) return i;
-  }
-  return maxSets-1;
-}
-function checkMatchDone(){
-  const {p1,p2}=calcMatchPoints();
-  if(p1>=SETS_TO_WIN||p2>=SETS_TO_WIN) return true;
-  if(matchSets.length>=MAX_SETS){
-    const all5done=matchSets.slice(0,MAX_SETS).every(s=>s&&s.arrows1.length===getArrowsPerSet()&&s.arrows2.length===getArrowsPerSet());
-    if(!all5done) return false;
-    if(p1===5&&p2===5){
-      // Need tiebreak — check if tiebreak set (index MAX_SETS) is done (1 arrow each)
-      const tb=matchSets[MAX_SETS];
-      if(!tb||tb.arrows1.length<1||tb.arrows2.length<1) return false;
-      return true;
-    }
-    return true;
-  }
-  return false;
-}
-
-function isTiebreakNeeded(){
-  if(matchSets.length<MAX_SETS) return false;
-  const all5done=matchSets.slice(0,MAX_SETS).every(s=>s&&s.arrows1.length===getArrowsPerSet()&&s.arrows2.length===getArrowsPerSet());
-  if(!all5done) return false;
-  const {p1,p2}=calcMatchPoints();
-  return p1===5&&p2===5;
-}
+/* ── MATCH SCORING ── */
+function getMatchSetScore(setIdx,archerIdx){const s=matchSets[setIdx];if(!s)return 0;return archerIdx===0?s.score1||0:s.score2||0;}
+function getMatchArrows(setIdx,archerIdx){const s=matchSets[setIdx];if(!s)return[];return archerIdx===0?(s.arrows1||[]):(s.arrows2||[]);}
+function setMatchArrows(setIdx,archerIdx,arrows){if(!matchSets[setIdx])matchSets[setIdx]={score1:0,score2:0,arrows1:[],arrows2:[]};if(archerIdx===0){matchSets[setIdx].arrows1=arrows;matchSets[setIdx].score1=arrows.reduce((s,v)=>s+getVal(v),0);}else{matchSets[setIdx].arrows2=arrows;matchSets[setIdx].score2=arrows.reduce((s,v)=>s+getVal(v),0);}}
+function calcMatchPoints(){let p1=0,p2=0;matchSets.slice(0,MAX_SETS).forEach((s,i)=>{if(!s)return;if(s.arrows1.length<getArrowsPerSet()||s.arrows2.length<getArrowsPerSet())return;if(s.score1>s.score2)p1+=2;else if(s.score2>s.score1)p2+=2;else{p1+=1;p2+=1;}});return{p1,p2};}
+function getTBArrows(setIdx){return setIdx===MAX_SETS?1:getArrowsPerSet();}
+function isMatchWon(){const{p1,p2}=calcMatchPoints();return p1>=SETS_TO_WIN||p2>=SETS_TO_WIN;}
+function getActiveMatchSet(){if(isMatchWon())return -1;const maxSets=isTiebreakNeeded()?MAX_SETS+1:MAX_SETS;for(let i=0;i<maxSets;i++){if(getMatchArrows(i,matchActiveArcher).length<getTBArrows(i))return i;}return maxSets-1;}
+function checkMatchDone(){const{p1,p2}=calcMatchPoints();if(p1>=SETS_TO_WIN||p2>=SETS_TO_WIN)return true;if(matchSets.length>=MAX_SETS){const all5done=matchSets.slice(0,MAX_SETS).every(s=>s&&s.arrows1.length===getArrowsPerSet()&&s.arrows2.length===getArrowsPerSet());if(!all5done)return false;if(p1===5&&p2===5){const tb=matchSets[MAX_SETS];if(!tb||tb.arrows1.length<1||tb.arrows2.length<1)return false;return true;}return true;}return false;}
+function isTiebreakNeeded(){if(matchSets.length<MAX_SETS)return false;const all5done=matchSets.slice(0,MAX_SETS).every(s=>s&&s.arrows1.length===getArrowsPerSet()&&s.arrows2.length===getArrowsPerSet());if(!all5done)return false;const{p1,p2}=calcMatchPoints();return p1===5&&p2===5;}
 
 window.startMatch=()=>{
   document.getElementById('login-screen').style.display='none';
@@ -938,8 +991,7 @@ window.startMatch=()=>{
   document.getElementById('m-format-label').textContent=matchFormat==='sets'?'Set System · First to 6 pts':'Cumulative · 15 arrows';
   document.getElementById('sp-a1-label').textContent=matchData.archer1?.name?.split(' ')[0]||'A1';
   document.getElementById('sp-a2-label').textContent=matchData.archer2?.name?.split(' ')[0]||'A2';
-  matchActiveArcher=0;
-  cumTB1=null; cumTB2=null; window._cumTBWinner=null;
+  matchActiveArcher=0;cumTB1=null;cumTB2=null;window._cumTBWinner=null;
   renderMatchTabs();renderMatchSets();renderMatchPad();updateMatchHeader();
 };
 
@@ -955,14 +1007,14 @@ window.switchMatchArcher=(idx)=>{matchActiveArcher=idx;renderMatchTabs();renderM
 function updateMatchHeader(){
   const archer=matchActiveArcher===0?matchData.archer1:matchData.archer2;
   if(matchFormat==='sets'){
-    const {p1,p2}=calcMatchPoints();
+    const{p1,p2}=calcMatchPoints();
     document.getElementById('sp-a1').textContent=p1;
     document.getElementById('sp-a2').textContent=p2;
     const si=getActiveMatchSet();
     document.getElementById('m-set-label').textContent=`SET ${si+1}`;
     const arr=getMatchArrows(si,matchActiveArcher);
     document.getElementById('m-arrow-count').textContent=`${arr.length}/${getTBArrows(si)}`;
-  } else {
+  }else{
     const t1=cumArrows1.reduce((s,v)=>s+getVal(v),0);
     const t2=cumArrows2.reduce((s,v)=>s+getVal(v),0);
     document.getElementById('sp-a1').textContent=t1;
@@ -975,87 +1027,60 @@ function updateMatchHeader(){
   document.getElementById('m-archer-name').textContent=archer?.name||'—';
 }
 
-function arrowChip(v, isActive){
-  if(v===undefined) return `<span style="width:28px;height:28px;border-radius:6px;background:var(--surface2);border:1px dashed var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);">·</span>`;
+function arrowChip(v,isActive){
+  if(v===undefined)return`<span style="width:28px;height:28px;border-radius:6px;background:var(--surface2);border:1px dashed var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);">·</span>`;
   const cls=chipClass(v);
   const act=isActive?'outline:2px solid var(--accent);outline-offset:1px;':'';
-  return `<span class="arrow-chip ${cls}" style="min-width:28px;text-align:center;${act}">${v===0?'M':v}</span>`;
+  return`<span class="arrow-chip ${cls}" style="min-width:28px;text-align:center;${act}">${v===0?'M':v}</span>`;
 }
 
 function renderMatchSets(){
   const list=document.getElementById('sets-list');
-  const a1=matchData.archer1, a2=matchData.archer2;
+  const a1=matchData.archer1,a2=matchData.archer2;
   const activeSi=getActiveMatchSet();
-
   if(matchFormat==='sets'){
-    const totalSets = isTiebreakNeeded() ? MAX_SETS+1 : MAX_SETS;
+    const totalSets=isTiebreakNeeded()?MAX_SETS+1:MAX_SETS;
     let html=`<div style="display:grid;grid-template-columns:1fr auto auto auto 1fr;gap:4px;padding:6px 10px;background:var(--surface2);border-radius:8px;margin-bottom:6px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--muted);">
-      <div>${a1?.name||'A1'}</div>
-      <div style="min-width:34px;text-align:center;">SET</div>
-      <div style="min-width:32px;text-align:center;"></div>
-      <div style="min-width:34px;text-align:center;">SET</div>
-      <div style="text-align:right;">${a2?.name||'A2'}</div>
-    </div>`;
-
+      <div>${a1?.name||'A1'}</div><div style="min-width:34px;text-align:center;">SET</div><div style="min-width:32px;text-align:center;"></div><div style="min-width:34px;text-align:center;">SET</div><div style="text-align:right;">${a2?.name||'A2'}</div></div>`;
     for(let i=0;i<totalSets;i++){
       const isTB=i===MAX_SETS;
-      const arr1=getMatchArrows(i,0), arr2=getMatchArrows(i,1);
-      const s1=getMatchSetScore(i,0), s2=getMatchSetScore(i,1);
-      const done1=arr1.length===getTBArrows(i), done2=arr2.length===getTBArrows(i);
+      const arr1=getMatchArrows(i,0),arr2=getMatchArrows(i,1);
+      const s1=getMatchSetScore(i,0),s2=getMatchSetScore(i,1);
+      const done1=arr1.length===getTBArrows(i),done2=arr2.length===getTBArrows(i);
       const bothDone=done1&&done2;
       const isActive1=i===activeSi&&matchActiveArcher===0&&!done1;
       const isActive2=i===activeSi&&matchActiveArcher===1&&!done2;
-
-      let c1='var(--muted2)', c2='var(--muted2)';
-      if(bothDone){
-        if(s1>s2){c1='var(--green)';}
-        else if(s2>s1){c2='var(--green)';}
-        else{c1='var(--accent)';c2='var(--accent)';}
-      }
-
+      let c1='var(--muted2)',c2='var(--muted2)';
+      if(bothDone){if(s1>s2){c1='var(--green)';}else if(s2>s1){c2='var(--green)';}else{c1='var(--accent)';c2='var(--accent)';}}
       const arrowCount=getTBArrows(i);
       const chips1=Array.from({length:arrowCount},(_,ai)=>arrowChip(arr1[ai],isActive1&&ai===arr1.length)).join('');
       const chips2=Array.from({length:arrowCount},(_,ai)=>arrowChip(arr2[ai],isActive2&&ai===arr2.length)).join('');
       const pts1=bothDone&&!isTB?(s1>s2?2:s1===s2?1:0):'';
       const pts2=bothDone&&!isTB?(s2>s1?2:s1===s2?1:0):'';
-      const matchAlreadyWon = isMatchWon() && !bothDone && i>0;
+      const matchAlreadyWon=isMatchWon()&&!bothDone&&i>0;
       const borderCol=isTB?'var(--red)':bothDone?'var(--green)':i===activeSi?'var(--accent)':matchAlreadyWon?'var(--surface2)':'var(--border)';
       const setBg=i===activeSi&&!bothDone?'rgba(255,215,0,0.04)':matchAlreadyWon?'rgba(0,0,0,0.2)':'transparent';
       const setLabel=isTB?'TB':'S'+(i+1);
-
       html+=`<div style="display:grid;grid-template-columns:1fr auto auto auto 1fr;gap:4px;align-items:center;padding:6px 8px;margin-bottom:4px;background:${setBg};border:1px solid ${borderCol};border-radius:8px;">
         <div style="display:flex;gap:3px;flex-wrap:wrap;">${chips1}</div>
         <div style="min-width:34px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:${c1};">${bothDone?s1:''}</div>
-        <div style="min-width:32px;text-align:center;">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;color:${isTB?'var(--red)':'var(--muted2)'};">${setLabel}</div>
-          ${bothDone&&!isTB?`<div style="font-size:9px;color:var(--muted2);">${pts1}–${pts2}</div>`:''}
-        </div>
+        <div style="min-width:32px;text-align:center;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;color:${isTB?'var(--red)':'var(--muted2)'};">${setLabel}</div>${bothDone&&!isTB?`<div style="font-size:9px;color:var(--muted2);">${pts1}–${pts2}</div>`:''}</div>
         <div style="min-width:34px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:${c2};">${bothDone?s2:''}</div>
         <div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end;">${chips2}</div>
       </div>`;
-
       if(isTB&&bothDone&&s1===s2){
-        html+=`<div style="background:var(--surface2);border:1px solid var(--red);border-radius:8px;padding:12px;margin-bottom:4px;">
-          <div style="font-size:11px;color:var(--red);margin-bottom:8px;font-weight:700;text-align:center;">⚡ TIED — WHO IS CLOSEST TO CENTER?</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-            <button onclick="setTBWinner(0)" style="padding:10px;border-radius:8px;border:2px solid ${window._tbWinner===0?'var(--green)':'var(--border)'};background:${window._tbWinner===0?'rgba(67,160,71,0.2)':'var(--surface3)'};color:${window._tbWinner===0?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">${a1?.name||'A1'}</button>
-            <button onclick="setTBWinner(1)" style="padding:10px;border-radius:8px;border:2px solid ${window._tbWinner===1?'var(--green)':'var(--border)'};background:${window._tbWinner===1?'rgba(67,160,71,0.2)':'var(--surface3)'};color:${window._tbWinner===1?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">${a2?.name||'A2'}</button>
-          </div>
-        </div>`;
+        html+=`<div style="background:var(--surface2);border:1px solid var(--red);border-radius:8px;padding:12px;margin-bottom:4px;"><div style="font-size:11px;color:var(--red);margin-bottom:8px;font-weight:700;text-align:center;">⚡ TIED — WHO IS CLOSEST TO CENTER?</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><button onclick="setTBWinner(0)" style="padding:10px;border-radius:8px;border:2px solid ${window._tbWinner===0?'var(--green)':'var(--border)'};background:${window._tbWinner===0?'rgba(67,160,71,0.2)':'var(--surface3)'};color:${window._tbWinner===0?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">${a1?.name||'A1'}</button><button onclick="setTBWinner(1)" style="padding:10px;border-radius:8px;border:2px solid ${window._tbWinner===1?'var(--green)':'var(--border)'};background:${window._tbWinner===1?'rgba(67,160,71,0.2)':'var(--surface3)'};color:${window._tbWinner===1?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">${a2?.name||'A2'}</button></div></div>`;
       }
     }
     list.innerHTML=html;
-  } else {
+  }else{
     let html=`<div style="display:grid;grid-template-columns:1fr auto auto auto 1fr;gap:4px;padding:6px 10px;background:var(--surface2);border-radius:8px;margin-bottom:6px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--muted);">
-      <div>${a1?.name||'A1'}</div>
-      <div style="text-align:center;">END</div><div></div><div style="text-align:center;">END</div>
-      <div style="text-align:right;">${a2?.name||'A2'}</div>
-    </div>`;
+      <div>${a1?.name||'A1'}</div><div style="text-align:center;">END</div><div></div><div style="text-align:center;">END</div><div style="text-align:right;">${a2?.name||'A2'}</div></div>`;
     for(let e=0;e<getCumEnds();e++){
       const si=e*getArrowsPerSet();
-      const ea1=cumArrows1.slice(si,si+getArrowsPerSet()), ea2=cumArrows2.slice(si,si+getArrowsPerSet());
-      const t1=ea1.reduce((s,v)=>s+getVal(v),0), t2=ea2.reduce((s,v)=>s+getVal(v),0);
-      const d1=ea1.length===getArrowsPerSet(), d2=ea2.length===getArrowsPerSet();
+      const ea1=cumArrows1.slice(si,si+getArrowsPerSet()),ea2=cumArrows2.slice(si,si+getArrowsPerSet());
+      const t1=ea1.reduce((s,v)=>s+getVal(v),0),t2=ea2.reduce((s,v)=>s+getVal(v),0);
+      const d1=ea1.length===getArrowsPerSet(),d2=ea2.length===getArrowsPerSet();
       const isActive1=matchActiveArcher===0&&e===Math.floor(cumArrows1.length/getArrowsPerSet())&&!d1;
       const isActive2=matchActiveArcher===1&&e===Math.floor(cumArrows2.length/getArrowsPerSet())&&!d2;
       const borderCol=isActive1||isActive2?'var(--accent)':d1&&d2?'var(--green)':'var(--border)';
@@ -1069,19 +1094,16 @@ function renderMatchSets(){
         <div style="display:flex;gap:3px;justify-content:flex-end;">${chips2}</div>
       </div>`;
     }
-    // Add TB row if all targets done and scores are tied
-    const allCumDone = cumArrows1.length>=getCumEnds()*getArrowsPerSet() && cumArrows2.length>=getCumEnds()*getArrowsPerSet();
+    const allCumDone=cumArrows1.length>=getCumEnds()*getArrowsPerSet()&&cumArrows2.length>=getCumEnds()*getArrowsPerSet();
     if(allCumDone){
       const tot1=cumArrows1.reduce((s,v)=>s+getVal(v),0);
       const tot2=cumArrows2.reduce((s,v)=>s+getVal(v),0);
-      const tied = tot1===tot2;
-      // TB arrow (1 arrow each, closest to centre wins)
-      const tb1=cumTB1, tb2=cumTB2;
-      const tbActive1=matchActiveArcher===0&&tb1===null;
-      const tbActive2=matchActiveArcher===1&&tb2===null;
-      const tbBorder=tbActive1||tbActive2?'var(--accent)':tb1!==null&&tb2!==null?'var(--green)':'var(--border)';
-      if(tied){
-        const tbStillTied = tb1!==null && tb2!==null && getVal(tb1)===getVal(tb2);
+      if(tot1===tot2){
+        const tb1=cumTB1,tb2=cumTB2;
+        const tbActive1=matchActiveArcher===0&&tb1===null;
+        const tbActive2=matchActiveArcher===1&&tb2===null;
+        const tbBorder=tbActive1||tbActive2?'var(--accent)':tb1!==null&&tb2!==null?'var(--green)':'var(--border)';
+        const tbStillTied=tb1!==null&&tb2!==null&&getVal(tb1)===getVal(tb2);
         html+=`<div style="display:grid;grid-template-columns:1fr auto auto auto 1fr;gap:4px;align-items:center;padding:6px 8px;margin-bottom:4px;border:1px solid ${tbBorder};border-radius:8px;background:#1a1500;">
           <div style="display:flex;gap:3px;">${arrowChip(tb1,tbActive1)}</div>
           <div style="min-width:34px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;color:var(--accent);">${tb1!==null?getVal(tb1):''}</div>
@@ -1090,39 +1112,29 @@ function renderMatchSets(){
           <div style="display:flex;gap:3px;justify-content:flex-end;">${arrowChip(tb2,tbActive2)}</div>
         </div>`;
         if(tbStillTied){
-          html+=`<div style="background:#1a1500;border:1px solid var(--accent);border-radius:8px;padding:10px;margin-bottom:4px;text-align:center;">
-            <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:8px;letter-spacing:1px;">CLOSER TO CENTER?</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-              <button onclick="setCumTBWinner(0)" style="padding:10px;border-radius:8px;border:2px solid ${window._cumTBWinner===0?'var(--green)':'var(--border)'};background:${window._cumTBWinner===0?'rgba(67,160,71,0.2)':'var(--surface2)'};color:${window._cumTBWinner===0?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">${matchData.archer1?.name||'A1'}</button>
-              <button onclick="setCumTBWinner(1)" style="padding:10px;border-radius:8px;border:2px solid ${window._cumTBWinner===1?'var(--green)':'var(--border)'};background:${window._cumTBWinner===1?'rgba(67,160,71,0.2)':'var(--surface2)'};color:${window._cumTBWinner===1?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">${matchData.archer2?.name||'A2'}</button>
-            </div>
-          </div>`;
+          html+=`<div style="background:#1a1500;border:1px solid var(--accent);border-radius:8px;padding:10px;margin-bottom:4px;text-align:center;"><div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:8px;letter-spacing:1px;">CLOSER TO CENTER?</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><button onclick="setCumTBWinner(0)" style="padding:10px;border-radius:8px;border:2px solid ${window._cumTBWinner===0?'var(--green)':'var(--border)'};background:${window._cumTBWinner===0?'rgba(67,160,71,0.2)':'var(--surface2)'};color:${window._cumTBWinner===0?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">${matchData.archer1?.name||'A1'}</button><button onclick="setCumTBWinner(1)" style="padding:10px;border-radius:8px;border:2px solid ${window._cumTBWinner===1?'var(--green)':'var(--border)'};background:${window._cumTBWinner===1?'rgba(67,160,71,0.2)':'var(--surface2)'};color:${window._cumTBWinner===1?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">${matchData.archer2?.name||'A2'}</button></div></div>`;
         }
       }
     }
     list.innerHTML=html;
   }
-  setTimeout(()=>{
-    const rows=list.querySelectorAll('[style*="border:1px solid var(--accent)"]');
-    if(rows.length) rows[rows.length-1].scrollIntoView({behavior:'smooth',block:'center'});
-  },50);
+  setTimeout(()=>{const rows=list.querySelectorAll('[style*="border:1px solid var(--accent)"]');if(rows.length)rows[rows.length-1].scrollIntoView({behavior:'smooth',block:'center'});},50);
 }
 
 function renderMatchPad(){
-  const padScores=getPadScores();
+  const padScores=getPadScores(0); // match always uses standard scoring
   let isFull;
   if(matchFormat==='sets'){
     const asi=getActiveMatchSet();
-    isFull = asi===-1 || isMatchWon() || getMatchArrows(asi,matchActiveArcher).length>=getTBArrows(asi);
-  }
-  else{
+    isFull=asi===-1||isMatchWon()||getMatchArrows(asi,matchActiveArcher).length>=getTBArrows(asi);
+  }else{
     const aPerT=getArrowsPerSet();
     const allDoneCum=cumArrows1.length>=getCumEnds()*aPerT&&cumArrows2.length>=getCumEnds()*aPerT;
     if(allDoneCum){
       const tot1=cumArrows1.reduce((s,v)=>s+getVal(v),0),tot2=cumArrows2.reduce((s,v)=>s+getVal(v),0);
-      if(tot1!==tot2){isFull=true;} // not tied, pad disabled, show submit
+      if(tot1!==tot2){isFull=true;}
       else{isFull=(cumTB1!==null&&matchActiveArcher===0)||(cumTB2!==null&&matchActiveArcher===1);}
-    } else {
+    }else{
       const myCum=matchActiveArcher===0?cumArrows1:cumArrows2;
       isFull=myCum.length>=getCumEnds()*aPerT;
     }
@@ -1130,8 +1142,8 @@ function renderMatchPad(){
   let btns=padScores.map(s=>{
     const label=s===0?'M':s;
     const scoreArg=s==='X'?"'X'":s;
-    const cls = s===0 ? 'pad-done' : padBtnClass(s);
-    return `<button class="pad-btn ${cls}" onclick="handleMatchScore(${scoreArg})" ${isFull?'disabled style="opacity:0.4"':''}>${label}</button>`;
+    const cls=s===0?'pad-done':padBtnClass(s);
+    return`<button class="pad-btn ${cls}" onclick="handleMatchScore(${scoreArg})" ${isFull?'disabled style="opacity:0.4"':''}>${label}</button>`;
   }).join('');
   btns+=`<button class="pad-btn pad-back" onclick="handleMatchBack()" style="grid-column:span 2;">BACKSPACE ←</button>`;
   const aPerT2=getArrowsPerSet();
@@ -1142,10 +1154,10 @@ function renderMatchPad(){
   const cumTBStillTied=cumTBBothDone&&getVal(cumTB1)===getVal(cumTB2);
   const cumTBDone=cumNeedsTB?(cumTBBothDone&&(!cumTBStillTied||window._cumTBWinner!==null)):true;
   const allDone=matchFormat==='sets'?checkMatchDone():(allCumDoneCheck&&cumTBDone);
-  const tbTied = matchSets[MAX_SETS]&&matchSets[MAX_SETS].score1===matchSets[MAX_SETS].score2&&matchSets[MAX_SETS].arrows1.length>=1&&matchSets[MAX_SETS].arrows2.length>=1;
-  const canSubmit = allDone && (!tbTied || window._tbWinner!==null);
-  if(canSubmit) btns+=`<button class="pad-btn pad-done" onclick="submitMatch()" style="grid-column:span 2;">SUBMIT MATCH ✓</button>`;
-  else if(allDone&&tbTied) btns+=`<button class="pad-btn" style="grid-column:span 2;background:#333;color:#888;cursor:not-allowed;">SELECT CLOSEST TO CENTER ↑</button>`;
+  const tbTied=matchSets[MAX_SETS]&&matchSets[MAX_SETS].score1===matchSets[MAX_SETS].score2&&matchSets[MAX_SETS].arrows1.length>=1&&matchSets[MAX_SETS].arrows2.length>=1;
+  const canSubmit=allDone&&(!tbTied||window._tbWinner!==null);
+  if(canSubmit)btns+=`<button class="pad-btn pad-done" onclick="submitMatch()" style="grid-column:span 2;">SUBMIT MATCH ✓</button>`;
+  else if(allDone&&tbTied)btns+=`<button class="pad-btn" style="grid-column:span 2;background:#333;color:#888;cursor:not-allowed;">SELECT CLOSEST TO CENTER ↑</button>`;
   const pad=document.getElementById('match-pad');
   pad.style.gridTemplateColumns='repeat(4,1fr)';
   pad.innerHTML=btns;
@@ -1153,59 +1165,43 @@ function renderMatchPad(){
 
 window.handleMatchScore=async(val)=>{
   if(matchFormat==='sets'){
-    if(isMatchWon()) return; // match already decided
+    if(isMatchWon())return;
     const si=getActiveMatchSet();
-    if(si===-1) return;
+    if(si===-1)return;
     const arrows=[...getMatchArrows(si,matchActiveArcher)];
-    if(arrows.length>=getTBArrows(si)) return;
+    if(arrows.length>=getTBArrows(si))return;
     arrows.push(val);
     setMatchArrows(si,matchActiveArcher,arrows);
     await saveMatchProgress();
     if(arrows.length===getTBArrows(si)){
       const otherArr=getMatchArrows(si,1-matchActiveArcher);
-      if(otherArr.length<getTBArrows(si)){
-        // Other archer hasn't scored this set yet — switch to them
-        matchActiveArcher=1-matchActiveArcher;
-        renderMatchTabs();
-      } else {
-        // Both done this set — go to archer 0 for next set (or tiebreak)
-        matchActiveArcher=0;
-        renderMatchTabs();
-      }
+      if(otherArr.length<getTBArrows(si)){matchActiveArcher=1-matchActiveArcher;renderMatchTabs();}
+      else{matchActiveArcher=0;renderMatchTabs();}
     }
-  } else {
-    // Cumulative: alternate per target (T1 archer1 → T1 archer2 → T2 archer1 ...)
-    const aPerT = getArrowsPerSet();
-    const allTargetsDone = cumArrows1.length>=getCumEnds()*aPerT && cumArrows2.length>=getCumEnds()*aPerT;
+  }else{
+    const aPerT=getArrowsPerSet();
+    const allTargetsDone=cumArrows1.length>=getCumEnds()*aPerT&&cumArrows2.length>=getCumEnds()*aPerT;
     if(allTargetsDone){
-      // TB arrow phase
       const tot1=cumArrows1.reduce((s,v)=>s+getVal(v),0);
       const tot2=cumArrows2.reduce((s,v)=>s+getVal(v),0);
-      if(tot1!==tot2) return; // not tied, no TB needed
-      if(matchActiveArcher===0 && cumTB1===null){ cumTB1=val; }
-      else if(matchActiveArcher===1 && cumTB2===null){ cumTB2=val; }
+      if(tot1!==tot2)return;
+      if(matchActiveArcher===0&&cumTB1===null){cumTB1=val;}
+      else if(matchActiveArcher===1&&cumTB2===null){cumTB2=val;}
       else return;
       await saveMatchProgress();
-      // Switch after each TB arrow
-      if(matchActiveArcher===0 && cumTB2===null){ matchActiveArcher=1; renderMatchTabs(); }
-      else if(matchActiveArcher===1 && cumTB1===null){ matchActiveArcher=0; renderMatchTabs(); }
-    } else {
-      const myCum = matchActiveArcher===0?cumArrows1:cumArrows2;
-      if(myCum.length>=getCumEnds()*aPerT) return;
+      if(matchActiveArcher===0&&cumTB2===null){matchActiveArcher=1;renderMatchTabs();}
+      else if(matchActiveArcher===1&&cumTB1===null){matchActiveArcher=0;renderMatchTabs();}
+    }else{
+      const myCum=matchActiveArcher===0?cumArrows1:cumArrows2;
+      if(myCum.length>=getCumEnds()*aPerT)return;
       myCum.push(val);
       await saveMatchProgress();
-      // Check if archer just completed a target
-      if(myCum.length % aPerT === 0){
-        const targetDone = myCum.length / aPerT;
-        const otherCum = matchActiveArcher===0?cumArrows2:cumArrows1;
-        const otherTargetDone = Math.floor(otherCum.length / aPerT);
-        if(otherTargetDone < targetDone){
-          matchActiveArcher = 1 - matchActiveArcher;
-          renderMatchTabs();
-        } else if(targetDone < getCumEnds()){
-          matchActiveArcher = 0;
-          renderMatchTabs();
-        }
+      if(myCum.length%aPerT===0){
+        const targetDone=myCum.length/aPerT;
+        const otherCum=matchActiveArcher===0?cumArrows2:cumArrows1;
+        const otherTargetDone=Math.floor(otherCum.length/aPerT);
+        if(otherTargetDone<targetDone){matchActiveArcher=1-matchActiveArcher;renderMatchTabs();}
+        else if(targetDone<getCumEnds()){matchActiveArcher=0;renderMatchTabs();}
       }
     }
   }
@@ -1217,44 +1213,35 @@ window.handleMatchBack=()=>{
     const si=getActiveMatchSet();
     const arrows=[...getMatchArrows(si,matchActiveArcher)];
     if(arrows.length>0){arrows.pop();setMatchArrows(si,matchActiveArcher,arrows);}
-  } else {
-    const aPerT = getArrowsPerSet();
-    const myCum = matchActiveArcher===0?cumArrows1:cumArrows2;
-    const otherCum = matchActiveArcher===0?cumArrows2:cumArrows1;
-    if(myCum.length>0){
-      myCum.pop();
-    } else if(otherCum.length>0){
-      matchActiveArcher = 1-matchActiveArcher;
-      otherCum.pop();
-      renderMatchTabs();
-    }
-    saveMatchProgress(); // fire and forget - no await needed
+  }else{
+    const myCum=matchActiveArcher===0?cumArrows1:cumArrows2;
+    const otherCum=matchActiveArcher===0?cumArrows2:cumArrows1;
+    if(myCum.length>0){myCum.pop();}
+    else if(otherCum.length>0){matchActiveArcher=1-matchActiveArcher;otherCum.pop();renderMatchTabs();}
+    saveMatchProgress();
   }
   renderMatchSets();renderMatchPad();updateMatchHeader();
 };
 
 async function saveMatchProgress(){
-  if(!compId||!matchCatKey||!matchRoundKey||matchIdx===null) return;
+  if(!compId||!matchCatKey||!matchRoundKey||matchIdx===null)return;
   try{
     const snap=await getDoc(doc(db,'competitions',compId));
     const data=snap.data();
     const match=data.elimination[matchCatKey].rounds[matchRoundKey][matchIdx];
     if(matchFormat==='sets'){
       match.sets=matchSets.map(s=>({score1:s.score1||0,score2:s.score2||0,arrows1:s.arrows1||[],arrows2:s.arrows2||[]}));
-    } else {
+    }else{
       match.arrows1=cumArrows1;match.score1=cumArrows1.reduce((s,v)=>s+getVal(v),0);
       match.arrows2=cumArrows2;match.score2=cumArrows2.reduce((s,v)=>s+getVal(v),0);
       match.tiebreak1=cumTB1!==null?getVal(cumTB1):null;
       match.tiebreak2=cumTB2!==null?getVal(cumTB2):null;
-      // Build sets[] per target so T1-T4 show live in admin/results
       const arrowsPerTarget=getArrowsPerSet();
       match.sets=[];
       for(let t=0;t<getCumEnds();t++){
         const a1=cumArrows1.slice(t*arrowsPerTarget,(t+1)*arrowsPerTarget);
         const a2=cumArrows2.slice(t*arrowsPerTarget,(t+1)*arrowsPerTarget);
-        if(a1.length>0||a2.length>0){
-          match.sets.push({score1:a1.reduce((s,v)=>s+getVal(v),0),score2:a2.reduce((s,v)=>s+getVal(v),0)});
-        }
+        if(a1.length>0||a2.length>0)match.sets.push({score1:a1.reduce((s,v)=>s+getVal(v),0),score2:a2.reduce((s,v)=>s+getVal(v),0)});
       }
     }
     data.elimination[matchCatKey].rounds[matchRoundKey][matchIdx]=match;
@@ -1262,27 +1249,17 @@ async function saveMatchProgress(){
   }catch(e){console.error('Save error:',e);}
 }
 
-window._tbWinner = null;
-window.setTBWinner = (idx) => {
-  window._tbWinner = idx;
-  renderMatchSets();
-  renderMatchPad();
-};
-
-window._cumTBWinner = null;
-window.setCumTBWinner = (idx) => {
-  window._cumTBWinner = idx;
-  renderMatchSets();
-  renderMatchPad();
-};
+window._tbWinner=null;
+window.setTBWinner=(idx)=>{window._tbWinner=idx;renderMatchSets();renderMatchPad();};
+window._cumTBWinner=null;
+window.setCumTBWinner=(idx)=>{window._cumTBWinner=idx;renderMatchSets();renderMatchPad();};
 
 window.submitMatch=async()=>{
-  // Auto-calculate winner
-  let winnerId=null, winnerName='', loserName='';
+  let winnerId=null,winnerName='';
   if(matchFormat==='sets'){
-    const {p1,p2}=calcMatchPoints();
-    if(p1>p2){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';loserName=matchData.archer2?.name||'A2';}
-    else if(p2>p1){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';loserName=matchData.archer1?.name||'A1';}
+    const{p1,p2}=calcMatchPoints();
+    if(p1>p2){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';}
+    else if(p2>p1){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';}
     else if(isTiebreakNeeded()||matchSets[MAX_SETS]){
       const tb=matchSets[MAX_SETS];
       if(tb){
@@ -1292,21 +1269,19 @@ window.submitMatch=async()=>{
         else if(window._tbWinner===1){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';}
       }
     }
-  } else {
+  }else{
     const t1=cumArrows1.reduce((s,v)=>s+getVal(v),0);
     const t2=cumArrows2.reduce((s,v)=>s+getVal(v),0);
-    if(t1>t2){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';loserName=matchData.archer2?.name||'A2';}
-    else if(t2>t1){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';loserName=matchData.archer1?.name||'A1';}
+    if(t1>t2){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';}
+    else if(t2>t1){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';}
     else if(cumTB1!==null&&cumTB2!==null){
       const tb1v=getVal(cumTB1),tb2v=getVal(cumTB2);
-      if(tb1v>tb2v){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';loserName=matchData.archer2?.name||'A2';}
-      else if(tb2v>tb1v){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';loserName=matchData.archer1?.name||'A1';}
-      else if(window._cumTBWinner===0){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';loserName=matchData.archer2?.name||'A2';}
-      else if(window._cumTBWinner===1){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';loserName=matchData.archer1?.name||'A1';}
+      if(tb1v>tb2v){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';}
+      else if(tb2v>tb1v){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';}
+      else if(window._cumTBWinner===0){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';}
+      else if(window._cumTBWinner===1){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';}
     }
   }
-
-  // Save winner to Firebase
   if(winnerId){
     try{
       const snap=await getDoc(doc(db,'competitions',compId));
@@ -1315,24 +1290,20 @@ window.submitMatch=async()=>{
       match.winnerChoice=winnerId;
       if(matchFormat==='sets'){
         match.sets=matchSets.map(s=>({score1:s.score1||0,score2:s.score2||0,arrows1:s.arrows1||[],arrows2:s.arrows2||[]}));
-        const {p1,p2}=calcMatchPoints();
-        match.score1=p1; match.score2=p2;
-      } else {
+        const{p1,p2}=calcMatchPoints();match.score1=p1;match.score2=p2;
+      }else{
         match.arrows1=cumArrows1;match.score1=cumArrows1.reduce((s,v)=>s+getVal(v),0);
         match.arrows2=cumArrows2;match.score2=cumArrows2.reduce((s,v)=>s+getVal(v),0);
       }
       data.elimination[matchCatKey].rounds[matchRoundKey][matchIdx]=match;
       await setDoc(doc(db,'competitions',compId),{elimination:data.elimination},{merge:true});
     }catch(e){console.error('Save error:',e);}
-  } else {
-    await saveMatchProgress();
-  }
-
+  }else{await saveMatchProgress();}
   document.getElementById('match-screen').style.display='none';
   document.getElementById('summary-screen').style.display='flex';
   document.getElementById('summary-archer-tabs').style.display='none';
   document.getElementById('sum-title').textContent='Match Complete';
-  const {p1,p2}=matchFormat==='sets'?calcMatchPoints():{p1:cumArrows1.reduce((s,v)=>s+getVal(v),0),p2:cumArrows2.reduce((s,v)=>s+getVal(v),0)};
+  const{p1,p2}=matchFormat==='sets'?calcMatchPoints():{p1:cumArrows1.reduce((s,v)=>s+getVal(v),0),p2:cumArrows2.reduce((s,v)=>s+getVal(v),0)};
   let html=`<div style="background:${winnerId?'#1b5e20':'#37474f'};color:#fff;padding:16px;text-align:center;">
     <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;color:#aaa;margin-bottom:6px;">MATCH RESULT</div>
     <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
@@ -1345,14 +1316,10 @@ window.submitMatch=async()=>{
   if(matchFormat==='sets'){
     html+='<div style="padding:12px;">';
     matchSets.forEach((s,i)=>{
-      if(!s||(!s.arrows1.length&&!s.arrows2.length)) return;
+      if(!s||(!s.arrows1.length&&!s.arrows2.length))return;
       const c1=s.score1>s.score2?'var(--green)':s.score1<s.score2?'var(--red)':'var(--accent)';
       const c2=s.score2>s.score1?'var(--green)':s.score2<s.score1?'var(--red)':'var(--accent)';
-      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #eee;">
-        <span style="font-weight:700;color:${c1};font-size:16px;">${s.score1}</span>
-        <span style="color:#888;font-size:12px;">Set ${i+1}</span>
-        <span style="font-weight:700;color:${c2};font-size:16px;">${s.score2}</span>
-      </div>`;
+      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #eee;"><span style="font-weight:700;color:${c1};font-size:16px;">${s.score1}</span><span style="color:#888;font-size:12px;">Set ${i+1}</span><span style="font-weight:700;color:${c2};font-size:16px;">${s.score2}</span></div>`;
     });
     html+='</div>';
   }
@@ -1360,9 +1327,7 @@ window.submitMatch=async()=>{
   toast('Match submitted ✓','success');
 };
 
-/* ══════════════════════════════════════════
-   INIT
-══════════════════════════════════════════ */
+/* ── INIT ── */
 loadCompetitions();
 </script>
 </body>
