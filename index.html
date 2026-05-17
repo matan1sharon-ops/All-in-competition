@@ -283,7 +283,18 @@ tbody td{padding:10px 12px;color:#111;}
 <!-- MODALS -->
 <div class="modal-backdrop" id="modal-new-comp"><div class="modal"><div class="modal-title">🏆 New Competition</div><div class="form-grid"><div class="form-group" style="grid-column:1/-1"><label>Competition Name</label><input type="text" id="nc-name" placeholder="e.g. National Championship 2025"></div><div class="form-group"><label>Date</label><input type="date" id="nc-date"></div><div class="form-group"><label>Location</label><input type="text" id="nc-location" placeholder="Venue / City"></div><div class="form-group"><label>Discipline</label><select id="nc-discipline"><option>Outdoor</option><option>Indoor</option><option>3D</option><option>Field</option><option>Custom</option></select></div><div class="form-group"><label>Organizer</label><input type="text" id="nc-organizer" placeholder="Club / Federation"></div></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-new-comp')">Cancel</button><button class="btn btn-primary" onclick="createCompetition()">CREATE →</button></div></div></div>
 <div class="modal-backdrop" id="modal-assign"><div class="modal"><div class="modal-title" id="assign-modal-title">Assign Archer</div><div class="form-group"><label>Select Archer</label><select id="assign-archer-select" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:14px;outline:none;width:100%;"></select></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-assign')">Cancel</button><button class="btn btn-danger btn-sm" onclick="removeFromSlot()" id="btn-remove-slot" style="display:none;">Remove</button><button class="btn btn-primary" onclick="confirmAssign()">ASSIGN →</button></div></div></div>
-<div class="modal-backdrop" id="modal-import"><div class="modal"><div class="modal-title">📥 Import Archers (CSV)</div><p style="font-size:13px;color:var(--muted2);margin-bottom:4px;">Paste your CSV below — one archer per line.</p><div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;margin-bottom:12px;font-size:11px;color:var(--muted2);font-family:monospace;line-height:1.8;">FirstName, LastName, Club, <span style="color:var(--accent);">Bow</span>, <span style="color:var(--accent);">Age</span>, <span style="color:var(--accent);">Gender</span><br><span style="color:var(--muted);">Bow: Recurve / Compound / Barebow / Traditional / Longbow</span><br><span style="color:var(--muted);">Age: U12 / U14 / U18 / U21 / Senior / Master 50+ / Master 60+</span><br><span style="color:var(--muted);">Gender: M / F</span></div><textarea id="import-csv" rows="8" style="width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:12px;border-radius:8px;font-family:monospace;font-size:12px;outline:none;resize:vertical;" placeholder="John,Smith,City Archers,Recurve,Senior,M&#10;Jane,Doe,National Club,Compound,U21,F"></textarea><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-import')">Cancel</button><button class="btn btn-secondary" onclick="downloadCSVTemplate()">📋 GET TEMPLATE</button><button class="btn btn-primary" onclick="importCSV()">IMPORT →</button></div></div></div>
+<div class="modal-backdrop" id="modal-import"><div class="modal"><div class="modal-title">📥 Import Archers (CSV)</div>
+<div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;margin-bottom:12px;font-size:11px;color:var(--muted2);font-family:monospace;line-height:1.8;">FirstName, LastName, Club, <span style="color:var(--accent);">Bow</span>, <span style="color:var(--accent);">Age</span>, <span style="color:var(--accent);">Gender</span><br><span style="color:var(--muted);">Bow: Recurve / Compound / Barebow / Traditional / Longbow</span><br><span style="color:var(--muted);">Age: U12 / U14 / U18 / U21 / Senior / Master 50+ / Master 60+</span><br><span style="color:var(--muted);">Gender: M / F</span></div>
+<div id="csv-drop-zone" style="border:2px dashed var(--border2);border-radius:8px;padding:20px;text-align:center;margin-bottom:12px;cursor:pointer;transition:border-color 0.15s;" onclick="document.getElementById('csv-file-input').click()" ondragover="event.preventDefault();this.style.borderColor='var(--accent)'" ondragleave="this.style.borderColor='var(--border2)'" ondrop="handleCSVDrop(event)">
+  <div style="font-size:28px;margin-bottom:6px;">📂</div>
+  <div style="font-size:13px;font-weight:600;color:var(--text);">Click to choose CSV file</div>
+  <div style="font-size:11px;color:var(--muted2);margin-top:4px;">or drag and drop your file here</div>
+  <input type="file" id="csv-file-input" accept=".csv,.txt" style="display:none;" onchange="handleCSVFile(this)">
+</div>
+<div style="font-size:11px;color:var(--muted2);margin-bottom:6px;text-align:center;">— or paste text directly —</div>
+<textarea id="import-csv" rows="5" style="width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:12px;border-radius:8px;font-family:monospace;font-size:12px;outline:none;resize:vertical;" placeholder="John,Smith,City Archers,Recurve,Senior,M&#10;Jane,Doe,National Club,Compound,U21,F"></textarea>
+<div id="csv-preview" style="margin-top:8px;font-size:12px;color:var(--green);display:none;"></div>
+<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-import')">Cancel</button><button class="btn btn-secondary" onclick="downloadCSVTemplate()">📋 GET TEMPLATE</button><button class="btn btn-primary" onclick="importCSV()">IMPORT →</button></div></div></div>
 <div id="toast"></div>
 <div class="modal-backdrop" id="modal-edit-archer"><div class="modal"><div class="modal-title">✏️ Edit Archer</div><input type="hidden" id="edit-archer-id"><div class="form-grid"><div class="form-group"><label>First Name</label><input type="text" id="edit-fname"></div><div class="form-group"><label>Last Name</label><input type="text" id="edit-lname"></div><div class="form-group"><label>Club</label><input type="text" id="edit-club"></div><div class="form-group"><label>Bow Type</label><select id="edit-bow"><option>Recurve</option><option>Compound</option><option>Barebow</option><option>Traditional</option><option>Longbow</option></select></div><div class="form-group"><label>Age Category</label><select id="edit-age"><option>U12</option><option>U14</option><option>U18</option><option>U21</option><option>Senior</option><option>Master 50+</option><option>Master 60+</option></select></div><div class="form-group"><label>Gender</label><select id="edit-gender"><option value="M">Male</option><option value="F">Female</option></select></div></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-edit-archer')">Cancel</button><button class="btn btn-primary" onclick="saveEditArcher()">SAVE →</button></div></div></div>
 <div class="modal-backdrop" id="modal-move-archer"><div class="modal" style="max-width:460px;"><div class="modal-title" id="move-modal-title">Move Archer</div><div id="move-modal-body"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-move-archer')">Cancel</button></div></div></div>
@@ -343,8 +354,75 @@ function renderDashboard(){if(!currentCompId)return;document.getElementById('d-t
 window.addArcher=async()=>{if(!currentCompId){toast('Select a competition first','error');return;}const fname=document.getElementById('e-fname').value.trim();const lname=document.getElementById('e-lname').value.trim();if(!fname||!lname){toast('Enter first and last name','error');return;}archers.push({id:String(Date.now()),fname,lname,name:`${fname} ${lname}`,club:document.getElementById('e-club').value.trim(),bow:document.getElementById('e-bow').value,age:document.getElementById('e-age').value,gender:document.getElementById('e-gender').value,target:null,slot:null});await saveArchers();document.getElementById('e-fname').value='';document.getElementById('e-lname').value='';renderAll();toast(`${fname} ${lname} added ✓`,'success');};
 window.deleteArcher=async(id)=>{if(!confirm('Remove this archer?'))return;archers=archers.filter(a=>a.id!==id);targets.forEach(t=>['A','B','C','D'].forEach(s=>{if(t[s]?.id===id)t[s]=null;}));await saveArchers();await saveTargets();renderAll();toast('Archer removed','success');};
 window.renderEntries=()=>{const search=(document.getElementById('search-archer')?.value||'').toLowerCase();const bowF=document.getElementById('filter-bow')?.value||'';const filtered=archers.filter(a=>(a.name.toLowerCase().includes(search)||(a.club||'').toLowerCase().includes(search))&&(!bowF||a.bow===bowF));document.getElementById('entry-count').textContent=archers.length+' archers';document.getElementById('entry-badge').textContent=archers.length;document.getElementById('entries-table').innerHTML=filtered.map((a)=>`<tr><td style="color:#999;">${archers.indexOf(a)+1}</td><td style="color:#111;font-weight:600;">${a.fname} ${a.lname}</td><td style="color:#555;">${a.club||'—'}</td><td><span class="tag tag-${a.bow.toLowerCase()}">${a.bow}</span></td><td style="color:#111;">${a.age}</td><td><span class="tag tag-${a.gender.toLowerCase()}">${a.gender}</span></td><td style="color:#1565c0;font-weight:700;">${a.target?`T${a.target}${a.slot}`:'<span style="color:#999">—</span>'}</td><td style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="openEditArcher('${a.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteArcher('${a.id}')">✕</button></td></tr>`).join('')||'<tr><td colspan="8" style="text-align:center;color:#999;padding:24px">No archers yet</td></tr>';};
-window.openImportModal=()=>openModal('modal-import');
-window.importCSV=async()=>{if(!currentCompId){toast('Select a competition first','error');return;}const lines=document.getElementById('import-csv').value.trim().split('\n').filter(l=>l.trim());let added=0;lines.forEach(line=>{const[fname,lname,club,bow,age,gender='M']=line.split(',').map(p=>p.trim());if(!fname||!lname)return;const bowNorm=BOW_ORDER.find(b=>b.toLowerCase()===bow?.toLowerCase())||'Recurve';archers.push({id:String(Date.now()+added),fname,lname,name:`${fname} ${lname}`,club,bow:bowNorm,age:age||'Senior',gender:(gender||'M').toUpperCase(),target:null,slot:null});added++;});await saveArchers();closeModal('modal-import');renderAll();toast(`${added} archers imported ✓`,'success');};
+window.openImportModal=()=>{
+  document.getElementById('import-csv').value='';
+  document.getElementById('csv-preview').style.display='none';
+  document.getElementById('csv-drop-zone').style.borderColor='var(--border2)';
+  const fi=document.getElementById('csv-file-input');
+  if(fi)fi.value='';
+  openModal('modal-import');
+};
+
+window.handleCSVFile=(input)=>{
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    const text=e.target.result;
+    document.getElementById('import-csv').value=text;
+    const lines=text.trim().split('\n').filter(l=>l.trim());
+    // Detect and skip header row
+    const firstLine=lines[0]?.toLowerCase()||'';
+    const isHeader=firstLine.includes('firstname')||firstLine.includes('first name')||firstLine.includes('name');
+    const dataLines=isHeader?lines.slice(1):lines;
+    const preview=document.getElementById('csv-preview');
+    preview.textContent=`✓ ${file.name} loaded — ${dataLines.length} archer${dataLines.length!==1?'s':''} detected`;
+    preview.style.display='block';
+    document.getElementById('csv-drop-zone').style.borderColor='var(--green)';
+    document.getElementById('csv-drop-zone').innerHTML=`<div style="font-size:20px;">✅</div><div style="font-size:13px;font-weight:600;color:var(--green);">${file.name}</div><div style="font-size:11px;color:var(--muted2);margin-top:4px;">${dataLines.length} archers ready to import</div>`;
+  };
+  reader.readAsText(file);
+};
+
+window.handleCSVDrop=(e)=>{
+  e.preventDefault();
+  document.getElementById('csv-drop-zone').style.borderColor='var(--border2)';
+  const file=e.dataTransfer.files[0];
+  if(!file)return;
+  const input=document.getElementById('csv-file-input');
+  const dt=new DataTransfer();
+  dt.items.add(file);
+  input.files=dt.files;
+  handleCSVFile(input);
+};
+window.importCSV=async()=>{
+  if(!currentCompId){toast('Select a competition first','error');return;}
+  const raw=document.getElementById('import-csv').value.trim();
+  if(!raw){toast('No data to import','error');return;}
+  const lines=raw.split('\n').filter(l=>l.trim());
+  // Skip header row if detected
+  const firstLine=lines[0]?.toLowerCase()||'';
+  const isHeader=firstLine.includes('firstname')||firstLine.includes('first name')||firstLine.includes('name')||firstLine.includes('bow');
+  const dataLines=isHeader?lines.slice(1):lines;
+  let added=0,skipped=0;
+  dataLines.forEach(line=>{
+    // Handle quoted CSV values (from Excel export)
+    const parts=line.split(',').map(p=>p.trim().replace(/^"|"$/g,'').trim());
+    const[fname,lname,club,bow,age,gender='M']=parts;
+    if(!fname||!lname||fname.toLowerCase()==='firstname'){skipped++;return;}
+    // Skip valid options row
+    if(fname.includes('/')||fname.toLowerCase().includes('recurve')){skipped++;return;}
+    const bowNorm=BOW_ORDER.find(b=>b.toLowerCase()===bow?.toLowerCase())||'Recurve';
+    const ageNorm=AGE_ORDER.find(a=>a.toLowerCase()===age?.toLowerCase())||age||'Senior';
+    archers.push({id:String(Date.now()+added),fname,lname,name:`${fname} ${lname}`,club:club||'',bow:bowNorm,age:ageNorm,gender:(gender||'M').toUpperCase().charAt(0),target:null,slot:null});
+    added++;
+  });
+  await saveArchers();
+  closeModal('modal-import');
+  renderAll();
+  if(added>0)toast(`${added} archers imported ✓${skipped>0?' ('+skipped+' skipped)':''}`, 'success');
+  else toast('No archers imported — check format','error');
+};
 window.generateTargets=async()=>{if(!currentCompId){toast('Select a competition first','error');return;}if(!archers.length){toast('Add archers first','error');return;}targets=[];archers.forEach(a=>{a.target=null;a.slot=null;});const slots=['A','B','C','D'];let targetNum=1;function assignGroup(group,bowLabel){if(!group.length)return;let cur=null,si=0;group.forEach(archer=>{if(si===0){cur={num:targetNum++,bow:bowLabel,A:null,B:null,C:null,D:null};targets.push(cur);}cur[slots[si]]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};const orig=archers.find(a=>a.id===archer.id);if(orig){orig.target=cur.num;orig.slot=slots[si];}si++;if(si>=4)si=0;});}function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}if(currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom'){assignGroup(shuffle(archers),'Mixed');}else if(currentDiscipline==='Outdoor'){assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['Senior','U21'].includes(a.age))),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['U18','Master 50+','Master 60+'].includes(a.age))),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Compound')),'Compound');assignGroup(shuffle(archers.filter(a=>a.bow==='Barebow')),'Barebow');assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['U14','U12'].includes(a.age))),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Traditional'||a.bow==='Longbow')),'Trad/Longbow');}else if(currentDiscipline==='Indoor'){assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve')),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Compound')),'Compound');assignGroup(shuffle(archers.filter(a=>a.bow==='Barebow')),'Barebow');assignGroup(shuffle(archers.filter(a=>a.bow==='Traditional'||a.bow==='Longbow')),'Trad/Longbow');}await saveTargets();await saveArchers();renderAll();toast(`${targets.length} targets generated ✓`,'success');};
 window.archiveCompetition=async()=>{if(!currentCompId)return;const snap=await getDoc(doc(db,'competitions',currentCompId));const name=snap.data()?.name||'this competition';if(!confirm(`Archive "${name}"?\n\nIt will move to History and disappear from the active list.`))return;await setDoc(doc(db,'competitions',currentCompId),{archived:true},{merge:true});currentCompId=null;archers=[];targets=[];sessions=[];scores={};document.getElementById('no-comp-msg').style.display='block';document.getElementById('dash-content').style.display='none';document.getElementById('btn-delete-comp').style.display='none';document.getElementById('btn-archive-comp').style.display='none';updateNavForDiscipline('');await loadCompetitions();document.getElementById('comp-select').value='';toast('Competition archived ✓','success');};
 window.deleteCompetition=async()=>{if(!currentCompId)return;const snap=await getDoc(doc(db,'competitions',currentCompId));const name=snap.data()?.name||'this competition';if(!confirm(`DELETE "${name}"?\n\nThis cannot be undone.`))return;const{deleteDoc}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");await deleteDoc(doc(db,'competitions',currentCompId));currentCompId=null;archers=[];targets=[];sessions=[];scores={};document.getElementById('no-comp-msg').style.display='block';document.getElementById('dash-content').style.display='none';document.getElementById('btn-delete-comp').style.display='none';document.getElementById('btn-archive-comp').style.display='none';updateNavForDiscipline('');await loadCompetitions();document.getElementById('comp-select').value='';toast('Competition deleted','success');};
