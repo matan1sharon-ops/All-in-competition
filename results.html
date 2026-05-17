@@ -247,7 +247,10 @@ function renderResults(data){
         h1:s.h1||0,
         h2:s.h2||0,
         xs:s.xs||0,
-        tens:s.tens||0
+        tens:s.tens||0,
+        kills:s.kills||0,
+        elevens:s.elevens||0,
+        sixes:s.sixes||0
       };
     });
 
@@ -273,6 +276,7 @@ function renderResults(data){
   let html='<div class="categories-grid">';
   cats.forEach(cat=>{
     // ── TIEBREAK: total → X count → 10 count ──
+    const isCustomDisc=disc==='Custom';
     const ranked=[...cat.archers].sort((a,b)=>
       b.total-a.total ||
       (b.xs||0)-(a.xs||0) ||
@@ -293,8 +297,9 @@ function renderResults(data){
         <td style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;padding:6px 8px;white-space:nowrap;">${a.name}</td>
         ${h1h2}
         <td style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;color:var(--accent);text-align:center;padding:6px 8px;min-width:46px;">${a.total}</td>
-        <td style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted2);text-align:center;padding:6px 4px;min-width:32px;">${a.xs}</td>
-        <td style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted2);text-align:center;padding:6px 4px;min-width:32px;">${a.tens}</td>
+        <td style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted2);text-align:center;padding:6px 4px;min-width:32px;">${isCustomDisc?(a.kills||0):a.xs}</td>
+        <td style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted2);text-align:center;padding:6px 4px;min-width:32px;">${isCustomDisc?(a.elevens||0):a.tens}</td>
+        ${isCustomDisc?`<td style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted2);text-align:center;padding:6px 4px;min-width:32px;">${a.sixes||0}</td>`:''}
       </tr>`;
     }).join('');
 
@@ -312,8 +317,9 @@ function renderResults(data){
           <td style="width:36px;"></td>
           <td style="font-size:10px;color:var(--muted);padding:3px 10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px;">NAME</td>
           <td style="font-size:10px;color:var(--muted);padding:3px 10px;text-align:center;font-family:'Barlow Condensed',sans-serif;">SCORE</td>
-          <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">X</td>
-          <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">10</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${isCustomDisc?'Kills':'X'}</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${isCustomDisc?'11s':'10'}</td>
+          ${isCustomDisc?`<td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">6s</td>`:''}
         </tr>`;
 
     html+=`<div class="cat-block">
