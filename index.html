@@ -710,24 +710,6 @@ function applyTranslations(){
   const scFilter=document.getElementById('sc-filter-bow');
   if(scFilter&&scFilter.options[0])scFilter.options[0].textContent=t('all_bows');
 }
-  });
-  // Placeholder-only elements
-  document.querySelectorAll('[data-placeholder-t]').forEach(el=>{
-    const key=el.getAttribute('data-placeholder-t');
-    const val=t(key);
-    if(val&&val!==key) el.placeholder=val;
-  });
-  // Status
-  const connEl=document.getElementById('conn-status');
-  // Sidebar buttons
-  const newCompBtn=document.querySelector('.new-comp-btn');
-  if(newCompBtn) newCompBtn.textContent=t('new_comp');
-  // Archive/delete buttons
-  const archBtn=document.getElementById('btn-archive-comp');
-  const delBtn=document.getElementById('btn-delete-comp');
-  if(archBtn) archBtn.textContent=t('archive_comp');
-  if(delBtn) delBtn.textContent=t('delete_comp');
-}
 
 function initAdminLang(){
   const saved=localStorage.getItem('adminLang')||'en';
