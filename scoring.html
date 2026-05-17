@@ -11,6 +11,18 @@
 :root{--bg:#111;--surface:#1e1e1e;--surface2:#2a2a2a;--border:#333;--accent:#FFD700;--red:#e53935;--green:#43a047;--blue:#1e88e5;--text:#f0f0f0;--muted:#888;--radius:12px;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);height:100dvh;overflow:hidden;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);}
+body.rtl{direction:rtl;font-family:'Barlow',sans-serif;}
+body.rtl .sc-half-header .sc-half-title{text-align:right;padding-right:10px;padding-left:0;}
+body.rtl .archer-tab .tab-check{right:auto;left:4px;}
+body.rtl .score-footer .current-archer-bar{flex-direction:row-reverse;}
+body.rtl .end-header{flex-direction:row-reverse;}
+body.rtl .end-arrows{flex-direction:row-reverse;}
+body.rtl .score-header-top{flex-direction:row-reverse;}
+body.rtl .match-header-top{flex-direction:row-reverse;}
+body.rtl .summary-header{flex-direction:row-reverse;}
+.lang-toggle-login{display:flex;justify-content:center;gap:8px;margin-bottom:16px;}
+.lang-btn-login{background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:5px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Barlow Condensed',sans-serif;}
+.lang-btn-login.active{background:var(--accent);color:#000;border-color:var(--accent);}
 #login-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
 .login-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 24px;width:100%;max-width:360px;}
 .login-logo{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;letter-spacing:4px;color:var(--accent);text-align:center;margin-bottom:4px;}
@@ -125,33 +137,37 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
   <div class="login-card">
     <div class="login-logo">ALL IN</div>
     <div class="login-sub">Scoring</div>
+    <div class="lang-toggle-login">
+      <button class="lang-btn-login active" id="lang-en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn-login" id="lang-he" onclick="setLang('he')">עברית</button>
+    </div>
     <div id="login-step-1">
       <div class="error-msg" id="error-msg"></div>
-      <label class="login-label">Competition</label>
-      <select id="comp-select" class="login-select"><option value="">Loading...</option></select>
-      <label class="login-label">Your Name</label>
-      <select id="archer-select" class="login-select"><option value="">— Select competition first —</option></select>
-      <button class="login-btn" onclick="checkPhase()">CONTINUE →</button>
+      <label class="login-label" data-t="competition">Competition</label>
+      <select id="comp-select" class="login-select"><option value="" data-t="loading">Loading...</option></select>
+      <label class="login-label" data-t="your_name">Your Name</label>
+      <select id="archer-select" class="login-select"><option value="" data-t="select_comp_first">— Select competition first —</option></select>
+      <button class="login-btn" onclick="checkPhase()" data-t="continue">CONTINUE →</button>
     </div>
     <div id="login-step-qual" style="display:none;">
       <div style="background:#b71c1c22;border:1px solid var(--red);color:var(--red);padding:14px;border-radius:8px;margin-bottom:16px;font-size:13px;text-align:center;">
-        ⚠️ You have no target assigned yet.<br>Please ask the admin to assign your target.
+        <span data-t="no_target">⚠️ You have no target assigned yet.<br>Please ask the admin to assign your target.</span>
       </div>
-      <button class="login-back" onclick="backToStep1()">← BACK</button>
+      <button class="login-back" onclick="backToStep1()" data-t="back" data-t="back">← BACK</button>
     </div>
     <div id="login-step-match" style="display:none;">
       <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">ACTIVE MATCH FOUND</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px;"><span data-t="active_match">ACTIVE MATCH FOUND</span></div>
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--accent);" id="match-confirm-label"></div>
         <div style="font-size:13px;margin-top:6px;" id="match-confirm-vs"></div>
       </div>
-      <button class="login-btn" onclick="startMatch()">START MATCH →</button>
+      <button class="login-btn" onclick="startMatch()" data-t="start_match">START MATCH →</button>
       <button class="login-back" onclick="backToStep1()">← BACK</button>
     </div>
     <div id="login-step-2" style="display:none;">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">Confirm Archers on this Target</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;"><span data-t="confirm_archers">Confirm Archers on this Target</span></div>
       <div class="confirm-card" id="confirm-archers"></div>
-      <button class="login-btn" onclick="startScoring()">START SCORING →</button>
+      <button class="login-btn" onclick="startScoring()" data-t="start_scoring">START SCORING →</button>
       <button class="login-back" onclick="backToStep1()">← BACK</button>
     </div>
   </div>
@@ -388,14 +404,161 @@ function showError(msg){const el=document.getElementById('error-msg');el.textCon
 function toast(msg,type='success'){const el=document.getElementById('toast');el.textContent=msg;el.className=`show ${type}`;setTimeout(()=>el.classList.remove('show'),2500);}
 
 /* ── LOGIN FLOW ── */
+
+/* ── LANGUAGE / TRANSLATION ── */
+let currentLang='en';
+
+const T={
+  en:{
+    competition:'Competition',
+    your_name:'Your Name',
+    loading:'Loading...',
+    select_comp_first:'— Select competition first —',
+    select_name:'— Select your name —',
+    continue:'CONTINUE →',
+    back:'← BACK',
+    no_target:'⚠️ You have no target assigned yet.\nPlease ask the admin to assign your target.',
+    active_match:'ACTIVE MATCH FOUND',
+    start_match:'START MATCH →',
+    confirm_archers:'Confirm Archers on this Target',
+    start_scoring:'START SCORING →',
+    target:'TARGET',
+    end:'END',
+    editing:'EDITING',
+    active:'ACTIVE',
+    half_total:t('half_total'),
+    total:'TOTAL',
+    backspace:t('backspace'),
+    done_editing:'DONE EDITING ✓',
+    view_summary:'VIEW SUMMARY 🏆',
+    set:'SET',
+    submit_match:t('submit_match'),
+    match_complete:'Match Complete',
+    match_result:t('match_result'),
+    winner:'Winner',
+    set_system:t('set_system'),
+    cumulative:t('cumulative'),
+    station:'STATION',
+    half1_outdoor:t('half1_outdoor'),
+    half2_outdoor:t('half2_outdoor'),
+    half1_indoor:t('half1_indoor'),
+    half2_indoor:t('half2_indoor'),
+    running:'Running',
+    score_saved:'Scores saved ✓',
+    save_failed:'Save failed',
+    no_competitions:'No competitions found',
+    select_competition:'— Select Competition —',
+    complete:'Complete',
+    kills:'Kills',
+    elevens:'11s',
+    sixes:'6s',
+    closest_center:'TIED — WHO IS CLOSEST TO CENTER?',
+    closer_center:t('closer_center'),
+    select_closest:t('select_closest'),
+    bye:'BYE ✓',
+    tbd:'TBD',
+    field_lbl:t('field_lbl'),
+    threed_lbl:t('threed_lbl'),
+    kill_lbl:t('kill_lbl'),
+    arrows:'arrows',
+  },
+  he:{
+    competition:'תחרות',
+    your_name:'שמך',
+    loading:'טוען...',
+    select_comp_first:'— בחר תחרות תחילה —',
+    select_name:'— בחר את שמך —',
+    continue:'המשך →',
+    back:'← חזרה',
+    no_target:'⚠️ אין לך מטרה מוקצית.\nבקש מהמנהל להקצות לך מטרה.',
+    active_match:'נמצאה מקצה פעילה',
+    start_match:'התחל מקצה →',
+    confirm_archers:'אשר קשתים במטרה זו',
+    start_scoring:'התחל ניקוד →',
+    target:'מטרה',
+    end:'סבב',
+    editing:'עריכה',
+    active:'פעיל',
+    half_total:'סה״כ מחצית',
+    total:'סה״כ',
+    backspace:'מחק ←',
+    done_editing:'סיום עריכה ✓',
+    view_summary:'צפה בסיכום 🏆',
+    set:'סט',
+    submit_match:'שלח תוצאת מקצה ✓',
+    match_complete:'המקצה הסתיים',
+    match_result:'תוצאת המקצה',
+    winner:'מנצח',
+    set_system:'שיטת סטים · ראשון ל-6 נקודות',
+    cumulative:'צבירה · 15 חצים',
+    station:'תחנה',
+    half1_outdoor:'מחצית 1 (סבבים 1–6)',
+    half2_outdoor:'מחצית 2 (סבבים 7–12)',
+    half1_indoor:'מחצית 1 (סבבים 1–10)',
+    half2_indoor:'מחצית 2 (סבבים 11–20)',
+    running:'מצטבר',
+    score_saved:'ניקוד נשמר ✓',
+    save_failed:'שמירה נכשלה',
+    no_competitions:'לא נמצאו תחרויות',
+    select_competition:'— בחר תחרות —',
+    complete:'הושלם',
+    kills:'קטלניות',
+    elevens:'11',
+    sixes:'6',
+    closest_center:'שוויון — מי קרוב יותר למרכז?',
+    closer_center:'קרוב יותר למרכז?',
+    select_closest:'בחר קרוב למרכז ↑',
+    bye:'פטור ✓',
+    tbd:'טרם נקבע',
+    field_lbl:'🌄 שדה',
+    threed_lbl:t('threed_lbl'),
+    kill_lbl:'🎯 קטילה',
+    arrows:'חצים',
+  }
+};
+
+function t(key){return T[currentLang]?.[key]||T.en[key]||key;}
+
+window.setLang=(lang)=>{
+  currentLang=lang;
+  localStorage.setItem('scoringLang',lang);
+  // Toggle button styles
+  document.getElementById('lang-en').classList.toggle('active',lang==='en');
+  document.getElementById('lang-he').classList.toggle('active',lang==='he');
+  // RTL
+  document.body.classList.toggle('rtl',lang==='he');
+  document.documentElement.lang=lang==='he'?'he':'en';
+  // Update all static data-t elements
+  document.querySelectorAll('[data-t]').forEach(el=>{
+    const key=el.getAttribute('data-t');
+    const val=t(key);
+    if(el.tagName==='OPTION') el.textContent=val;
+    else if(el.tagName==='BUTTON') el.textContent=val;
+    else if(el.tagName==='LABEL') el.textContent=val;
+    else el.innerHTML=val.replace(/\n/g,'<br>');
+  });
+  // Re-render dynamic content if on scoring screen
+  if(document.getElementById('scoring-screen').style.display==='flex'){
+    renderTabs();renderScoreList();renderPad();updateHeader();
+  }
+  if(document.getElementById('match-screen').style.display==='flex'){
+    renderMatchSets();renderMatchPad();updateMatchHeader();
+  }
+};
+
+function initLang(){
+  const saved=localStorage.getItem('scoringLang')||'en';
+  setLang(saved);
+}
+
 async function loadCompetitions(){
   try{
     const snap=await getDocs(collection(db,'competitions'));
     const sel=document.getElementById('comp-select');
-    sel.innerHTML='<option value="">— Select Competition —</option>';
+    sel.innerHTML=`<option value="">${t('select_competition')}</option>`;
     const active=snap.docs.filter(d=>!d.data().archived);
     active.forEach(d=>{const c=d.data(),o=document.createElement('option');o.value=d.id;o.textContent=c.name+(c.date?` (${c.date})`:'');sel.appendChild(o);});
-    if(!active.length)sel.innerHTML='<option value="">No competitions found</option>';
+    if(!active.length)sel.innerHTML=`<option value="">${t('no_competitions')}</option>`;
     sel.onchange=()=>loadArchers(sel.value);
   }catch(e){showError('Connection error');}
 }
@@ -410,13 +573,13 @@ async function loadArchers(id){
   targetConfig=compData.targetConfig||[];
   const archers=compData.archers||[];
   const sel=document.getElementById('archer-select');
-  sel.innerHTML='<option value="">— Select your name —</option>'+archers.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
+  sel.innerHTML=`<option value="">${t('select_name')}</option>`+archers.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
 }
 
 window.checkPhase=async()=>{
   selectedArcherId=document.getElementById('archer-select').value;
-  if(!compId){showError('Select a competition');return;}
-  if(!selectedArcherId){showError('Select your name');return;}
+  if(!compId){showError(t('competition'));return;}
+  if(!selectedArcherId){showError(t('your_name'));return;}
   document.getElementById('error-msg').style.display='none';
   const snap=await getDoc(doc(db,'competitions',compId));
   compData=snap.data();
@@ -487,7 +650,7 @@ window.startScoring=()=>{
   targetArchers.forEach(a=>recalcStats(a.id));
   activeArcherIdx=0;editingEnd=null;
   document.getElementById('s-comp-name').textContent=compData.name||'';
-  document.getElementById('s-target-label').textContent=`TARGET ${targetNum}`;
+  document.getElementById('s-target-label').textContent=`${t('target')} ${targetNum}`;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('scoring-screen').style.display='flex';
   renderTabs();renderScoreList();renderPad();updateHeader();
@@ -555,7 +718,7 @@ function renderScoreList(){
 
       // Type badge colors
       const typeColor=tc.type==='Kill'?'#c62828':tc.type==='3D'?'#4a148c':'#1565c0';
-      const typeLabel=tc.type==='Kill'?`🎯 Kill(${tc.kill})/Body(${tc.body})/M(${tc.miss})`:tc.type==='3D'?'🦌 3D':'🌄 Field';
+      const typeLabel=tc.type==='Kill'?`🎯 Kill(${tc.kill})/Body(${tc.body})/M(${tc.miss})`:tc.type==='3D'?t('threed_lbl'):t('field_lbl');
       const cls=isEditing?'end-card editing':isActive?'end-card active-end':'end-card';
 
       // Arrow chips - variable count per target
@@ -697,7 +860,7 @@ function updateQualHeader(){
     const typeStr=tc.type==='Kill'?` — 🎯 Kill`:tc.type==='3D'?` — 🦌 3D`:` — 🌄 Field`;
     endLabel=`TARGET ${endIdx+1}${typeStr}${editingEnd?' — EDITING':''}`;
   }else{
-    endLabel=`${cfg.label.toUpperCase()} ${endIdx+1}${editingEnd?' — EDITING':''}`;
+    endLabel=`${(cfg.label==='Target'?t('target').toUpperCase():cfg.label==='End'?t('end').toUpperCase():t('station').toUpperCase())} ${endIdx+1}${editingEnd?' — EDITING':''}`;
   }
 
   document.getElementById('s-end-label').textContent=endLabel;
@@ -708,7 +871,7 @@ function updateQualHeader(){
   if(discipline==='3D'){g1l='11';g2l='10';}
   else if(discipline==='Field'){g1l='6';g2l='5';}
   else if(discipline==='Indoor'){g1l='10';g2l='9';}
-  else if(discipline==='Custom'){g1l='Kills';g2l='11s';}
+  else if(discipline==='Custom'){g1l=t('kills');g2l=t('elevens');}
   else{g1l='X';g2l='10';}
   document.getElementById('s-grand-total').textContent=s.total||0;
   if(discipline==='Custom'){
@@ -777,8 +940,8 @@ function renderPad(){
   btns+=`<button class="pad-btn pad-back" onclick="handleBack()" style="grid-column:span 2;">BACKSPACE ←</button>`;
 
   let nextLabel,nextDisabled;
-  if(isEditing){nextLabel='DONE EDITING ✓';nextDisabled=false;}
-  else if(allDone){nextLabel='VIEW SUMMARY 🏆';nextDisabled=false;}
+  if(isEditing){nextLabel=t('done_editing');nextDisabled=false;}
+  else if(allDone){nextLabel=t('view_summary');nextDisabled=false;}
   else{nextLabel=`${curArrows.length}/${arrowsForEnd}`;nextDisabled=true;}
   if(!nextDisabled)btns+=`<button class="pad-btn pad-next" onclick="handleNext()" style="grid-column:span 2;">${nextLabel}</button>`;
 
@@ -832,7 +995,7 @@ window.handleBack=()=>{
 };
 
 window.handleNext=async()=>{
-  if(editingEnd!==null){editingEnd=null;await saveQualScores();renderTabs();renderScoreList();renderPad();updateQualHeader();toast('Scores saved ✓','success');return;}
+  if(editingEnd!==null){editingEnd=null;await saveQualScores();renderTabs();renderScoreList();renderPad();updateQualHeader();toast(t('score_saved'),'success');return;}
   const allDone=targetArchers.every(a=>isArcherDone(a.id));
   if(allDone){showQualSummary();return;}
   const myDone=countDoneEnds(getCurrentArcher().id);
@@ -899,7 +1062,7 @@ async function saveQualScores(){
       payload.scores[key]={total:s.total,tens:s.tens,xs:s.xs,g1:s.g1||0,g2:s.g2||0,h1:s.h1||0,h2:s.h2||0,kills:s.kills||0,elevens:s.elevens||0,sixes:s.sixes||0,ends:endsObj};
     });
     await setDoc(doc(db,'competitions',compId),payload,{merge:true});
-  }catch(e){toast('Save failed','error');}
+  }catch(e){toast(t('save_failed'),'error');}
 }
 
 /* ── QUALIFICATION SUMMARY ── */
@@ -907,7 +1070,7 @@ let summaryArcherIdx=0;
 function showQualSummary(){
   document.getElementById('scoring-screen').style.display='none';
   document.getElementById('summary-screen').style.display='flex';
-  document.getElementById('sum-title').textContent=`Target ${targetNum} — Complete`;
+  document.getElementById('sum-title').textContent=`${t('target')} ${targetNum} — ${t('complete')}`;
   summaryArcherIdx=0;
   renderSummaryTabs();
   renderSummaryScorecard(0);
@@ -1026,7 +1189,7 @@ window.startMatch=()=>{
   document.getElementById('m-comp-name').textContent=compData.name||'';
   const rl={R1:`Round of ${(compData.elimination?.[matchCatKey]?.bracketSize||2)*2}`,QF:'Quarter Final',SF:'Semi Final',F:'🏆 Final',B:'🥉 Bronze'};
   document.getElementById('m-match-label').textContent=rl[matchRoundKey]||matchRoundKey;
-  document.getElementById('m-format-label').textContent=matchFormat==='sets'?'Set System · First to 6 pts':'Cumulative · 15 arrows';
+  document.getElementById('m-format-label').textContent=matchFormat==='sets'?'<span data-t="set_system">Set System · First to 6 pts</span>':'<span data-t="cumulative">Cumulative · 15 arrows</span>';
   document.getElementById('sp-a1-label').textContent=matchData.archer1?.name?.split(' ')[0]||'A1';
   document.getElementById('sp-a2-label').textContent=matchData.archer2?.name?.split(' ')[0]||'A2';
   matchActiveArcher=0;cumTB1=null;cumTB2=null;window._cumTBWinner=null;
@@ -1049,7 +1212,7 @@ function updateMatchHeader(){
     document.getElementById('sp-a1').textContent=p1;
     document.getElementById('sp-a2').textContent=p2;
     const si=getActiveMatchSet();
-    document.getElementById('m-set-label').textContent=`SET ${si+1}`;
+    document.getElementById('m-set-label').textContent=`${t('set')} ${si+1}`;
     const arr=getMatchArrows(si,matchActiveArcher);
     document.getElementById('m-arrow-count').textContent=`${arr.length}/${getTBArrows(si)}`;
   }else{
@@ -1059,7 +1222,7 @@ function updateMatchHeader(){
     document.getElementById('sp-a2').textContent=t2;
     const myCum=matchActiveArcher===0?cumArrows1:cumArrows2;
     const end=Math.floor(myCum.length/getArrowsPerSet())+1;
-    document.getElementById('m-set-label').textContent=`END ${Math.min(end,getCumEnds())}`;
+    document.getElementById('m-set-label').textContent=`${t('end')} ${Math.min(end,getCumEnds())}`;
     document.getElementById('m-arrow-count').textContent=`${myCum.length%getArrowsPerSet()||0}/${getArrowsPerSet()}`;
   }
   document.getElementById('m-archer-name').textContent=archer?.name||'—';
@@ -1098,7 +1261,7 @@ function renderMatchSets(){
       const matchAlreadyWon=isMatchWon()&&!bothDone&&i>0;
       const borderCol=isTB?'var(--red)':bothDone?'var(--green)':i===activeSi?'var(--accent)':matchAlreadyWon?'var(--surface2)':'var(--border)';
       const setBg=i===activeSi&&!bothDone?'rgba(255,215,0,0.04)':matchAlreadyWon?'rgba(0,0,0,0.2)':'transparent';
-      const setLabel=isTB?'TB':'S'+(i+1);
+      const setLabel=isTB?'TB':(t('set').charAt(0))+(i+1);
       html+=`<div style="display:grid;grid-template-columns:1fr auto auto auto 1fr;gap:4px;align-items:center;padding:6px 8px;margin-bottom:4px;background:${setBg};border:1px solid ${borderCol};border-radius:8px;">
         <div style="display:flex;gap:3px;flex-wrap:wrap;">${chips1}</div>
         <div style="min-width:34px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:${c1};">${bothDone?s1:''}</div>
@@ -1194,7 +1357,7 @@ function renderMatchPad(){
   const allDone=matchFormat==='sets'?checkMatchDone():(allCumDoneCheck&&cumTBDone);
   const tbTied=matchSets[MAX_SETS]&&matchSets[MAX_SETS].score1===matchSets[MAX_SETS].score2&&matchSets[MAX_SETS].arrows1.length>=1&&matchSets[MAX_SETS].arrows2.length>=1;
   const canSubmit=allDone&&(!tbTied||window._tbWinner!==null);
-  if(canSubmit)btns+=`<button class="pad-btn pad-done" onclick="submitMatch()" style="grid-column:span 2;">SUBMIT MATCH ✓</button>`;
+  if(canSubmit)btns+=`<button class="pad-btn pad-done" onclick="submitMatch()" style="grid-column:span 2;"><span data-t="submit_match">SUBMIT MATCH ✓</span></button>`;
   else if(allDone&&tbTied)btns+=`<button class="pad-btn" style="grid-column:span 2;background:#333;color:#888;cursor:not-allowed;">SELECT CLOSEST TO CENTER ↑</button>`;
   const pad=document.getElementById('match-pad');
   pad.style.gridTemplateColumns='repeat(4,1fr)';
@@ -1340,7 +1503,7 @@ window.submitMatch=async()=>{
   document.getElementById('match-screen').style.display='none';
   document.getElementById('summary-screen').style.display='flex';
   document.getElementById('summary-archer-tabs').style.display='none';
-  document.getElementById('sum-title').textContent='Match Complete';
+  document.getElementById('sum-title').textContent=t('match_complete');
   const{p1,p2}=matchFormat==='sets'?calcMatchPoints():{p1:cumArrows1.reduce((s,v)=>s+getVal(v),0),p2:cumArrows2.reduce((s,v)=>s+getVal(v),0)};
   let html=`<div style="background:${winnerId?'#1b5e20':'#37474f'};color:#fff;padding:16px;text-align:center;">
     <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;color:#aaa;margin-bottom:6px;">MATCH RESULT</div>
@@ -1349,7 +1512,7 @@ window.submitMatch=async()=>{
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:var(--accent);">${p1} — ${p2}</div>
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;">${matchData.archer2?.name||'A2'}</div>
     </div>
-    ${winnerId?`<div style="font-size:14px;color:#a5d6a7;margin-top:8px;">🏆 Winner: <strong>${winnerName}</strong></div>`:'<div style="font-size:12px;color:#aaa;margin-top:8px;">Still tied — admin will decide winner</div>'}
+    ${winnerId?`<div style="font-size:14px;color:#a5d6a7;margin-top:8px;">🏆 ${t('winner')}: <strong>${winnerName}</strong></div>`:'<div style="font-size:12px;color:#aaa;margin-top:8px;">Still tied — admin will decide winner</div>'}
   </div>`;
   if(matchFormat==='sets'){
     html+='<div style="padding:12px;">';
@@ -1411,6 +1574,7 @@ async function autoLoginFromQR(qrCompId,qrTargetNum){
 }
 
 /* ── INIT ── */
+initLang();
 loadCompetitions().then(()=>{
   // Auto-login from QR code URL params
   const params=new URLSearchParams(window.location.search);
