@@ -611,6 +611,8 @@ window.printBlankScorecards=()=>{
   const compName=document.querySelector('#comp-info-grid input')?.value||'Competition';
 
   // Build styles
+  const baseUrl=window.location.href.replace(/\/[^/]*$|\?.*$/,'').replace('admin.html','');
+  const scoringUrl=baseUrl+'/scoring.html';
   const style=`
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:Arial,sans-serif;font-size:11px;background:#fff;color:#111;}
@@ -643,6 +645,11 @@ window.printBlankScorecards=()=>{
     .stn-end{background:#e3f2fd;width:22px;}
     .stn-run{background:#fff8e1;width:26px;}
     @media print{@page{size:A4 portrait;margin:0;}body{margin:0;}}
+    .qr-wrap{display:flex;align-items:center;gap:6px;padding:2px 6px;background:#f9f9f9;border-top:1px solid #eee;flex-shrink:0;}
+    .qr-placeholder{width:64px;height:64px;flex-shrink:0;}
+    .qr-placeholder img{width:64px!important;height:64px!important;}
+    .qr-info{font-size:8px;color:#555;line-height:1.5;}
+    .qr-info strong{font-size:9px;color:#111;}
   `;
 
   let pages='';
@@ -750,6 +757,10 @@ window.printBlankScorecards=()=>{
         <tr class="half-total"><td colspan="6">HALF TOTAL</td><td></td><td></td><td></td></tr>
         </tbody>
       </table>
+      <div class="qr-wrap">
+        <div class="qr-placeholder" data-url="${scoringUrl}?comp=${currentCompId}&target=${archer.target||''}"></div>
+        <div class="qr-info"><strong>Scan to score</strong><br>T${archer.target||'?'}${archer.slot} · ${archer.name}</div>
+      </div>
       <div class="sig"><span>Scorer: _________________</span><span>Witness: _________________</span></div>
     </div>`;
   }
@@ -776,6 +787,10 @@ window.printBlankScorecards=()=>{
         <tr class="half-total"><td colspan="${arrows+1}">TOTAL</td><td></td><td></td></tr>
         </tbody>
       </table>
+      <div class="qr-wrap">
+        <div class="qr-placeholder" data-url="${scoringUrl}?comp=${currentCompId}&target=${archer.targetNum||''}"></div>
+        <div class="qr-info"><strong>Scan to score</strong><br>T${archer.targetNum||'?'}${archer.slot} · ${archer.name}</div>
+      </div>
       <div class="sig"><span>Archer: _________________</span><span>Scorer: _________________</span></div>
     </div>`;
   }
@@ -810,13 +825,17 @@ window.printBlankScorecards=()=>{
         <tr class="half-total"><td colspan="5">TOTAL</td><td></td><td></td></tr>
         </tbody>
       </table>
+      <div class="qr-wrap">
+        <div class="qr-placeholder" data-url="${scoringUrl}?comp=${currentCompId}&target=${archer.targetNum||''}"></div>
+        <div class="qr-info"><strong>Scan to score</strong><br>T${archer.targetNum||'?'}${archer.slot} · ${archer.name}</div>
+      </div>
       <div class="sig"><span>Archer: _________________</span><span>Scorer: _________________</span></div>
     </div>`;
   }
 
   if(!pages){toast('No targets with archers assigned','error');return;}
   const win=window.open('','_blank');
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Blank Scorecards — ${compName}</title><style>${style}</style></head><body>${pages}</body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Blank Scorecards — ${compName}</title><style>${style}</style><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script></head><body>${pages}<script>document.querySelectorAll(".qr-placeholder").forEach(el=>{new QRCode(el,{text:el.dataset.url,width:64,height:64,correctLevel:QRCode.CorrectLevel.M});});<\/script></body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),500);
 };
