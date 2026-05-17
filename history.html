@@ -112,7 +112,7 @@ table.qual-table tbody tr:hover{background:var(--surface3);}
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import{getFirestore,collection,doc,getDoc,getDocs}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import{getFirestore,collection,doc,getDoc,getDocs,deleteDoc}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig={apiKey:"AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To",authDomain:"all-in-competition.firebaseapp.com",projectId:"all-in-competition",storageBucket:"all-in-competition.firebasestorage.app",messagingSenderId:"620146958631",appId:"1:620146958631:web:1e88019d1436372689c902"};
 const app=initializeApp(firebaseConfig);
@@ -150,7 +150,7 @@ async function loadArchived(){
       </div>
       <div class="comp-card-footer">
         <div class="comp-card-archers">${archers} archers</div>
-        <div class="comp-card-disc">${c.discipline||'Outdoor'}</div>
+        <div style="display:flex;align-items:center;gap:8px;"><div class="comp-card-disc">${c.discipline||'Outdoor'}</div><button onclick="event.stopPropagation();deleteComp('${c.id}','${c.name||''}')" style="background:#e5393522;border:1px solid #e5393544;color:#e53935;padding:4px 10px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">🗑 DELETE</button></div>
       </div>
     </div>`;
   }).join('');
@@ -413,6 +413,12 @@ window.togglePanel=(id,btn)=>{
     section.querySelectorAll('.cat-pill').forEach(b=>b.classList.remove('open'));
   }
   if(!isOpen){panel.classList.add('open');btn.classList.add('open');}
+};
+
+window.deleteComp=async(id,name)=>{
+  if(!confirm(`Permanently delete "${name}"?\n\nThis cannot be undone.`))return;
+  await deleteDoc(doc(db,'competitions',id));
+  await loadArchived();
 };
 
 loadArchived();
