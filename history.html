@@ -196,7 +196,7 @@ function renderDetail(d){
   // Build categories from scored archers
   const scored=archers
     .filter(a=>(getScore(scores,a.id)?.total||0)>0)
-    .map(a=>{const s=getScore(scores,a.id);return{...a,total:s.total||0,xs:s.xs||0,tens:s.tens||0,g1:s.g1||0,g2:s.g2||0,h1:s.h1||0,h2:s.h2||0};});
+    .map(a=>{const s=getScore(scores,a.id);return{...a,total:s.total||0,xs:s.xs||0,tens:s.tens||0,g1:s.g1||0,g2:s.g2||0,h1:s.h1||0,h2:s.h2||0,kills:s.kills||0,elevens:s.elevens||0,sixes:s.sixes||0};});
 
   const catMap={};
   scored.forEach(a=>{
@@ -226,6 +226,7 @@ function renderDetail(d){
         }).join('')}
       </div>
       ${cats.map((cat,i)=>{
+        const isCustom=d.discipline==='Custom';
         const ranked=[...cat.archers].sort((a,b)=>b.total-a.total||(b.xs||0)-(a.xs||0)||(b.tens||0)-(a.tens||0));
         const gLabel=cat.gender==='M'?'Men':'Women';
         const color=BOW_COLORS[cat.bow]||'#555';
@@ -238,8 +239,9 @@ function renderDetail(d){
             <td style="font-weight:600;">${a.name}</td>
             ${halves}
             <td style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--accent);text-align:center;">${a.total}</td>
-            <td style="color:var(--muted2);text-align:center;">${a.xs}</td>
-            <td style="color:var(--muted2);text-align:center;">${a.tens}</td>
+            <td style="color:var(--muted2);text-align:center;">${isCustom?(a.kills||0):a.xs}</td>
+            <td style="color:var(--muted2);text-align:center;">${isCustom?(a.elevens||0):a.tens}</td>
+            ${isCustom?`<td style="color:var(--muted2);text-align:center;">${a.sixes||0}</td>`:''}
           </tr>`;
         }).join('');
         const hdrHalves=showHalves?'<th style="text-align:center;">H1</th><th style="text-align:center;">H2</th>':'';
@@ -248,7 +250,7 @@ function renderDetail(d){
             <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:${color};">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</span>
           </div>
           <table class="qual-table">
-            <thead><tr><th></th><th>Name</th>${hdrHalves}<th style="text-align:center;">Score</th><th style="text-align:center;">X</th><th style="text-align:center;">10</th></tr></thead>
+            <thead><tr><th></th><th>Name</th>${hdrHalves}<th style="text-align:center;">Score</th><th style="text-align:center;">${isCustom?'Kills':'X'}</th><th style="text-align:center;">${isCustom?'11s':'10'}</th>${isCustom?'<th style="text-align:center;">6s</th>':''}</tr></thead>
             <tbody>${rows}</tbody>
           </table>
         </div>`;
