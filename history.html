@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALL IN — Competition History</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--surface:#141414;--surface2:#1e1e1e;--surface3:#252525;--border:#2a2a2a;--border2:#333;--accent:#FFD700;--text:#f0f0f0;--muted:#666;--muted2:#888;--green:#43a047;--red:#e53935;--blue:#1e88e5;--radius:10px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.header{background:var(--surface);border-bottom:2px solid var(--accent);padding:16px 28px;display:flex;align-items:center;gap:20px;}
+.logo{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;letter-spacing:4px;color:var(--accent);}
+.header-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;}
+.back-btn{margin-left:auto;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 16px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;cursor:pointer;display:none;}
+.back-btn:hover{border-color:var(--accent);color:var(--accent);}
+.content{max-width:1100px;margin:0 auto;padding:28px 20px;}
+
+/* COMP LIST */
+.comp-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+.comp-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:20px;cursor:pointer;transition:border-color 0.15s,transform 0.1s;}
+.comp-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+.comp-card-name{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--text);margin-bottom:8px;}
+.comp-card-meta{font-size:12px;color:var(--muted2);display:flex;flex-direction:column;gap:3px;}
+.comp-card-meta span{display:flex;align-items:center;gap:6px;}
+.comp-card-footer{margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.comp-card-archers{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--accent);}
+.comp-card-disc{font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:var(--surface2);color:var(--muted2);}
+.empty-state{text-align:center;padding:80px 20px;color:var(--muted2);}
+.empty-state .icon{font-size:56px;margin-bottom:16px;}
+.empty-state p{font-size:15px;line-height:1.8;}
+
+/* COMP DETAIL */
+.comp-detail{display:none;}
+.comp-detail-header{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:20px 24px;margin-bottom:24px;}
+.comp-detail-name{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:var(--accent);letter-spacing:1px;margin-bottom:8px;}
+.comp-detail-meta{display:flex;flex-wrap:wrap;gap:16px;}
+.meta-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted2);}
+.meta-item strong{color:var(--text);}
+.section{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);margin-bottom:16px;overflow:hidden;}
+.section-title{padding:14px 20px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted2);border-bottom:1px solid var(--border);background:var(--surface2);}
+.section-body{padding:16px 20px;}
+
+/* CATEGORY PILLS */
+.cat-pills{display:flex;flex-wrap:wrap;gap:8px;}
+.cat-pill{padding:7px 14px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--muted2);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all 0.15s;}
+.cat-pill:hover{border-color:var(--accent);color:var(--accent);}
+.cat-pill.open{background:var(--accent);color:#000;border-color:var(--accent);}
+
+/* EXPANDABLE PANEL */
+.cat-panel{display:none;margin-top:12px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;overflow:hidden;}
+.cat-panel.open{display:block;}
+
+/* QUAL TABLE */
+table.qual-table{width:100%;border-collapse:collapse;font-size:13px;}
+table.qual-table thead tr{background:var(--surface3);}
+table.qual-table th{padding:8px 12px;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted2);border-bottom:1px solid var(--border2);}
+table.qual-table td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text);}
+table.qual-table tbody tr:last-child td{border-bottom:none;}
+table.qual-table tbody tr:hover{background:var(--surface3);}
+.medal{font-size:16px;}
+.rank-num{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--muted2);}
+
+/* BRACKET */
+.bracket-rounds{display:flex;gap:12px;flex-wrap:wrap;padding:12px;}
+.bracket-round{flex:1;min-width:200px;}
+.bracket-round-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted2);text-transform:uppercase;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border2);}
+.bracket-match{background:var(--surface3);border:1px solid var(--border2);border-radius:6px;padding:8px;margin-bottom:6px;}
+.bracket-match.complete{border-color:var(--green);}
+.bracket-archer{display:flex;align-items:center;justify-content:space-between;padding:4px 2px;}
+.bracket-archer-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;}
+.bracket-archer.winner .bracket-archer-name{color:var(--green);}
+.bracket-score{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:var(--accent);}
+.bracket-archer.winner .bracket-score{color:var(--green);}
+.bracket-sep{height:1px;background:var(--border2);margin:2px 0;}
+.bracket-label{font-size:9px;color:var(--muted);text-align:center;margin-top:4px;font-family:'Barlow Condensed',sans-serif;}
+
+/* FINAL RANKING */
+.podium{display:flex;flex-direction:column;gap:6px;padding:12px;}
+.podium-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;background:var(--surface3);border:1px solid var(--border);}
+.podium-row.p1{background:#fffde733;border-color:#FFD70044;}
+.podium-row.p2{background:#90909010;border-color:#C0C0C022;}
+.podium-row.p3{background:#CD7F3210;border-color:#CD7F3222;}
+.podium-medal{font-size:22px;width:32px;text-align:center;}
+.podium-rank{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--muted2);width:24px;}
+.podium-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;flex:1;}
+.podium-score{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--accent);}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">ALL IN</div>
+  <div class="header-title">Competition History</div>
+  <button class="back-btn" id="back-btn" onclick="showList()">← ALL COMPETITIONS</button>
+</div>
+
+<div class="content">
+  <!-- LIST VIEW -->
+  <div id="list-view">
+    <div id="comp-list" class="comp-list">
+      <div class="empty-state"><div class="icon">⏳</div><p>Loading competitions...</p></div>
+    </div>
+  </div>
+
+  <!-- DETAIL VIEW -->
+  <div id="detail-view" class="comp-detail">
+    <div class="comp-detail-header" id="detail-header"></div>
+    <div id="detail-body"></div>
+  </div>
+</div>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getFirestore,collection,doc,getDoc,getDocs}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig={apiKey:"AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To",authDomain:"all-in-competition.firebaseapp.com",projectId:"all-in-competition",storageBucket:"all-in-competition.firebasestorage.app",messagingSenderId:"620146958631",appId:"1:620146958631:web:1e88019d1436372689c902"};
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
+const BOW_ORDER=['Recurve','Compound','Barebow','Traditional','Longbow'];
+const AGE_ORDER=['U12','U14','U18','U21','Senior','Master 50+','Master 60+'];
+const BOW_COLORS={Recurve:'#1565c0',Compound:'#4a148c',Barebow:'#1b5e20',Traditional:'#e65100',Longbow:'#37474f'};
+const ROUND_LABELS={R1:'Round of 16',QF:'Quarter Finals',SF:'Semi Finals',F:'Final',B:'Bronze Medal'};
+
+function getScore(scores,archerId){const key=String(archerId).replace(/\./g,'_');return scores[key]||scores[String(archerId)]||{};}
+
+/* ── LOAD ARCHIVED COMPETITIONS ── */
+async function loadArchived(){
+  const snap=await getDocs(collection(db,'competitions'));
+  const archived=snap.docs
+    .filter(d=>d.data().archived===true)
+    .map(d=>({id:d.id,...d.data()}))
+    .sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+  const listEl=document.getElementById('comp-list');
+  if(!archived.length){
+    listEl.innerHTML=`<div class="empty-state"><div class="icon">📭</div><p>No archived competitions yet.<br>Competitions are archived automatically 7 days after their date.</p></div>`;
+    return;
+  }
+  listEl.innerHTML=archived.map(c=>{
+    const archers=(c.archers||[]).length;
+    const date=c.date?new Date(c.date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):'—';
+    return`<div class="comp-card" onclick="openComp('${c.id}')">
+      <div class="comp-card-name">${c.name||'Unnamed'}</div>
+      <div class="comp-card-meta">
+        <span>📅 ${date}</span>
+        ${c.location?`<span>📍 ${c.location}</span>`:''}
+        ${c.organizer?`<span>🏛 ${c.organizer}</span>`:''}
+      </div>
+      <div class="comp-card-footer">
+        <div class="comp-card-archers">${archers} archers</div>
+        <div class="comp-card-disc">${c.discipline||'Outdoor'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── OPEN COMPETITION DETAIL ── */
+window.openComp=async(id)=>{
+  const snap=await getDoc(doc(db,'competitions',id));
+  if(!snap.exists())return;
+  const d={id,...snap.data()};
+  renderDetail(d);
+  document.getElementById('list-view').style.display='none';
+  document.getElementById('detail-view').style.display='block';
+  document.getElementById('back-btn').style.display='inline-block';
+  window.scrollTo(0,0);
+};
+
+window.showList=()=>{
+  document.getElementById('list-view').style.display='block';
+  document.getElementById('detail-view').style.display='none';
+  document.getElementById('back-btn').style.display='none';
+};
+
+/* ── RENDER COMPETITION DETAIL ── */
+function renderDetail(d){
+  const archers=d.archers||[];
+  const scores=d.scores||{};
+  const elim=d.elimination||{};
+  const disc=d.discipline||'Outdoor';
+  const date=d.date?new Date(d.date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):'—';
+
+  // Header
+  document.getElementById('detail-header').innerHTML=`
+    <div class="comp-detail-name">${d.name||'Unnamed Competition'}</div>
+    <div class="comp-detail-meta">
+      <div class="meta-item">📅 <strong>${date}</strong></div>
+      ${d.location?`<div class="meta-item">📍 <strong>${d.location}</strong></div>`:''}
+      ${d.organizer?`<div class="meta-item">🏛 <strong>${d.organizer}</strong></div>`:''}
+      <div class="meta-item">🎯 <strong>${disc}</strong></div>
+      <div class="meta-item">🏹 <strong>${archers.length} archers</strong></div>
+    </div>`;
+
+  // Build categories from scored archers
+  const scored=archers
+    .filter(a=>(getScore(scores,a.id)?.total||0)>0)
+    .map(a=>{const s=getScore(scores,a.id);return{...a,total:s.total||0,xs:s.xs||0,tens:s.tens||0,g1:s.g1||0,g2:s.g2||0,h1:s.h1||0,h2:s.h2||0};});
+
+  const catMap={};
+  scored.forEach(a=>{
+    const key=`${a.bow}||${a.age}||${a.gender}`;
+    if(!catMap[key])catMap[key]={bow:a.bow,age:a.age,gender:a.gender,archers:[]};
+    catMap[key].archers.push(a);
+  });
+  const cats=Object.values(catMap).sort((a,b)=>{
+    const bi=BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);if(bi!==0)return bi;
+    const ai=AGE_ORDER.indexOf(a.age)-AGE_ORDER.indexOf(b.age);if(ai!==0)return ai;
+    return a.gender.localeCompare(b.gender);
+  });
+
+  const showHalves=disc==='Outdoor'||disc==='Indoor';
+  const hasElim=Object.keys(elim).length>0;
+  let html='';
+
+  // ── SECTION 1: QUALIFICATION ──
+  html+=`<div class="section">
+    <div class="section-title">🏹 Qualification Results</div>
+    <div class="section-body">
+      <div class="cat-pills" id="qual-pills">
+        ${cats.map((cat,i)=>{
+          const gLabel=cat.gender==='M'?'Men':'Women';
+          const color=BOW_COLORS[cat.bow]||'#555';
+          return`<button class="cat-pill" style="border-color:${color}44;color:${color};" onclick="togglePanel('qual-panel-${i}',this)">${cat.bow} · ${cat.age} · ${gLabel}</button>`;
+        }).join('')}
+      </div>
+      ${cats.map((cat,i)=>{
+        const ranked=[...cat.archers].sort((a,b)=>b.total-a.total||(b.xs||0)-(a.xs||0)||(b.tens||0)-(a.tens||0));
+        const gLabel=cat.gender==='M'?'Men':'Women';
+        const color=BOW_COLORS[cat.bow]||'#555';
+        const rows=ranked.map((a,ri)=>{
+          const medal=ri===0?'🥇':ri===1?'🥈':ri===2?'🥉':'';
+          const rankDisplay=medal||`<span class="rank-num">${ri+1}</span>`;
+          const halves=showHalves?`<td style="color:var(--muted2);text-align:center;">${a.h1||0}</td><td style="color:var(--muted2);text-align:center;">${a.h2||0}</td>`:'';
+          return`<tr>
+            <td style="text-align:center;width:36px;">${rankDisplay}</td>
+            <td style="font-weight:600;">${a.name}</td>
+            ${halves}
+            <td style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--accent);text-align:center;">${a.total}</td>
+            <td style="color:var(--muted2);text-align:center;">${a.xs}</td>
+            <td style="color:var(--muted2);text-align:center;">${a.tens}</td>
+          </tr>`;
+        }).join('');
+        const hdrHalves=showHalves?'<th style="text-align:center;">H1</th><th style="text-align:center;">H2</th>':'';
+        return`<div class="cat-panel" id="qual-panel-${i}">
+          <div style="padding:10px 14px;background:${color}22;border-bottom:1px solid ${color}33;">
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:${color};">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</span>
+          </div>
+          <table class="qual-table">
+            <thead><tr><th></th><th>Name</th>${hdrHalves}<th style="text-align:center;">Score</th><th style="text-align:center;">X</th><th style="text-align:center;">10</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+
+  // ── SECTION 2: ELIMINATION BRACKETS ──
+  if(hasElim){
+    const elimCats=Object.entries(elim).sort((a,b)=>a[0].localeCompare(b[0]));
+    html+=`<div class="section">
+      <div class="section-title">⚔️ Elimination Brackets</div>
+      <div class="section-body">
+        <div class="cat-pills">
+          ${elimCats.map(([key,data],i)=>{
+            const gLabel=data.gender==='M'?'Men':'Women';
+            const color=BOW_COLORS[data.bow]||'#555';
+            return`<button class="cat-pill" style="border-color:${color}44;color:${color};" onclick="togglePanel('elim-panel-${i}',this)">${data.bow} · ${data.age} · ${gLabel}</button>`;
+          }).join('')}
+        </div>
+        ${elimCats.map(([key,data],i)=>{
+          const gLabel=data.gender==='M'?'Men':'Women';
+          const color=BOW_COLORS[data.bow]||'#555';
+          const isCum=data.format==='cumulative';
+          const roundOrder=['R1','QF','SF','F','B'];
+          const rounds=roundOrder.filter(rk=>data.rounds?.[rk]?.length>0);
+          const roundsHtml=rounds.map(rk=>{
+            const matches=data.rounds[rk];
+            const matchesHtml=matches.map(m=>{
+              if(m.isBye)return`<div class="bracket-match"><div class="bracket-archer"><span class="bracket-archer-name" style="color:var(--accent);">${m.archer1?.name||'?'}</span><span style="font-size:10px;color:var(--accent);">BYE ✓</span></div></div>`;
+              const w1=m.winnerChoice&&String(m.winnerChoice)===String(m.archer1?.id);
+              const w2=m.winnerChoice&&String(m.winnerChoice)===String(m.archer2?.id);
+              let s1,s2;
+              if(isCum){s1=m.score1??'';s2=m.score2??'';}
+              else{let p1=0,p2=0;(m.sets||[]).forEach(s=>{if(s.score1>s.score2)p1+=2;else if(s.score2>s.score1)p2+=2;else{p1+=1;p2+=1;}});s1=m.winnerChoice?p1:'';s2=m.winnerChoice?p2:'';}
+              return`<div class="bracket-match ${m.winnerChoice?'complete':''}">
+                <div class="bracket-archer ${w1?'winner':''}">
+                  <span class="bracket-archer-name">${m.archer1?.name||'?'}</span>
+                  <span class="bracket-score">${s1}</span>
+                </div>
+                <div class="bracket-sep"></div>
+                <div class="bracket-archer ${w2?'winner':''}">
+                  <span class="bracket-archer-name">${m.archer2?.name||'?'}</span>
+                  <span class="bracket-score">${s2}</span>
+                </div>
+                ${m.winnerChoice?'':'<div class="bracket-label">PENDING</div>'}
+              </div>`;
+            }).join('');
+            return`<div class="bracket-round">
+              <div class="bracket-round-label">${ROUND_LABELS[rk]||rk}</div>
+              ${matchesHtml}
+            </div>`;
+          }).join('');
+          return`<div class="cat-panel" id="elim-panel-${i}">
+            <div style="padding:10px 14px;background:${color}22;border-bottom:1px solid ${color}33;">
+              <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:${color};">${data.bow.toUpperCase()} · ${data.age} · ${gLabel}</span>
+            </div>
+            <div class="bracket-rounds">${roundsHtml}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+
+    // ── SECTION 3: FINAL RANKING ──
+    html+=`<div class="section">
+      <div class="section-title">🏆 Final Ranking</div>
+      <div class="section-body">
+        <div class="cat-pills">
+          ${elimCats.map(([key,data],i)=>{
+            const gLabel=data.gender==='M'?'Men':'Women';
+            const color=BOW_COLORS[data.bow]||'#555';
+            return`<button class="cat-pill" style="border-color:${color}44;color:${color};" onclick="togglePanel('rank-panel-${i}',this)">${data.bow} · ${data.age} · ${gLabel}</button>`;
+          }).join('')}
+        </div>
+        ${elimCats.map(([key,data],i)=>{
+          const gLabel=data.gender==='M'?'Men':'Women';
+          const color=BOW_COLORS[data.bow]||'#555';
+          // Build final ranking from elimination results
+          const ranking=[];
+          // 1st & 2nd from Final
+          const finalMatch=data.rounds?.F?.[0];
+          if(finalMatch?.winnerChoice){
+            const winner=finalMatch.winnerChoice===finalMatch.archer1?.id?finalMatch.archer1:finalMatch.archer2;
+            const runnerUp=finalMatch.winnerChoice===finalMatch.archer1?.id?finalMatch.archer2:finalMatch.archer1;
+            if(winner)ranking.push({pos:1,archer:winner});
+            if(runnerUp)ranking.push({pos:2,archer:runnerUp});
+          }
+          // 3rd from Bronze
+          const bronzeMatch=data.rounds?.B?.[0];
+          if(bronzeMatch?.winnerChoice){
+            const bronze=bronzeMatch.winnerChoice===bronzeMatch.archer1?.id?bronzeMatch.archer1:bronzeMatch.archer2;
+            const fourth=bronzeMatch.winnerChoice===bronzeMatch.archer1?.id?bronzeMatch.archer2:bronzeMatch.archer1;
+            if(bronze)ranking.push({pos:3,archer:bronze});
+            if(fourth)ranking.push({pos:4,archer:fourth});
+          }
+          // SF losers (5th-8th) if they exist and not already added
+          const sfMatches=data.rounds?.SF||[];
+          sfMatches.forEach((m,mi)=>{
+            if(m.winnerChoice){
+              const loser=m.winnerChoice===m.archer1?.id?m.archer2:m.archer1;
+              if(loser&&!ranking.find(r=>r.archer?.id===loser?.id))
+                ranking.push({pos:5+mi,archer:loser});
+            }
+          });
+          // QF losers
+          const qfMatches=data.rounds?.QF||[];
+          let qfPos=ranking.length+1;
+          qfMatches.forEach(m=>{
+            if(m.winnerChoice){
+              const loser=m.winnerChoice===m.archer1?.id?m.archer2:m.archer1;
+              if(loser&&!ranking.find(r=>r.archer?.id===loser?.id))
+                ranking.push({pos:qfPos++,archer:loser});
+            }
+          });
+          // R1 losers
+          const r1Matches=data.rounds?.R1||[];
+          let r1Pos=ranking.length+1;
+          r1Matches.forEach(m=>{
+            if(m.winnerChoice&&!m.isBye){
+              const loser=m.winnerChoice===m.archer1?.id?m.archer2:m.archer1;
+              if(loser&&!ranking.find(r=>r.archer?.id===loser?.id))
+                ranking.push({pos:r1Pos++,archer:loser});
+            }
+          });
+          const medals=['🥇','🥈','🥉'];
+          const podiumHtml=ranking.map(({pos,archer})=>{
+            const medal=medals[pos-1]||'';
+            const cls=pos===1?'p1':pos===2?'p2':pos===3?'p3':'';
+            // Get qual score for this archer
+            const qualCat=cats.find(c=>c.bow===data.bow&&c.age===data.age&&c.gender===data.gender);
+            const qualArcher=qualCat?.archers.find(a=>String(a.id)===String(archer?.id));
+            return`<div class="podium-row ${cls}">
+              <div class="podium-medal">${medal}</div>
+              <div class="podium-rank" style="${medal?'display:none':''}">${pos}</div>
+              <div class="podium-name">${archer?.name||'?'}</div>
+              ${qualArcher?`<div class="podium-score">${qualArcher.total}</div>`:''}
+            </div>`;
+          }).join('');
+          return`<div class="cat-panel" id="rank-panel-${i}">
+            <div style="padding:10px 14px;background:${color}22;border-bottom:1px solid ${color}33;">
+              <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:${color};">${data.bow.toUpperCase()} · ${data.age} · ${gLabel}</span>
+            </div>
+            <div class="podium">${podiumHtml||'<p style="color:var(--muted2);font-size:13px;padding:8px;">No results yet.</p>'}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('detail-body').innerHTML=html;
+}
+
+/* ── TOGGLE PANEL ── */
+window.togglePanel=(id,btn)=>{
+  const panel=document.getElementById(id);
+  if(!panel)return;
+  const isOpen=panel.classList.contains('open');
+  // Close all panels in the same section
+  const section=btn.closest('.section-body');
+  if(section){
+    section.querySelectorAll('.cat-panel').forEach(p=>p.classList.remove('open'));
+    section.querySelectorAll('.cat-pill').forEach(b=>b.classList.remove('open'));
+  }
+  if(!isOpen){panel.classList.add('open');btn.classList.add('open');}
+};
+
+loadArchived();
+</script>
+</body>
+</html>
