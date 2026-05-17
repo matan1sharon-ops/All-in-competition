@@ -706,13 +706,6 @@ function applyTranslations(){
   const statLabels=document.querySelectorAll('.stat-label');
   const statKeys=['total_archers','assigned','targets_stat','scored'];
   statLabels.forEach((el,i)=>{if(statKeys[i])el.textContent=tr(statKeys[i]);});
-  // Modal titles
-  const mnc=document.querySelector('#modal-new-comp .modal-title');
-  if(mnc)mnc.textContent=tr('new_competition');
-  const mea=document.querySelector('#modal-edit-archer .modal-title');
-  if(mea)mea.textContent=tr('edit_archer');
-  const mim=document.querySelector('#modal-import .modal-title');
-  if(mim)mim.textContent=tr('import_archers');
   // Filter all bows
   const filterBow=document.getElementById('filter-bow');
   if(filterBow&&filterBow.options[0])filterBow.options[0].textContent=tr('all_bows');
