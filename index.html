@@ -681,36 +681,36 @@ window.printBlankScorecards=()=>{
     // Group archers 2 per page
     const allArchers=[];
     targets.forEach(t=>['A','B','C','D'].forEach(s=>{if(t[s])allArchers.push({...t[s],targetNum:t.num,slot:s});}));
-    for(let i=0;i<allArchers.length;i+=2){
-      const pair=allArchers.slice(i,i+2);
-      while(pair.length<2)pair.push(null);
-      const blocks=pair.map(archer=>{
-        if(!archer)return`<div style="flex:1;"></div>`;
+    for(let i=0;i<allArchers.length;i+=4){
+      const quad=allArchers.slice(i,i+4);
+      while(quad.length<4)quad.push(null);
+      const blocks=quad.map(archer=>{
+        if(!archer)return`<div style="background:#f9f9f9;border:1px solid #eee;border-radius:4px;"></div>`;
         return build3DFieldBlock(archer,stations,arrows,disc);
       });
       pages+=`<div class="page">
         <div class="page-header">
           <div><div class="page-title">${compName}</div><div class="page-sub">${disc} · Scoring: ${disc==='3D'?'11/10/8/5/0':'6/5/4/3/2/1/0'}</div></div>
         </div>
-        <div class="grid-sidebyside">${blocks.join('')}</div>
+        <div class="grid-2x2">${blocks.join('')}</div>
       </div>`;
     }
   } else if(disc==='Custom'){
     const config=window._targetConfig||[];
     const allArchers=[];
     targets.forEach(t=>['A','B','C','D'].forEach(s=>{if(t[s])allArchers.push({...t[s],targetNum:t.num,slot:s});}));
-    for(let i=0;i<allArchers.length;i+=2){
-      const pair=allArchers.slice(i,i+2);
-      while(pair.length<2)pair.push(null);
-      const blocks=pair.map(archer=>{
-        if(!archer)return`<div style="flex:1;"></div>`;
+    for(let i=0;i<allArchers.length;i+=4){
+      const quad=allArchers.slice(i,i+4);
+      while(quad.length<4)quad.push(null);
+      const blocks=quad.map(archer=>{
+        if(!archer)return`<div style="background:#f9f9f9;border:1px solid #eee;border-radius:4px;"></div>`;
         return buildCustomBlock(archer,config);
       });
       pages+=`<div class="page">
         <div class="page-header">
           <div><div class="page-title">${compName}</div><div class="page-sub">Custom</div></div>
         </div>
-        <div class="grid-sidebyside">${blocks.join('')}</div>
+        <div class="grid-2x2">${blocks.join('')}</div>
       </div>`;
     }
   }
