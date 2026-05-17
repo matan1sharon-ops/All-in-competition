@@ -649,66 +649,75 @@ window.setAdminLang=function(lang){
 };
 
 function applyTranslations(){
+  const lang=currentLang;
+  const tr=(key)=>T[lang]?.[key]||T['en']?.[key]||key;
   // Nav item labels
   document.querySelectorAll('.nav-item[data-panel]').forEach(el=>{
     const panel=el.getAttribute('data-panel');
     const span=el.querySelector('span:not(.icon):not(.badge)');
-    if(span)span.textContent=t(panel);
+    if(span)span.textContent=tr(panel);
   });
   // History link
   const histLink=document.querySelector('a[href="history.html"] span:last-child');
-  if(histLink)histLink.textContent=t('history');
+  if(histLink)histLink.textContent=tr('history');
   // Topbar title
   const activePanel=document.querySelector('.nav-item.active')?.getAttribute('data-panel');
-  if(activePanel)document.getElementById('topbar-title').textContent=t(activePanel)||t('dashboard');
+  if(activePanel)document.getElementById('topbar-title').textContent=tr(activePanel)||tr('dashboard');
   // New comp button
   const newCompBtn=document.querySelector('.new-comp-btn');
-  if(newCompBtn)newCompBtn.textContent=t('new_comp');
+  if(newCompBtn)newCompBtn.textContent=tr('new_comp');
   // Archive/delete
   const archBtn=document.getElementById('btn-archive-comp');
   const delBtn=document.getElementById('btn-delete-comp');
-  if(archBtn)archBtn.textContent=t('archive_comp');
-  if(delBtn)delBtn.textContent=t('delete_comp');
+  if(archBtn)archBtn.textContent=tr('archive_comp');
+  if(delBtn)delBtn.textContent=tr('delete_comp');
   // All buttons with data-t
   document.querySelectorAll('button[data-t]').forEach(btn=>{
-    btn.textContent=t(btn.getAttribute('data-t'));
+    btn.textContent=tr(btn.getAttribute('data-t'));
   });
   // All labels with data-t
   document.querySelectorAll('label[data-t]').forEach(el=>{
-    el.textContent=t(el.getAttribute('data-t'));
+    el.textContent=tr(el.getAttribute('data-t'));
   });
   // All spans/divs with data-t
   document.querySelectorAll('span[data-t],div[data-t]').forEach(el=>{
-    el.textContent=t(el.getAttribute('data-t'));
+    el.textContent=tr(el.getAttribute('data-t'));
   });
   // Placeholders
   document.querySelectorAll('[data-placeholder-t]').forEach(el=>{
-    el.placeholder=t(el.getAttribute('data-placeholder-t'));
+    el.placeholder=tr(el.getAttribute('data-placeholder-t'));
   });
   // Search
   const searchEl=document.getElementById('search-archer');
-  if(searchEl)searchEl.placeholder=t('search');
+  if(searchEl)searchEl.placeholder=tr('search');
   // Modal titles
-  const mnc=document.querySelector('#modal-new-comp .modal-title');if(mnc)mnc.textContent=t('new_competition');
-  const mim=document.querySelector('#modal-import .modal-title');if(mim)mim.textContent=t('import_archers');
-  const med=document.querySelector('#modal-edit-archer .modal-title');if(med)med.textContent=t('edit_archer');
+  const mnc=document.querySelector('#modal-new-comp .modal-title');if(mnc)mnc.textContent=tr('new_competition');
+  const mim=document.querySelector('#modal-import .modal-title');if(mim)mim.textContent=tr('import_archers');
+  const med=document.querySelector('#modal-edit-archer .modal-title');if(med)med.textContent=tr('edit_archer');
   // Add Archer card title
   const addCard=document.querySelector('#panel-entries .card .card-title');
-  if(addCard)addCard.textContent=t('add_archer_title');
+  if(addCard)addCard.textContent=tr('add_archer_title');
   // No comp message
   const noCompP=document.querySelector('#no-comp-msg p');
-  if(noCompP)noCompP.innerHTML=t('no_comp_selected')+'<br>'+t('create_or_select');
+  if(noCompP)noCompP.innerHTML=tr('no_comp_selected')+'<br>'+tr('create_or_select');
   const noCompBtn=document.querySelector('#no-comp-msg button');
-  if(noCompBtn)noCompBtn.textContent=t('create_competition');
+  if(noCompBtn)noCompBtn.textContent=tr('create_competition');
   // Stat labels
   const statLabels=document.querySelectorAll('.stat-label');
   const statKeys=['total_archers','assigned','targets_stat','scored'];
-  statLabels.forEach((el,i)=>{if(statKeys[i])el.textContent=t(statKeys[i]);});
+  statLabels.forEach((el,i)=>{if(statKeys[i])el.textContent=tr(statKeys[i]);});
+  // Modal titles
+  const mnc=document.querySelector('#modal-new-comp .modal-title');
+  if(mnc)mnc.textContent=tr('new_competition');
+  const mea=document.querySelector('#modal-edit-archer .modal-title');
+  if(mea)mea.textContent=tr('edit_archer');
+  const mim=document.querySelector('#modal-import .modal-title');
+  if(mim)mim.textContent=tr('import_archers');
   // Filter all bows
   const filterBow=document.getElementById('filter-bow');
-  if(filterBow&&filterBow.options[0])filterBow.options[0].textContent=t('all_bows');
+  if(filterBow&&filterBow.options[0])filterBow.options[0].textContent=tr('all_bows');
   const scFilter=document.getElementById('sc-filter-bow');
-  if(scFilter&&scFilter.options[0])scFilter.options[0].textContent=t('all_bows');
+  if(scFilter&&scFilter.options[0])scFilter.options[0].textContent=tr('all_bows');
 }
 
 function initAdminLang(){
