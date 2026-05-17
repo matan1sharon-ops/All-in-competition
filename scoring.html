@@ -144,9 +144,9 @@ body.rtl .summary-header{flex-direction:row-reverse;}
     <div id="login-step-1">
       <div class="error-msg" id="error-msg"></div>
       <label class="login-label" data-t="competition">Competition</label>
-      <select id="comp-select" class="login-select"><option value="" data-t="loading">Loading...</option></select>
+      <select id="comp-select" class="login-select"><option value="">— Select Competition —</option></select>
       <label class="login-label" data-t="your_name">Your Name</label>
-      <select id="archer-select" class="login-select"><option value="" data-t="select_comp_first">— Select competition first —</option></select>
+      <select id="archer-select" class="login-select"><option value="">— Select competition first —</option></select>
       <button class="login-btn" onclick="checkPhase()" data-t="continue">CONTINUE →</button>
     </div>
     <div id="login-step-qual" style="display:none;">
@@ -517,17 +517,29 @@ const T={
   }
 };
 
-function t(key){return T[currentLang]?.[key]||T.en[key]||key;}
+window.t=function(key){return T[currentLang]?.[key]||T.en[key]||key;};
+function t(key){return window.t(key);}
 
-window.setLang=(lang)=>{
+window.setLang=function(lang){
   currentLang=lang;
   localStorage.setItem('scoringLang',lang);
   // Toggle button styles
-  document.getElementById('lang-en').classList.toggle('active',lang==='en');
-  document.getElementById('lang-he').classList.toggle('active',lang==='he');
+  const btnEn=document.getElementById('lang-en');
+  const btnHe=document.getElementById('lang-he');
+  if(btnEn)btnEn.classList.toggle('active',lang==='en');
+  if(btnHe)btnHe.classList.toggle('active',lang==='he');
   // RTL
   document.body.classList.toggle('rtl',lang==='he');
   document.documentElement.lang=lang==='he'?'he':'en';
+  // Update select placeholders
+  const compSel=document.getElementById('comp-select');
+  if(compSel&&compSel.options[0]&&!compSel.options[0].value){
+    compSel.options[0].textContent=t('select_competition');
+  }
+  const archerSel=document.getElementById('archer-select');
+  if(archerSel&&archerSel.options[0]&&!archerSel.options[0].value){
+    archerSel.options[0].textContent=t('select_comp_first');
+  }
   // Update all static data-t elements
   document.querySelectorAll('[data-t]').forEach(el=>{
     const key=el.getAttribute('data-t');
@@ -538,10 +550,10 @@ window.setLang=(lang)=>{
     else el.innerHTML=val.replace(/\n/g,'<br>');
   });
   // Re-render dynamic content if on scoring screen
-  if(document.getElementById('scoring-screen').style.display==='flex'){
+  if(document.getElementById('scoring-screen')?.style.display==='flex'){
     renderTabs();renderScoreList();renderPad();updateHeader();
   }
-  if(document.getElementById('match-screen').style.display==='flex'){
+  if(document.getElementById('match-screen')?.style.display==='flex'){
     renderMatchSets();renderMatchPad();updateMatchHeader();
   }
 };
