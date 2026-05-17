@@ -175,7 +175,7 @@ function renderMatchRowDisplay(archer,won,score,sets,archerNum,fmt,slots,match){
 async function loadComps(){
   const snap=await getDocs(collection(db,'competitions'));
   const sel=document.getElementById('comp-select');
-  snap.docs.forEach(d=>{const c=d.data(),o=document.createElement('option');o.value=d.id;o.textContent=c.name+(c.date?` (${c.date})`:'');sel.appendChild(o);});
+  snap.docs.filter(d=>!d.data().archived).forEach(d=>{const c=d.data(),o=document.createElement('option');o.value=d.id;o.textContent=c.name+(c.date?` (${c.date})`:'');sel.appendChild(o);});
   const params=new URLSearchParams(window.location.search);
   const compId=params.get('comp');
   if(compId){sel.value=compId;selectComp(compId);}
