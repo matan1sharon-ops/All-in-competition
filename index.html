@@ -157,14 +157,14 @@ tbody td{padding:10px 12px;color:#111;}
       <!-- ENTRIES -->
       <div id="panel-entries" class="panel">
         <div class="card">
-          <div class="card-title">Add Archer</div>
+          <div class="card-title" data-t="add_archer_title">Add Archer</div>
           <div class="form-grid">
-            <div class="form-group"><label>First Name</label><input type="text" id="e-fname" placeholder="First name"></div>
-            <div class="form-group"><label>Last Name</label><input type="text" id="e-lname" placeholder="Last name"></div>
-            <div class="form-group"><label>Club</label><input type="text" id="e-club" placeholder="Club name"></div>
-            <div class="form-group"><label>Bow Type</label><select id="e-bow"><option>Recurve</option><option>Compound</option><option>Barebow</option><option>Traditional</option><option>Longbow</option></select></div>
-            <div class="form-group"><label>Age Category</label><select id="e-age"><option>U12</option><option>U14</option><option>U18</option><option>U21</option><option>Senior</option><option>Master 50+</option><option>Master 60+</option></select></div>
-            <div class="form-group"><label>Gender</label><select id="e-gender"><option value="M">Male</option><option value="F">Female</option></select></div>
+            <div class="form-group"><label data-t="first_name">First Name</label><input type="text" id="e-fname" data-placeholder-t="first_name" placeholder="First name"></div>
+            <div class="form-group"><label data-t="last_name">Last Name</label><input type="text" id="e-lname" data-placeholder-t="last_name" placeholder="Last name"></div>
+            <div class="form-group"><label data-t="club">Club</label><input type="text" id="e-club" data-placeholder-t="club_name" placeholder="Club name"></div>
+            <div class="form-group"><label data-t="bow_type">Bow Type</label><select id="e-bow"><option>Recurve</option><option>Compound</option><option>Barebow</option><option>Traditional</option><option>Longbow</option></select></div>
+            <div class="form-group"><label data-t="age_category">Age Category</label><select id="e-age"><option>U12</option><option>U14</option><option>U18</option><option>U21</option><option>Senior</option><option>Master 50+</option><option>Master 60+</option></select></div>
+            <div class="form-group"><label data-t="gender">Gender</label><select id="e-gender"><option value="M">Male</option><option value="F">Female</option></select></div>
           </div>
           <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
             <button class="btn btn-primary" onclick="addArcher()" data-t="add_archer">+ ADD ARCHER</button>
@@ -190,7 +190,7 @@ tbody td{padding:10px 12px;color:#111;}
           <div class="card-title">Target Assignment</div>
           <p style="font-size:13px;color:var(--muted2);margin-bottom:16px;">Targets are generated automatically from the entry list — 4 slots per target (A/B/C/D).</p>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn btn-primary" onclick="generateTargets()" data-t="auto_generate">⚡ AUTO GENERATE FROM ENTRIES</button>
+            <button class="btn btn-primary" onclick="generateTargets()" data-t="auto_generate">⚡ יצירת קבוצות אוטומטית</button>
             <button class="btn btn-secondary" onclick="clearAssignments()" data-t="clear_all">CLEAR ALL</button>
             <button class="btn btn-secondary" onclick="printStartList()" data-t="print_start">🖨 PRINT START LIST</button>
             <button class="btn btn-secondary" onclick="printFieldOfPlay()" data-t="field_of_play">🏟 FIELD OF PLAY</button>
@@ -225,7 +225,7 @@ tbody td{padding:10px 12px;color:#111;}
           <div class="card-title">Add Session</div>
           <div class="form-grid">
             <div class="form-group"><label>Session Name</label><input type="text" id="s-name" placeholder="e.g. Qualification Round 1"></div>
-            <div class="form-group"><label>Date</label><input type="date" id="s-date"></div>
+            <div class="form-group"><label data-t="date">Date</label><input type="date" id="s-date"></div>
             <div class="form-group"><label>Start Time</label><input type="time" id="s-time"></div>
             <div class="form-group"><label>Distance</label><select id="s-dist"><option>70m</option><option>60m</option><option>50m</option><option>30m</option><option>18m</option><option>25m</option><option>3D</option><option>Field</option><option>Custom</option></select></div>
             <div class="form-group"><label>Ends</label><input type="number" id="s-ends" value="12" min="1" max="30"></div>
@@ -281,7 +281,7 @@ tbody td{padding:10px 12px;color:#111;}
   </div>
 </div>
 <!-- MODALS -->
-<div class="modal-backdrop" id="modal-new-comp"><div class="modal"><div class="modal-title">🏆 New Competition</div><div class="form-grid"><div class="form-group" style="grid-column:1/-1"><label>Competition Name</label><input type="text" id="nc-name" placeholder="e.g. National Championship 2025"></div><div class="form-group"><label>Date</label><input type="date" id="nc-date"></div><div class="form-group"><label>Location</label><input type="text" id="nc-location" placeholder="Venue / City"></div><div class="form-group"><label>Discipline</label><select id="nc-discipline"><option>Outdoor</option><option>Indoor</option><option>3D</option><option>Field</option><option>Custom</option></select></div><div class="form-group"><label>Organizer</label><input type="text" id="nc-organizer" placeholder="Club / Federation"></div></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-new-comp')" data-t="cancel">Cancel</button><button class="btn btn-primary" onclick="createCompetition()" data-t="create">CREATE →</button></div></div></div>
+<div class="modal-backdrop" id="modal-new-comp"><div class="modal"><div class="modal-title">🏆 New Competition</div><div class="form-grid"><div class="form-group" style="grid-column:1/-1"><label data-t="comp_name">Competition Name</label><input type="text" id="nc-name" data-placeholder-t="comp_name_ph" placeholder="e.g. National Championship 2025"></div><div class="form-group"><label data-t="date">Date</label><input type="date" id="nc-date"></div><div class="form-group"><label data-t="location">Location</label><input type="text" id="nc-location" data-placeholder-t="venue_city" placeholder="Venue / City"></div><div class="form-group"><label data-t="discipline">Discipline</label><select id="nc-discipline"><option>Outdoor</option><option>Indoor</option><option>3D</option><option>Field</option><option>Custom</option></select></div><div class="form-group"><label data-t="organizer">Organizer</label><input type="text" id="nc-organizer" data-placeholder-t="club_fed" placeholder="Club / Federation"></div></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-new-comp')" data-t="cancel">Cancel</button><button class="btn btn-primary" onclick="createCompetition()" data-t="create">CREATE →</button></div></div></div>
 <div class="modal-backdrop" id="modal-assign"><div class="modal"><div class="modal-title" id="assign-modal-title">Assign Archer</div><div class="form-group"><label>Select Archer</label><select id="assign-archer-select" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:14px;outline:none;width:100%;"></select></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-assign')">Cancel</button><button class="btn btn-danger btn-sm" onclick="removeFromSlot()" id="btn-remove-slot" style="display:none;">Remove</button><button class="btn btn-primary" onclick="confirmAssign()">ASSIGN →</button></div></div></div>
 <div class="modal-backdrop" id="modal-import"><div class="modal"><div class="modal-title">📥 Import Archers (CSV)</div>
 <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;margin-bottom:12px;font-size:11px;color:var(--muted2);font-family:monospace;line-height:1.8;">FirstName, LastName, Club, <span style="color:var(--accent);">Bow</span>, <span style="color:var(--accent);">Age</span>, <span style="color:var(--accent);">Gender</span><br><span style="color:var(--muted);">Bow: Recurve / Compound / Barebow / Traditional / Longbow</span><br><span style="color:var(--muted);">Age: U12 / U14 / U18 / U21 / Senior / Master 50+ / Master 60+</span><br><span style="color:var(--muted);">Gender: M / F</span></div>
@@ -296,7 +296,7 @@ tbody td{padding:10px 12px;color:#111;}
 <div id="csv-preview" style="margin-top:8px;font-size:12px;color:var(--green);display:none;"></div>
 <div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-import')" data-t="cancel">Cancel</button><button class="btn btn-secondary" onclick="downloadCSVTemplate()" data-t="get_template">📋 GET TEMPLATE</button><button class="btn btn-primary" onclick="importCSV()" data-t="import_btn">IMPORT →</button></div></div></div>
 <div id="toast"></div>
-<div class="modal-backdrop" id="modal-edit-archer"><div class="modal"><div class="modal-title">✏️ Edit Archer</div><input type="hidden" id="edit-archer-id"><div class="form-grid"><div class="form-group"><label>First Name</label><input type="text" id="edit-fname"></div><div class="form-group"><label>Last Name</label><input type="text" id="edit-lname"></div><div class="form-group"><label>Club</label><input type="text" id="edit-club"></div><div class="form-group"><label>Bow Type</label><select id="edit-bow"><option>Recurve</option><option>Compound</option><option>Barebow</option><option>Traditional</option><option>Longbow</option></select></div><div class="form-group"><label>Age Category</label><select id="edit-age"><option>U12</option><option>U14</option><option>U18</option><option>U21</option><option>Senior</option><option>Master 50+</option><option>Master 60+</option></select></div><div class="form-group"><label>Gender</label><select id="edit-gender"><option value="M">Male</option><option value="F">Female</option></select></div></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-edit-archer')" data-t="cancel">Cancel</button><button class="btn btn-primary" onclick="saveEditArcher()" data-t="save">SAVE →</button></div></div></div>
+<div class="modal-backdrop" id="modal-edit-archer"><div class="modal"><div class="modal-title">✏️ Edit Archer</div><input type="hidden" id="edit-archer-id"><div class="form-grid"><div class="form-group"><label data-t="first_name">First Name</label><input type="text" id="edit-fname"></div><div class="form-group"><label data-t="last_name">Last Name</label><input type="text" id="edit-lname"></div><div class="form-group"><label data-t="club">Club</label><input type="text" id="edit-club"></div><div class="form-group"><label data-t="bow_type">Bow Type</label><select id="edit-bow"><option>Recurve</option><option>Compound</option><option>Barebow</option><option>Traditional</option><option>Longbow</option></select></div><div class="form-group"><label data-t="age_category">Age Category</label><select id="edit-age"><option>U12</option><option>U14</option><option>U18</option><option>U21</option><option>Senior</option><option>Master 50+</option><option>Master 60+</option></select></div><div class="form-group"><label data-t="gender">Gender</label><select id="edit-gender"><option value="M">Male</option><option value="F">Female</option></select></div></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-edit-archer')" data-t="cancel">Cancel</button><button class="btn btn-primary" onclick="saveEditArcher()" data-t="save">SAVE →</button></div></div></div>
 <div class="modal-backdrop" id="modal-move-archer"><div class="modal" style="max-width:460px;"><div class="modal-title" id="move-modal-title">Move Archer</div><div id="move-modal-body"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-move-archer')" data-t="cancel">Cancel</button></div></div></div>
 <div class="modal-backdrop" id="modal-match"><div class="modal" style="max-width:460px;"><div class="modal-title" id="match-modal-title">Match Result</div><div id="match-modal-body"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-match')" data-t="cancel">Cancel</button><button class="btn btn-primary" onclick="saveMatchResult()" data-t="save_result">SAVE RESULT →</button></div></div></div>
 
@@ -468,6 +468,12 @@ T={
     witness_sig:'Witness signature',
     archer_sig:'Archer signature',
     scan_to_score:'Scan to score',
+    comp_name_ph:'e.g. National Championship 2025',
+    venue_city:'Venue / City',
+    club_fed:'Club / Federation',
+    club_name:'Club name',
+    add_archer_title:'Add Archer',
+    auto_generate:'⚡ יצירת קבוצות אוטומטית',
   },
   he:{
     // Nav
@@ -620,6 +626,12 @@ T={
     witness_sig:'חתימת עד',
     archer_sig:'חתימת קשת',
     scan_to_score:'סרוק לניקוד',
+    comp_name_ph:'לדוגמה: אליפות ישראל 2025',
+    venue_city:'מקום / עיר',
+    club_fed:'מועדון / התאחדות',
+    club_name:'שם מועדון',
+    add_archer_title:'הוספת קשת',
+    auto_generate:'⚡ יצירת קבוצות אוטומטית',
   }
 };
 
@@ -647,7 +659,7 @@ function applyTranslations(){
   // Topbar title
   const activePanel=document.querySelector('.nav-item.active')?.getAttribute('data-panel');
   if(activePanel) document.getElementById('topbar-title').textContent=t(activePanel)||t('dashboard');
-  // Buttons with data-t
+  // Buttons and labels with data-t
   document.querySelectorAll('[data-t]').forEach(el=>{
     const key=el.getAttribute('data-t');
     const val=t(key);
@@ -656,6 +668,12 @@ function applyTranslations(){
         el.textContent=val;
       else if(el.tagName==='INPUT'&&el.placeholder) el.placeholder=val;
     }
+  });
+  // Placeholder-only elements
+  document.querySelectorAll('[data-placeholder-t]').forEach(el=>{
+    const key=el.getAttribute('data-placeholder-t');
+    const val=t(key);
+    if(val&&val!==key) el.placeholder=val;
   });
   // Status
   const connEl=document.getElementById('conn-status');
@@ -724,7 +742,7 @@ window.selectCompetition=async(id)=>{if(!id){currentCompId=null;document.getElem
 function getScore(archerId){const key=String(archerId).replace(/\./g,'_');return scores[key]||scores[String(archerId)]||{};}
 function getDistanceLabel(bow,discipline){if(discipline==='Outdoor'){if(bow==='Recurve')return '70m / 60m / 30m';if(bow==='Compound')return '50m';if(bow==='Barebow')return '50m';if(bow==='Trad/Longbow')return '30m';}return '';}
 function renderAll(){renderDashboard();renderEntries();renderTargets();renderSessions();renderResults();renderScorecards();}
-function renderDashboard(){if(!currentCompId)return;document.getElementById('d-total').textContent=archers.length;document.getElementById('d-assigned').textContent=archers.filter(a=>a.target).length;document.getElementById('d-targets').textContent=targets.length;document.getElementById('d-scored').textContent=archers.filter(a=>(getScore(a.id)?.total||0)>0).length;document.getElementById('entry-badge').textContent=archers.length;document.getElementById('entry-count').textContent=archers.length+' archers';getDoc(doc(db,'competitions',currentCompId)).then(s=>{const d=s.data();document.getElementById('comp-info-grid').innerHTML=`<div class="form-group"><label>Name</label><input value="${d.name||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label>Date</label><input value="${d.date||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label>Location</label><input value="${d.location||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label>Discipline</label><input value="${d.discipline||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label>Organizer</label><input value="${d.organizer||''}" readonly style="opacity:0.7;"></div>`;});const cats={};archers.forEach(a=>{const k=`${a.bow}|${a.age}`;if(!cats[k])cats[k]={bow:a.bow,age:a.age,M:0,F:0};cats[k][a.gender]++;});document.getElementById('cat-breakdown').innerHTML=BOW_ORDER.flatMap(bow=>AGE_ORDER.map(age=>{const c=cats[`${bow}|${age}`];if(!c)return'';const total=(c.M||0)+(c.F||0);const tgts=Math.ceil(total/4);return`<tr><td><span class="tag tag-${bow.toLowerCase()}">${bow}</span></td><td>${age}</td><td>${c.M||0}</td><td>${c.F||0}</td><td><strong>${total}</strong></td><td style="color:var(--accent)">${tgts}</td></tr>`;})).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">No archers yet</td></tr>';}
+function renderDashboard(){if(!currentCompId)return;document.getElementById('d-total').textContent=archers.length;document.getElementById('d-assigned').textContent=archers.filter(a=>a.target).length;document.getElementById('d-targets').textContent=targets.length;document.getElementById('d-scored').textContent=archers.filter(a=>(getScore(a.id)?.total||0)>0).length;document.getElementById('entry-badge').textContent=archers.length;document.getElementById('entry-count').textContent=archers.length+' archers';getDoc(doc(db,'competitions',currentCompId)).then(s=>{const d=s.data();document.getElementById('comp-info-grid').innerHTML=`<div class="form-group"><label>Name</label><input value="${d.name||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label data-t="date">Date</label><input value="${d.date||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label data-t="location">Location</label><input value="${d.location||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label data-t="discipline">Discipline</label><input value="${d.discipline||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label data-t="organizer">Organizer</label><input value="${d.organizer||''}" readonly style="opacity:0.7;"></div>`;});const cats={};archers.forEach(a=>{const k=`${a.bow}|${a.age}`;if(!cats[k])cats[k]={bow:a.bow,age:a.age,M:0,F:0};cats[k][a.gender]++;});document.getElementById('cat-breakdown').innerHTML=BOW_ORDER.flatMap(bow=>AGE_ORDER.map(age=>{const c=cats[`${bow}|${age}`];if(!c)return'';const total=(c.M||0)+(c.F||0);const tgts=Math.ceil(total/4);return`<tr><td><span class="tag tag-${bow.toLowerCase()}">${bow}</span></td><td>${age}</td><td>${c.M||0}</td><td>${c.F||0}</td><td><strong>${total}</strong></td><td style="color:var(--accent)">${tgts}</td></tr>`;})).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">No archers yet</td></tr>';}
 window.addArcher=async()=>{if(!currentCompId){toast(t('select_comp_first'),'error');return;}const fname=document.getElementById('e-fname').value.trim();const lname=document.getElementById('e-lname').value.trim();if(!fname||!lname){toast(t('enter_fname_lname'),'error');return;}archers.push({id:String(Date.now()),fname,lname,name:`${fname} ${lname}`,club:document.getElementById('e-club').value.trim(),bow:document.getElementById('e-bow').value,age:document.getElementById('e-age').value,gender:document.getElementById('e-gender').value,target:null,slot:null});await saveArchers();document.getElementById('e-fname').value='';document.getElementById('e-lname').value='';renderAll();toast(`${fname} ${lname} ${t('archer_added')}`,'success');};
 window.deleteArcher=async(id)=>{if(!confirm('Remove this archer?'))return;archers=archers.filter(a=>a.id!==id);targets.forEach(t=>['A','B','C','D'].forEach(s=>{if(t[s]?.id===id)t[s]=null;}));await saveArchers();await saveTargets();renderAll();toast(t('archer_removed'),'success');};
 window.renderEntries=()=>{const search=(document.getElementById('search-archer')?.value||'').toLowerCase();const bowF=document.getElementById('filter-bow')?.value||'';const filtered=archers.filter(a=>(a.name.toLowerCase().includes(search)||(a.club||'').toLowerCase().includes(search))&&(!bowF||a.bow===bowF));document.getElementById('entry-count').textContent=archers.length+' archers';document.getElementById('entry-badge').textContent=archers.length;document.getElementById('entries-table').innerHTML=filtered.map((a)=>`<tr><td style="color:#999;">${archers.indexOf(a)+1}</td><td style="color:#111;font-weight:600;">${a.fname} ${a.lname}</td><td style="color:#555;">${a.club||'—'}</td><td><span class="tag tag-${a.bow.toLowerCase()}">${a.bow}</span></td><td style="color:#111;">${a.age}</td><td><span class="tag tag-${a.gender.toLowerCase()}">${a.gender}</span></td><td style="color:#1565c0;font-weight:700;">${a.target?`T${a.target}${a.slot}`:'<span style="color:#999">—</span>'}</td><td style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="openEditArcher('${a.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteArcher('${a.id}')">✕</button></td></tr>`).join('')||'<tr><td colspan="8" style="text-align:center;color:#999;padding:24px">No archers yet</td></tr>';};
