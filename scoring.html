@@ -393,8 +393,9 @@ async function loadCompetitions(){
     const snap=await getDocs(collection(db,'competitions'));
     const sel=document.getElementById('comp-select');
     sel.innerHTML='<option value="">— Select Competition —</option>';
-    snap.docs.forEach(d=>{const c=d.data(),o=document.createElement('option');o.value=d.id;o.textContent=c.name+(c.date?` (${c.date})`:'');sel.appendChild(o);});
-    if(!snap.docs.length)sel.innerHTML='<option value="">No competitions found</option>';
+    const active=snap.docs.filter(d=>!d.data().archived);
+    active.forEach(d=>{const c=d.data(),o=document.createElement('option');o.value=d.id;o.textContent=c.name+(c.date?` (${c.date})`:'');sel.appendChild(o);});
+    if(!active.length)sel.innerHTML='<option value="">No competitions found</option>';
     sel.onchange=()=>loadArchers(sel.value);
   }catch(e){showError('Connection error');}
 }
