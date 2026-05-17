@@ -407,8 +407,12 @@ function toast(msg,type='success'){const el=document.getElementById('toast');el.
 
 /* ── LANGUAGE / TRANSLATION ── */
 let currentLang='en';
+let T={};  // populated below
 
-const T={
+window.t=function(key){return T[currentLang]?.[key]||T['en']?.[key]||key;};
+function t(key){return window.t(key);}
+
+T={
   en:{
     competition:'Competition',
     your_name:'Your Name',
@@ -426,23 +430,23 @@ const T={
     end:'END',
     editing:'EDITING',
     active:'ACTIVE',
-    half_total:t('half_total'),
+    half_total:'HALF TOTAL',
     total:'TOTAL',
-    backspace:t('backspace'),
+    backspace:'BACKSPACE ←',
     done_editing:'DONE EDITING ✓',
     view_summary:'VIEW SUMMARY 🏆',
     set:'SET',
-    submit_match:t('submit_match'),
+    submit_match:'SUBMIT MATCH ✓',
     match_complete:'Match Complete',
-    match_result:t('match_result'),
+    match_result:'MATCH RESULT',
     winner:'Winner',
-    set_system:t('set_system'),
-    cumulative:t('cumulative'),
+    set_system:'Set System · First to 6 pts',
+    cumulative:'Cumulative · 15 arrows',
     station:'STATION',
-    half1_outdoor:t('half1_outdoor'),
-    half2_outdoor:t('half2_outdoor'),
-    half1_indoor:t('half1_indoor'),
-    half2_indoor:t('half2_indoor'),
+    half1_outdoor:'1st HALF (Ends 1–6)',
+    half2_outdoor:'2nd HALF (Ends 7–12)',
+    half1_indoor:'1st HALF (Ends 1–10)',
+    half2_indoor:'2nd HALF (Ends 11–20)',
     running:'Running',
     score_saved:'Scores saved ✓',
     save_failed:'Save failed',
@@ -453,13 +457,13 @@ const T={
     elevens:'11s',
     sixes:'6s',
     closest_center:'TIED — WHO IS CLOSEST TO CENTER?',
-    closer_center:t('closer_center'),
-    select_closest:t('select_closest'),
+    closer_center:'CLOSER TO CENTER?',
+    select_closest:'SELECT CLOSEST TO CENTER ↑',
     bye:'BYE ✓',
     tbd:'TBD',
-    field_lbl:t('field_lbl'),
-    threed_lbl:t('threed_lbl'),
-    kill_lbl:t('kill_lbl'),
+    field_lbl:'🌄 Field',
+    threed_lbl:'🦌 3D',
+    kill_lbl:'🎯 Kill',
     arrows:'arrows',
   },
   he:{
@@ -511,14 +515,13 @@ const T={
     bye:'פטור ✓',
     tbd:'טרם נקבע',
     field_lbl:'🌄 שדה',
-    threed_lbl:t('threed_lbl'),
+    threed_lbl:'🦌 3D',
     kill_lbl:'🎯 קטילה',
     arrows:'חצים',
   }
 };
 
-window.t=function(key){return T[currentLang]?.[key]||T.en[key]||key;};
-function t(key){return window.t(key);}
+
 
 window.setLang=function(lang){
   currentLang=lang;
