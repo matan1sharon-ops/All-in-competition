@@ -649,25 +649,67 @@ window.setAdminLang=function(lang){
 };
 
 function applyTranslations(){
-  // Nav items
+  // Nav item labels
   document.querySelectorAll('.nav-item[data-panel]').forEach(el=>{
     const panel=el.getAttribute('data-panel');
-    const key=panel;
     const span=el.querySelector('span:not(.icon):not(.badge)');
-    if(span&&t(key)!==key) span.textContent=t(key);
+    if(span)span.textContent=t(panel);
   });
+  // History link
+  const histLink=document.querySelector('a[href="history.html"] span:last-child');
+  if(histLink)histLink.textContent=t('history');
   // Topbar title
   const activePanel=document.querySelector('.nav-item.active')?.getAttribute('data-panel');
-  if(activePanel) document.getElementById('topbar-title').textContent=t(activePanel)||t('dashboard');
-  // Buttons and labels with data-t
-  document.querySelectorAll('[data-t]').forEach(el=>{
-    const key=el.getAttribute('data-t');
-    const val=t(key);
-    if(val&&val!==key){
-      if(el.tagName==='BUTTON'||el.tagName==='LABEL'||el.tagName==='SPAN'||el.tagName==='DIV')
-        el.textContent=val;
-      else if(el.tagName==='INPUT'&&el.placeholder) el.placeholder=val;
-    }
+  if(activePanel)document.getElementById('topbar-title').textContent=t(activePanel)||t('dashboard');
+  // New comp button
+  const newCompBtn=document.querySelector('.new-comp-btn');
+  if(newCompBtn)newCompBtn.textContent=t('new_comp');
+  // Archive/delete
+  const archBtn=document.getElementById('btn-archive-comp');
+  const delBtn=document.getElementById('btn-delete-comp');
+  if(archBtn)archBtn.textContent=t('archive_comp');
+  if(delBtn)delBtn.textContent=t('delete_comp');
+  // All buttons with data-t
+  document.querySelectorAll('button[data-t]').forEach(btn=>{
+    btn.textContent=t(btn.getAttribute('data-t'));
+  });
+  // All labels with data-t
+  document.querySelectorAll('label[data-t]').forEach(el=>{
+    el.textContent=t(el.getAttribute('data-t'));
+  });
+  // All spans/divs with data-t
+  document.querySelectorAll('span[data-t],div[data-t]').forEach(el=>{
+    el.textContent=t(el.getAttribute('data-t'));
+  });
+  // Placeholders
+  document.querySelectorAll('[data-placeholder-t]').forEach(el=>{
+    el.placeholder=t(el.getAttribute('data-placeholder-t'));
+  });
+  // Search
+  const searchEl=document.getElementById('search-archer');
+  if(searchEl)searchEl.placeholder=t('search');
+  // Modal titles
+  const mnc=document.querySelector('#modal-new-comp .modal-title');if(mnc)mnc.textContent=t('new_competition');
+  const mim=document.querySelector('#modal-import .modal-title');if(mim)mim.textContent=t('import_archers');
+  const med=document.querySelector('#modal-edit-archer .modal-title');if(med)med.textContent=t('edit_archer');
+  // Add Archer card title
+  const addCard=document.querySelector('#panel-entries .card .card-title');
+  if(addCard)addCard.textContent=t('add_archer_title');
+  // No comp message
+  const noCompP=document.querySelector('#no-comp-msg p');
+  if(noCompP)noCompP.innerHTML=t('no_comp_selected')+'<br>'+t('create_or_select');
+  const noCompBtn=document.querySelector('#no-comp-msg button');
+  if(noCompBtn)noCompBtn.textContent=t('create_competition');
+  // Stat labels
+  const statLabels=document.querySelectorAll('.stat-label');
+  const statKeys=['total_archers','assigned','targets_stat','scored'];
+  statLabels.forEach((el,i)=>{if(statKeys[i])el.textContent=t(statKeys[i]);});
+  // Filter all bows
+  const filterBow=document.getElementById('filter-bow');
+  if(filterBow&&filterBow.options[0])filterBow.options[0].textContent=t('all_bows');
+  const scFilter=document.getElementById('sc-filter-bow');
+  if(scFilter&&scFilter.options[0])scFilter.options[0].textContent=t('all_bows');
+}
   });
   // Placeholder-only elements
   document.querySelectorAll('[data-placeholder-t]').forEach(el=>{
@@ -1047,7 +1089,7 @@ window.showPanel=(name)=>{
   setTimeout(applyTranslations,50);
 };
 
-function openModal(id){document.getElementById(id).classList.add('open');}
+function openModal(id){document.getElementById(id).classList.add('open');applyTranslations();}
 window.closeModal=(id)=>{document.getElementById(id).classList.remove('open');};
 function toast(msg,type='success'){const el=document.getElementById('toast');el.textContent=(type==='success'?'✓ ':'✕ ')+msg;el.className=`show ${type}`;setTimeout(()=>el.classList.remove('show'),3000);}
 window.setLang=(l)=>{lang=l;document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent.trim()===(l==='en'?'EN':'עב')));};
