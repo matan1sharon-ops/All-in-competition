@@ -11,15 +11,23 @@
 :root{--bg:#111;--surface:#1e1e1e;--surface2:#2a2a2a;--border:#333;--accent:#FFD700;--red:#e53935;--green:#43a047;--blue:#1e88e5;--text:#f0f0f0;--muted:#888;--radius:12px;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);height:100dvh;overflow:hidden;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);}
-body.rtl{direction:rtl;font-family:'Barlow',sans-serif;}
-body.rtl .sc-half-header .sc-half-title{text-align:right;padding-right:10px;padding-left:0;}
-body.rtl .archer-tab .tab-check{right:auto;left:4px;}
-body.rtl .score-footer .current-archer-bar{flex-direction:row-reverse;}
-body.rtl .end-header{flex-direction:row-reverse;}
-body.rtl .end-arrows{flex-direction:row-reverse;}
+/* RTL: only specific elements flip, not the whole app */
+body.rtl .login-card{direction:rtl;}
+body.rtl .login-logo{direction:ltr;}
 body.rtl .score-header-top{flex-direction:row-reverse;}
+body.rtl .score-header-top>div:first-child{text-align:right;}
 body.rtl .match-header-top{flex-direction:row-reverse;}
 body.rtl .summary-header{flex-direction:row-reverse;}
+/* Everything else stays LTR */
+body.rtl .archer-tabs{direction:ltr;}
+body.rtl .score-list{direction:ltr;}
+body.rtl #score-list{direction:ltr;}
+body.rtl .score-footer{direction:ltr;}
+body.rtl #sets-list{direction:ltr;}
+body.rtl .sp-bar{direction:ltr;}
+body.rtl #match-archer-tabs{direction:ltr;}
+body.rtl #summary-list{direction:ltr;}
+body.rtl #summary-archer-tabs{direction:ltr;}
 .lang-toggle-login{display:flex;justify-content:center;gap:8px;margin-bottom:16px;}
 .lang-btn-login{background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:5px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Barlow Condensed',sans-serif;}
 .lang-btn-login.active{background:var(--accent);color:#000;border-color:var(--accent);}
