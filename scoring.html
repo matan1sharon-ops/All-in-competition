@@ -1364,8 +1364,61 @@ window.submitMatch=async()=>{
   toast('Match submitted ✓','success');
 };
 
+/* ── QR AUTO LOGIN ── */
+async function autoLoginFromQR(qrCompId,qrTargetNum){
+  try{
+    compId=qrCompId;
+    const snap=await getDoc(doc(db,'competitions',qrCompId));
+    if(!snap.exists())return;
+    compData=snap.data();
+    discipline=compData.discipline||'Outdoor';
+    targetConfig=compData.targetConfig||[];
+
+    const allArchers=compData.archers||[];
+    const allTargets=compData.targets||[];
+    const target=allTargets.find(t=>t.num===qrTargetNum);
+    if(!target)return;
+
+    targetNum=qrTargetNum;
+    targetArchers=['A','B','C','D'].filter(s=>target[s]).map(s=>{
+      const sd=target[s];
+      const fa=allArchers.find(a=>String(a.id)===String(sd.id)||a.name===sd.name);
+      return{...(fa||sd),slot:s,id:fa?fa.id:sd.id};
+    });
+    if(!targetArchers.length)return;
+
+    // Show confirmation screen directly
+    document.getElementById('confirm-archers').innerHTML=targetArchers.map(a=>`
+      <div class="confirm-archer">
+        <div class="confirm-slot">${a.slot}</div>
+        <div style="flex:1;padding:0 10px;">
+          <div class="confirm-name">${a.name}</div>
+          <div class="confirm-cat">${a.bow} · ${a.age}</div>
+        </div>
+      </div>`).join('');
+
+    // Add a label showing this was opened via QR
+    const card=document.querySelector('.login-card');
+    if(card){
+      const qrBanner=document.createElement('div');
+      qrBanner.style.cssText='background:#1a3300;border:1px solid #43a047;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:#81c784;text-align:center;';
+      qrBanner.innerHTML=`📱 <strong>${compData.name||'Competition'}</strong> · Target ${qrTargetNum}`;
+      card.insertBefore(qrBanner,card.firstChild);
+    }
+    showLoginStep('login-step-2');
+  }catch(e){console.error('QR auto-login error:',e);}
+}
+
 /* ── INIT ── */
-loadCompetitions();
+loadCompetitions().then(()=>{
+  // Auto-login from QR code URL params
+  const params=new URLSearchParams(window.location.search);
+  const qrComp=params.get('comp');
+  const qrTarget=parseInt(params.get('target'));
+  if(qrComp&&qrTarget){
+    autoLoginFromQR(qrComp,qrTarget);
+  }
+});
 </script>
 </body>
 </html>
