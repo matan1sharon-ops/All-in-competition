@@ -150,8 +150,8 @@ tbody td{padding:10px 12px;color:#111;}
             <div class="stat-card"><div class="stat-val" id="d-targets">0</div><div class="stat-label">Targets</div></div>
             <div class="stat-card"><div class="stat-val" id="d-scored">0</div><div class="stat-label">Scored</div></div>
           </div>
-          <div class="card"><div class="card-title">Competition Info</div><div class="form-grid" id="comp-info-grid"></div></div>
-          <div class="card"><div class="card-title">Categories Breakdown</div><div class="table-wrap"><table><thead><tr><th>Bow</th><th>Age</th><th>M</th><th>F</th><th>Total</th><th>Targets Needed</th></tr></thead><tbody id="cat-breakdown"></tbody></table></div></div>
+          <div class="card"><div class="card-title" id="comp-info-title">Competition Info</div><div class="form-grid" id="comp-info-grid"></div></div>
+          <div class="card"><div class="card-title" id="cat-breakdown-title">Categories Breakdown</div><div class="table-wrap"><table><thead><tr><th>${t('bow')}</th><th>${t('age')}</th><th>${t('male_short')}</th><th>${t('female_short')}</th><th>${t('total')}</th><th>${t('targets_needed')}</th></tr></thead><tbody id="cat-breakdown"></tbody></table></div></div>
         </div>
       </div>
       <!-- ENTRIES -->
@@ -384,6 +384,8 @@ T={
     comp_info:'Competition Info',
     categories:'Categories Breakdown',
     targets_needed:'Targets Needed',
+    male_short:'M',
+    female_short:'F',
     // Modals
     new_competition:'🏆 New Competition',
     import_archers:'📥 Import Archers (CSV)',
@@ -484,7 +486,7 @@ T={
     schedule:'לוח זמנים',
     results:'תוצאות חיות',
     scorecards:'כרטיסי ניקוד',
-    elimination:'מקצי הדחות',
+    elimination:'מקצי חתימה',
     history:'היסטוריה',
     // Buttons
     new_comp:'+ תחרות חדשה',
@@ -492,7 +494,7 @@ T={
     import_csv:'📥 ייבוא CSV',
     get_template:'📋 קבל תבנית',
     template:'📋 תבנית',
-    reg_link:'🔗 קישור להרשמה',
+    reg_link:'🔗 קישור הרשמה',
     auto_generate:'⚡ יצירה אוטומטית מהמשתתפים',
     clear_all:'נקה הכל',
     print_start:'🖨 הדפס רשימת פתיחה',
@@ -505,8 +507,8 @@ T={
     share_results:'🔗 שתף תוצאות',
     print_all:'🖨 הדפס הכל',
     print_blank:'🖨 הדפס ריק',
-    generate_bracket:'⚡ צור סבבי הדחות',
-    generate_all:'⚡ צור הדחות לכולם',
+    generate_bracket:'⚡ צור סולם',
+    generate_all:'⚡ צור הכל',
     share_match:'🔗 קישור ניקוד מקצה',
     delete_comp:'🗑 מחק',
     archive_comp:'🗄 העבר לארכיון',
@@ -542,6 +544,8 @@ T={
     comp_info:'פרטי התחרות',
     categories:'פירוט קטגוריות',
     targets_needed:'מטרות נדרשות',
+    male_short:'ז',
+    female_short:'נ',
     // Modals
     new_competition:'🏆 תחרות חדשה',
     import_archers:'📥 ייבוא קשתים (CSV)',
@@ -690,6 +694,11 @@ function applyTranslations(){
   // Search
   const searchEl=document.getElementById('search-archer');
   if(searchEl)searchEl.placeholder=tr('search');
+  // Dashboard titles
+  const catTitle=document.getElementById('cat-breakdown-title');
+  if(catTitle)catTitle.textContent=tr('categories');
+  const compInfoTitle=document.getElementById('comp-info-title');
+  if(compInfoTitle)compInfoTitle.textContent=tr('comp_info');
   // Modal titles
   const mnc=document.querySelector('#modal-new-comp .modal-title');if(mnc)mnc.textContent=tr('new_competition');
   const mim=document.querySelector('#modal-import .modal-title');if(mim)mim.textContent=tr('import_archers');
@@ -761,7 +770,7 @@ window.openNewCompModal=()=>{
   const modal=document.getElementById('modal-new-comp');
   modal.querySelector('.modal-title').textContent=isHe?'🏆 תחרות חדשה':'🏆 New Competition';
   const labels=modal.querySelectorAll('label');
-  const labelKeys=isHe?['שם התחרות','תאריך','מיקום','דיסציפלינה','מארגן']:['Competition Name','Date','Location','Discipline','Organizer'];
+  const labelKeys=isHe?['שם התחרות','תאריך','מיקום','סוג תחרות','מארגן']:['Competition Name','Date','Location','Discipline','Organizer'];
   labels.forEach((l,i)=>{if(labelKeys[i])l.textContent=labelKeys[i];});
   const inputs=modal.querySelectorAll('input[type=text]');
   const phKeys=isHe?['לדוגמה: אליפות ישראל 2025','מקום / עיר','מועדון / התאחדות']:['e.g. National Championship 2025','Venue / City','Club / Federation'];
@@ -784,7 +793,7 @@ window.selectCompetition=async(id)=>{if(!id){currentCompId=null;document.getElem
 function getScore(archerId){const key=String(archerId).replace(/\./g,'_');return scores[key]||scores[String(archerId)]||{};}
 function getDistanceLabel(bow,discipline){if(discipline==='Outdoor'){if(bow==='Recurve')return '70m / 60m / 30m';if(bow==='Compound')return '50m';if(bow==='Barebow')return '50m';if(bow==='Trad/Longbow')return '30m';}return '';}
 function renderAll(){renderDashboard();renderEntries();renderTargets();renderSessions();renderResults();renderScorecards();}
-function renderDashboard(){if(!currentCompId)return;document.getElementById('d-total').textContent=archers.length;document.getElementById('d-assigned').textContent=archers.filter(a=>a.target).length;document.getElementById('d-targets').textContent=targets.length;document.getElementById('d-scored').textContent=archers.filter(a=>(getScore(a.id)?.total||0)>0).length;document.getElementById('entry-badge').textContent=archers.length;document.getElementById('entry-count').textContent=archers.length+' archers';getDoc(doc(db,'competitions',currentCompId)).then(s=>{const d=s.data();document.getElementById('comp-info-grid').innerHTML=`<div class="form-group"><label>Name</label><input value="${d.name||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label data-t="date">Date</label><input value="${d.date||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label data-t="location">Location</label><input value="${d.location||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label data-t="discipline">Discipline</label><input value="${d.discipline||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label data-t="organizer">Organizer</label><input value="${d.organizer||''}" readonly style="opacity:0.7;"></div>`;});const cats={};archers.forEach(a=>{const k=`${a.bow}|${a.age}`;if(!cats[k])cats[k]={bow:a.bow,age:a.age,M:0,F:0};cats[k][a.gender]++;});document.getElementById('cat-breakdown').innerHTML=BOW_ORDER.flatMap(bow=>AGE_ORDER.map(age=>{const c=cats[`${bow}|${age}`];if(!c)return'';const total=(c.M||0)+(c.F||0);const tgts=Math.ceil(total/4);return`<tr><td><span class="tag tag-${bow.toLowerCase()}">${bow}</span></td><td>${age}</td><td>${c.M||0}</td><td>${c.F||0}</td><td><strong>${total}</strong></td><td style="color:var(--accent)">${tgts}</td></tr>`;})).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">No archers yet</td></tr>';}
+function renderDashboard(){if(!currentCompId)return;document.getElementById('d-total').textContent=archers.length;document.getElementById('d-assigned').textContent=archers.filter(a=>a.target).length;document.getElementById('d-targets').textContent=targets.length;document.getElementById('d-scored').textContent=archers.filter(a=>(getScore(a.id)?.total||0)>0).length;document.getElementById('entry-badge').textContent=archers.length;document.getElementById('entry-count').textContent=archers.length+' archers';getDoc(doc(db,'competitions',currentCompId)).then(s=>{const d=s.data();document.getElementById('comp-info-grid').innerHTML=`<div class="form-group"><label>${t('name')}</label><input value="${d.name||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label>${t('date')}</label><input value="${d.date||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label>${t('location')}</label><input value="${d.location||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label>${t('discipline')}</label><input value="${d.discipline||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label>${t('organizer')}</label><input value="${d.organizer||''}" readonly style="opacity:0.7;"></div>`;});const cats={};archers.forEach(a=>{const k=`${a.bow}|${a.age}`;if(!cats[k])cats[k]={bow:a.bow,age:a.age,M:0,F:0};cats[k][a.gender]++;});document.getElementById('cat-breakdown').innerHTML=BOW_ORDER.flatMap(bow=>AGE_ORDER.map(age=>{const c=cats[`${bow}|${age}`];if(!c)return'';const total=(c.M||0)+(c.F||0);const tgts=Math.ceil(total/4);return`<tr><td><span class="tag tag-${bow.toLowerCase()}">${bow}</span></td><td>${age}</td><td>${c.M||0}</td><td>${c.F||0}</td><td><strong>${total}</strong></td><td style="color:var(--accent)">${tgts}</td></tr>`;})).join('')||`<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">${t('no_archers_yet')}</td></tr>`;}
 window.addArcher=async()=>{if(!currentCompId){toast(t('select_comp_first'),'error');return;}const fname=document.getElementById('e-fname').value.trim();const lname=document.getElementById('e-lname').value.trim();if(!fname||!lname){toast(t('enter_fname_lname'),'error');return;}archers.push({id:String(Date.now()),fname,lname,name:`${fname} ${lname}`,club:document.getElementById('e-club').value.trim(),bow:document.getElementById('e-bow').value,age:document.getElementById('e-age').value,gender:document.getElementById('e-gender').value,target:null,slot:null});await saveArchers();document.getElementById('e-fname').value='';document.getElementById('e-lname').value='';renderAll();toast(`${fname} ${lname} ${t('archer_added')}`,'success');};
 window.deleteArcher=async(id)=>{if(!confirm('Remove this archer?'))return;archers=archers.filter(a=>a.id!==id);targets.forEach(t=>['A','B','C','D'].forEach(s=>{if(t[s]?.id===id)t[s]=null;}));await saveArchers();await saveTargets();renderAll();toast(t('archer_removed'),'success');};
 window.renderEntries=()=>{
