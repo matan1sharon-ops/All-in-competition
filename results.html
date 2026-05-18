@@ -411,17 +411,17 @@ function renderResults(data){
     const colHeaders=showHalves
       ?`<tr style="border-bottom:1px solid var(--border2);">
           <td style="width:36px;"></td>
-          <td style="font-size:10px;color:var(--muted);padding:3px 10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px;">'+t('name')+'</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px;">${t('name')}</td>
           <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">H1</td>
           <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">H2</td>
-          <td style="font-size:10px;color:var(--muted);padding:3px 10px;text-align:center;font-family:'Barlow Condensed',sans-serif;">'+t('score')+'</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 10px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${t('score')}</td>
           <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">X</td>
           <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">10</td>
         </tr>`
       :`<tr style="border-bottom:1px solid var(--border2);">
           <td style="width:36px;"></td>
-          <td style="font-size:10px;color:var(--muted);padding:3px 10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px;">'+t('name')+'</td>
-          <td style="font-size:10px;color:var(--muted);padding:3px 10px;text-align:center;font-family:'Barlow Condensed',sans-serif;">'+t('score')+'</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px;">${t('name')}</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 10px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${t('score')}</td>
           <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${isCustomDisc?'Kills':'X'}</td>
           <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${isCustomDisc?'11s':'10'}</td>
           ${isCustomDisc?`<td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">6s</td>`:''}
