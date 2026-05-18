@@ -294,7 +294,7 @@ function renderDetail(d){
 
   // ── SECTION 1: QUALIFICATION ──
   html+=`<div class="section">
-    <div class="section-title">🏹 Qualification Results</div>
+    <div class="section-title">${t('qual_results')}</div>
     <div class="section-body">
       <div class="cat-pills" id="qual-pills">
         ${cats.map((cat,i)=>{
@@ -340,7 +340,7 @@ function renderDetail(d){
   if(hasElim){
     const elimCats=Object.entries(elim).sort((a,b)=>a[0].localeCompare(b[0]));
     html+=`<div class="section">
-      <div class="section-title">⚔️ Elimination Brackets</div>
+      <div class="section-title">${t('elim_brackets')}</div>
       <div class="section-body">
         <div class="cat-pills">
           ${elimCats.map(([key,data],i)=>{
@@ -394,7 +394,7 @@ function renderDetail(d){
 
     // ── SECTION 3: FINAL RANKING ──
     html+=`<div class="section">
-      <div class="section-title">🏆 Final Ranking</div>
+      <div class="section-title">${t('final_ranking')}</div>
       <div class="section-body">
         <div class="cat-pills">
           ${elimCats.map(([key,data],i)=>{
