@@ -52,7 +52,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
 </div>
 
 <div class="selector-bar">
-  <label>COMPETITION:</label>
+  <label id="results-comp-label">COMPETITION:</label>
   <select id="comp-select" onchange="selectComp(this.value)">
     <option value="">— Select —</option>
   </select>
@@ -68,7 +68,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
   <div id="elim-content" style="display:none;"></div>
   <div class="no-comp">
     <div class="icon">🏆</div>
-    <p>Select a competition above<br>to show live results.</p>
+    <p id='results-no-comp-msg'>Select a competition above<br>to show live results.</p>
   </div>
 </div>
 
@@ -79,6 +79,111 @@ import{getFirestore,collection,doc,getDocs,onSnapshot}from"https://www.gstatic.c
 const firebaseConfig={apiKey:"AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To",authDomain:"all-in-competition.firebaseapp.com",projectId:"all-in-competition",storageBucket:"all-in-competition.firebasestorage.app",messagingSenderId:"620146958631",appId:"1:620146958631:web:1e88019d1436372689c902"};
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
+
+
+/* ── LANGUAGE / TRANSLATION ── */
+let currentLang='en';
+let T={};
+window.t=function(key){return T[currentLang]?.[key]||T['en']?.[key]||key;};
+function t(key){return window.t(key);}
+
+T={
+  en:{
+    live:'LIVE',
+    select_comp:''+t('select_comp')+'',
+    select_above:'Select a competition above',
+    to_show:'to show live results.',
+    competition:'COMPETITION:',
+    qualification:'🏹 QUALIFICATION',
+    elimination:'⚔️ ELIMINATION',
+    updated:'Updated',
+    no_scores:'No scores yet.',
+    results_appear:'Results will appear here as archers complete their rounds.',
+    name:'NAME',
+    score:'SCORE',
+    men:'MEN',
+    women:'WOMEN',
+    round_of:'Round of',
+    quarter_finals:'Quarter Finals',
+    semi_finals:'Semi Finals',
+    final:'Final',
+    bronze:'Bronze Medal',
+    set_system:'Set System',
+    cumulative:'Cumulative',
+    pending:'PENDING',
+    select:'— Select —',
+    archers:'archers',
+    tbd:t('tbd'),
+    closest_center:'TIED — WHO IS CLOSEST TO CENTER?',
+    closer_center:t('closer_center'),
+  },
+  he:{
+    live:'חי',
+    select_comp:'בחר תחרות למטה',
+    select_above:'בחר תחרות למעלה',
+    to_show:'להצגת תוצאות חיות.',
+    competition:'תחרות:',
+    qualification:'🏹 כשירות',
+    elimination:'⚔️ מקצי הדחות',
+    updated:'עודכן',
+    no_scores:'אין ניקוד עדיין.',
+    results_appear:'התוצאות יופיעו כאן לאחר סיום הניקוד.',
+    name:'שם',
+    score:'ניקוד',
+    men:'גברים',
+    women:'נשים',
+    round_of:'סיבוב של',
+    quarter_finals:'רבע גמר',
+    semi_finals:'חצי גמר',
+    final:'גמר',
+    bronze:'גמר קטן',
+    set_system:'שיטת סטים',
+    cumulative:'צבירה',
+    pending:'ממתין',
+    select:'— בחר —',
+    archers:'קשתים',
+    tbd:'טרם נקבע',
+    closest_center:'שוויון — מי קרוב יותר למרכז?',
+    closer_center:'קרוב יותר למרכז?',
+  }
+};
+
+// Read lang from localStorage (shared with admin)
+function initResultsLang(){
+  const saved=localStorage.getItem('adminLang')||localStorage.getItem('scoringLang')||'en';
+  currentLang=saved;
+  applyResultsTranslations();
+}
+
+function applyResultsTranslations(){
+  const lang=currentLang;
+  const tr=(key)=>T[lang]?.[key]||T['en']?.[key]||key;
+  // Header
+  const compName=document.getElementById('comp-name');
+  if(compName&&compName.textContent===T['en']['select_comp']||compName?.textContent===T['he']['select_comp'])
+    compName.textContent=tr('select_comp');
+  // Selector bar label
+  const compLabel=document.querySelector('.selector-bar label');
+  if(compLabel)compLabel.textContent=tr('competition');
+  // Select option
+  const sel=document.getElementById('comp-select');
+  if(sel&&sel.options[0])sel.options[0].textContent=tr('select');
+  // Toggle buttons
+  const btnQual=document.getElementById('btn-qual');
+  const btnElim=document.getElementById('btn-elim');
+  if(btnQual)btnQual.textContent=tr('qualification');
+  if(btnElim)btnElim.textContent=tr('elimination');
+  // No comp message
+  const noCompP=document.getElementById('results-no-comp-msg');
+  if(noCompP)noCompP.innerHTML=tr('select_above')+'<br>'+tr('to_show');
+  // comp-name default
+  const compNameEl=document.getElementById('comp-name');
+  if(compNameEl&&(compNameEl.textContent===T['en']['select_comp']||compNameEl.textContent===T['he']['select_comp']))
+    compNameEl.textContent=tr('select_comp');
+  // LIVE label
+  const liveLabel=document.querySelector('.live-label');
+  if(liveLabel)liveLabel.textContent=tr('live');
+}
 
 const BOW_ORDER=['Recurve','Compound','Barebow','Traditional','Longbow'];
 const AGE_ORDER=['U12','U14','U18','U21','Senior','Master 50+','Master 60+'];
@@ -93,11 +198,11 @@ function renderElimDisplay(elimData,discipline){
   const main=document.getElementById('elim-content');
   const scrollTop=main.scrollTop;
   const roundOrder=['R1','QF','SF','F','B'];
-  const roundLabels={R1:'Round of 16',QF:'Quarter Finals',SF:'Semi Finals',F:'🏆 Final',B:'🥉 Bronze Medal'};
+  const roundLabels={R1:t('round_of')+' 16',QF:t('quarter_finals'),SF:t('semi_finals'),F:'🏆 '+t('final'),B:'🥉 '+t('bronze')};
   let html='<div style="display:flex;flex-direction:column;gap:20px;">';
   Object.entries(elimData).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([catKey,data])=>{
-    const gLabel=data.gender==='M'?'MEN':'WOMEN';
-    const formatLabel=data.format==='sets'?'Set System':'Cumulative';
+    const gLabel=data.gender==='M'?t('men').toUpperCase():t('women').toUpperCase();
+    const formatLabel=data.format==='sets'?t('set_system'):t('cumulative');
     html+=`<div><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;letter-spacing:2px;color:var(--accent);padding:8px 0 12px;">${data.bow.toUpperCase()} · ${data.age} · ${gLabel}<span style="font-size:12px;color:var(--muted2);font-weight:400;margin-left:12px;">${formatLabel}</span></div><div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;">`;
     roundOrder.forEach(rk=>{
       const matches=data.rounds?.[rk];
@@ -212,12 +317,12 @@ window.selectComp=(id)=>{
     const d=snap.data();
     lastData=d;
     document.getElementById('comp-name').textContent=`${d.name||''}${d.discipline?' · '+d.discipline:''}${d.date?' · '+d.date:''}`;
-    document.getElementById('last-update').textContent='Updated '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    document.getElementById('last-update').textContent=t('updated')+' '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
     const hasElim=Object.keys(d.elimination||{}).length>0;
     const toggle=document.getElementById('view-toggle');
     if(toggle)toggle.style.display=hasElim?'flex':'none';
     if(_renderTimer)clearTimeout(_renderTimer);
-    _renderTimer=setTimeout(()=>renderResults(d),150);
+    _renderTimer=setTimeout(()=>{renderResults(d);applyResultsTranslations();},150);
   });
 };
 
@@ -283,7 +388,7 @@ function renderResults(data){
       (b.tens||0)-(a.tens||0)
     );
     const color=BOW_COLORS[cat.bow]||'#555';
-    const gLabel=cat.gender==='M'?'MEN':'WOMEN';
+    const gLabel=cat.gender==='M'?t('men').toUpperCase():t('women').toUpperCase();
 
     const rows=ranked.map((a,i)=>{
       const rankClass=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-n';
@@ -306,17 +411,17 @@ function renderResults(data){
     const colHeaders=showHalves
       ?`<tr style="border-bottom:1px solid var(--border2);">
           <td style="width:36px;"></td>
-          <td style="font-size:10px;color:var(--muted);padding:3px 10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px;">NAME</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px;">'+t('name')+'</td>
           <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">H1</td>
           <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">H2</td>
-          <td style="font-size:10px;color:var(--muted);padding:3px 10px;text-align:center;font-family:'Barlow Condensed',sans-serif;">SCORE</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 10px;text-align:center;font-family:'Barlow Condensed',sans-serif;">'+t('score')+'</td>
           <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">X</td>
           <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">10</td>
         </tr>`
       :`<tr style="border-bottom:1px solid var(--border2);">
           <td style="width:36px;"></td>
-          <td style="font-size:10px;color:var(--muted);padding:3px 10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px;">NAME</td>
-          <td style="font-size:10px;color:var(--muted);padding:3px 10px;text-align:center;font-family:'Barlow Condensed',sans-serif;">SCORE</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px;">'+t('name')+'</td>
+          <td style="font-size:10px;color:var(--muted);padding:3px 10px;text-align:center;font-family:'Barlow Condensed',sans-serif;">'+t('score')+'</td>
           <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${isCustomDisc?'Kills':'X'}</td>
           <td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${isCustomDisc?'11s':'10'}</td>
           ${isCustomDisc?`<td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">6s</td>`:''}
@@ -336,6 +441,7 @@ function renderResults(data){
 }
 
 loadComps();
+initResultsLang();
 </script>
 </body>
 </html>
