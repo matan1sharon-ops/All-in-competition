@@ -151,7 +151,7 @@ tbody td{padding:10px 12px;color:#111;}
             <div class="stat-card"><div class="stat-val" id="d-scored">0</div><div class="stat-label">Scored</div></div>
           </div>
           <div class="card"><div class="card-title" id="comp-info-title">Competition Info</div><div class="form-grid" id="comp-info-grid"></div></div>
-          <div class="card"><div class="card-title" id="cat-breakdown-title">Categories Breakdown</div><div class="table-wrap"><table><thead><tr><th>${t('bow')}</th><th>${t('age')}</th><th>${t('male_short')}</th><th>${t('female_short')}</th><th>${t('total')}</th><th>${t('targets_needed')}</th></tr></thead><tbody id="cat-breakdown"></tbody></table></div></div>
+          <div class="card"><div class="card-title" id="cat-breakdown-title">Categories Breakdown</div><div class="table-wrap"><table><thead><tr><th id="th-bow">Bow</th><th id="th-age">Age</th><th id="th-m">M</th><th id="th-f">F</th><th id="th-total">Total</th><th id="th-targets-needed">Targets Needed</th></tr></thead><tbody id="cat-breakdown"></tbody></table></div></div>
         </div>
       </div>
       <!-- ENTRIES -->
@@ -531,7 +531,7 @@ T={
     arrows_end:'חצים לסבב',
     num_targets:'מספר מטרות',
     // Table headers
-    name:'שם',
+    name:'שם תחרות',
     score:'ניקוד',
     target:'מטרה',
     bow:'קשת',
@@ -694,6 +694,13 @@ function applyTranslations(){
   // Search
   const searchEl=document.getElementById('search-archer');
   if(searchEl)searchEl.placeholder=tr('search');
+  // Dashboard table headers
+  const thBow=document.getElementById('th-bow');if(thBow)thBow.textContent=tr('bow');
+  const thAge=document.getElementById('th-age');if(thAge)thAge.textContent=tr('age');
+  const thM=document.getElementById('th-m');if(thM)thM.textContent=tr('male_short');
+  const thF=document.getElementById('th-f');if(thF)thF.textContent=tr('female_short');
+  const thTotal=document.getElementById('th-total');if(thTotal)thTotal.textContent=tr('total');
+  const thTN=document.getElementById('th-targets-needed');if(thTN)thTN.textContent=tr('targets_needed');
   // Dashboard titles
   const catTitle=document.getElementById('cat-breakdown-title');
   if(catTitle)catTitle.textContent=tr('categories');
