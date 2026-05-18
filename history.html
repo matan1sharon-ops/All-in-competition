@@ -91,7 +91,7 @@ table.qual-table tbody tr:hover{background:var(--surface3);}
 
 <div class="header">
   <div class="logo">ALL IN</div>
-  <div class="header-title">Competition History</div>
+  <div class="header-title" id="history-title">Competition History</div>
   <button class="back-btn" id="back-btn" onclick="showList()">← ALL COMPETITIONS</button>
 </div>
 
@@ -99,7 +99,7 @@ table.qual-table tbody tr:hover{background:var(--surface3);}
   <!-- LIST VIEW -->
   <div id="list-view">
     <div id="comp-list" class="comp-list">
-      <div class="empty-state"><div class="icon">⏳</div><p>Loading competitions...</p></div>
+      <div class="empty-state"><div class="icon">⏳</div><p id="loading-text">Loading competitions...</p></div>
     </div>
   </div>
 
@@ -118,10 +118,87 @@ const firebaseConfig={apiKey:"AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To",authDomai
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
 
+
+/* ── LANGUAGE / TRANSLATION ── */
+let currentLang='en';
+let T={};
+window.t=function(key){return T[currentLang]?.[key]||T['en']?.[key]||key;};
+function t(key){return window.t(key);}
+
+T={
+  en:{
+    history_title:'Competition History',
+    back_btn:'← ALL COMPETITIONS',
+    loading:'Loading competitions...',
+    no_archived:'No archived competitions yet.<br>Competitions are archived automatically 7 days after their date.',
+    archers:'archers',
+    delete:'🗑 DELETE',
+    qual_results:t('qual_results'),
+    elim_brackets:t('elim_brackets'),
+    final_ranking:t('final_ranking'),
+    men:'Men',
+    women:'Women',
+    name:'Name',
+    score:'Score',
+    round_of:'Round of',
+    quarter_finals:'Quarter Finals',
+    semi_finals:'Semi Finals',
+    final:'Final',
+    bronze:'Bronze Medal',
+    pending:t('pending'),
+    no_results:'No results yet.',
+    confirm_delete:'Permanently delete',
+    cannot_undo:'This cannot be undone.',
+  },
+  he:{
+    history_title:'היסטוריית תחרויות',
+    back_btn:'← כל התחרויות',
+    loading:'טוען תחרויות...',
+    no_archived:'אין תחרויות בארכיון עדיין.<br>תחרויות מועברות לארכיון אוטומטית 7 ימים לאחר תאריכן.',
+    archers:'קשתים',
+    delete:'🗑 מחק',
+    qual_results:'🏹 תוצאות מוקדמות',
+    elim_brackets:'⚔️ מקצי הדחות',
+    final_ranking:'🏆 דירוג סופי',
+    men:'גברים',
+    women:'נשים',
+    name:'שם',
+    score:'ניקוד',
+    round_of:'סיבוב של',
+    quarter_finals:'רבע גמר',
+    semi_finals:'חצי גמר',
+    final:'גמר',
+    bronze:'גמר קטן',
+    pending:'ממתין',
+    no_results:'אין תוצאות עדיין.',
+    confirm_delete:'מחק לצמיתות',
+    cannot_undo:'לא ניתן לבטל פעולה זו.',
+  }
+};
+
+function initHistoryLang(){
+  const saved=localStorage.getItem('adminLang')||localStorage.getItem('scoringLang')||'en';
+  currentLang=saved;
+  applyHistoryTranslations();
+}
+
+function applyHistoryTranslations(){
+  const lang=currentLang;
+  const tr=(key)=>T[lang]?.[key]||T['en']?.[key]||key;
+  const title=document.querySelector('.header-title');
+  if(title)title.textContent=tr('history_title');
+  const backBtn=document.getElementById('back-btn');
+  if(backBtn)backBtn.textContent=tr('back_btn');
+  const loadingText=document.getElementById('loading-text');
+  if(loadingText)loadingText.textContent=tr('loading');
+  const histTitle=document.getElementById('history-title');
+  if(histTitle)histTitle.textContent=tr('history_title');
+}
+
 const BOW_ORDER=['Recurve','Compound','Barebow','Traditional','Longbow'];
 const AGE_ORDER=['U12','U14','U18','U21','Senior','Master 50+','Master 60+'];
 const BOW_COLORS={Recurve:'#1565c0',Compound:'#4a148c',Barebow:'#1b5e20',Traditional:'#e65100',Longbow:'#37474f'};
-const ROUND_LABELS={R1:'Round of 16',QF:'Quarter Finals',SF:'Semi Finals',F:'Final',B:'Bronze Medal'};
+const ROUND_LABELS={R1:t('round_of')+' 16',QF:t('quarter_finals'),SF:t('semi_finals'),F:t('final'),B:t('bronze')};
 
 function getScore(scores,archerId){const key=String(archerId).replace(/\./g,'_');return scores[key]||scores[String(archerId)]||{};}
 
@@ -135,7 +212,7 @@ async function loadArchived(){
 
   const listEl=document.getElementById('comp-list');
   if(!archived.length){
-    listEl.innerHTML=`<div class="empty-state"><div class="icon">📭</div><p>No archived competitions yet.<br>Competitions are archived automatically 7 days after their date.</p></div>`;
+    listEl.innerHTML=`<div class="empty-state"><div class="icon">📭</div><p>${t('no_archived')}</p></div>`;
     return;
   }
   listEl.innerHTML=archived.map(c=>{
@@ -149,8 +226,8 @@ async function loadArchived(){
         ${c.organizer?`<span>🏛 ${c.organizer}</span>`:''}
       </div>
       <div class="comp-card-footer">
-        <div class="comp-card-archers">${archers} archers</div>
-        <div style="display:flex;align-items:center;gap:8px;"><div class="comp-card-disc">${c.discipline||'Outdoor'}</div><button onclick="event.stopPropagation();deleteComp('${c.id}','${c.name||''}')" style="background:#e5393522;border:1px solid #e5393544;color:#e53935;padding:4px 10px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">🗑 DELETE</button></div>
+        <div class="comp-card-archers">${archers} ${t('archers')}</div>
+        <div style="display:flex;align-items:center;gap:8px;"><div class="comp-card-disc">${c.discipline||'Outdoor'}</div><button onclick="event.stopPropagation();deleteComp('${c.id}','${c.name||''}')" style="background:#e5393522;border:1px solid #e5393544;color:#e53935;padding:4px 10px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">${t('delete')}</button></div>
       </div>
     </div>`;
   }).join('');
@@ -190,7 +267,7 @@ function renderDetail(d){
       ${d.location?`<div class="meta-item">📍 <strong>${d.location}</strong></div>`:''}
       ${d.organizer?`<div class="meta-item">🏛 <strong>${d.organizer}</strong></div>`:''}
       <div class="meta-item">🎯 <strong>${disc}</strong></div>
-      <div class="meta-item">🏹 <strong>${archers.length} archers</strong></div>
+      <div class="meta-item">🏹 <strong>${archers.length} ${t('archers')}</strong></div>
     </div>`;
 
   // Build categories from scored archers
@@ -220,7 +297,7 @@ function renderDetail(d){
     <div class="section-body">
       <div class="cat-pills" id="qual-pills">
         ${cats.map((cat,i)=>{
-          const gLabel=cat.gender==='M'?'Men':'Women';
+          const gLabel=cat.gender==='M'?t('men'):t('women');
           const color=BOW_COLORS[cat.bow]||'#555';
           return`<button class="cat-pill" style="border-color:${color}44;color:${color};" onclick="togglePanel('qual-panel-${i}',this)">${cat.bow} · ${cat.age} · ${gLabel}</button>`;
         }).join('')}
@@ -228,7 +305,7 @@ function renderDetail(d){
       ${cats.map((cat,i)=>{
         const isCustom=d.discipline==='Custom';
         const ranked=[...cat.archers].sort((a,b)=>b.total-a.total||(b.xs||0)-(a.xs||0)||(b.tens||0)-(a.tens||0));
-        const gLabel=cat.gender==='M'?'Men':'Women';
+        const gLabel=cat.gender==='M'?t('men'):t('women');
         const color=BOW_COLORS[cat.bow]||'#555';
         const rows=ranked.map((a,ri)=>{
           const medal=ri===0?'🥇':ri===1?'🥈':ri===2?'🥉':'';
@@ -250,7 +327,7 @@ function renderDetail(d){
             <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:${color};">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</span>
           </div>
           <table class="qual-table">
-            <thead><tr><th></th><th>Name</th>${hdrHalves}<th style="text-align:center;">Score</th><th style="text-align:center;">${isCustom?'Kills':'X'}</th><th style="text-align:center;">${isCustom?'11s':'10'}</th>${isCustom?'<th style="text-align:center;">6s</th>':''}</tr></thead>
+            <thead><tr><th></th><th>${t('name')}</th>${hdrHalves}<th style="text-align:center;">${t('score')}</th><th style="text-align:center;">${isCustom?'Kills':'X'}</th><th style="text-align:center;">${isCustom?'11s':'10'}</th>${isCustom?'<th style="text-align:center;">6s</th>':''}</tr></thead>
             <tbody>${rows}</tbody>
           </table>
         </div>`;
@@ -266,13 +343,13 @@ function renderDetail(d){
       <div class="section-body">
         <div class="cat-pills">
           ${elimCats.map(([key,data],i)=>{
-            const gLabel=data.gender==='M'?'Men':'Women';
+            const gLabel=data.gender==='M'?t('men'):t('women');
             const color=BOW_COLORS[data.bow]||'#555';
             return`<button class="cat-pill" style="border-color:${color}44;color:${color};" onclick="togglePanel('elim-panel-${i}',this)">${data.bow} · ${data.age} · ${gLabel}</button>`;
           }).join('')}
         </div>
         ${elimCats.map(([key,data],i)=>{
-          const gLabel=data.gender==='M'?'Men':'Women';
+          const gLabel=data.gender==='M'?t('men'):t('women');
           const color=BOW_COLORS[data.bow]||'#555';
           const isCum=data.format==='cumulative';
           const roundOrder=['R1','QF','SF','F','B'];
@@ -320,13 +397,13 @@ function renderDetail(d){
       <div class="section-body">
         <div class="cat-pills">
           ${elimCats.map(([key,data],i)=>{
-            const gLabel=data.gender==='M'?'Men':'Women';
+            const gLabel=data.gender==='M'?t('men'):t('women');
             const color=BOW_COLORS[data.bow]||'#555';
             return`<button class="cat-pill" style="border-color:${color}44;color:${color};" onclick="togglePanel('rank-panel-${i}',this)">${data.bow} · ${data.age} · ${gLabel}</button>`;
           }).join('')}
         </div>
         ${elimCats.map(([key,data],i)=>{
-          const gLabel=data.gender==='M'?'Men':'Women';
+          const gLabel=data.gender==='M'?t('men'):t('women');
           const color=BOW_COLORS[data.bow]||'#555';
           // Build final ranking from elimination results
           const ranking=[];
@@ -393,7 +470,7 @@ function renderDetail(d){
             <div style="padding:10px 14px;background:${color}22;border-bottom:1px solid ${color}33;">
               <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:${color};">${data.bow.toUpperCase()} · ${data.age} · ${gLabel}</span>
             </div>
-            <div class="podium">${podiumHtml||'<p style="color:var(--muted2);font-size:13px;padding:8px;">No results yet.</p>'}</div>
+            <div class="podium">${podiumHtml||`<p style="color:var(--muted2);font-size:13px;padding:8px;">${t('no_results')}</p>`}</div>
           </div>`;
         }).join('')}
       </div>
@@ -418,9 +495,10 @@ window.togglePanel=(id,btn)=>{
 };
 
 window.deleteComp=async(id,name)=>{
-  if(!confirm(`Permanently delete "${name}"?\n\nThis cannot be undone.`))return;
+  if(!confirm(`${t('confirm_delete')} "${name}"?\n\n${t('cannot_undo')}`))return;
   await deleteDoc(doc(db,'competitions',id));
   await loadArchived();
+initHistoryLang();
 };
 
 loadArchived();
