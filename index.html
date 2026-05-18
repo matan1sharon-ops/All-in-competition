@@ -238,7 +238,7 @@ tbody td{padding:10px 12px;color:#111;}
       <!-- RESULTS -->
       <div id="panel-results" class="panel">
         <div class="card">
-          <div class="card-title"><span class="status-dot status-live"></span> Live Results</div>
+          <div class="card-title"><span class="status-dot status-live"></span> <span id="live-results-title">Live Results</span></div>
           <div style="margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap;">
             <button class="btn btn-secondary btn-sm" onclick="exportResultsPDF()" data-t="export_pdf">📄 EXPORT PDF</button>
             <button class="btn btn-secondary btn-sm" onclick="openDisplayScreen()" data-t="display_screen">🖥 DISPLAY SCREEN</button>
@@ -391,6 +391,7 @@ T={
     club:'Club',
     gender_h:'Gender',
     archers_count:'archers',
+    results_will_appear:'Results will appear here as archers complete their rounds.',
     entry_list:'Entry List',
     // Modals
     new_competition:'🏆 New Competition',
@@ -492,7 +493,7 @@ T={
     schedule:'לוח זמנים',
     results:'תוצאות חיות',
     scorecards:'כרטיסי ניקוד',
-    elimination:'מקצי חתימה',
+    elimination:'מקצי הדחות',
     history:'היסטוריה',
     // Buttons
     new_comp:'+ תחרות חדשה',
@@ -557,6 +558,7 @@ T={
     club:'מועדון',
     gender_h:'מין',
     archers_count:'קשתים',
+    results_will_appear:'התוצאות יופיעו כאן לאחר סיום הניקוד.',
     entry_list:'רשימת משתתפים',
     // Modals
     new_competition:'🏆 תחרות חדשה',
@@ -706,6 +708,9 @@ function applyTranslations(){
   // Search
   const searchEl=document.getElementById('search-archer');
   if(searchEl)searchEl.placeholder=tr('search');
+  // Live Results title
+  const lrTitle=document.getElementById('live-results-title');
+  if(lrTitle)lrTitle.textContent=tr('results');
   // Schedule panel
   const schTitle=document.getElementById('schedule-title');if(schTitle)schTitle.textContent=tr('add_session_title');
   const lblSN=document.getElementById('lbl-session-name');if(lblSN)lblSN.textContent=tr('session_name');
@@ -1045,7 +1050,7 @@ window.renderResults=()=>{
   const labels=getGoldLabels();
   const showHalves=currentDiscipline==='Outdoor'||currentDiscipline==='Indoor';
   const scoredArchers=archers.filter(a=>(getScore(a.id)?.total||0)>0).map(a=>{const s=getScore(a.id);return{...a,total:s.total||0,g1:s.g1||0,g2:s.g2||0,h1:s.h1||0,h2:s.h2||0,xs:s.xs||0,tens:s.tens||0,kills:s.kills||0,elevens:s.elevens||0,sixes:s.sixes||0};});
-  if(!scoredArchers.length){container.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted2);">No scores yet.<br>Results will appear here as archers complete their rounds.</div>';return;}
+  if(!scoredArchers.length){container.innerHTML=`<div style="text-align:center;padding:40px;color:var(--muted2);">${t('no_scores_yet')}<br>${t('results_will_appear')}</div>`;return;}
   const catMap={};
   scoredArchers.forEach(a=>{const key=`${a.bow}||${a.age}||${a.gender}`;if(!catMap[key])catMap[key]={bow:a.bow,age:a.age,gender:a.gender,archers:[]};catMap[key].archers.push(a);});
   const sortedCats=Object.values(catMap).sort((a,b)=>{const bi=BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);if(bi!==0)return bi;const ai=AGE_ORDER.indexOf(a.age)-AGE_ORDER.indexOf(b.age);if(ai!==0)return ai;return a.gender.localeCompare(b.gender);});
@@ -1056,7 +1061,7 @@ window.renderResults=()=>{
     const ranked=[...cat.archers].sort((a,b)=>b.total-a.total||(b.xs||0)-(a.xs||0)||(b.tens||0)-(a.tens||0));
     const color=BOW_COLORS[cat.bow]||'#555';
     const gLabel=cat.gender==='M'?t('men'):t('women');
-    catCards+=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;break-inside:avoid;margin-bottom:14px;"><div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${color}22;border-bottom:1px solid ${color}44;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:1px;color:${color};">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</span><span style="font-size:11px;color:var(--muted2);margin-left:auto;">${ranked.length} archer${ranked.length!==1?'s':''}</span></div><div class="table-wrap"><table><thead><tr><th style="width:36px;text-align:center;"></th><th>Name</th><th style="text-align:center;">Score</th>${showHalves?'<th style="text-align:center;">H1</th><th style="text-align:center;">H2</th>':''}<th style="text-align:center;">${isCustomDisc?'Kills':labels.g1}</th><th style="text-align:center;">${isCustomDisc?'11s':labels.g2}</th>${isCustomDisc?'<th style="text-align:center;">6s</th>':''}</tr></thead><tbody>${ranked.map((a,i)=>`<tr style="${i===0?'background:#fffde7;':i===1?'background:#f9f9f9;':i===2?'background:#fff8f0;':''}"><td style="text-align:center;font-size:16px;padding:8px 4px;">${medal(i)}</td><td style="color:#111;font-weight:${i<3?'700':'600'};font-size:${i===0?'14px':'13px'};">${a.name}</td><td style="font-weight:900;font-size:${i===0?'16px':'14px'};color:${i===0?'#c62828':i===1?'#37474f':i===2?'#bf360c':'#111'};text-align:center;">${a.total}</td>${showHalves?`<td style="color:#555;text-align:center;font-size:12px;">${a.h1||'—'}</td><td style="color:#555;text-align:center;font-size:12px;">${a.h2||'—'}</td>`:''}<td style="color:#111;text-align:center;font-size:12px;">${isCustomDisc?(a.kills||0):a.g1||'—'}</td><td style="color:#111;text-align:center;font-size:12px;">${isCustomDisc?(a.elevens||0):a.g2||'—'}</td>${isCustomDisc?`<td style="color:#111;text-align:center;font-size:12px;">${a.sixes||0}</td>`:''}</tr>`).join('')}</tbody></table></div></div>`;
+    catCards+=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;break-inside:avoid;margin-bottom:14px;"><div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${color}22;border-bottom:1px solid ${color}44;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:1px;color:${color};">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</span><span style="font-size:11px;color:var(--muted2);margin-left:auto;">${ranked.length} ${t('archers_count')}</span></div><div class="table-wrap"><table><thead><tr><th style="width:36px;text-align:center;"></th><th>${t('name')}</th><th style="text-align:center;">${t('score')}</th>${showHalves?'<th style="text-align:center;">H1</th><th style="text-align:center;">H2</th>':''}<th style="text-align:center;">${isCustomDisc?'Kills':labels.g1}</th><th style="text-align:center;">${isCustomDisc?'11s':labels.g2}</th>${isCustomDisc?'<th style="text-align:center;">6s</th>':''}</tr></thead><tbody>${ranked.map((a,i)=>`<tr style="${i===0?'background:#fffde7;':i===1?'background:#f9f9f9;':i===2?'background:#fff8f0;':''}"><td style="text-align:center;font-size:16px;padding:8px 4px;">${medal(i)}</td><td style="color:#111;font-weight:${i<3?'700':'600'};font-size:${i===0?'14px':'13px'};">${a.name}</td><td style="font-weight:900;font-size:${i===0?'16px':'14px'};color:${i===0?'#c62828':i===1?'#37474f':i===2?'#bf360c':'#111'};text-align:center;">${a.total}</td>${showHalves?`<td style="color:#555;text-align:center;font-size:12px;">${a.h1||'—'}</td><td style="color:#555;text-align:center;font-size:12px;">${a.h2||'—'}</td>`:''}<td style="color:#111;text-align:center;font-size:12px;">${isCustomDisc?(a.kills||0):a.g1||'—'}</td><td style="color:#111;text-align:center;font-size:12px;">${isCustomDisc?(a.elevens||0):a.g2||'—'}</td>${isCustomDisc?`<td style="color:#111;text-align:center;font-size:12px;">${a.sixes||0}</td>`:''}</tr>`).join('')}</tbody></table></div></div>`;
   });
   const n=sortedCats.length;
   const numCols=n<=1?1:n===2?2:n<=6?3:4;
@@ -1176,7 +1181,7 @@ window.setLang=(l)=>{lang=l;document.querySelectorAll('.lang-btn').forEach(b=>b.
 /* ── ELIMINATION ── */
 function getElimFormat(bow){if(currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom')return 'cumulative';if(bow==='Compound')return 'cumulative';return 'sets';}
 function getMatchSlots(){if(currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom')return 4;return 5;}
-function initElimination(){if(!currentCompId){document.getElementById('elim-content').innerHTML='<p style="color:var(--muted2)">Select a competition first.</p>';return;}const scored=archers.filter(a=>(getScore(a.id)?.total||0)>0);const catMap={};scored.forEach(a=>{const key=`${a.bow}||${a.age}||${a.gender}`;if(!catMap[key])catMap[key]={bow:a.bow,age:a.age,gender:a.gender,count:0};catMap[key].count++;});const cats=Object.entries(catMap).filter(([k,v])=>v.count>=3);const sel=document.getElementById('elim-cat-select');sel.innerHTML='<option value="">— Select Category —</option>'+cats.map(([k,v])=>`<option value="${k}">${v.bow} · ${v.age} · ${v.gender==='M'?'Men':'Women'} (${v.count})</option>`).join('');renderElimContent();}
+function initElimination(){if(!currentCompId){document.getElementById('elim-content').innerHTML='<p style="color:var(--muted2)">Select a competition first.</p>';return;}const scored=archers.filter(a=>(getScore(a.id)?.total||0)>0);const catMap={};scored.forEach(a=>{const key=`${a.bow}||${a.age}||${a.gender}`;if(!catMap[key])catMap[key]={bow:a.bow,age:a.age,gender:a.gender,count:0};catMap[key].count++;});const cats=Object.entries(catMap).filter(([k,v])=>v.count>=3);const sel=document.getElementById('elim-cat-select');sel.innerHTML=`<option value="">${t('select_category')}</option>`+cats.map(([k,v])=>`<option value="${k}">${v.bow} · ${v.age} · ${v.gender==='M'?t('men'):t('women')} (${v.count})</option>`).join('');renderElimContent();}
 function getActualBracketSize(archerCount,maxBracket){if(archerCount<3)return null;if(archerCount<=4)return 2;if(archerCount<=8)return Math.min(maxBracket,4);return Math.min(maxBracket,8);}
 function buildBracketMatches(seeds,bracketSize,firstRound){const totalSlots=bracketSize*2;const matches=[];const slots=Array.from({length:totalSlots},(_,i)=>seeds[i]||null);for(let i=0;i<totalSlots/2;i++){const a1=slots[i];const a2=slots[totalSlots-1-i];const isBye=a1&&!a2;if(isBye){matches.push({id:`${firstRound}_m${i+1}`,round:firstRound,position:i+1,archer1:{id:a1.id,name:a1.name,seed:i+1,qualScore:a1.qualScore},archer2:null,isBye:true,sets:[],score1:null,score2:null,tiebreak1:null,tiebreak2:null,winnerChoice:a1.id});}else{matches.push({id:`${firstRound}_m${i+1}`,round:firstRound,position:i+1,archer1:{id:a1.id,name:a1.name,seed:i+1,qualScore:a1.qualScore},archer2:{id:a2.id,name:a2.name,seed:totalSlots-i,qualScore:a2.qualScore},sets:[],score1:null,score2:null,tiebreak1:null,tiebreak2:null,winnerChoice:null});}}return matches;}
 async function generateBracketForCategory(catKey,maxBracket){const[bow,age,gender]=catKey.split('||');const format=getElimFormat(bow);const catArchers=archers.filter(a=>a.bow===bow&&a.age===age&&a.gender===gender&&(getScore(a.id)?.total||0)>0).map(a=>({...a,qualScore:getScore(a.id)?.total||0,g1:getScore(a.id)?.g1||0,g2:getScore(a.id)?.g2||0,xs:getScore(a.id)?.xs||0,tens:getScore(a.id)?.tens||0})).sort((a,b)=>b.qualScore-a.qualScore||(b.xs||0)-(a.xs||0)||(b.tens||0)-(a.tens||0));if(catArchers.length<3)return null;const bracketSize=getActualBracketSize(catArchers.length,maxBracket);if(!bracketSize)return null;const firstRound=bracketSize===8?'R1':bracketSize===4?'QF':'SF';const totalSlots=bracketSize*2;const seeds=catArchers.slice(0,totalSlots);const matches=buildBracketMatches(seeds,bracketSize,firstRound);return{catKey,bow,age,gender,format,bracketSize,rounds:{[firstRound]:matches},currentRound:firstRound,createdAt:Date.now()};}
