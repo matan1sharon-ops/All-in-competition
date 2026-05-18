@@ -215,6 +215,7 @@ async function loadArchived(){
     listEl.innerHTML=`<div class="empty-state"><div class="icon">📭</div><p>${t('no_archived')}</p></div>`;
     return;
   }
+  currentLang=localStorage.getItem('adminLang')||localStorage.getItem('scoringLang')||'en';
   listEl.innerHTML=archived.map(c=>{
     const archers=(c.archers||[]).length;
     const date=c.date?new Date(c.date).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}):'—';
@@ -498,10 +499,10 @@ window.deleteComp=async(id,name)=>{
   if(!confirm(`${t('confirm_delete')} "${name}"?\n\n${t('cannot_undo')}`))return;
   await deleteDoc(doc(db,'competitions',id));
   await loadArchived();
-initHistoryLang();
 };
 
 loadArchived();
+initHistoryLang();
 </script>
 </body>
 </html>
