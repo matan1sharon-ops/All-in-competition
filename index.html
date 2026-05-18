@@ -222,14 +222,14 @@ tbody td{padding:10px 12px;color:#111;}
       <!-- SCHEDULE -->
       <div id="panel-schedule" class="panel">
         <div class="card">
-          <div class="card-title">Add Session</div>
+          <div class="card-title" id="schedule-title">Add Session</div>
           <div class="form-grid">
-            <div class="form-group"><label>Session Name</label><input type="text" id="s-name" placeholder="e.g. Qualification Round 1"></div>
-            <div class="form-group"><label data-t="date">Date</label><input type="date" id="s-date"></div>
-            <div class="form-group"><label>Start Time</label><input type="time" id="s-time"></div>
-            <div class="form-group"><label>Distance</label><select id="s-dist"><option>70m</option><option>60m</option><option>50m</option><option>30m</option><option>18m</option><option>25m</option><option>3D</option><option>Field</option><option>Custom</option></select></div>
-            <div class="form-group"><label>Ends</label><input type="number" id="s-ends" value="12" min="1" max="30"></div>
-            <div class="form-group"><label>Arrows/End</label><input type="number" id="s-arrows" value="6" min="1" max="6"></div>
+            <div class="form-group"><label id="lbl-session-name">Session Name</label><input type="text" id="s-name" placeholder="e.g. Qualification Round 1"></div>
+            <div class="form-group"><label id="lbl-s-date">Date</label><input type="date" id="s-date"></div>
+            <div class="form-group"><label id="lbl-start-time">Start Time</label><input type="time" id="s-time"></div>
+            <div class="form-group"><label id="lbl-distance">Distance</label><select id="s-dist"><option>70m</option><option>60m</option><option>50m</option><option>30m</option><option>18m</option><option>25m</option><option>3D</option><option>Field</option><option>Custom</option></select></div>
+            <div class="form-group"><label id="lbl-ends">Ends</label><input type="number" id="s-ends" value="12" min="1" max="30"></div>
+            <div class="form-group"><label id="lbl-arrows-end">Arrows/End</label><input type="number" id="s-arrows" value="6" min="1" max="6"></div>
           </div>
           <div style="margin-top:14px;"><button class="btn btn-primary" onclick="addSession()" data-t="add_session">+ ADD SESSION</button></div>
         </div>
@@ -369,6 +369,8 @@ T={
     distance:'Distance',
     ends:'Ends',
     arrows_end:'Arrows/End',
+    add_session_title:'Add Session',
+    session_name_ph:'e.g. Qualification Round 1',
     num_targets:'Number of Targets',
     // Table headers
     name:'Name',
@@ -533,6 +535,8 @@ T={
     distance:'מרחק',
     ends:'סבבים',
     arrows_end:'חצים לסבב',
+    add_session_title:'הוספת סבב',
+    session_name_ph:'לדוגמה: סבב כשירות 1',
     num_targets:'מספר מטרות',
     // Table headers
     name:'שם תחרות',
@@ -702,6 +706,15 @@ function applyTranslations(){
   // Search
   const searchEl=document.getElementById('search-archer');
   if(searchEl)searchEl.placeholder=tr('search');
+  // Schedule panel
+  const schTitle=document.getElementById('schedule-title');if(schTitle)schTitle.textContent=tr('add_session_title');
+  const lblSN=document.getElementById('lbl-session-name');if(lblSN)lblSN.textContent=tr('session_name');
+  const lblSD=document.getElementById('lbl-s-date');if(lblSD)lblSD.textContent=tr('date');
+  const lblST=document.getElementById('lbl-start-time');if(lblST)lblST.textContent=tr('start_time');
+  const lblDist=document.getElementById('lbl-distance');if(lblDist)lblDist.textContent=tr('distance');
+  const lblEnds=document.getElementById('lbl-ends');if(lblEnds)lblEnds.textContent=tr('ends');
+  const lblAE=document.getElementById('lbl-arrows-end');if(lblAE)lblAE.textContent=tr('arrows_end');
+  const sNameEl=document.getElementById('s-name');if(sNameEl)sNameEl.placeholder=tr('session_name_ph');
   // Entry list headers
   const thName=document.getElementById('th-name');if(thName)thName.textContent=tr('name');
   const thClub=document.getElementById('th-club');if(thClub)thClub.textContent=tr('club');
