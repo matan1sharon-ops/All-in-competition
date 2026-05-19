@@ -25,14 +25,27 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
 .submit-btn{width:100%;padding:16px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:20px;letter-spacing:1px;cursor:pointer;margin-top:8px;transition:filter 0.15s,transform 0.1s;}
 .submit-btn:active{transform:scale(0.97);filter:brightness(0.9);}
 .submit-btn:disabled{background:#333;color:#555;cursor:not-allowed;}
-.success-screen{display:none;text-align:center;padding:20px 0;}
-.success-icon{font-size:64px;margin-bottom:16px;}
-.success-title{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:var(--green);letter-spacing:1px;margin-bottom:8px;}
-.success-sub{font-size:14px;color:var(--muted);line-height:1.6;}
-.success-score{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-top:16px;padding:12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);}
+.success-screen{display:none;padding:4px 0;}
+.success-banner{background:linear-gradient(135deg,#1b5e20,#2e7d32);border-radius:12px;padding:20px;text-align:center;margin-bottom:16px;}
+.success-icon{font-size:48px;margin-bottom:8px;}
+.success-title{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;color:#fff;letter-spacing:2px;margin-bottom:4px;}
+.success-sub{font-size:13px;color:#a5d6a7;line-height:1.5;}
+.success-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+.success-card-title{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;}
+.success-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.success-row:last-child{border-bottom:none;}
+.success-row-icon{font-size:16px;width:22px;text-align:center;flex-shrink:0;}
+.success-row-label{color:var(--muted);font-size:11px;min-width:70px;}
+.success-row-val{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--text);}
+.link-btn{display:flex;align-items:center;gap:10px;width:100%;padding:14px 16px;border-radius:10px;border:none;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:0.5px;text-decoration:none;margin-bottom:8px;transition:filter 0.15s;}
+.link-btn:active{filter:brightness(0.9);}
+.link-btn-scoring{background:#1e88e5;color:#fff;}
+.link-btn-results{background:var(--surface2);color:var(--accent);border:1px solid var(--accent);}
+.link-btn-icon{font-size:20px;}
+.screenshot-hint{text-align:center;font-size:11px;color:var(--muted);margin:8px 0 12px;line-height:1.5;}
 .error-msg{background:#b71c1c22;border:1px solid var(--red);color:var(--red);padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none;}
 .loading{display:none;text-align:center;padding:20px 0;color:var(--muted);}
-#register-another-btn{width:100%;padding:12px;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:var(--radius);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;cursor:pointer;margin-top:12px;}
+#register-another-btn{width:100%;padding:12px;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:var(--radius);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -89,10 +102,37 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
   </div>
 
   <div class="success-screen" id="success-screen">
-    <div class="success-icon">🏹</div>
-    <div class="success-title" id="success-title-text">REGISTERED!</div>
-    <div class="success-sub" id="success-sub-text">You have been successfully registered.</div>
-    <div class="success-score" id="success-details"></div>
+    <div class="success-banner">
+      <div class="success-icon">🏹</div>
+      <div class="success-title" id="success-title-text">REGISTERED!</div>
+      <div class="success-sub" id="success-sub-text">You have been successfully registered.</div>
+    </div>
+
+    <!-- Archer details -->
+    <div class="success-card">
+      <div class="success-card-title" id="sc-archer-title">Your Details</div>
+      <div id="success-archer-rows"></div>
+    </div>
+
+    <!-- Competition details -->
+    <div class="success-card">
+      <div class="success-card-title" id="sc-comp-title">Competition</div>
+      <div id="success-comp-rows"></div>
+    </div>
+
+    <!-- Screenshot hint -->
+    <div class="screenshot-hint" id="sc-hint">📸 Screenshot this page to keep your registration details</div>
+
+    <!-- Links -->
+    <a id="link-scoring" class="link-btn link-btn-scoring" href="#" target="_blank">
+      <span class="link-btn-icon">📱</span>
+      <span id="lbl-scoring">Score your round</span>
+    </a>
+    <a id="link-results" class="link-btn link-btn-results" href="#" target="_blank">
+      <span class="link-btn-icon">🏆</span>
+      <span id="lbl-results">Live Results</span>
+    </a>
+
     <button id="register-another-btn" onclick="registerAnother()">+ Register Another Archer</button>
   </div>
 </div>
@@ -137,6 +177,15 @@ const T={
     registered:'REGISTERED!',
     success_sub:'You have been successfully registered for the competition.',
     register_another:'+ Register Another Archer',
+    your_details:'Your Details',
+    competition_lbl:'Competition',
+    screenshot_hint:'📸 Screenshot this page to keep your registration details',
+    score_your_round:'📱 Score your round',
+    live_results:'🏆 Live Results',
+    bow_lbl:'Bow',
+    age_lbl:'Age',
+    gender_lbl:'Gender',
+    club_lbl:'Club',
   },
   he:{
     sub_title:'הרשמה לתחרות',
@@ -164,6 +213,15 @@ const T={
     registered:'נרשמת!',
     success_sub:'נרשמת בהצלחה לתחרות.',
     register_another:'+ הרשם קשת נוסף',
+    your_details:'הפרטים שלך',
+    competition_lbl:'תחרות',
+    screenshot_hint:'📸 צלם מסך לשמירת פרטי ההרשמה',
+    score_your_round:'📱 ניקוד הסיבוב שלך',
+    live_results:'🏆 תוצאות חיות',
+    bow_lbl:'קשת',
+    age_lbl:'גיל',
+    gender_lbl:'מין',
+    club_lbl:'מועדון',
   }
 };
 
@@ -187,6 +245,11 @@ function applyLang(){
   document.getElementById('success-title-text').textContent=t('registered');
   document.getElementById('success-sub-text').textContent=t('success_sub');
   document.getElementById('register-another-btn').textContent=t('register_another');
+  const scArcherTitle=document.getElementById('sc-archer-title');if(scArcherTitle)scArcherTitle.textContent=t('your_details');
+  const scCompTitle=document.getElementById('sc-comp-title');if(scCompTitle)scCompTitle.textContent=t('competition_lbl');
+  const scHint=document.getElementById('sc-hint');if(scHint)scHint.textContent=t('screenshot_hint');
+  const lblScoring=document.getElementById('lbl-scoring');if(lblScoring)lblScoring.textContent=t('score_your_round');
+  const lblResults=document.getElementById('lbl-results');if(lblResults)lblResults.textContent=t('live_results');
   document.getElementById('lang-en').classList.toggle('active',currentLang==='en');
   document.getElementById('lang-he').classList.toggle('active',currentLang==='he');
   document.documentElement.lang=currentLang;
@@ -268,9 +331,34 @@ window.submitRegistration=async()=>{
     document.getElementById('form-section').style.display='none';
     document.getElementById('success-screen').style.display='block';
     const gLabel=gender==='M'?t('male'):t('female');
-    document.getElementById('success-details').innerHTML=
-      `<strong>${fname} ${lname}</strong><br>`+
-      `${bow} · ${age} · ${gLabel}`+(club?`<br>${club}`:'');
+
+    // Archer details rows
+    const archerRows=[
+      {icon:'👤',label:'',val:`<strong style="font-size:18px;">${fname} ${lname}</strong>`},
+      {icon:'🏹',label:t('bow_lbl'),val:bow},
+      {icon:'📅',label:t('age_lbl'),val:age},
+      {icon:'⚧',label:t('gender_lbl'),val:gLabel},
+      ...(club?[{icon:'🏛',label:t('club_lbl'),val:club}]:[]),
+    ];
+    document.getElementById('success-archer-rows').innerHTML=archerRows.map(r=>
+      `<div class="success-row"><span class="success-row-icon">${r.icon}</span><span class="success-row-label">${r.label}</span><span class="success-row-val">${r.val}</span></div>`
+    ).join('');
+
+    // Competition details rows
+    const compRows=[
+      {icon:'🏆',label:'',val:`<strong>${compData.name}</strong>`},
+      ...(compData.date?[{icon:'📅',label:'',val:compData.date}]:[]),
+      ...(compData.location?[{icon:'📍',label:'',val:compData.location}]:[]),
+      ...(compData.discipline?[{icon:'🎯',label:'',val:compData.discipline}]:[]),
+    ];
+    document.getElementById('success-comp-rows').innerHTML=compRows.map(r=>
+      `<div class="success-row"><span class="success-row-icon">${r.icon}</span><span class="success-row-label">${r.label}</span><span class="success-row-val">${r.val}</span></div>`
+    ).join('');
+
+    // Set links
+    const base='https://matan1sharon-ops.github.io/All-in-competition';
+    document.getElementById('link-scoring').href=`${base}/scoring.html?comp=${compId}`;
+    document.getElementById('link-results').href=`${base}/results.html?comp=${compId}`;
 
   }catch(err){
     showError(t('reg_failed'));
