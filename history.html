@@ -133,9 +133,9 @@ T={
     no_archived:'No archived competitions yet.<br>Competitions are archived automatically 7 days after their date.',
     archers:'archers',
     delete:'🗑 DELETE',
-    qual_results:t('qual_results'),
-    elim_brackets:t('elim_brackets'),
-    final_ranking:t('final_ranking'),
+    qual_results:'🏹 Qualification Results',
+    elim_brackets:'⚔️ Elimination Brackets',
+    final_ranking:'🏆 Final Ranking',
     men:'Men',
     women:'Women',
     name:'Name',
@@ -145,7 +145,7 @@ T={
     semi_finals:'Semi Finals',
     final:'Final',
     bronze:'Bronze Medal',
-    pending:t('pending'),
+    pending:'PENDING',
     no_results:'No results yet.',
     confirm_delete:'Permanently delete',
     cannot_undo:'This cannot be undone.',
@@ -198,7 +198,14 @@ function applyHistoryTranslations(){
 const BOW_ORDER=['Recurve','Compound','Barebow','Traditional','Longbow'];
 const AGE_ORDER=['U12','U14','U18','U21','Senior','Master 50+','Master 60+'];
 const BOW_COLORS={Recurve:'#1565c0',Compound:'#4a148c',Barebow:'#1b5e20',Traditional:'#e65100',Longbow:'#37474f'};
-const ROUND_LABELS={R1:t('round_of')+' 16',QF:t('quarter_finals'),SF:t('semi_finals'),F:t('final'),B:t('bronze')};
+function getRoundLabel(rk,bracketSize){
+  if(rk==='R1')return t('round_of')+' '+(bracketSize*2||16);
+  if(rk==='QF')return t('quarter_finals');
+  if(rk==='SF')return t('semi_finals');
+  if(rk==='F')return '🏆 '+t('final');
+  if(rk==='B')return '🥉 '+t('bronze');
+  return rk;
+}
 
 function getScore(scores,archerId){const key=String(archerId).replace(/\./g,'_');return scores[key]||scores[String(archerId)]||{};}
 
@@ -378,7 +385,7 @@ function renderDetail(d){
               </div>`;
             }).join('');
             return`<div class="bracket-round">
-              <div class="bracket-round-label">${ROUND_LABELS[rk]||rk}</div>
+              <div class="bracket-round-label">${getRoundLabel(rk,data.bracketSize)}</div>
               ${matchesHtml}
             </div>`;
           }).join('');
