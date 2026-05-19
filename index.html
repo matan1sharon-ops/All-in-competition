@@ -841,7 +841,7 @@ window.openNewCompModal=()=>{
   if(btns[1])btns[1].textContent=isHe?'צור →':'CREATE →';
   openModal('modal-new-comp');
 };
-window.createCompetition=async()=>{const name=document.getElementById('nc-name').value.trim();const date=document.getElementById('nc-date').value;const location=document.getElementById('nc-location').value.trim();const discipline=document.getElementById('nc-discipline').value;const organizer=document.getElementById('nc-organizer').value.trim();if(!name){toast(t('enter_name'),'error');return;}const ref=await addDoc(collection(db,'competitions'),{name,date,location,discipline,organizer,lang:currentLang,createdAt:Date.now(),archers:[],targets:[],sessions:[],targetConfig:[]});closeModal('modal-new-comp');toast(t('comp_created'),'success');await loadCompetitions();
+window.createCompetition=async()=>{const name=document.getElementById('nc-name').value.trim();const date=document.getElementById('nc-date').value;const location=document.getElementById('nc-location').value.trim();const discipline=document.getElementById('nc-discipline').value;const organizer=document.getElementById('nc-organizer').value.trim();if(!name){toast(t('enter_name'),'error');return;}const ref=await addDoc(collection(db,'competitions'),{name,date,location,discipline,organizer,createdAt:Date.now(),archers:[],targets:[],sessions:[],targetConfig:[]});closeModal('modal-new-comp');toast(t('comp_created'),'success');await loadCompetitions();
 initAdminLang();document.getElementById('comp-select').value=ref.id;selectCompetition(ref.id);};
 
 function updateNavForDiscipline(disc){
