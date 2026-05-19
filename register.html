@@ -35,32 +35,28 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
 <body>
 <div class="card">
   <div class="logo">ALL IN</div>
-  <div class="sub">Competition Registration</div>
+  <div class="sub" id="sub-title">Competition Registration</div>
 
-  <!-- Loading -->
   <div class="loading" id="loading">⏳ Loading competition...</div>
-
-  <!-- Error -->
   <div class="error-msg" id="error-msg"></div>
 
-  <!-- Form -->
   <div id="form-section" style="display:none;">
     <div class="comp-name" id="comp-display">—</div>
     <div class="form-group">
-      <label>First Name</label>
+      <label id="lbl-fname">First Name</label>
       <input type="text" id="fname" placeholder="First name" autocomplete="given-name">
     </div>
     <div class="form-group">
-      <label>Last Name</label>
+      <label id="lbl-lname">Last Name</label>
       <input type="text" id="lname" placeholder="Last name" autocomplete="family-name">
     </div>
     <div class="form-group">
-      <label>Club</label>
+      <label id="lbl-club">Club</label>
       <input type="text" id="club" placeholder="Club name (optional)" autocomplete="organization">
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>Bow Type</label>
+        <label id="lbl-bow">Bow Type</label>
         <select id="bow">
           <option>Recurve</option>
           <option>Compound</option>
@@ -70,15 +66,15 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
         </select>
       </div>
       <div class="form-group">
-        <label>Gender</label>
+        <label id="lbl-gender">Gender</label>
         <select id="gender">
-          <option value="M">Male</option>
-          <option value="F">Female</option>
+          <option value="M" id="opt-male">Male</option>
+          <option value="F" id="opt-female">Female</option>
         </select>
       </div>
     </div>
     <div class="form-group">
-      <label>Age Category</label>
+      <label id="lbl-age">Age Category</label>
       <select id="age">
         <option>U12</option>
         <option>U14</option>
@@ -92,142 +88,201 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
     <button class="submit-btn" id="submit-btn" onclick="submitRegistration()">REGISTER →</button>
   </div>
 
-  <!-- Success -->
   <div class="success-screen" id="success-screen">
     <div class="success-icon">🏹</div>
-    <div class="success-title">REGISTERED!</div>
-    <div class="success-sub">You have been successfully registered for the competition.</div>
+    <div class="success-title" id="success-title-text">REGISTERED!</div>
+    <div class="success-sub" id="success-sub-text">You have been successfully registered for the competition.</div>
     <div class="success-score" id="success-details"></div>
     <button id="register-another-btn" onclick="registerAnother()">+ Register Another Archer</button>
   </div>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getFirestore,doc,getDoc,setDoc}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To",
-  authDomain: "all-in-competition.firebaseapp.com",
-  projectId: "all-in-competition",
-  storageBucket: "all-in-competition.firebasestorage.app",
-  messagingSenderId: "620146958631",
-  appId: "1:620146958631:web:1e88019d1436372689c902"
+const firebaseConfig={apiKey:"AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To",authDomain:"all-in-competition.firebaseapp.com",projectId:"all-in-competition",storageBucket:"all-in-competition.firebasestorage.app",messagingSenderId:"620146958631",appId:"1:620146958631:web:1e88019d1436372689c902"};
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
+const params=new URLSearchParams(window.location.search);
+const compId=params.get('comp');
+let compData=null;
+let currentLang='en';
+
+/* ── TRANSLATIONS ── */
+const T={
+  en:{
+    sub_title:'Competition Registration',
+    loading:'⏳ Loading competition...',
+    no_comp:'No competition specified. Please use the link provided by the organizer.',
+    not_found:'Competition not found. Please check your registration link.',
+    conn_error:'Connection error. Please try again.',
+    first_name:'First Name',
+    last_name:'Last Name',
+    club:'Club',
+    club_ph:'Club name (optional)',
+    bow_type:'Bow Type',
+    gender:'Gender',
+    male:'Male',
+    female:'Female',
+    age_category:'Age Category',
+    register_btn:'REGISTER →',
+    registering:'REGISTERING...',
+    enter_fname:'Please enter your first name.',
+    enter_lname:'Please enter your last name.',
+    already_registered:'is already registered for this competition.',
+    reg_failed:'Registration failed. Please try again.',
+    registered:'REGISTERED!',
+    success_sub:'You have been successfully registered for the competition.',
+    register_another:'+ Register Another Archer',
+  },
+  he:{
+    sub_title:'הרשמה לתחרות',
+    loading:'⏳ טוען תחרות...',
+    no_comp:'לא צוינה תחרות. אנא השתמש בקישור שסיפק המארגן.',
+    not_found:'התחרות לא נמצאה. אנא בדוק את קישור ההרשמה.',
+    conn_error:'שגיאת חיבור. אנא נסה שוב.',
+    first_name:'שם פרטי',
+    last_name:'שם משפחה',
+    club:'מועדון',
+    club_ph:'שם מועדון (לא חובה)',
+    bow_type:'סוג קשת',
+    gender:'מין',
+    male:'זכר',
+    female:'נקבה',
+    age_category:'קטגוריית גיל',
+    register_btn:'הרשמה →',
+    registering:'...מירשם',
+    enter_fname:'אנא הזן את שמך הפרטי.',
+    enter_lname:'אנא הזן את שם משפחתך.',
+    already_registered:'כבר רשום לתחרות זו.',
+    reg_failed:'ההרשמה נכשלה. אנא נסה שוב.',
+    registered:'נרשמת!',
+    success_sub:'נרשמת בהצלחה לתחרות.',
+    register_another:'+ הרשם קשת נוסף',
+  }
 };
 
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
+function t(key){return T[currentLang]?.[key]||T['en']?.[key]||key;}
 
-// Get competition ID from URL
-const params = new URLSearchParams(window.location.search);
-const compId = params.get('comp');
-
-let compData = null;
-
-function showError(msg) {
-  const el = document.getElementById('error-msg');
-  el.textContent = msg;
-  el.style.display = 'block';
-  document.getElementById('loading').style.display = 'none';
+function applyLang(){
+  document.getElementById('sub-title').textContent=t('sub_title');
+  document.getElementById('loading').textContent=t('loading');
+  document.getElementById('lbl-fname').textContent=t('first_name');
+  document.getElementById('lbl-lname').textContent=t('last_name');
+  document.getElementById('lbl-club').textContent=t('club');
+  document.getElementById('club').placeholder=t('club_ph');
+  document.getElementById('fname').placeholder=t('first_name');
+  document.getElementById('lname').placeholder=t('last_name');
+  document.getElementById('lbl-bow').textContent=t('bow_type');
+  document.getElementById('lbl-gender').textContent=t('gender');
+  document.getElementById('opt-male').textContent=t('male');
+  document.getElementById('opt-female').textContent=t('female');
+  document.getElementById('lbl-age').textContent=t('age_category');
+  document.getElementById('submit-btn').textContent=t('register_btn');
+  document.getElementById('success-title-text').textContent=t('registered');
+  document.getElementById('success-sub-text').textContent=t('success_sub');
+  document.getElementById('register-another-btn').textContent=t('register_another');
+  document.documentElement.lang=currentLang;
 }
 
-async function loadCompetition() {
-  document.getElementById('loading').style.display = 'block';
+function showError(msg){
+  const el=document.getElementById('error-msg');
+  el.textContent=msg;
+  el.style.display='block';
+  document.getElementById('loading').style.display='none';
+}
 
-  if (!compId) {
-    showError('No competition specified. Please use the link provided by the organizer.');
-    return;
-  }
+async function loadCompetition(){
+  document.getElementById('loading').style.display='block';
+  if(!compId){showError(t('no_comp'));return;}
+  try{
+    const snap=await getDoc(doc(db,'competitions',compId));
+    if(!snap.exists()){showError(t('not_found'));return;}
+    compData=snap.data();
 
-  try {
-    const snap = await getDoc(doc(db, 'competitions', compId));
-    if (!snap.exists()) {
-      showError('Competition not found. Please check your registration link.');
-      return;
-    }
-    compData = snap.data();
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('form-section').style.display = 'block';
-    document.getElementById('comp-display').textContent =
-      `🏆 ${compData.name}` + (compData.date ? `  ·  ${compData.date}` : '') +
-      (compData.location ? `  ·  ${compData.location}` : '');
-    document.title = `Register — ${compData.name}`;
-  } catch(err) {
-    showError('Connection error. Please try again.');
+    // Set language from competition's lang field
+    currentLang=compData.lang||'en';
+    applyLang();
+
+    document.getElementById('loading').style.display='none';
+    document.getElementById('form-section').style.display='block';
+    document.getElementById('comp-display').textContent=
+      `🏆 ${compData.name}`+(compData.date?`  ·  ${compData.date}`:'')+(compData.location?`  ·  ${compData.location}`:'');
+    document.title=`${t('sub_title')} — ${compData.name}`;
+  }catch(err){
+    showError(t('conn_error'));
   }
 }
 
-window.submitRegistration = async () => {
-  const fname = document.getElementById('fname').value.trim();
-  const lname = document.getElementById('lname').value.trim();
-  const club  = document.getElementById('club').value.trim();
-  const bow   = document.getElementById('bow').value;
-  const gender= document.getElementById('gender').value;
-  const age   = document.getElementById('age').value;
+window.submitRegistration=async()=>{
+  const fname=document.getElementById('fname').value.trim();
+  const lname=document.getElementById('lname').value.trim();
+  const club=document.getElementById('club').value.trim();
+  const bow=document.getElementById('bow').value;
+  const gender=document.getElementById('gender').value;
+  const age=document.getElementById('age').value;
 
-  // Validate
-  document.getElementById('error-msg').style.display = 'none';
-  if (!fname) { showError('Please enter your first name.'); return; }
-  if (!lname) { showError('Please enter your last name.'); return; }
+  document.getElementById('error-msg').style.display='none';
+  if(!fname){showError(t('enter_fname'));return;}
+  if(!lname){showError(t('enter_lname'));return;}
 
-  const btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  btn.textContent = 'REGISTERING...';
+  const btn=document.getElementById('submit-btn');
+  btn.disabled=true;
+  btn.textContent=t('registering');
 
-  try {
-    // Load latest archers list
-    const snap = await getDoc(doc(db, 'competitions', compId));
-    const data = snap.data();
-    const archers = data.archers || [];
+  try{
+    const snap=await getDoc(doc(db,'competitions',compId));
+    const data=snap.data();
+    const archers=data.archers||[];
 
-    // Check if already registered
-    const exists = archers.find(a =>
-      a.fname?.toLowerCase() === fname.toLowerCase() &&
-      a.lname?.toLowerCase() === lname.toLowerCase()
+    const exists=archers.find(a=>
+      a.fname?.toLowerCase()===fname.toLowerCase()&&
+      a.lname?.toLowerCase()===lname.toLowerCase()
     );
-    if (exists) {
-      showError(`${fname} ${lname} is already registered for this competition.`);
-      btn.disabled = false;
-      btn.textContent = 'REGISTER →';
+    if(exists){
+      showError(`${fname} ${lname} ${t('already_registered')}`);
+      btn.disabled=false;
+      btn.textContent=t('register_btn');
       return;
     }
 
-    // Add archer
     archers.push({
-      id: String(Date.now()),
-      fname, lname,
-      name: `${fname} ${lname}`,
-      club, bow, age, gender,
-      target: null, slot: null,
-      registeredAt: new Date().toISOString()
+      id:String(Date.now()),
+      fname,lname,
+      name:`${fname} ${lname}`,
+      club,bow,age,gender,
+      target:null,slot:null,
+      registeredAt:new Date().toISOString()
     });
 
-    await setDoc(doc(db, 'competitions', compId), { archers }, { merge: true });
+    await setDoc(doc(db,'competitions',compId),{archers},{merge:true});
 
-    // Show success
-    document.getElementById('form-section').style.display = 'none';
-    document.getElementById('success-screen').style.display = 'block';
-    document.getElementById('success-details').innerHTML =
-      `<strong>${fname} ${lname}</strong><br>` +
-      `${bow} · ${age} · ${gender === 'M' ? 'Male' : 'Female'}` +
-      (club ? `<br>${club}` : '');
+    document.getElementById('form-section').style.display='none';
+    document.getElementById('success-screen').style.display='block';
+    const gLabel=gender==='M'?t('male'):t('female');
+    document.getElementById('success-details').innerHTML=
+      `<strong>${fname} ${lname}</strong><br>`+
+      `${bow} · ${age} · ${gLabel}`+
+      (club?`<br>${club}`:'');
 
-  } catch(err) {
-    showError('Registration failed. Please try again.');
-    btn.disabled = false;
-    btn.textContent = 'REGISTER →';
+  }catch(err){
+    showError(t('reg_failed'));
+    btn.disabled=false;
+    btn.textContent=t('register_btn');
   }
 };
 
-window.registerAnother = () => {
-  document.getElementById('success-screen').style.display = 'none';
-  document.getElementById('form-section').style.display = 'block';
-  document.getElementById('fname').value = '';
-  document.getElementById('lname').value = '';
-  document.getElementById('club').value = '';
-  document.getElementById('error-msg').style.display = 'none';
-  document.getElementById('submit-btn').disabled = false;
-  document.getElementById('submit-btn').textContent = 'REGISTER →';
+window.registerAnother=()=>{
+  document.getElementById('success-screen').style.display='none';
+  document.getElementById('form-section').style.display='block';
+  document.getElementById('fname').value='';
+  document.getElementById('lname').value='';
+  document.getElementById('club').value='';
+  document.getElementById('error-msg').style.display='none';
+  document.getElementById('submit-btn').disabled=false;
+  document.getElementById('submit-btn').textContent=t('register_btn');
 };
 
 loadCompetition();
