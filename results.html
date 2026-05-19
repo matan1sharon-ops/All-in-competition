@@ -90,7 +90,7 @@ function t(key){return window.t(key);}
 T={
   en:{
     live:'LIVE',
-    select_comp:''+t('select_comp')+'',
+    select_comp:'Select a competition below',
     select_above:'Select a competition above',
     to_show:'to show live results.',
     competition:'COMPETITION:',
@@ -113,9 +113,9 @@ T={
     pending:'PENDING',
     select:'— Select —',
     archers:'archers',
-    tbd:t('tbd'),
+    tbd:'TBD',
     closest_center:'TIED — WHO IS CLOSEST TO CENTER?',
-    closer_center:t('closer_center'),
+    closer_center:'Closer to center?',
   },
   he:{
     live:'חי',
@@ -198,7 +198,7 @@ function renderElimDisplay(elimData,discipline){
   const main=document.getElementById('elim-content');
   const scrollTop=main.scrollTop;
   const roundOrder=['R1','QF','SF','F','B'];
-  const roundLabels={R1:t('round_of')+' 16',QF:t('quarter_finals'),SF:t('semi_finals'),F:'🏆 '+t('final'),B:'🥉 '+t('bronze')};
+  const getRLabel=(rk,bs)=>{if(rk==='R1')return t('round_of')+' '+(bs*2||16);if(rk==='QF')return t('quarter_finals');if(rk==='SF')return t('semi_finals');if(rk==='F')return'🏆 '+t('final');if(rk==='B')return'🥉 '+t('bronze');return rk;};
   let html='<div style="display:flex;flex-direction:column;gap:20px;">';
   Object.entries(elimData).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([catKey,data])=>{
     const gLabel=data.gender==='M'?t('men').toUpperCase():t('women').toUpperCase();
@@ -207,7 +207,7 @@ function renderElimDisplay(elimData,discipline){
     roundOrder.forEach(rk=>{
       const matches=data.rounds?.[rk];
       if(!matches||!matches.length)return;
-      const label=roundLabels[rk]||rk;
+      const label=getRLabel(rk,data.bracketSize);
       html+=`<div style="flex:1;min-width:240px;max-width:380px;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:var(--muted2);text-transform:uppercase;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border2);">${label}</div><div style="display:flex;flex-direction:column;gap:8px;">`;
       matches.forEach(match=>{
         const done=!!match.winnerChoice;
