@@ -12,6 +12,9 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
 .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 24px;width:100%;max-width:420px;}
 .logo{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;letter-spacing:4px;color:var(--accent);text-align:center;margin-bottom:4px;}
 .sub{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:8px;}
+.lang-toggle{display:flex;justify-content:center;gap:6px;margin-bottom:20px;}
+.lang-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:5px 16px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s;}
+.lang-btn.active{background:var(--accent);color:#000;border-color:var(--accent);}
 .comp-name{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:var(--text);text-align:center;margin-bottom:24px;padding:10px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);}
 .form-group{margin-bottom:14px;}
 .form-group label{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;}
@@ -37,32 +40,34 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
   <div class="logo">ALL IN</div>
   <div class="sub" id="sub-title">Competition Registration</div>
 
-  <div class="loading" id="loading">⏳ Loading competition...</div>
+  <div class="lang-toggle">
+    <button class="lang-btn active" id="lang-en" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" id="lang-he" onclick="setLang('he')">עברית</button>
+  </div>
+
+  <div class="loading" id="loading">⏳ Loading...</div>
   <div class="error-msg" id="error-msg"></div>
 
   <div id="form-section" style="display:none;">
     <div class="comp-name" id="comp-display">—</div>
     <div class="form-group">
       <label id="lbl-fname">First Name</label>
-      <input type="text" id="fname" placeholder="First name" autocomplete="given-name">
+      <input type="text" id="fname" autocomplete="given-name">
     </div>
     <div class="form-group">
       <label id="lbl-lname">Last Name</label>
-      <input type="text" id="lname" placeholder="Last name" autocomplete="family-name">
+      <input type="text" id="lname" autocomplete="family-name">
     </div>
     <div class="form-group">
       <label id="lbl-club">Club</label>
-      <input type="text" id="club" placeholder="Club name (optional)" autocomplete="organization">
+      <input type="text" id="club" autocomplete="organization">
     </div>
     <div class="form-row">
       <div class="form-group">
         <label id="lbl-bow">Bow Type</label>
         <select id="bow">
-          <option>Recurve</option>
-          <option>Compound</option>
-          <option>Barebow</option>
-          <option>Traditional</option>
-          <option>Longbow</option>
+          <option>Recurve</option><option>Compound</option><option>Barebow</option>
+          <option>Traditional</option><option>Longbow</option>
         </select>
       </div>
       <div class="form-group">
@@ -76,13 +81,8 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
     <div class="form-group">
       <label id="lbl-age">Age Category</label>
       <select id="age">
-        <option>U12</option>
-        <option>U14</option>
-        <option>U18</option>
-        <option>U21</option>
-        <option selected>Senior</option>
-        <option>Master 50+</option>
-        <option>Master 60+</option>
+        <option>U12</option><option>U14</option><option>U18</option><option>U21</option>
+        <option selected>Senior</option><option>Master 50+</option><option>Master 60+</option>
       </select>
     </div>
     <button class="submit-btn" id="submit-btn" onclick="submitRegistration()">REGISTER →</button>
@@ -91,7 +91,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
   <div class="success-screen" id="success-screen">
     <div class="success-icon">🏹</div>
     <div class="success-title" id="success-title-text">REGISTERED!</div>
-    <div class="success-sub" id="success-sub-text">You have been successfully registered for the competition.</div>
+    <div class="success-sub" id="success-sub-text">You have been successfully registered.</div>
     <div class="success-score" id="success-details"></div>
     <button id="register-another-btn" onclick="registerAnother()">+ Register Another Archer</button>
   </div>
@@ -108,18 +108,19 @@ const db=getFirestore(app);
 const params=new URLSearchParams(window.location.search);
 const compId=params.get('comp');
 let compData=null;
-let currentLang='en';
+let currentLang=localStorage.getItem('registerLang')||'en';
 
-/* ── TRANSLATIONS ── */
 const T={
   en:{
     sub_title:'Competition Registration',
-    loading:'⏳ Loading competition...',
+    loading:'⏳ Loading...',
     no_comp:'No competition specified. Please use the link provided by the organizer.',
     not_found:'Competition not found. Please check your registration link.',
     conn_error:'Connection error. Please try again.',
     first_name:'First Name',
+    first_name_ph:'First name',
     last_name:'Last Name',
+    last_name_ph:'Last name',
     club:'Club',
     club_ph:'Club name (optional)',
     bow_type:'Bow Type',
@@ -139,12 +140,14 @@ const T={
   },
   he:{
     sub_title:'הרשמה לתחרות',
-    loading:'⏳ טוען תחרות...',
+    loading:'⏳ טוען...',
     no_comp:'לא צוינה תחרות. אנא השתמש בקישור שסיפק המארגן.',
     not_found:'התחרות לא נמצאה. אנא בדוק את קישור ההרשמה.',
     conn_error:'שגיאת חיבור. אנא נסה שוב.',
     first_name:'שם פרטי',
+    first_name_ph:'שם פרטי',
     last_name:'שם משפחה',
+    last_name_ph:'שם משפחה',
     club:'מועדון',
     club_ph:'שם מועדון (לא חובה)',
     bow_type:'סוג קשת',
@@ -153,7 +156,7 @@ const T={
     female:'נקבה',
     age_category:'קטגוריית גיל',
     register_btn:'הרשמה →',
-    registering:'...מירשם',
+    registering:'...נרשם',
     enter_fname:'אנא הזן את שמך הפרטי.',
     enter_lname:'אנא הזן את שם משפחתך.',
     already_registered:'כבר רשום לתחרות זו.',
@@ -170,11 +173,11 @@ function applyLang(){
   document.getElementById('sub-title').textContent=t('sub_title');
   document.getElementById('loading').textContent=t('loading');
   document.getElementById('lbl-fname').textContent=t('first_name');
+  document.getElementById('fname').placeholder=t('first_name_ph');
   document.getElementById('lbl-lname').textContent=t('last_name');
+  document.getElementById('lname').placeholder=t('last_name_ph');
   document.getElementById('lbl-club').textContent=t('club');
   document.getElementById('club').placeholder=t('club_ph');
-  document.getElementById('fname').placeholder=t('first_name');
-  document.getElementById('lname').placeholder=t('last_name');
   document.getElementById('lbl-bow').textContent=t('bow_type');
   document.getElementById('lbl-gender').textContent=t('gender');
   document.getElementById('opt-male').textContent=t('male');
@@ -184,8 +187,16 @@ function applyLang(){
   document.getElementById('success-title-text').textContent=t('registered');
   document.getElementById('success-sub-text').textContent=t('success_sub');
   document.getElementById('register-another-btn').textContent=t('register_another');
+  document.getElementById('lang-en').classList.toggle('active',currentLang==='en');
+  document.getElementById('lang-he').classList.toggle('active',currentLang==='he');
   document.documentElement.lang=currentLang;
 }
+
+window.setLang=function(lang){
+  currentLang=lang;
+  localStorage.setItem('registerLang',lang);
+  applyLang();
+};
 
 function showError(msg){
   const el=document.getElementById('error-msg');
@@ -196,16 +207,12 @@ function showError(msg){
 
 async function loadCompetition(){
   document.getElementById('loading').style.display='block';
+  applyLang();
   if(!compId){showError(t('no_comp'));return;}
   try{
     const snap=await getDoc(doc(db,'competitions',compId));
     if(!snap.exists()){showError(t('not_found'));return;}
     compData=snap.data();
-
-    // Set language from competition's lang field
-    currentLang=compData.lang||'en';
-    applyLang();
-
     document.getElementById('loading').style.display='none';
     document.getElementById('form-section').style.display='block';
     document.getElementById('comp-display').textContent=
@@ -250,8 +257,7 @@ window.submitRegistration=async()=>{
 
     archers.push({
       id:String(Date.now()),
-      fname,lname,
-      name:`${fname} ${lname}`,
+      fname,lname,name:`${fname} ${lname}`,
       club,bow,age,gender,
       target:null,slot:null,
       registeredAt:new Date().toISOString()
@@ -264,8 +270,7 @@ window.submitRegistration=async()=>{
     const gLabel=gender==='M'?t('male'):t('female');
     document.getElementById('success-details').innerHTML=
       `<strong>${fname} ${lname}</strong><br>`+
-      `${bow} · ${age} · ${gLabel}`+
-      (club?`<br>${club}`:'');
+      `${bow} · ${age} · ${gLabel}`+(club?`<br>${club}`:'');
 
   }catch(err){
     showError(t('reg_failed'));
