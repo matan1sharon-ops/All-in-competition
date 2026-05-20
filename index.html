@@ -107,6 +107,10 @@ tbody td{padding:10px 12px;color:#111;}
 .ts-type-field{border-left:4px solid #1565c0;}
 .ts-type-3d{border-left:4px solid #4a148c;}
 .ts-type-kill{border-left:4px solid #e53935;}
+.target-slot.drag-over{border-color:var(--accent)!important;background:rgba(255,215,0,0.1)!important;}
+.target-slot.dragging{opacity:0.4;}
+.target-slot[draggable="true"]{cursor:grab;}
+.target-slot[draggable="true"]:active{cursor:grabbing;}
 @media(max-width:768px){.sidebar{width:60px;}.sidebar-logo .brand,.sidebar-logo .sub,.nav-item span:not(.icon),.comp-selector,.sidebar-footer{display:none;}.nav-item{justify-content:center;padding:12px;}}
 </style>
 </head>
@@ -964,7 +968,25 @@ window.importCSV=async()=>{
   if(added>0)toast(`${added} ${t('imported_ok')}${skipped>0?' ('+skipped+' skipped)':''}`, 'success');
   else toast('No archers imported — check format','error');
 };
-window.generateTargets=async()=>{if(!currentCompId){toast(t('select_comp_first'),'error');return;}if(!archers.length){toast(t('add_archers_first'),'error');return;}targets=[];archers.forEach(a=>{a.target=null;a.slot=null;});const slots=['A','B','C','D'];let targetNum=1;function assignGroup(group,bowLabel){if(!group.length)return;let cur=null,si=0;group.forEach(archer=>{if(si===0){cur={num:targetNum++,bow:bowLabel,A:null,B:null,C:null,D:null};targets.push(cur);}cur[slots[si]]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};const orig=archers.find(a=>a.id===archer.id);if(orig){orig.target=cur.num;orig.slot=slots[si];}si++;if(si>=4)si=0;});}function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}if(currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom'){assignGroup(shuffle(archers),'Mixed');}else if(currentDiscipline==='Outdoor'){assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['Senior','U21'].includes(a.age))),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['U18','Master 50+','Master 60+'].includes(a.age))),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Compound')),'Compound');assignGroup(shuffle(archers.filter(a=>a.bow==='Barebow')),'Barebow');assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['U14','U12'].includes(a.age))),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Traditional'||a.bow==='Longbow')),'Trad/Longbow');}else if(currentDiscipline==='Indoor'){assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve')),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Compound')),'Compound');assignGroup(shuffle(archers.filter(a=>a.bow==='Barebow')),'Barebow');assignGroup(shuffle(archers.filter(a=>a.bow==='Traditional'||a.bow==='Longbow')),'Trad/Longbow');}await saveTargets();await saveArchers();renderAll();toast(`${targets.length} ${t('targets_generated')}`,'success');};
+window.generateTargets=async()=>{if(!currentCompId){toast(t('select_comp_first'),'error');return;}if(!archers.length){toast(t('add_archers_first'),'error');return;}targets=[];archers.forEach(a=>{a.target=null;a.slot=null;});const slots=['A','B','C','D'];let targetNum=1;function assignGroup(group,bowLabel){if(!group.length)return;let cur=null,si=0;group.forEach(archer=>{if(si===0){cur={num:targetNum++,bow:bowLabel,A:null,B:null,C:null,D:null};targets.push(cur);}cur[slots[si]]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};const orig=archers.find(a=>a.id===archer.id);if(orig){orig.target=cur.num;orig.slot=slots[si];}si++;if(si>=4)si=0;});}function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}if(currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom'){assignGroup(shuffle(archers),'Mixed');}else if(currentDiscipline==='Outdoor'){assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['Senior','U21'].includes(a.age))),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['U18','Master 50+','Master 60+'].includes(a.age))),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Compound')),'Compound');assignGroup(shuffle(archers.filter(a=>a.bow==='Barebow')),'Barebow');assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['U14','U12'].includes(a.age))),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Traditional'||a.bow==='Longbow')),'Trad/Longbow');}else if(currentDiscipline==='Indoor'){
+  // Split by bow + age group (same logic as Outdoor)
+  const indoorBowGroups=[
+    {bow:'Recurve',ages:['Senior','U21'],label:'Recurve'},
+    {bow:'Recurve',ages:['U18','Master 50+','Master 60+'],label:'Recurve'},
+    {bow:'Recurve',ages:['U12','U14'],label:'Recurve'},
+    {bow:'Compound',ages:AGE_ORDER,label:'Compound'},
+    {bow:'Barebow',ages:AGE_ORDER,label:'Barebow'},
+    {bow:'Traditional',ages:AGE_ORDER,label:'Trad/Longbow'},
+    {bow:'Longbow',ages:AGE_ORDER,label:'Trad/Longbow'},
+  ];
+  // Collect already-assigned IDs to avoid double-assignment
+  const assigned=new Set();
+  indoorBowGroups.forEach(g=>{
+    const group=shuffle(archers.filter(a=>a.bow===g.bow&&g.ages.includes(a.age)&&!assigned.has(a.id)));
+    group.forEach(a=>assigned.add(a.id));
+    assignGroup(group,g.label);
+  });
+}await saveTargets();await saveArchers();renderAll();toast(`${targets.length} ${t('targets_generated')}`,'success');};
 window.generateOddTargets=async()=>{
   if(!currentCompId){toast(t('select_comp_first'),'error');return;}
   if(!archers.length){toast(t('add_archers_first'),'error');return;}
@@ -1036,7 +1058,130 @@ window.editTargetNum=async(ti)=>{
 window.archiveCompetition=async()=>{if(!currentCompId)return;const snap=await getDoc(doc(db,'competitions',currentCompId));const name=snap.data()?.name||'this competition';if(!confirm(`Archive "${name}"?\n\nIt will move to History and disappear from the active list.`))return;await setDoc(doc(db,'competitions',currentCompId),{archived:true},{merge:true});currentCompId=null;archers=[];targets=[];sessions=[];scores={};document.getElementById('no-comp-msg').style.display='block';document.getElementById('dash-content').style.display='none';document.getElementById('btn-delete-comp').style.display='none';document.getElementById('btn-archive-comp').style.display='none';updateNavForDiscipline('');await loadCompetitions();document.getElementById('comp-select').value='';toast(t('archived_ok'),'success');};
 window.deleteCompetition=async()=>{if(!currentCompId)return;const snap=await getDoc(doc(db,'competitions',currentCompId));const name=snap.data()?.name||'this competition';if(!confirm(`DELETE "${name}"?\n\nThis cannot be undone.`))return;const{deleteDoc}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");await deleteDoc(doc(db,'competitions',currentCompId));currentCompId=null;archers=[];targets=[];sessions=[];scores={};document.getElementById('no-comp-msg').style.display='block';document.getElementById('dash-content').style.display='none';document.getElementById('btn-delete-comp').style.display='none';document.getElementById('btn-archive-comp').style.display='none';updateNavForDiscipline('');await loadCompetitions();document.getElementById('comp-select').value='';toast(t('deleted_ok'),'success');};
 window.clearAssignments=async()=>{if(!confirm('Clear all target assignments?'))return;targets=[];archers.forEach(a=>{a.target=null;a.slot=null;});await saveTargets();await saveArchers();renderAll();toast(t('clear_all')+' ✓','success');};
-function renderTargets(){const grid=document.getElementById('target-grid');if(!targets.length){grid.innerHTML='<div class="empty-state"><div class="empty-icon">🎯</div><p>No targets yet.<br>Add archers then click <strong>AUTO GENERATE FROM ENTRIES</strong>.</p></div>';return;}const allBows=[...new Set(targets.map(t=>t.bow))];let html='';allBows.forEach(bow=>{const group=targets.filter(t=>t.bow===bow);const color=BOW_COLORS[bow]||'#555';const archerCount=group.reduce((n,t)=>n+['A','B','C','D'].filter(s=>t[s]).length,0);const tRange=group.length>1?`T${group[0].num}–T${group[group.length-1].num}`:`T${group[0].num}`;const distLabel=getDistanceLabel(bow,currentDiscipline);html+=`<div style="margin-bottom:24px;"><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px 14px;background:${color}22;border:1px solid ${color}44;border-radius:8px;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:2px;color:${color};">${bow==='Mixed'?'🎯 MIXED':bow==='Trad/Longbow'?'🏹 TRAD / LONGBOW':bow.toUpperCase()}</span>${distLabel?`<span style="font-size:12px;font-weight:700;color:var(--accent);background:rgba(255,215,0,0.15);padding:2px 8px;border-radius:4px;">${distLabel}</span>`:''}<span style="font-size:11px;color:#888;">${archerCount} archers · ${group.length} target${group.length!==1?'s':''} (${tRange})</span></div><div class="target-grid">`;group.forEach(t=>{const globalTi=targets.indexOf(t);const slotsHtml=['A','B','C','D'].map(s=>{const archer=t[s];return`<div class="target-slot ${archer?'filled':'empty'}" onclick="${archer?`openMoveModal('${archer.id}',${globalTi},'${s}')`:`openAssignModal(${globalTi},'${s}')`}"><div class="slot-label">${s}</div>${archer?`<div class="slot-name" style="cursor:pointer;">${archer.name} <span style="font-size:9px;color:var(--accent);">✦ MOVE</span></div><div class="slot-cat">${archer.age} · ${archer.gender}</div>`:`<div class="slot-name">Tap to assign</div>`}</div>`;}).join('');html+=`<div class="target-card"><div class="target-num" style="display:flex;align-items:center;gap:6px;">T${t.num}<button onclick="editTargetNum(${globalTi})" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:12px;padding:2px 4px;border-radius:4px;" title="Change target number">✏️</button></div>${slotsHtml}</div>`;});html+='</div></div>';});grid.innerHTML=html;}
+/* ── DRAG GROUP HELPERS ── */
+function getDragGroup(archer){
+  if(!archer)return null;
+  if(currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom') return 'Mixed';
+  if(currentDiscipline==='Indoor') return archer.bow; // bow type only for Indoor drag
+  // Outdoor — bow + age subgroup
+  if(archer.bow==='Recurve'){
+    if(['Senior','U21'].includes(archer.age)) return 'Recurve-70m';
+    if(['U18','Master 50+','Master 60+'].includes(archer.age)) return 'Recurve-60m';
+    return 'Recurve-30m';
+  }
+  if(archer.bow==='Traditional'||archer.bow==='Longbow') return 'Trad/Longbow';
+  return archer.bow;
+}
+
+function canDrop(draggedArcher,targetSlotArcher){
+  // Empty slot — check dragged archer's group matches the target
+  const dg=getDragGroup(draggedArcher);
+  if(!targetSlotArcher) return true; // empty slot — group check done at target level
+  return dg===getDragGroup(targetSlotArcher);
+}
+
+let dragState=null; // {fromTi, fromSlot, archer}
+
+function renderTargets(){const grid=document.getElementById('target-grid');if(!targets.length){grid.innerHTML='<div class="empty-state"><div class="empty-icon">🎯</div><p>No targets yet.<br>Add archers then click <strong>AUTO GENERATE FROM ENTRIES</strong>.</p></div>';return;}const allBows=[...new Set(targets.map(t=>t.bow))];let html='';allBows.forEach(bow=>{const group=targets.filter(t=>t.bow===bow);const color=BOW_COLORS[bow]||'#555';const archerCount=group.reduce((n,t)=>n+['A','B','C','D'].filter(s=>t[s]).length,0);const tRange=group.length>1?`T${group[0].num}–T${group[group.length-1].num}`:`T${group[0].num}`;const distLabel=getDistanceLabel(bow,currentDiscipline);html+=`<div style="margin-bottom:24px;"><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px 14px;background:${color}22;border:1px solid ${color}44;border-radius:8px;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:2px;color:${color};">${bow==='Mixed'?'🎯 MIXED':bow==='Trad/Longbow'?'🏹 TRAD / LONGBOW':bow.toUpperCase()}</span>${distLabel?`<span style="font-size:12px;font-weight:700;color:var(--accent);background:rgba(255,215,0,0.15);padding:2px 8px;border-radius:4px;">${distLabel}</span>`:''}<span style="font-size:11px;color:#888;">${archerCount} archers · ${group.length} target${group.length!==1?'s':''} (${tRange})</span></div><div class="target-grid">`;
+group.forEach(t=>{const globalTi=targets.indexOf(t);const slotsHtml=['A','B','C','D'].map(s=>{const archer=t[s];
+const isDraggable=!!archer;
+const slotEl=`<div class="target-slot ${archer?'filled':'empty'}"
+  ${isDraggable?`draggable="true" data-ti="${globalTi}" data-slot="${s}"`:''}
+  data-ti="${globalTi}" data-slot="${s}"
+  onclick="${archer?`openMoveModal('${archer.id}',${globalTi},'${s}')`:`openAssignModal(${globalTi},'${s}')`}"
+  ondragstart="handleDragStart(event,${globalTi},'${s}')"
+  ondragover="handleDragOver(event,${globalTi},'${s}')"
+  ondragleave="handleDragLeave(event)"
+  ondrop="handleDrop(event,${globalTi},'${s}')"
+  ondragend="handleDragEnd(event)">
+  <div class="slot-label">${s}</div>
+  ${archer?`<div class="slot-name" style="cursor:grab;">${archer.name} <span style="font-size:9px;color:var(--accent);">⠿</span></div><div class="slot-cat">${archer.age} · ${archer.gender}</div>`:`<div class="slot-name">Tap to assign</div>`}
+</div>`;return slotEl;}).join('');
+html+=`<div class="target-card"><div class="target-num" style="display:flex;align-items:center;gap:6px;">T${t.num}<button onclick="editTargetNum(${globalTi})" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:12px;padding:2px 4px;border-radius:4px;" title="Change target number">✏️</button></div>${slotsHtml}</div>`;});html+='</div></div>';});grid.innerHTML=html;}
+
+window.handleDragStart=(e,ti,slot)=>{
+  const archer=targets[ti]?.[slot];
+  if(!archer){e.preventDefault();return;}
+  dragState={fromTi:ti,fromSlot:slot,archer};
+  e.dataTransfer.effectAllowed='move';
+  e.dataTransfer.setData('text/plain',`${ti}:${slot}`);
+  setTimeout(()=>e.target.classList.add('dragging'),0);
+};
+
+window.handleDragOver=(e,ti,slot)=>{
+  e.preventDefault();
+  if(!dragState)return;
+  const targetArcher=targets[ti]?.[slot];
+  // Check drag group compatibility
+  const dg=getDragGroup(dragState.archer);
+  const tg=targetArcher?getDragGroup(targetArcher):null;
+  // For empty slots, check if this target's group matches the dragged archer's group
+  // by checking the bow type of the target
+  const targetBow=targets[ti]?.bow;
+  const is3DFieldCustom=currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom';
+  let allowed=false;
+  if(is3DFieldCustom){allowed=true;}
+  else if(currentDiscipline==='Indoor'){allowed=dragState.archer.bow===targetBow||(targetArcher&&getDragGroup(dragState.archer)===getDragGroup(targetArcher));}
+  else{// Outdoor — same drag group
+    if(targetArcher){allowed=dg===tg;}
+    else{// Empty slot — check if any archer in this target shares the same group
+      const sibs=['A','B','C','D'].map(s=>targets[ti]?.[s]).filter(Boolean);
+      if(sibs.length===0)allowed=dg===getDragGroup({bow:targetBow,age:'Senior'});
+      else allowed=sibs.some(a=>getDragGroup(a)===dg);
+    }
+  }
+  if(allowed){e.dataTransfer.dropEffect='move';e.currentTarget.classList.add('drag-over');}
+  else{e.dataTransfer.dropEffect='none';}
+};
+
+window.handleDragLeave=(e)=>{
+  e.currentTarget.classList.remove('drag-over');
+};
+
+window.handleDrop=async(e,toTi,toSlot)=>{
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if(!dragState)return;
+  const{fromTi,fromSlot,archer}=dragState;
+  if(fromTi===toTi&&fromSlot===toSlot){dragState=null;return;}
+  // Validate group
+  const targetArcher=targets[toTi]?.[toSlot];
+  const dg=getDragGroup(archer);
+  const tg=targetArcher?getDragGroup(targetArcher):null;
+  const is3DFieldCustom=currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom';
+  let allowed=false;
+  if(is3DFieldCustom){allowed=true;}
+  else if(currentDiscipline==='Indoor'){
+    const targetBow=targets[toTi]?.bow;
+    allowed=archer.bow===targetBow||(targetArcher&&dg===tg);
+  }else{
+    if(targetArcher){allowed=dg===tg;}
+    else{
+      const sibs=['A','B','C','D'].map(s=>targets[toTi]?.[s]).filter(Boolean);
+      allowed=sibs.length===0||sibs.some(a=>getDragGroup(a)===dg);
+    }
+  }
+  if(!allowed){toast('Cannot move — different group','error');dragState=null;return;}
+  // Perform swap
+  const fromArcher=targets[fromTi][fromSlot];
+  const toArcher=targets[toTi][toSlot];
+  // Update target slots
+  targets[toTi][toSlot]=fromArcher?{...fromArcher}:null;
+  targets[fromTi][fromSlot]=toArcher?{...toArcher}:null;
+  // Update archer records
+  if(fromArcher){const a=archers.find(x=>x.id===fromArcher.id);if(a){a.target=targets[toTi].num;a.slot=toSlot;}}
+  if(toArcher){const a=archers.find(x=>x.id===toArcher.id);if(a){a.target=targets[fromTi].num;a.slot=fromSlot;}}
+  dragState=null;
+  await saveTargets();await saveArchers();
+  renderTargets();renderEntries();
+  toast(toArcher?'Archers swapped ✓':'Archer moved ✓','success');
+};
+
+window.handleDragEnd=(e)=>{
+  e.target.classList.remove('dragging');
+  document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  dragState=null;
+};
 window.openAssignModal=(ti,slot)=>{assignPending={ti,slot};const t=targets[ti];document.getElementById('assign-modal-title').textContent=`Target ${t.num} — Slot ${slot}`;const unassigned=archers.filter(a=>!a.target||(a.target===t.num&&a.slot===slot));document.getElementById('assign-archer-select').innerHTML='<option value="">— Unassign —</option>'+unassigned.map(a=>`<option value="${a.id}" ${t[slot]?.id===a.id?'selected':''}>${a.name} (${a.bow} · ${a.age})</option>`).join('');document.getElementById('btn-remove-slot').style.display=t[slot]?'block':'none';openModal('modal-assign');};
 window.confirmAssign=async()=>{const{ti,slot}=assignPending;const archerId=document.getElementById('assign-archer-select').value;const t=targets[ti];if(t[slot]){const old=archers.find(a=>a.id===t[slot].id);if(old){old.target=null;old.slot=null;}}if(archerId){const archer=archers.find(a=>a.id===archerId);if(archer){if(archer.target){const oldT=targets.find(x=>x.num===archer.target);if(oldT)oldT[archer.slot]=null;}t[slot]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};archer.target=t.num;archer.slot=slot;}}else{t[slot]=null;}await saveTargets();await saveArchers();closeModal('modal-assign');renderTargets();renderEntries();toast(t('assignment_saved'),'success');};
 window.removeFromSlot=async()=>{const{ti,slot}=assignPending;const t=targets[ti];if(t[slot]){const old=archers.find(a=>a.id===t[slot].id);if(old){old.target=null;old.slot=null;}t[slot]=null;}await saveTargets();await saveArchers();closeModal('modal-assign');renderTargets();renderEntries();toast(t('removed_ok'),'success');};
