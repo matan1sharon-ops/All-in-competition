@@ -1118,15 +1118,34 @@ window.handleDragOver=(e,ti,slot)=>{
   if(is3DFieldCustom){
     allowed=true;
   }else if(currentDiscipline==='Indoor'){
-    const targetBow=targets[ti]?.bow;
-    allowed=dragState.archer.bow===targetBow||(!!targetArcher&&dg===getDragGroup(targetArcher));
+    if(targetArcher){
+      allowed=dg===getDragGroup(targetArcher);
+    }else{
+      // Empty slot — check siblings in target or target bow label
+      const sibs=['A','B','C','D'].map(s=>targets[ti]?.[s]).filter(Boolean);
+      if(sibs.length>0){allowed=sibs.some(a=>getDragGroup(a)===dg);}
+      else{
+        // No siblings — check target bow label matches drag group
+        const tb=targets[ti]?.bow;
+        const tradBows=['Traditional','Longbow'];
+        if(tb==='Trad/Longbow')allowed=tradBows.includes(dragState.archer.bow);
+        else allowed=dragState.archer.bow===tb;
+      }
+    }
   }else{
     // Outdoor
     if(targetArcher){
       allowed=dg===getDragGroup(targetArcher);
     }else{
       const sibs=['A','B','C','D'].map(s=>targets[ti]?.[s]).filter(Boolean);
-      allowed=sibs.length===0||sibs.some(a=>getDragGroup(a)===dg);
+      if(sibs.length>0){allowed=sibs.some(a=>getDragGroup(a)===dg);}
+      else{
+        // Empty target — check bow label
+        const tb=targets[ti]?.bow;
+        const tradBows=['Traditional','Longbow'];
+        if(tb==='Trad/Longbow')allowed=tradBows.includes(dragState.archer.bow);
+        else allowed=dragState.archer.bow===tb;
+      }
     }
   }
   if(allowed){e.dataTransfer.dropEffect='move';e.currentTarget.classList.add('drag-over');}
@@ -1149,15 +1168,29 @@ window.handleDrop=async(e,toTi,toSlot)=>{
   const tg=targetArcher?getDragGroup(targetArcher):null;
   const is3DFieldCustom=currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom';
   let allowed=false;
-  if(is3DFieldCustom){allowed=true;}
-  else if(currentDiscipline==='Indoor'){
-    const targetBow=targets[toTi]?.bow;
-    allowed=archer.bow===targetBow||(targetArcher&&dg===tg);
+  if(is3DFieldCustom){
+    allowed=true;
+  }else if(currentDiscipline==='Indoor'){
+    if(targetArcher){allowed=dg===tg;}
+    else{
+      const sibs=['A','B','C','D'].map(s=>targets[toTi]?.[s]).filter(Boolean);
+      if(sibs.length>0){allowed=sibs.some(a=>getDragGroup(a)===dg);}
+      else{
+        const tb=targets[toTi]?.bow;
+        const tradBows=['Traditional','Longbow'];
+        allowed=tb==='Trad/Longbow'?tradBows.includes(archer.bow):archer.bow===tb;
+      }
+    }
   }else{
     if(targetArcher){allowed=dg===tg;}
     else{
       const sibs=['A','B','C','D'].map(s=>targets[toTi]?.[s]).filter(Boolean);
-      allowed=sibs.length===0||sibs.some(a=>getDragGroup(a)===dg);
+      if(sibs.length>0){allowed=sibs.some(a=>getDragGroup(a)===dg);}
+      else{
+        const tb=targets[toTi]?.bow;
+        const tradBows=['Traditional','Longbow'];
+        allowed=tb==='Trad/Longbow'?tradBows.includes(archer.bow):archer.bow===tb;
+      }
     }
   }
   if(!allowed){toast('Cannot move — different group','error');dragState=null;return;}
