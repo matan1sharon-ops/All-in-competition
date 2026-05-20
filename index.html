@@ -191,6 +191,7 @@ tbody td{padding:10px 12px;color:#111;}
           <p style="font-size:13px;color:var(--muted2);margin-bottom:16px;">Targets are generated automatically from the entry list — 4 slots per target (A/B/C/D).</p>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button class="btn btn-primary" onclick="generateTargets()" data-t="auto_generate">⚡ AUTO GENERATE FROM ENTRIES</button>
+            <button class="btn btn-secondary" id="btn-assign-odd" onclick="generateOddTargets()" style="display:none;" data-t="assign_odd">🔢 ASSIGN ODD NUMBERS</button>
             <button class="btn btn-secondary" onclick="clearAssignments()" data-t="clear_all">CLEAR ALL</button>
             <button class="btn btn-secondary" onclick="printStartList()" data-t="print_start">🖨 PRINT START LIST</button>
             <button class="btn btn-secondary" onclick="printFieldOfPlay()" data-t="field_of_play">🏟 FIELD OF PLAY</button>
@@ -336,6 +337,7 @@ T={
     template:'📋 TEMPLATE',
     reg_link:'🔗 REGISTRATION LINK',
     auto_generate:'⚡ AUTO GENERATE FROM ENTRIES',
+    assign_odd:'🔢 ASSIGN ODD NUMBERS',
     clear_all:'CLEAR ALL',
     print_start:'🖨 PRINT START LIST',
     field_of_play:'🏟 FIELD OF PLAY',
@@ -512,6 +514,7 @@ T={
     template:'📋 תבנית',
     reg_link:'🔗 קישור הרשמה',
     auto_generate:'⚡ יצירת קבוצות אוטומטית',
+    assign_odd:'🔢 שיבוץ מספרים אי-זוגיים',
     clear_all:'נקה הכל',
     print_start:'🖨 הדפס רשימת פתיחה',
     field_of_play:'🏟 מגרש תחרות',
@@ -847,6 +850,8 @@ initAdminLang();document.getElementById('comp-select').value=ref.id;selectCompet
 function updateNavForDiscipline(disc){
   const navTs=document.getElementById('nav-targetsetup');
   if(navTs)navTs.style.display=disc==='Custom'?'flex':'none';
+  const btnOdd=document.getElementById('btn-assign-odd');
+  if(btnOdd)btnOdd.style.display=(disc==='3D'||disc==='Field'||disc==='Custom')?'inline-flex':'none';
 }
 
 window.selectCompetition=async(id)=>{if(!id){currentCompId=null;document.getElementById('no-comp-msg').style.display='block';document.getElementById('dash-content').style.display='none';return;}currentCompId=id;const snap=await getDoc(doc(db,'competitions',id));if(!snap.exists())return;const data=snap.data();archers=data.archers||[];targets=data.targets||[];sessions=data.sessions||[];scores=data.scores||{};currentDiscipline=data.discipline||'Outdoor';window._targetConfig=data.targetConfig||[];document.getElementById('no-comp-msg').style.display='none';document.getElementById('dash-content').style.display='block';document.getElementById('conn-status').textContent=t('connected');document.getElementById('btn-delete-comp').style.display='inline-block';document.getElementById('btn-archive-comp').style.display='inline-block';updateNavForDiscipline(currentDiscipline);renderAll();onSnapshot(doc(db,'competitions',id),snap=>{const d=snap.data();scores=d.scores||{};archers=d.archers||[];currentDiscipline=d.discipline||'Outdoor';window._targetConfig=d.targetConfig||[];window._scorecards=d.scorecards||{};updateNavForDiscipline(currentDiscipline);const newElimJson=JSON.stringify(d.elimination||{});const elimChanged=newElimJson!==window._lastElimJson;window._lastElimJson=newElimJson;window._elimData=d.elimination||{};const onElimPanel=document.getElementById('panel-elimination')?.classList.contains('active');if(!onElimPanel){renderResults();renderDashboard();renderScorecards();}else{document.getElementById('d-scored').textContent=archers.filter(a=>(getScore(a.id)?.total||0)>0).length;}if(elimChanged&&onElimPanel){renderElimContent();}});};
@@ -960,7 +965,39 @@ window.importCSV=async()=>{
   else toast('No archers imported — check format','error');
 };
 window.generateTargets=async()=>{if(!currentCompId){toast(t('select_comp_first'),'error');return;}if(!archers.length){toast(t('add_archers_first'),'error');return;}targets=[];archers.forEach(a=>{a.target=null;a.slot=null;});const slots=['A','B','C','D'];let targetNum=1;function assignGroup(group,bowLabel){if(!group.length)return;let cur=null,si=0;group.forEach(archer=>{if(si===0){cur={num:targetNum++,bow:bowLabel,A:null,B:null,C:null,D:null};targets.push(cur);}cur[slots[si]]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};const orig=archers.find(a=>a.id===archer.id);if(orig){orig.target=cur.num;orig.slot=slots[si];}si++;if(si>=4)si=0;});}function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}if(currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom'){assignGroup(shuffle(archers),'Mixed');}else if(currentDiscipline==='Outdoor'){assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['Senior','U21'].includes(a.age))),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['U18','Master 50+','Master 60+'].includes(a.age))),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Compound')),'Compound');assignGroup(shuffle(archers.filter(a=>a.bow==='Barebow')),'Barebow');assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['U14','U12'].includes(a.age))),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Traditional'||a.bow==='Longbow')),'Trad/Longbow');}else if(currentDiscipline==='Indoor'){assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve')),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Compound')),'Compound');assignGroup(shuffle(archers.filter(a=>a.bow==='Barebow')),'Barebow');assignGroup(shuffle(archers.filter(a=>a.bow==='Traditional'||a.bow==='Longbow')),'Trad/Longbow');}await saveTargets();await saveArchers();renderAll();toast(`${targets.length} ${t('targets_generated')}`,'success');};
-window.archiveCompetition=async()=>{if(!currentCompId)return;const snap=await getDoc(doc(db,'competitions',currentCompId));const name=snap.data()?.name||'this competition';if(!confirm(`Archive "${name}"?\n\nIt will move to History and disappear from the active list.`))return;await setDoc(doc(db,'competitions',currentCompId),{archived:true},{merge:true});currentCompId=null;archers=[];targets=[];sessions=[];scores={};document.getElementById('no-comp-msg').style.display='block';document.getElementById('dash-content').style.display='none';document.getElementById('btn-delete-comp').style.display='none';document.getElementById('btn-archive-comp').style.display='none';updateNavForDiscipline('');await loadCompetitions();document.getElementById('comp-select').value='';toast(t('archived_ok'),'success');};
+window.generateOddTargets=async()=>{
+  if(!currentCompId){toast(t('select_comp_first'),'error');return;}
+  if(!archers.length){toast(t('add_archers_first'),'error');return;}
+  targets=[];archers.forEach(a=>{a.target=null;a.slot=null;});
+  const slots=['A','B','C','D'];
+  // Build odd numbers first (1,3,5...), then even (2,4,6...)
+  const maxTargets=Math.ceil(archers.length/4);
+  const oddNums=[],evenNums=[];
+  for(let i=1;i<=maxTargets*2;i++){if(i%2!==0)oddNums.push(i);else evenNums.push(i);}
+  const allNums=[...oddNums,...evenNums];
+  let numIdx=0;
+  function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+  function assignGroup(group){
+    if(!group.length)return;
+    let cur=null,si=0;
+    group.forEach(archer=>{
+      if(si===0){
+        const num=allNums[numIdx++];
+        cur={num,bow:'Mixed',A:null,B:null,C:null,D:null};
+        targets.push(cur);
+      }
+      cur[slots[si]]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};
+      const orig=archers.find(a=>a.id===archer.id);
+      if(orig){orig.target=cur.num;orig.slot=slots[si];}
+      si++;if(si>=4)si=0;
+    });
+  }
+  assignGroup(shuffle(archers));
+  // Sort targets by num for display
+  targets.sort((a,b)=>a.num-b.num);
+  await saveTargets();await saveArchers();renderAll();
+  toast(`${targets.length} ${t('targets_generated')}`,'success');
+};if(!currentCompId)return;const snap=await getDoc(doc(db,'competitions',currentCompId));const name=snap.data()?.name||'this competition';if(!confirm(`Archive "${name}"?\n\nIt will move to History and disappear from the active list.`))return;await setDoc(doc(db,'competitions',currentCompId),{archived:true},{merge:true});currentCompId=null;archers=[];targets=[];sessions=[];scores={};document.getElementById('no-comp-msg').style.display='block';document.getElementById('dash-content').style.display='none';document.getElementById('btn-delete-comp').style.display='none';document.getElementById('btn-archive-comp').style.display='none';updateNavForDiscipline('');await loadCompetitions();document.getElementById('comp-select').value='';toast(t('archived_ok'),'success');};
 window.deleteCompetition=async()=>{if(!currentCompId)return;const snap=await getDoc(doc(db,'competitions',currentCompId));const name=snap.data()?.name||'this competition';if(!confirm(`DELETE "${name}"?\n\nThis cannot be undone.`))return;const{deleteDoc}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");await deleteDoc(doc(db,'competitions',currentCompId));currentCompId=null;archers=[];targets=[];sessions=[];scores={};document.getElementById('no-comp-msg').style.display='block';document.getElementById('dash-content').style.display='none';document.getElementById('btn-delete-comp').style.display='none';document.getElementById('btn-archive-comp').style.display='none';updateNavForDiscipline('');await loadCompetitions();document.getElementById('comp-select').value='';toast(t('deleted_ok'),'success');};
 window.clearAssignments=async()=>{if(!confirm('Clear all target assignments?'))return;targets=[];archers.forEach(a=>{a.target=null;a.slot=null;});await saveTargets();await saveArchers();renderAll();toast(t('clear_all')+' ✓','success');};
 function renderTargets(){const grid=document.getElementById('target-grid');if(!targets.length){grid.innerHTML='<div class="empty-state"><div class="empty-icon">🎯</div><p>No targets yet.<br>Add archers then click <strong>AUTO GENERATE FROM ENTRIES</strong>.</p></div>';return;}const allBows=[...new Set(targets.map(t=>t.bow))];let html='';allBows.forEach(bow=>{const group=targets.filter(t=>t.bow===bow);const color=BOW_COLORS[bow]||'#555';const archerCount=group.reduce((n,t)=>n+['A','B','C','D'].filter(s=>t[s]).length,0);const tRange=group.length>1?`T${group[0].num}–T${group[group.length-1].num}`:`T${group[0].num}`;const distLabel=getDistanceLabel(bow,currentDiscipline);html+=`<div style="margin-bottom:24px;"><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px 14px;background:${color}22;border:1px solid ${color}44;border-radius:8px;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:2px;color:${color};">${bow==='Mixed'?'🎯 MIXED':bow==='Trad/Longbow'?'🏹 TRAD / LONGBOW':bow.toUpperCase()}</span>${distLabel?`<span style="font-size:12px;font-weight:700;color:var(--accent);background:rgba(255,215,0,0.15);padding:2px 8px;border-radius:4px;">${distLabel}</span>`:''}<span style="font-size:11px;color:#888;">${archerCount} archers · ${group.length} target${group.length!==1?'s':''} (${tRange})</span></div><div class="target-grid">`;group.forEach(t=>{const globalTi=targets.indexOf(t);const slotsHtml=['A','B','C','D'].map(s=>{const archer=t[s];return`<div class="target-slot ${archer?'filled':'empty'}" onclick="${archer?`openMoveModal('${archer.id}',${globalTi},'${s}')`:`openAssignModal(${globalTi},'${s}')`}"><div class="slot-label">${s}</div>${archer?`<div class="slot-name" style="cursor:pointer;">${archer.name} <span style="font-size:9px;color:var(--accent);">✦ MOVE</span></div><div class="slot-cat">${archer.age} · ${archer.gender}</div>`:`<div class="slot-name">Tap to assign</div>`}</div>`;}).join('');html+=`<div class="target-card"><div class="target-num">T${t.num}</div>${slotsHtml}</div>`;});html+='</div></div>';});grid.innerHTML=html;}
@@ -1317,7 +1354,7 @@ window.printBlankScorecards=()=>{
   } else if(disc==='3D'||disc==='Field'){
     const arrows=disc==='3D'?2:3;
     const stations=24;
-    // Group archers 2 per page
+    // Group archers 4 per page
     const allArchers=[];
     targets.forEach(t=>['A','B','C','D'].forEach(s=>{if(t[s])allArchers.push({...t[s],targetNum:t.num,slot:s});}));
     for(let i=0;i<allArchers.length;i+=4){
@@ -1399,13 +1436,19 @@ window.printBlankScorecards=()=>{
 
   function build3DFieldBlock(archer,stations,arrows,disc){
     const scoring=disc==='3D'?'11/10/8/5/0':'6/5/4/3/2/1/0';
-    let rows='';
-    for(let i=1;i<=stations;i++){
-      const bg=i%2===0?'':'background:#fafafa;';
-      const borderBot=(i%6===0)?'border-bottom:1.5px solid #999;':'';
-      const arrowCells=Array.from({length:arrows},()=>`<td class="arr-cell" style="${bg}"></td>`).join('');
-      rows+=`<tr style="${borderBot}"><td class="stn-lbl">${i}</td>${arrowCells}<td class="stn-end"></td><td class="stn-run"></td></tr>`;
+    // Build station order starting from archer's target, wrapping around
+    const startNum=archer.targetNum||1;
+    const stationOrder=[];
+    for(let i=0;i<stations;i++){
+      stationOrder.push(((startNum-1+i)%stations)+1);
     }
+    let rows='';
+    stationOrder.forEach((stn,idx)=>{
+      const bg=idx%2===0?'':'background:#fafafa;';
+      const borderBot=((idx+1)%6===0)?'border-bottom:1.5px solid #999;':'';
+      const arrowCells=Array.from({length:arrows},()=>`<td class="arr-cell" style="${bg}"></td>`).join('');
+      rows+=`<tr style="${borderBot}"><td class="stn-lbl">${stn}</td>${arrowCells}<td class="stn-end"></td><td class="stn-run"></td></tr>`;
+    });
     const arrHeaders=Array.from({length:arrows},(_,i)=>`<th>A${i+1}</th>`).join('');
     return`<div class="archer-block">
       <div class="archer-name-bar">
@@ -1428,18 +1471,26 @@ window.printBlankScorecards=()=>{
   }
 
   function buildCustomBlock(archer,config){
+    // Build target order starting from archer's target, wrapping around
+    const startNum=archer.targetNum||1;
+    const totalTargets=config.length;
+    const targetOrder=[];
+    for(let i=0;i<totalTargets;i++){
+      targetOrder.push((startNum-1+i)%totalTargets);// 0-based index into config
+    }
     let rows='';
-    config.forEach((tc,i)=>{
+    targetOrder.forEach((cfgIdx,orderIdx)=>{
+      const tc=config[cfgIdx]||{type:'Field',arrows:3,kill:10,body:5,miss:0};
       const arrows=tc.arrows||3;
       const typeColor=tc.type==='Kill'?'#c62828':tc.type==='3D'?'#4a148c':'#1565c0';
       const typeShort=tc.type==='Kill'?`K(${tc.kill}/${tc.body}/${tc.miss})`:tc.type==='3D'?'3D':'Fld';
-      const bg=(i%2===0)?'':'background:#fafafa;';
-      const borderBot=(i+1)%6===0?'border-bottom:1.5px solid #999;':'';
+      const bg=(orderIdx%2===0)?'':'background:#fafafa;';
+      const borderBot=((orderIdx+1)%6===0)?'border-bottom:1.5px solid #999;':'';
       const arrCells=Array.from({length:3},(_,ai)=>
         ai<arrows?`<td class="arr-cell" style="${bg}"></td>`:`<td style="background-image:repeating-linear-gradient(135deg,transparent,transparent 3px,#e0e0e0 3px,#e0e0e0 4px);"></td>`
       ).join('');
       rows+=`<tr style="${borderBot}">
-        <td class="stn-lbl">T${i+1}</td>
+        <td class="stn-lbl">T${cfgIdx+1}</td>
         <td style="font-size:8px;font-weight:700;color:${typeColor};width:28px;">${typeShort}</td>
         ${arrCells}
         <td class="stn-end"></td><td class="stn-run"></td>
