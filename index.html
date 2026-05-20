@@ -1086,10 +1086,10 @@ function renderTargets(){const grid=document.getElementById('target-grid');if(!t
 group.forEach(t=>{const globalTi=targets.indexOf(t);const slotsHtml=['A','B','C','D'].map(s=>{const archer=t[s];
 const isDraggable=!!archer;
 const slotEl=`<div class="target-slot ${archer?'filled':'empty'}"
-  ${isDraggable?`draggable="true" data-ti="${globalTi}" data-slot="${s}"`:''}
+  ${isDraggable?`draggable="true"`:''}
   data-ti="${globalTi}" data-slot="${s}"
   onclick="${archer?`openMoveModal('${archer.id}',${globalTi},'${s}')`:`openAssignModal(${globalTi},'${s}')`}"
-  ondragstart="handleDragStart(event,${globalTi},'${s}')"
+  ondragstart="${isDraggable?`handleDragStart(event,${globalTi},'${s}')`:''}"
   ondragover="handleDragOver(event,${globalTi},'${s}')"
   ondragleave="handleDragLeave(event)"
   ondrop="handleDrop(event,${globalTi},'${s}')"
@@ -1112,22 +1112,21 @@ window.handleDragOver=(e,ti,slot)=>{
   e.preventDefault();
   if(!dragState)return;
   const targetArcher=targets[ti]?.[slot];
-  // Check drag group compatibility
   const dg=getDragGroup(dragState.archer);
-  const tg=targetArcher?getDragGroup(targetArcher):null;
-  // For empty slots, check if this target's group matches the dragged archer's group
-  // by checking the bow type of the target
-  const targetBow=targets[ti]?.bow;
   const is3DFieldCustom=currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom';
   let allowed=false;
-  if(is3DFieldCustom){allowed=true;}
-  else if(currentDiscipline==='Indoor'){allowed=dragState.archer.bow===targetBow||(targetArcher&&getDragGroup(dragState.archer)===getDragGroup(targetArcher));}
-  else{// Outdoor — same drag group
-    if(targetArcher){allowed=dg===tg;}
-    else{// Empty slot — check if any archer in this target shares the same group
+  if(is3DFieldCustom){
+    allowed=true;
+  }else if(currentDiscipline==='Indoor'){
+    const targetBow=targets[ti]?.bow;
+    allowed=dragState.archer.bow===targetBow||(!!targetArcher&&dg===getDragGroup(targetArcher));
+  }else{
+    // Outdoor
+    if(targetArcher){
+      allowed=dg===getDragGroup(targetArcher);
+    }else{
       const sibs=['A','B','C','D'].map(s=>targets[ti]?.[s]).filter(Boolean);
-      if(sibs.length===0)allowed=dg===getDragGroup({bow:targetBow,age:'Senior'});
-      else allowed=sibs.some(a=>getDragGroup(a)===dg);
+      allowed=sibs.length===0||sibs.some(a=>getDragGroup(a)===dg);
     }
   }
   if(allowed){e.dataTransfer.dropEffect='move';e.currentTarget.classList.add('drag-over');}
