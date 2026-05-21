@@ -1,6 +1,6 @@
 {
   "name": "ALL IN Scoring",
-  "short_name": "ALL IN",
+  "short_name": "All In Scoring",
   "description": "ALL IN Archery Competition Scoring App",
   "start_url": "/All-in-competition/scoring.html",
   "display": "standalone",
