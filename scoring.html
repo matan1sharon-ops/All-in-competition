@@ -14,17 +14,14 @@
 :root{--bg:#111;--surface:#1e1e1e;--surface2:#2a2a2a;--border:#333;--accent:#FFD700;--red:#e53935;--green:#43a047;--blue:#1e88e5;--text:#f0f0f0;--muted:#888;--radius:12px;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);height:100dvh;overflow:hidden;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);}
-/* ── MAIN MENU ── */
 #main-menu{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
 .menu-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 24px;width:100%;max-width:360px;}
 .menu-logo{font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:900;letter-spacing:6px;color:var(--accent);text-align:center;margin-bottom:4px;}
 .menu-sub{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:32px;}
-.menu-btn{width:100%;padding:18px 16px;border:none;border-radius:var(--radius);font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:20px;letter-spacing:1px;cursor:pointer;margin-bottom:12px;display:flex;align-items:center;gap:14px;transition:filter 0.15s,transform 0.1s;}
+.menu-btn{width:100%;padding:18px 16px;border:none;border-radius:var(--radius);font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:20px;cursor:pointer;margin-bottom:12px;display:flex;align-items:center;gap:14px;transition:filter 0.15s,transform 0.1s;}
 .menu-btn:active{transform:scale(0.97);}
-.menu-btn:last-child{margin-bottom:0;}
 .menu-btn-score{background:var(--accent);color:#000;}
-.menu-btn-results{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
-.menu-btn-history{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+.menu-btn-results,.menu-btn-history{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
 .menu-btn-icon{font-size:24px;flex-shrink:0;}
 .menu-btn-text{display:flex;flex-direction:column;align-items:flex-start;}
 .menu-btn-label{font-size:20px;font-weight:900;letter-spacing:1px;}
@@ -32,18 +29,15 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 .menu-lang{display:flex;justify-content:center;gap:8px;margin-bottom:24px;}
 .menu-lang-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:5px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Barlow Condensed',sans-serif;}
 .menu-lang-btn.active{background:var(--accent);color:#000;border-color:var(--accent);}
-/* Results dropdown in menu */
 #results-dropdown{display:none;margin-top:8px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;width:100%;}
 #results-dropdown select{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:15px;outline:none;margin-bottom:10px;}
 #results-dropdown .go-btn{width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:16px;cursor:pointer;}
-/* Install banner */
 #install-banner{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:12px 16px;z-index:100;align-items:center;gap:12px;}
 #install-banner.show{display:flex;}
 .install-text{flex:1;font-size:13px;color:var(--text);}
 .install-text strong{color:var(--accent);}
 .install-btn{background:var(--accent);color:#000;border:none;padding:8px 16px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:14px;cursor:pointer;white-space:nowrap;}
 .install-dismiss{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px;}
-/* ── LOGIN ── */
 .lang-toggle-login{display:flex;justify-content:center;gap:8px;margin-bottom:16px;}
 .lang-btn-login{background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:5px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Barlow Condensed',sans-serif;}
 .lang-btn-login.active{background:var(--accent);color:#000;border-color:var(--accent);}
@@ -163,28 +157,28 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
     <div class="menu-sub">Archery Competition</div>
     <div class="menu-lang">
       <button class="menu-lang-btn active" id="menu-lang-en" onclick="setLang('en')">EN</button>
-      <button class="menu-lang-btn" id="menu-lang-he" onclick="setLang('he')">עברית</button>
+      <button class="menu-lang-btn" id="menu-lang-he" onclick="setLang('he')">\u05e2\u05d1\u05e8\u05d9\u05ea</button>
     </div>
     <button class="menu-btn menu-btn-score" onclick="goToScoring()">
-      <span class="menu-btn-icon">📱</span>
+      <span class="menu-btn-icon">\U0001f4f1</span>
       <span class="menu-btn-text">
         <span class="menu-btn-label" id="menu-lbl-score">SCORE YOUR ROUND</span>
         <span class="menu-btn-sub" id="menu-sub-score">Enter scores for your target</span>
       </span>
     </button>
     <button class="menu-btn menu-btn-results" onclick="toggleResultsDropdown()">
-      <span class="menu-btn-icon">🏆</span>
+      <span class="menu-btn-icon">\U0001f3c6</span>
       <span class="menu-btn-text">
         <span class="menu-btn-label" id="menu-lbl-results">LIVE RESULTS</span>
         <span class="menu-btn-sub" id="menu-sub-results">View today's competition results</span>
       </span>
     </button>
     <div id="results-dropdown">
-      <select id="results-comp-select"><option value="">Loading competitions...</option></select>
-      <button class="go-btn" onclick="openResults()">VIEW RESULTS →</button>
+      <select id="results-comp-select"><option value="">Loading...</option></select>
+      <button class="go-btn" onclick="openResults()">VIEW RESULTS \u2192</button>
     </div>
     <button class="menu-btn menu-btn-history" onclick="openHistory()">
-      <span class="menu-btn-icon">📚</span>
+      <span class="menu-btn-icon">\U0001f4da</span>
       <span class="menu-btn-text">
         <span class="menu-btn-label" id="menu-lbl-history">HISTORY</span>
         <span class="menu-btn-sub" id="menu-sub-history">Past competition results</span>
@@ -195,34 +189,34 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 
 <!-- INSTALL BANNER -->
 <div id="install-banner">
-  <span class="install-text">📲 <strong>Install ALL IN</strong> for faster access on your home screen</span>
-  <button class="install-btn" id="install-btn" onclick="installApp()">INSTALL</button>
-  <button class="install-dismiss" onclick="dismissInstall()">✕</button>
+  <span class="install-text">\U0001f4f2 <strong>Install ALL IN</strong> for faster access on your home screen</span>
+  <button class="install-btn" onclick="installApp()">INSTALL</button>
+  <button class="install-dismiss" onclick="dismissInstall()">\u2715</button>
 </div>
 
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo">ALL IN</div>
-    <div class="login-sub" id="login-sub-text">Scoring</div>
+    <div class="login-sub">Scoring</div>
     <div class="lang-toggle-login">
       <button class="lang-btn-login active" id="lang-en" onclick="setLang('en')">EN</button>
-      <button class="lang-btn-login" id="lang-he" onclick="setLang('he')">עברית</button>
+      <button class="lang-btn-login" id="lang-he" onclick="setLang('he')">\u05e2\u05d1\u05e8\u05d9\u05ea</button>
     </div>
     <div id="login-step-1">
       <div class="error-msg" id="error-msg"></div>
       <label class="login-label" data-t="competition">Competition</label>
-      <select id="comp-select" class="login-select"><option value="">— Select Competition —</option></select>
+      <select id="comp-select" class="login-select"><option value="">\u2014 Select Competition \u2014</option></select>
       <label class="login-label" data-t="your_name">Your Name</label>
-      <select id="archer-select" class="login-select"><option value="">— Select competition first —</option></select>
-      <button class="login-btn" onclick="checkPhase()" data-t="continue">CONTINUE →</button>
-      <button class="login-back" onclick="goToMainMenu()" style="margin-top:12px;">← BACK TO MENU</button>
+      <select id="archer-select" class="login-select"><option value="">\u2014 Select competition first \u2014</option></select>
+      <button class="login-btn" onclick="checkPhase()" data-t="continue">CONTINUE \u2192</button>
+      <button class="login-back" onclick="goToMainMenu()" style="margin-top:12px;">\u2190 BACK TO MENU</button>
     </div>
     <div id="login-step-qual" style="display:none;">
       <div style="background:#b71c1c22;border:1px solid var(--red);color:var(--red);padding:14px;border-radius:8px;margin-bottom:16px;font-size:13px;text-align:center;">
-        <span data-t="no_target">⚠️ You have no target assigned yet.<br>Please ask the admin to assign your target.</span>
+        <span data-t="no_target">\u26a0\ufe0f You have no target assigned yet.<br>Please ask the admin to assign your target.</span>
       </div>
-      <button class="login-back" onclick="backToStep1()" data-t="back">← BACK</button>
+      <button class="login-back" onclick="backToStep1()" data-t="back">\u2190 BACK</button>
     </div>
     <div id="login-step-match" style="display:none;">
       <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px;">
@@ -230,14 +224,14 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--accent);" id="match-confirm-label"></div>
         <div style="font-size:13px;margin-top:6px;" id="match-confirm-vs"></div>
       </div>
-      <button class="login-btn" onclick="startMatch()" data-t="start_match">START MATCH →</button>
-      <button class="login-back" onclick="backToStep1()">← BACK</button>
+      <button class="login-btn" onclick="startMatch()" data-t="start_match">START MATCH \u2192</button>
+      <button class="login-back" onclick="backToStep1()">\u2190 BACK</button>
     </div>
     <div id="login-step-2" style="display:none;">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;"><span data-t="confirm_archers">Confirm Archers on this Target</span></div>
       <div class="confirm-card" id="confirm-archers"></div>
-      <button class="login-btn" onclick="startScoring()" data-t="start_scoring">START SCORING →</button>
-      <button class="login-back" onclick="backToStep1()">← BACK</button>
+      <button class="login-btn" onclick="startScoring()" data-t="start_scoring">START SCORING \u2192</button>
+      <button class="login-back" onclick="backToStep1()">\u2190 BACK</button>
     </div>
   </div>
 </div>
@@ -246,27 +240,12 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 <div id="scoring-screen">
   <div class="score-header">
     <div class="score-header-top">
-      <div>
-        <div class="comp-name" id="s-comp-name"></div>
-        <div class="target-label" id="s-target-label"></div>
-      </div>
+      <div><div class="comp-name" id="s-comp-name"></div><div class="target-label" id="s-target-label"></div></div>
       <div style="display:flex;gap:12px;align-items:flex-end;">
-        <div style="text-align:right;" id="s-g1-wrap">
-          <div style="font-size:11px;color:var(--muted);" id="s-g1-label">X</div>
-          <div id="s-g1" style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--accent);">0</div>
-        </div>
-        <div style="text-align:right;" id="s-g2-wrap">
-          <div style="font-size:11px;color:var(--muted);" id="s-g2-label">10</div>
-          <div id="s-g2" style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--accent);">0</div>
-        </div>
-        <div style="text-align:right;" id="s-g3-wrap" style="display:none;">
-          <div style="font-size:11px;color:var(--muted);">6s</div>
-          <div id="s-g3" style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--accent);">0</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:11px;color:var(--muted);">TOTAL</div>
-          <div id="s-grand-total" style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:var(--accent);">0</div>
-        </div>
+        <div style="text-align:right;" id="s-g1-wrap"><div style="font-size:11px;color:var(--muted);" id="s-g1-label">X</div><div id="s-g1" style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--accent);">0</div></div>
+        <div style="text-align:right;" id="s-g2-wrap"><div style="font-size:11px;color:var(--muted);" id="s-g2-label">10</div><div id="s-g2" style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--accent);">0</div></div>
+        <div style="text-align:right;" id="s-g3-wrap" style="display:none;"><div style="font-size:11px;color:var(--muted);">6s</div><div id="s-g3" style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--accent);">0</div></div>
+        <div style="text-align:right;"><div style="font-size:11px;color:var(--muted);">TOTAL</div><div id="s-grand-total" style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:var(--accent);">0</div></div>
       </div>
     </div>
     <div class="progress-bar-wrap"><div class="progress-bar" id="s-progress"></div></div>
@@ -275,7 +254,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
   <div id="score-list"></div>
   <div class="score-footer">
     <div class="current-archer-bar">
-      <div><div class="current-end-label" id="s-end-label">TARGET 1</div><div class="current-archer-name" id="s-archer-name">—</div></div>
+      <div><div class="current-end-label" id="s-end-label">TARGET 1</div><div class="current-archer-name" id="s-archer-name">&#8212;</div></div>
       <div class="current-archer-slot" id="s-archer-slot">A</div>
     </div>
     <div class="pad" id="score-pad"></div>
@@ -285,22 +264,19 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 <!-- MATCH SCORING -->
 <div id="match-screen">
   <div class="match-header">
-    <div class="match-header-top">
-      <div class="comp-name" id="m-comp-name"></div>
-      <div class="match-label" id="m-match-label">SEMI FINAL</div>
-    </div>
+    <div class="match-header-top"><div class="comp-name" id="m-comp-name"></div><div class="match-label" id="m-match-label">SEMI FINAL</div></div>
     <div style="font-size:11px;color:var(--muted)" id="m-format-label"></div>
   </div>
   <div id="match-archer-tabs" style="display:flex;gap:4px;padding:8px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;"></div>
   <div class="sp-bar">
     <div style="text-align:center;"><div class="sp-label" id="sp-a1-label">A1</div><div class="sp-val" id="sp-a1">0</div></div>
-    <div class="sp-sep">—</div>
+    <div class="sp-sep">&#8212;</div>
     <div style="text-align:center;"><div class="sp-label" id="sp-a2-label">A2</div><div class="sp-val" id="sp-a2">0</div></div>
   </div>
   <div id="sets-list"></div>
   <div class="score-footer">
     <div class="current-archer-bar">
-      <div><div class="current-end-label" id="m-set-label">SET 1</div><div class="current-archer-name" id="m-archer-name">—</div></div>
+      <div><div class="current-end-label" id="m-set-label">SET 1</div><div class="current-archer-name" id="m-archer-name">&#8212;</div></div>
       <div class="current-archer-slot" id="m-arrow-count">0/3</div>
     </div>
     <div class="pad" id="match-pad"></div>
@@ -312,7 +288,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
   <div class="summary-header">
     <div class="summary-title" id="sum-title">Complete</div>
     <div style="display:flex;gap:6px;">
-      <button style="background:var(--accent);border:none;color:#000;padding:8px 14px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:13px;cursor:pointer;" onclick="goBackToScoring()">← BACK</button>
+      <button style="background:var(--accent);border:none;color:#000;padding:8px 14px;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:13px;cursor:pointer;" onclick="goBackToScoring()">&#8592; BACK</button>
     </div>
   </div>
   <div id="summary-archer-tabs" style="display:flex;gap:4px;padding:6px 8px;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;"></div>
@@ -324,35 +300,23 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import{getFirestore,collection,doc,getDoc,getDocs,setDoc}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
 const firebaseConfig={apiKey:"AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To",authDomain:"all-in-competition.firebaseapp.com",projectId:"all-in-competition",storageBucket:"all-in-competition.firebasestorage.app",messagingSenderId:"620146958631",appId:"1:620146958631:web:1e88019d1436372689c902"};
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
-
-/* ── SHARED STATE ── */
 let compId=null,compData=null,selectedArcherId=null,discipline='Outdoor';
 let targetConfig=[];
-
-/* ── QUALIFICATION STATE ── */
 let targetNum=null,targetArchers=[],activeArcherIdx=0,editingEnd=null;
 let scores={};
-
-/* ── MATCH STATE ── */
 let matchCatKey=null,matchRoundKey=null,matchIdx=null,matchData=null;
 let matchFormat='sets',matchActiveArcher=0;
 let matchSets=[],cumArrows1=[],cumArrows2=[],cumTB1=null,cumTB2=null;
 const MAX_SETS=5,SETS_TO_WIN=6;
 function getCumEnds(){return(discipline==='3D'||discipline==='Field'||discipline==='Custom')?4:5;}
 function getArrowsPerSet(){return discipline==='3D'?2:3;}
-
-/* ── CUSTOM HELPERS ── */
 function getCustomTargetConfig(endIdx){return targetConfig[endIdx]||{type:'Field',arrows:3,kill:10,body:5,miss:0};}
 function getCustomArrowsForEnd(endIdx){if(discipline!=='Custom')return getConfig().arrows;return getCustomTargetConfig(endIdx).arrows||3;}
 function getTotalCustomEnds(){return targetConfig.length||24;}
-
-/* ── HELPERS ── */
 function getVal(s){return s==='X'?10:(parseInt(s)||0);}
-
 function chipClass(s,endIdx){
   if(discipline==='Custom'){const tc=getCustomTargetConfig(endIdx||0);if(tc.type==='Kill'){if(s==='Kill'||s===tc.kill)return'chip-kill';if(s==='Body'||s===tc.body)return'chip-body';return'chip-miss';}if(tc.type==='3D'){if(s===11)return'chip-gold';if(s===10)return'chip-red';if(s===8)return'chip-blue';if(s===5)return'chip-black';return'chip-miss';}if(s===6||s===5)return'chip-gold';if(s===4||s===3||s===2||s===1)return'chip-black';return'chip-miss';}
   if(discipline==='Field'){if(s===6||s===5)return'chip-gold';if(s===4||s===3||s===2||s===1)return'chip-black';return'chip-miss';}
@@ -365,237 +329,92 @@ function padBtnClass(s){
   if(discipline==='3D'){if(s===11)return'pad-gold';if(s===10)return'pad-red';if(s===8)return'pad-blue';if(s===5)return'pad-black';return'pad-miss';}
   if(s==='X'||s===10||s===9||s===11)return'pad-gold';if(s===8||s===7)return'pad-red';if(s===6||s===5)return'pad-blue';if(s===4||s===3)return'pad-black';if(s===2||s===1)return'pad-white';return'pad-miss';
 }
-function getConfig(){
-  if(discipline==='3D')return{arrows:2,ends:24,label:'Station'};
-  if(discipline==='Field')return{arrows:3,ends:24,label:'Target'};
-  if(discipline==='Indoor')return{arrows:3,ends:20,label:'End'};
-  if(discipline==='Custom')return{arrows:3,ends:getTotalCustomEnds(),label:'Target'};
-  return{arrows:6,ends:12,label:'End'};
-}
-function getPadScores(endIdx){
-  if(discipline==='Custom'){const tc=getCustomTargetConfig(endIdx);if(tc.type==='Kill')return['Kill','Body','Miss'];if(tc.type==='3D')return[11,10,8,5,0];return[6,5,4,3,2,1,0];}
-  if(discipline==='3D')return[11,10,8,5,0];if(discipline==='Field')return[6,5,4,3,2,1,0];if(discipline==='Indoor')return[10,9,8,7,6,5,4,3,2,1,0];return['X',10,9,8,7,6,5,4,3,2,1,0];
-}
+function getConfig(){if(discipline==='3D')return{arrows:2,ends:24,label:'Station'};if(discipline==='Field')return{arrows:3,ends:24,label:'Target'};if(discipline==='Indoor')return{arrows:3,ends:20,label:'End'};if(discipline==='Custom')return{arrows:3,ends:getTotalCustomEnds(),label:'Target'};return{arrows:6,ends:12,label:'End'};}
+function getPadScores(endIdx){if(discipline==='Custom'){const tc=getCustomTargetConfig(endIdx);if(tc.type==='Kill')return['Kill','Body','Miss'];if(tc.type==='3D')return[11,10,8,5,0];return[6,5,4,3,2,1,0];}if(discipline==='3D')return[11,10,8,5,0];if(discipline==='Field')return[6,5,4,3,2,1,0];if(discipline==='Indoor')return[10,9,8,7,6,5,4,3,2,1,0];return['X',10,9,8,7,6,5,4,3,2,1,0];}
 function scoreToValue(s,endIdx){if(discipline==='Custom'){const tc=getCustomTargetConfig(endIdx);if(s==='Kill')return tc.kill;if(s==='Body')return tc.body;if(s==='Miss')return tc.miss;}return s;}
 function valueToLabel(v,endIdx){if(discipline==='Custom'){const tc=getCustomTargetConfig(endIdx);if(tc.type==='Kill'){if(v===tc.kill)return'Kill';if(v===tc.body)return'Body';return'Miss';}}return v;}
 function showError(msg){const el=document.getElementById('error-msg');el.textContent=msg;el.style.display='block';}
 function toast(msg,type='success'){const el=document.getElementById('toast');el.textContent=msg;el.className=`show ${type}`;setTimeout(()=>el.classList.remove('show'),2500);}
-
-/* ── LANGUAGE ── */
 let currentLang='en';
-let T={};
 window.t=function(key){return T[currentLang]?.[key]||T['en']?.[key]||key;};
 function t(key){return window.t(key);}
-T={en:{competition:'Competition',your_name:'Your Name',loading:'Loading...',select_comp_first:'— Select competition first —',select_name:'— Select your name —',continue:'CONTINUE →',back:'← BACK',no_target:'⚠️ You have no target assigned yet.\nPlease ask the admin to assign your target.',active_match:'ACTIVE MATCH FOUND',start_match:'START MATCH →',confirm_archers:'Confirm Archers on this Target',start_scoring:'START SCORING →',target:'TARGET',end:'END',editing:'EDITING',active:'ACTIVE',half_total:'HALF TOTAL',total:'TOTAL',backspace:'BACKSPACE ←',done_editing:'DONE EDITING ✓',view_summary:'VIEW SUMMARY 🏆',set:'SET',submit_match:'SUBMIT MATCH ✓',match_complete:'Match Complete',match_result:'MATCH RESULT',winner:'Winner',set_system:'Set System · First to 6 pts',cumulative:'Cumulative · 15 arrows',station:'STATION',half1_outdoor:'1st HALF (Ends 1–6)',half2_outdoor:'2nd HALF (Ends 7–12)',half1_indoor:'1st HALF (Ends 1–10)',half2_indoor:'2nd HALF (Ends 11–20)',running:'Running',score_saved:'Scores saved ✓',save_failed:'Save failed',no_competitions:'No competitions found',select_competition:'— Select Competition —',complete:'Complete',kills:'Kills',elevens:'11s',sixes:'6s',closest_center:'TIED — WHO IS CLOSEST TO CENTER?',closer_center:'CLOSER TO CENTER?',select_closest:'SELECT CLOSEST TO CENTER ↑',bye:'BYE ✓',tbd:'TBD',field_lbl:'🌄 Field',threed_lbl:'🦌 3D',kill_lbl:'🎯 Kill',arrows:'arrows',menu_score:'SCORE YOUR ROUND',menu_score_sub:'Enter scores for your target',menu_results:'LIVE RESULTS',menu_results_sub:"View today's competition results",menu_history:'HISTORY',menu_history_sub:'Past competition results',select_results_comp:'— Select competition —',no_active_comps:'No active competitions today',},
-he:{competition:'תחרות',your_name:'שמך',loading:'טוען...',select_comp_first:'— בחר תחרות תחילה —',select_name:'— בחר את שמך —',continue:'המשך →',back:'← חזרה',no_target:'⚠️ אין לך מטרה מוקצית.\nבקש מהמנהל להקצות לך מטרה.',active_match:'נמצאה מקצה פעילה',start_match:'התחל מקצה →',confirm_archers:'אשר קשתים במטרה זו',start_scoring:'התחל ניקוד →',target:'מטרה',end:'סבב',editing:'עריכה',active:'פעיל',half_total:'סה״כ מחצית',total:'סה״כ',backspace:'מחק ←',done_editing:'סיום עריכה ✓',view_summary:'צפה בסיכום 🏆',set:'סט',submit_match:'שלח תוצאת מקצה ✓',match_complete:'המקצה הסתיים',match_result:'תוצאת המקצה',winner:'מנצח',set_system:'שיטת סטים · ראשון ל-6 נקודות',cumulative:'צבירה · 15 חצים',station:'תחנה',half1_outdoor:'מחצית 1 (סבבים 1–6)',half2_outdoor:'מחצית 2 (סבבים 7–12)',half1_indoor:'מחצית 1 (סבבים 1–10)',half2_indoor:'מחצית 2 (סבבים 11–20)',running:'מצטבר',score_saved:'ניקוד נשמר ✓',save_failed:'שמירה נכשלה',no_competitions:'לא נמצאו תחרויות',select_competition:'— בחר תחרות —',complete:'הושלם',kills:'קטלניות',elevens:'11',sixes:'6',closest_center:'שוויון — מי קרוב יותר למרכז?',closer_center:'קרוב יותר למרכז?',select_closest:'בחר קרוב למרכז ↑',bye:'פטור ✓',tbd:'טרם נקבע',field_lbl:'🌄 שדה',threed_lbl:'🦌 3D',kill_lbl:'🎯 קטילה',arrows:'חצים',menu_score:'ניקוד הסבב',menu_score_sub:'הזן ניקוד למטרה שלך',menu_results:'תוצאות חיות',menu_results_sub:'צפה בתוצאות התחרות',menu_history:'היסטוריה',menu_history_sub:'תוצאות תחרויות קודמות',select_results_comp:'— בחר תחרות —',no_active_comps:'אין תחרויות פעילות היום',}};
-
+const T={en:{competition:'Competition',your_name:'Your Name',loading:'Loading...',select_comp_first:'— Select competition first —',select_name:'— Select your name —',continue:'CONTINUE →',back:'← BACK',no_target:'⚠️ You have no target assigned yet.\nPlease ask the admin to assign your target.',active_match:'ACTIVE MATCH FOUND',start_match:'START MATCH →',confirm_archers:'Confirm Archers on this Target',start_scoring:'START SCORING →',target:'TARGET',end:'END',editing:'EDITING',active:'ACTIVE',half_total:'HALF TOTAL',total:'TOTAL',backspace:'BACKSPACE ←',done_editing:'DONE EDITING ✓',view_summary:'VIEW SUMMARY 🏆',set:'SET',submit_match:'SUBMIT MATCH ✓',match_complete:'Match Complete',match_result:'MATCH RESULT',winner:'Winner',set_system:'Set System · First to 6 pts',cumulative:'Cumulative · 15 arrows',station:'STATION',score_saved:'Scores saved ✓',save_failed:'Save failed',no_competitions:'No competitions found',select_competition:'— Select Competition —',complete:'Complete',kills:'Kills',elevens:'11s',sixes:'6s',closest_center:'TIED — WHO IS CLOSEST TO CENTER?',closer_center:'CLOSER TO CENTER?',select_closest:'SELECT CLOSEST TO CENTER ↑',field_lbl:'🌄 Field',threed_lbl:'🦌 3D',kill_lbl:'🎯 Kill',arrows:'arrows',},
+he:{competition:'תחרות',your_name:'שמך',loading:'טוען...',select_comp_first:'— בחר תחרות תחילה —',select_name:'— בחר את שמך —',continue:'המשך →',back:'← חזרה',no_target:'⚠️ אין לך מטרה מוקצית.\nבקש מהמנהל להקצות לך מטרה.',active_match:'נמצאה מקצה פעילה',start_match:'התחל מקצה →',confirm_archers:'אשר קשתים במטרה זו',start_scoring:'התחל ניקוד →',target:'מטרה',end:'סבב',editing:'עריכה',active:'פעיל',half_total:'סה״כ מחצית',total:'סה״כ',backspace:'מחק ←',done_editing:'סיום עריכה ✓',view_summary:'צפה בסיכום 🏆',set:'סט',submit_match:'שלח תוצאת מקצה ✓',match_complete:'המקצה הסתיים',match_result:'תוצאת המקצה',winner:'מנצח',set_system:'שיטת סטים · ראשון ל-6 נקודות',cumulative:'צבירה · 15 חצים',station:'תחנה',score_saved:'ניקוד נשמר ✓',save_failed:'שמירה נכשלה',no_competitions:'לא נמצאו תחרויות',select_competition:'— בחר תחרות —',complete:'הושלם',kills:'קטלניות',elevens:'11',sixes:'6',closest_center:'שוויון — מי קרוב יותר למרכז?',closer_center:'קרוב יותר למרכז?',select_closest:'בחר קרוב למרכז ↑',field_lbl:'🌄 שדה',threed_lbl:'🦌 3D',kill_lbl:'🎯 קטילה',arrows:'חצים',}};
 window.setLang=function(lang){
   currentLang=lang;localStorage.setItem('scoringLang',lang);
   ['menu-lang-en','lang-en'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.toggle('active',lang==='en');});
   ['menu-lang-he','lang-he'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.toggle('active',lang==='he');});
   document.documentElement.lang=lang==='he'?'he':'en';
-  const compSel=document.getElementById('comp-select');
-  if(compSel&&compSel.options[0]&&!compSel.options[0].value)compSel.options[0].textContent=t('select_competition');
-  const archerSel=document.getElementById('archer-select');
-  if(archerSel&&archerSel.options[0]&&!archerSel.options[0].value)archerSel.options[0].textContent=t('select_comp_first');
+  const compSel=document.getElementById('comp-select');if(compSel&&compSel.options[0]&&!compSel.options[0].value)compSel.options[0].textContent=t('select_competition');
+  const archerSel=document.getElementById('archer-select');if(archerSel&&archerSel.options[0]&&!archerSel.options[0].value)archerSel.options[0].textContent=t('select_comp_first');
   document.querySelectorAll('[data-t]').forEach(el=>{const key=el.getAttribute('data-t');const val=t(key);if(el.tagName==='OPTION')el.textContent=val;else if(el.tagName==='BUTTON')el.textContent=val;else if(el.tagName==='LABEL')el.textContent=val;else el.innerHTML=val.replace(/\n/g,'<br>');});
-  // Update menu labels
-  const ml=document.getElementById('menu-lbl-score');if(ml)ml.textContent=t('menu_score');
-  const ms=document.getElementById('menu-sub-score');if(ms)ms.textContent=t('menu_score_sub');
-  const rl=document.getElementById('menu-lbl-results');if(rl)rl.textContent=t('menu_results');
-  const rs=document.getElementById('menu-sub-results');if(rs)rs.textContent=t('menu_results_sub');
-  const hl=document.getElementById('menu-lbl-history');if(hl)hl.textContent=t('menu_history');
-  const hs=document.getElementById('menu-sub-history');if(hs)hs.textContent=t('menu_history_sub');
+  const menuLabels={en:{score:'SCORE YOUR ROUND',score_sub:'Enter scores for your target',results:'LIVE RESULTS',results_sub:"View today's competition results",history:'HISTORY',history_sub:'Past competition results'},he:{score:'ניקוד הסבב',score_sub:'הזן ניקוד למטרה שלך',results:'תוצאות חיות',results_sub:'צפה בתוצאות התחרות',history:'היסטוריה',history_sub:'תוצאות תחרויות קודמות'}};
+  const L=menuLabels[lang]||menuLabels.en;
+  const ids={score:'menu-lbl-score',score_sub:'menu-sub-score',results:'menu-lbl-results',results_sub:'menu-sub-results',history:'menu-lbl-history',history_sub:'menu-sub-history'};
+  Object.entries(ids).forEach(([k,id])=>{const el=document.getElementById(id);if(el)el.textContent=L[k];});
   if(document.getElementById('scoring-screen')?.style.display==='flex'){renderTabs();renderScoreList();renderPad();updateHeader();}
   if(document.getElementById('match-screen')?.style.display==='flex'){renderMatchSets();renderMatchPad();updateMatchHeader();}
 };
 function initLang(){const saved=localStorage.getItem('scoringLang')||'en';setLang(saved);}
-
-/* ── MAIN MENU FUNCTIONS ── */
-window.goToMainMenu=()=>{
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('scoring-screen').style.display='none';
-  document.getElementById('match-screen').style.display='none';
-  document.getElementById('summary-screen').style.display='none';
-  document.getElementById('main-menu').style.display='flex';
-  document.getElementById('results-dropdown').style.display='none';
-};
-
-window.goToScoring=()=>{
-  document.getElementById('main-menu').style.display='none';
-  document.getElementById('login-screen').style.display='flex';
-  showLoginStep('login-step-1');
-  loadCompetitions();
-};
-
-window.toggleResultsDropdown=async()=>{
-  const dd=document.getElementById('results-dropdown');
-  if(dd.style.display==='block'){dd.style.display='none';return;}
-  dd.style.display='block';
-  await loadTodayCompetitions();
-};
-
-async function loadTodayCompetitions(){
-  const sel=document.getElementById('results-comp-select');
-  sel.innerHTML=`<option value="">Loading...</option>`;
-  try{
-    const snap=await getDocs(collection(db,'competitions'));
-    const today=new Date();
-    today.setHours(0,0,0,0);
-    const comps=[];
-    snap.docs.forEach(d=>{
-      const c=d.data();
-      if(c.archived)return;
-      if(!c.date){comps.push({id:d.id,name:c.name});return;}
-      const start=new Date(c.date);start.setHours(0,0,0,0);
-      const days=parseInt(c.numDays)||1;
-      const end=new Date(start);end.setDate(end.getDate()+days-1);end.setHours(23,59,59,999);
-      if(today>=start&&today<=end)comps.push({id:d.id,name:c.name});
-    });
-    if(!comps.length){sel.innerHTML=`<option value="">${t('no_active_comps')}</option>`;return;}
-    sel.innerHTML=`<option value="">${t('select_results_comp')}</option>`+comps.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
-  }catch(e){sel.innerHTML=`<option value="">Connection error</option>`;}
-}
-
-window.openResults=()=>{
-  const id=document.getElementById('results-comp-select').value;
-  if(!id)return;
-  window.open(`https://matan1sharon-ops.github.io/All-in-competition/results.html?comp=${id}`,'_blank');
-};
-
-window.openHistory=()=>{
-  window.open('https://matan1sharon-ops.github.io/All-in-competition/history.html','_blank');
-};
-
-/* ── PWA INSTALL BANNER ── */
+/* ── MAIN MENU ── */
+window.goToMainMenu=()=>{['login-screen','scoring-screen','match-screen','summary-screen'].forEach(id=>{document.getElementById(id).style.display='none';});document.getElementById('main-menu').style.display='flex';document.getElementById('results-dropdown').style.display='none';};
+window.goToScoring=()=>{document.getElementById('main-menu').style.display='none';document.getElementById('login-screen').style.display='flex';showLoginStep('login-step-1');loadCompetitions();};
+window.toggleResultsDropdown=async()=>{const dd=document.getElementById('results-dropdown');if(dd.style.display==='block'){dd.style.display='none';return;}dd.style.display='block';await loadTodayCompetitions();};
+async function loadTodayCompetitions(){const sel=document.getElementById('results-comp-select');sel.innerHTML='<option value="">Loading...</option>';try{const snap=await getDocs(collection(db,'competitions'));const today=new Date();today.setHours(0,0,0,0);const comps=[];snap.docs.forEach(d=>{const c=d.data();if(c.archived)return;if(!c.date){comps.push({id:d.id,name:c.name});return;}const start=new Date(c.date);start.setHours(0,0,0,0);const days=parseInt(c.numDays)||1;const end=new Date(start);end.setDate(end.getDate()+days-1);end.setHours(23,59,59,999);if(today>=start&&today<=end)comps.push({id:d.id,name:c.name});});if(!comps.length){sel.innerHTML='<option value="">No active competitions today</option>';return;}sel.innerHTML='<option value="">— Select competition —</option>'+comps.map(c=>'<option value="'+c.id+'">'+c.name+'</option>').join('');}catch(e){sel.innerHTML='<option value="">Connection error</option>';}}
+window.openResults=()=>{const id=document.getElementById('results-comp-select').value;if(!id)return;window.open('https://matan1sharon-ops.github.io/All-in-competition/results.html?comp='+id,'_blank');};
+window.openHistory=()=>{window.open('https://matan1sharon-ops.github.io/All-in-competition/history.html','_blank');};
+/* ── PWA ── */
 let deferredInstallPrompt=null;
-window.addEventListener('beforeinstallprompt',(e)=>{
-  e.preventDefault();
-  deferredInstallPrompt=e;
-  if(!localStorage.getItem('installDismissed')){
-    document.getElementById('install-banner').classList.add('show');
-  }
-});
-window.installApp=async()=>{
-  if(!deferredInstallPrompt)return;
-  deferredInstallPrompt.prompt();
-  const{outcome}=await deferredInstallPrompt.userChoice;
-  deferredInstallPrompt=null;
-  document.getElementById('install-banner').classList.remove('show');
-};
-window.dismissInstall=()=>{
-  document.getElementById('install-banner').classList.remove('show');
-  localStorage.setItem('installDismissed','1');
-};
-window.addEventListener('appinstalled',()=>{
-  document.getElementById('install-banner').classList.remove('show');
-});
+window.addEventListener('beforeinstallprompt',(e)=>{e.preventDefault();deferredInstallPrompt=e;if(!localStorage.getItem('installDismissed'))document.getElementById('install-banner').classList.add('show');});
+window.installApp=async()=>{if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;document.getElementById('install-banner').classList.remove('show');};
+window.dismissInstall=()=>{document.getElementById('install-banner').classList.remove('show');localStorage.setItem('installDismissed','1');};
+window.addEventListener('appinstalled',()=>document.getElementById('install-banner').classList.remove('show'));
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
 
-/* ── REGISTER SERVICE WORKER ── */
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('sw.js').catch(()=>{});
-  });
-}
-
-/* ── LOGIN FLOW ── */
-async function loadCompetitions(){
-  try{
-    const snap=await getDocs(collection(db,'competitions'));
-    const sel=document.getElementById('comp-select');
-    sel.innerHTML=`<option value="">${t('select_competition')}</option>`;
-    const active=snap.docs.filter(d=>!d.data().archived);
-    active.forEach(d=>{const c=d.data(),o=document.createElement('option');o.value=d.id;o.textContent=c.name+(c.date?` (${c.date})`:'');sel.appendChild(o);});
-    if(!active.length)sel.innerHTML=`<option value="">${t('no_competitions')}</option>`;
-    sel.onchange=()=>loadArchers(sel.value);
-  }catch(e){showError('Connection error');}
-}
-async function loadArchers(id){
-  if(!id)return;compId=id;
-  const snap=await getDoc(doc(db,'competitions',id));
-  if(!snap.exists())return;
-  compData=snap.data();discipline=compData.discipline||'Outdoor';targetConfig=compData.targetConfig||[];
-  const archers=compData.archers||[];
-  const sel=document.getElementById('archer-select');
-  sel.innerHTML=`<option value="">${t('select_name')}</option>`+archers.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
-}
+/* ── LOGIN ── */
+async function loadCompetitions(){try{const snap=await getDocs(collection(db,'competitions'));const sel=document.getElementById('comp-select');sel.innerHTML='<option value="">'+t('select_competition')+'</option>';const active=snap.docs.filter(d=>!d.data().archived);active.forEach(d=>{const c=d.data(),o=document.createElement('option');o.value=d.id;o.textContent=c.name+(c.date?' ('+c.date+')':'');sel.appendChild(o);});if(!active.length)sel.innerHTML='<option value="">'+t('no_competitions')+'</option>';sel.onchange=()=>loadArchers(sel.value);}catch(e){showError('Connection error');}}
+async function loadArchers(id){if(!id)return;compId=id;const snap=await getDoc(doc(db,'competitions',id));if(!snap.exists())return;compData=snap.data();discipline=compData.discipline||'Outdoor';targetConfig=compData.targetConfig||[];const archers=compData.archers||[];const sel=document.getElementById('archer-select');sel.innerHTML='<option value="">'+t('select_name')+'</option>'+archers.map(a=>'<option value="'+a.id+'">'+a.name+'</option>').join('');}
 window.checkPhase=async()=>{
   selectedArcherId=document.getElementById('archer-select').value;
-  if(!compId){showError(t('competition'));return;}
-  if(!selectedArcherId){showError(t('your_name'));return;}
+  if(!compId){showError(t('competition'));return;}if(!selectedArcherId){showError(t('your_name'));return;}
   document.getElementById('error-msg').style.display='none';
-  const snap=await getDoc(doc(db,'competitions',compId));
-  compData=snap.data();discipline=compData.discipline||'Outdoor';targetConfig=compData.targetConfig||[];
-  const elim=compData.elimination||{};
-  const roundOrder=['R1','QF','SF','F','B'];
-  for(const[ck,data]of Object.entries(elim)){
-    for(const rk of roundOrder){
-      const matches=data.rounds?.[rk]||[];
-      for(let mi=0;mi<matches.length;mi++){
-        const m=matches[mi];
-        if((m.archer1?.id===selectedArcherId||m.archer2?.id===selectedArcherId)&&!m.winnerChoice&&!m.isBye){
-          matchCatKey=ck;matchRoundKey=rk;matchIdx=mi;matchData=m;matchFormat=data.format;
-          matchSets=(m.sets||[]).map(s=>({score1:s.score1||0,score2:s.score2||0,arrows1:s.arrows1||[],arrows2:s.arrows2||[]}));
-          cumArrows1=m.arrows1||[];cumArrows2=m.arrows2||[];
-          const rl={R1:`Round of ${data.bracketSize*2}`,QF:'Quarter Final',SF:'Semi Final',F:'Final',B:'Bronze Medal'};
-          document.getElementById('match-confirm-label').textContent=rl[rk]||rk;
-          document.getElementById('match-confirm-vs').innerHTML=`<strong>${m.archer1?.name||'?'}</strong> vs <strong>${m.archer2?.name||'?'}</strong>`;
-          showLoginStep('login-step-match');return;
-        }
-      }
-    }
-  }
+  const snap=await getDoc(doc(db,'competitions',compId));compData=snap.data();discipline=compData.discipline||'Outdoor';targetConfig=compData.targetConfig||[];
+  const elim=compData.elimination||{};const roundOrder=['R1','QF','SF','F','B'];
+  for(const[ck,data]of Object.entries(elim)){for(const rk of roundOrder){const matches=data.rounds?.[rk]||[];for(let mi=0;mi<matches.length;mi++){const m=matches[mi];if((m.archer1?.id===selectedArcherId||m.archer2?.id===selectedArcherId)&&!m.winnerChoice&&!m.isBye){matchCatKey=ck;matchRoundKey=rk;matchIdx=mi;matchData=m;matchFormat=data.format;matchSets=(m.sets||[]).map(s=>({score1:s.score1||0,score2:s.score2||0,arrows1:s.arrows1||[],arrows2:s.arrows2||[]}));cumArrows1=m.arrows1||[];cumArrows2=m.arrows2||[];const rl={R1:'Round of '+(data.bracketSize*2),QF:'Quarter Final',SF:'Semi Final',F:'Final',B:'Bronze Medal'};document.getElementById('match-confirm-label').textContent=rl[rk]||rk;document.getElementById('match-confirm-vs').innerHTML='<strong>'+(m.archer1?.name||'?')+'</strong> vs <strong>'+(m.archer2?.name||'?')+'</strong>';showLoginStep('login-step-match');return;}}}}
   const allArchers=compData.archers||[];const allTargets=compData.targets||[];
   let archer=allArchers.find(a=>String(a.id)===String(selectedArcherId));
-  if(archer?.target){targetNum=archer.target;}
-  else{let foundTarget=null;for(const t of allTargets){for(const s of['A','B','C','D']){if(t[s]&&String(t[s].id)===String(selectedArcherId)){foundTarget=t.num;break;}}if(foundTarget)break;}if(foundTarget)targetNum=foundTarget;}
-  if(targetNum){
-    const target=allTargets.find(t=>t.num===targetNum);
-    if(target){
-      targetArchers=['A','B','C','D'].filter(s=>target[s]).map(s=>{const sd=target[s];const fa=allArchers.find(a=>String(a.id)===String(sd.id)||a.name===sd.name);return{...(fa||sd),slot:s,id:fa?fa.id:sd.id};});
-      if(targetArchers.length){document.getElementById('confirm-archers').innerHTML=targetArchers.map(a=>`<div class="confirm-archer"><div class="confirm-slot">${a.slot}</div><div style="flex:1;padding:0 10px;"><div class="confirm-name">${a.name}</div><div class="confirm-cat">${a.bow} · ${a.age}</div></div></div>`).join('');showLoginStep('login-step-2');return;}
-    }
-  }
+  if(archer?.target){targetNum=archer.target;}else{let foundTarget=null;for(const t of allTargets){for(const s of['A','B','C','D']){if(t[s]&&String(t[s].id)===String(selectedArcherId)){foundTarget=t.num;break;}}if(foundTarget)break;}if(foundTarget)targetNum=foundTarget;}
+  if(targetNum){const target=allTargets.find(t=>t.num===targetNum);if(target){targetArchers=['A','B','C','D'].filter(s=>target[s]).map(s=>{const sd=target[s];const fa=allArchers.find(a=>String(a.id)===String(sd.id)||a.name===sd.name);return{...(fa||sd),slot:s,id:fa?fa.id:sd.id};});if(targetArchers.length){document.getElementById('confirm-archers').innerHTML=targetArchers.map(a=>'<div class="confirm-archer"><div class="confirm-slot">'+a.slot+'</div><div style="flex:1;padding:0 10px;"><div class="confirm-name">'+a.name+'</div><div class="confirm-cat">'+a.bow+' · '+a.age+'</div></div></div>').join('');showLoginStep('login-step-2');return;}}}
   showLoginStep('login-step-qual');
 };
 function showLoginStep(id){['login-step-1','login-step-qual','login-step-match','login-step-2'].forEach(s=>{document.getElementById(s).style.display=s===id?'block':'none';});}
 window.backToStep1=()=>showLoginStep('login-step-1');
-
-/* ── QUALIFICATION SCORING ── */
-window.startScoring=()=>{
-  const cfg=getConfig(),existing=compData.scores||{};
-  targetArchers.forEach(a=>{const key=String(a.id).replace(/\./g,'_');const raw=existing[key]||existing[String(a.id)];if(raw){let endsArr;if(Array.isArray(raw.ends)){endsArr=raw.ends;}else{endsArr=Array.from({length:cfg.ends},()=>[]);Object.keys(raw.ends||{}).forEach(i=>{endsArr[parseInt(i)]=raw.ends[i]||[];});}scores[a.id]={total:raw.total||0,tens:raw.tens||0,xs:raw.xs||0,g1:raw.g1||0,g2:raw.g2||0,h1:raw.h1||0,h2:raw.h2||0,kills:raw.kills||0,elevens:raw.elevens||0,sixes:raw.sixes||0,ends:endsArr};}else{scores[a.id]={ends:Array.from({length:cfg.ends},()=>[]),total:0,tens:0,xs:0,g1:0,g2:0,h1:0,h2:0,kills:0,elevens:0,sixes:0};}});
-  targetArchers.forEach(a=>recalcStats(a.id));
-  activeArcherIdx=0;editingEnd=null;
-  document.getElementById('s-comp-name').textContent=compData.name||'';
-  document.getElementById('s-target-label').textContent=`${t('target')} ${targetNum}`;
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('scoring-screen').style.display='flex';
-  renderTabs();renderScoreList();renderPad();updateHeader();
-};
+/* ── SCORING ── */
+window.startScoring=()=>{const cfg=getConfig(),existing=compData.scores||{};targetArchers.forEach(a=>{const key=String(a.id).replace(/\./g,'_');const raw=existing[key]||existing[String(a.id)];if(raw){let endsArr;if(Array.isArray(raw.ends)){endsArr=raw.ends;}else{endsArr=Array.from({length:cfg.ends},()=>[]);Object.keys(raw.ends||{}).forEach(i=>{endsArr[parseInt(i)]=raw.ends[i]||[];});}scores[a.id]={total:raw.total||0,tens:raw.tens||0,xs:raw.xs||0,g1:raw.g1||0,g2:raw.g2||0,h1:raw.h1||0,h2:raw.h2||0,kills:raw.kills||0,elevens:raw.elevens||0,sixes:raw.sixes||0,ends:endsArr};}else{scores[a.id]={ends:Array.from({length:cfg.ends},()=>[]),total:0,tens:0,xs:0,g1:0,g2:0,h1:0,h2:0,kills:0,elevens:0,sixes:0};}});targetArchers.forEach(a=>recalcStats(a.id));activeArcherIdx=0;editingEnd=null;document.getElementById('s-comp-name').textContent=compData.name||'';document.getElementById('s-target-label').textContent=t('target')+' '+targetNum;document.getElementById('login-screen').style.display='none';document.getElementById('scoring-screen').style.display='flex';renderTabs();renderScoreList();renderPad();updateHeader();};
 function getCurrentArcher(){return targetArchers[activeArcherIdx];}
 function isEndComplete(archerId,endIdx){const arrows=getCustomArrowsForEnd(endIdx);return(scores[archerId].ends[endIdx]||[]).length>=arrows;}
 function isArcherDone(archerId){const cfg=getConfig();for(let e=0;e<cfg.ends;e++){if(!isEndComplete(archerId,e))return false;}return true;}
-function renderTabs(){document.getElementById('archer-tabs').innerHTML=targetArchers.map((a,i)=>{const done=isArcherDone(a.id);const cls=done?'done':(i===activeArcherIdx?'active':'');return`<button class="archer-tab ${cls}" onclick="switchArcher(${i})">${a.slot} · ${a.name.split(' ')[0]}${done?'<span class="tab-check">✓</span>':''}</button>`;}).join('');}
+function renderTabs(){document.getElementById('archer-tabs').innerHTML=targetArchers.map((a,i)=>{const done=isArcherDone(a.id);const cls=done?'done':(i===activeArcherIdx?'active':'');return'<button class="archer-tab '+cls+'" onclick="switchArcher('+i+')">'+a.slot+' · '+a.name.split(' ')[0]+(done?'<span class="tab-check">✓</span>':'')+'</button>';}).join('');}
 window.switchArcher=(idx)=>{activeArcherIdx=idx;editingEnd=null;renderTabs();renderScoreList();renderPad();updateHeader();};
-function scCellHtml(val,isActive,isEditing,endIdx){const classes=[];if(val==='X'||val===10||val===9||val===11)classes.push('sc-gold');if(isEditing)classes.push('sc-editing');else if(isActive)classes.push('sc-active');let display;if(val===0||val==='M')display='M';else if(val===undefined||val==='')display='';else if(discipline==='Custom')display=valueToLabel(val,endIdx);else display=val;return`<td class="${classes.join(' ')}" onclick="editEnd(${endIdx})">${display}</td>`;}
+function scCellHtml(val,isActive,isEditing,endIdx){const classes=[];if(val==='X'||val===10||val===9||val===11)classes.push('sc-gold');if(isEditing)classes.push('sc-editing');else if(isActive)classes.push('sc-active');let display;if(val===0||val==='M')display='M';else if(val===undefined||val==='')display='';else if(discipline==='Custom')display=valueToLabel(val,endIdx);else display=val;return'<td class="'+classes.join(' ')+'" onclick="editEnd('+endIdx+')">'+display+'</td>';}
 function getNextIncompleteEnd(){const cfg=getConfig();const archer=getCurrentArcher();for(let e=0;e<cfg.ends;e++){if(!isEndComplete(archer.id,e))return e;}return cfg.ends-1;}
+
 function renderScoreList(){
   const cfg=getConfig(),archer=getCurrentArcher(),ends=scores[archer.id].ends;
   const curEnd=editingEnd!==null?editingEnd.endIdx:getNextIncompleteEnd();
   const list=document.getElementById('score-list');
-  if(discipline==='Custom'){let html='',running=0;for(let i=0;i<cfg.ends;i++){const ea=ends[i]||[];const tc=getCustomTargetConfig(i);const arrowsForEnd=tc.arrows||3;const isActive=i===curEnd&&editingEnd===null;const isEditing=editingEnd!==null&&editingEnd.endIdx===i;const tot=ea.reduce((s,v)=>s+getVal(v),0);if(ea.length>0)running+=tot;const typeColor=tc.type==='Kill'?'#c62828':tc.type==='3D'?'#4a148c':'#1565c0';const typeLabel=tc.type==='Kill'?`🎯 Kill(${tc.kill})/Body(${tc.body})/M(${tc.miss})`:tc.type==='3D'?t('threed_lbl'):t('field_lbl');const cls=isEditing?'end-card editing':isActive?'end-card active-end':'end-card';const chips=Array.from({length:arrowsForEnd},(_,ai)=>{const v=ea[ai];if(v!==undefined){const label=tc.type==='Kill'?valueToLabel(v,i):(v===0?'M':v);const chipCls=tc.type==='Kill'?(v===tc.kill?'chip-kill':v===tc.body?'chip-body':'chip-miss'):chipClass(v,i);return`<span class="arrow-chip ${chipCls}">${label}</span>`;}return`<span class="arrow-chip chip-empty">·</span>`;}).join('');html+=`<div class="${cls}" onclick="editEnd(${i})"><div class="end-header"><div><div class="end-num">T${i+1} — <span style="color:${typeColor};font-size:10px;">${typeLabel}</span>${isEditing?' (EDITING)':isActive?' (ACTIVE)':''}</div></div><div style="display:flex;align-items:center;gap:8px;"><div style="font-size:11px;color:var(--muted);">${ea.length}/${arrowsForEnd} arrows</div><div class="end-total">${ea.length>0?tot:'—'}</div>${ea.length>0?`<div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;color:var(--muted);">${running}</div>`:''}</div></div><div class="end-arrows">${chips}</div></div>`;}list.innerHTML='<div style="padding:10px;">'+html+'</div>';setTimeout(()=>{const a=list.querySelector('.active-end,.editing');if(a)a.scrollIntoView({behavior:'smooth',block:'center'});},50);return;}
-  if(discipline==='3D'||discipline==='Field'){let html='';for(let i=0;i<cfg.ends;i++){const ea=ends[i]||[];const isActive=i===curEnd&&editingEnd===null;const isEditing=editingEnd!==null&&editingEnd.endIdx===i;const tot=ea.reduce((s,v)=>s+getVal(v),0);const cls=isEditing?'end-card editing':isActive?'end-card active-end':'end-card';const chips=Array.from({length:cfg.arrows},(_,ai)=>{const v=ea[ai];return v!==undefined?`<span class="arrow-chip ${chipClass(v,i)}">${v===0?'M':v}</span>`:`<span class="arrow-chip chip-empty">·</span>`;}).join('');html+=`<div class="${cls}" onclick="editEnd(${i})"><div class="end-header"><div class="end-num">${cfg.label} ${i+1}${isEditing?' (EDITING)':isActive?' (ACTIVE)':''}</div><div class="end-total">${ea.length===cfg.arrows?tot:ea.length?tot:'—'}</div></div><div class="end-arrows">${chips}</div></div>`;}list.innerHTML='<div style="padding:10px;">'+html+'</div>';setTimeout(()=>{const a=list.querySelector('.active-end,.editing');if(a)a.scrollIntoView({behavior:'smooth',block:'center'});},50);return;}
-  if(discipline==='Outdoor'){list.innerHTML=`<div class="sc-half-header"><div class="sc-half-title">1st HALF (Ends 1–6)</div><div>10+X</div><div>X</div></div><table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:32px"><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sc-body-1"></tbody></table><div class="sc-half-header" style="margin-top:6px;"><div class="sc-half-title">2nd HALF (Ends 7–12)</div><div>10+X</div><div>X</div></div><table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:32px"><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sc-body-2"></tbody></table><div style="height:10px;"></div>`;renderScOutdoor(ends,0,6,'sc-body-1',curEnd);renderScOutdoor(ends,6,12,'sc-body-2',curEnd);}else{list.innerHTML=`<div class="sc-half-header"><div class="sc-half-title">1st HALF (Ends 1–10)</div><div>10</div><div>9</div></div><table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sc-body-1"></tbody></table><div class="sc-half-header" style="margin-top:6px;"><div class="sc-half-title">2nd HALF (Ends 11–20)</div><div>10</div><div>9</div></div><table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sc-body-2"></tbody></table><div style="height:10px;"></div>`;renderScIndoor(ends,0,10,'sc-body-1',curEnd);renderScIndoor(ends,10,20,'sc-body-2',curEnd);}
+  if(discipline==='Custom'){let html='',running=0;for(let i=0;i<cfg.ends;i++){const ea=ends[i]||[];const tc=getCustomTargetConfig(i);const arrowsForEnd=tc.arrows||3;const isActive=i===curEnd&&editingEnd===null;const isEditing=editingEnd!==null&&editingEnd.endIdx===i;const tot=ea.reduce((s,v)=>s+getVal(v),0);if(ea.length>0)running+=tot;const typeColor=tc.type==='Kill'?'#c62828':tc.type==='3D'?'#4a148c':'#1565c0';const typeLabel=tc.type==='Kill'?'🎯 Kill('+tc.kill+')/Body('+tc.body+')/M('+tc.miss+')':tc.type==='3D'?t('threed_lbl'):t('field_lbl');const cls=isEditing?'end-card editing':isActive?'end-card active-end':'end-card';const chips=Array.from({length:arrowsForEnd},(_,ai)=>{const v=ea[ai];if(v!==undefined){const label=tc.type==='Kill'?valueToLabel(v,i):(v===0?'M':v);const chipCls=tc.type==='Kill'?(v===tc.kill?'chip-kill':v===tc.body?'chip-body':'chip-miss'):chipClass(v,i);return'<span class="arrow-chip '+chipCls+'">'+label+'</span>';}return'<span class="arrow-chip chip-empty">·</span>';}).join('');html+='<div class="'+cls+'" onclick="editEnd('+i+')"><div class="end-header"><div><div class="end-num">T'+(i+1)+' — <span style="color:'+typeColor+';font-size:10px;">'+typeLabel+'</span>'+(isEditing?' (EDITING)':isActive?' (ACTIVE)':'')+'</div></div><div style="display:flex;align-items:center;gap:8px;"><div style="font-size:11px;color:var(--muted);">'+ea.length+'/'+arrowsForEnd+' arrows</div><div class="end-total">'+(ea.length>0?tot:'—')+'</div>'+(ea.length>0?'<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:14px;font-weight:900;color:var(--muted);">'+running+'</div>':'')+'</div></div><div class="end-arrows">'+chips+'</div></div>';}list.innerHTML='<div style="padding:10px;">'+html+'</div>';setTimeout(()=>{const a=list.querySelector('.active-end,.editing');if(a)a.scrollIntoView({behavior:'smooth',block:'center'});},50);return;}
+  if(discipline==='3D'||discipline==='Field'){let html='';for(let i=0;i<cfg.ends;i++){const ea=ends[i]||[];const isActive=i===curEnd&&editingEnd===null;const isEditing=editingEnd!==null&&editingEnd.endIdx===i;const tot=ea.reduce((s,v)=>s+getVal(v),0);const cls=isEditing?'end-card editing':isActive?'end-card active-end':'end-card';const chips=Array.from({length:cfg.arrows},(_,ai)=>{const v=ea[ai];return v!==undefined?'<span class="arrow-chip '+chipClass(v,i)+'">'+(v===0?'M':v)+'</span>':'<span class="arrow-chip chip-empty">·</span>';}).join('');html+='<div class="'+cls+'" onclick="editEnd('+i+')"><div class="end-header"><div class="end-num">'+cfg.label+' '+(i+1)+(isEditing?' (EDITING)':isActive?' (ACTIVE)':'')+'</div><div class="end-total">'+(ea.length===cfg.arrows?tot:ea.length?tot:'—')+'</div></div><div class="end-arrows">'+chips+'</div></div>';}list.innerHTML='<div style="padding:10px;">'+html+'</div>';setTimeout(()=>{const a=list.querySelector('.active-end,.editing');if(a)a.scrollIntoView({behavior:'smooth',block:'center'});},50);return;}
+  if(discipline==='Outdoor'){list.innerHTML='<div class="sc-half-header"><div class="sc-half-title">1st HALF (Ends 1–6)</div><div>10+X</div><div>X</div></div><table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:32px"><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sc-body-1"></tbody></table><div class="sc-half-header" style="margin-top:6px;"><div class="sc-half-title">2nd HALF (Ends 7–12)</div><div>10+X</div><div>X</div></div><table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:32px"><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sc-body-2"></tbody></table><div style="height:10px;"></div>';renderScOutdoor(ends,0,6,'sc-body-1',curEnd);renderScOutdoor(ends,6,12,'sc-body-2',curEnd);}else{list.innerHTML='<div class="sc-half-header"><div class="sc-half-title">1st HALF (Ends 1–10)</div><div>10</div><div>9</div></div><table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sc-body-1"></tbody></table><div class="sc-half-header" style="margin-top:6px;"><div class="sc-half-title">2nd HALF (Ends 11–20)</div><div>10</div><div>9</div></div><table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sc-body-2"></tbody></table><div style="height:10px;"></div>';renderScIndoor(ends,0,10,'sc-body-1',curEnd);renderScIndoor(ends,10,20,'sc-body-2',curEnd);}
   setTimeout(()=>{const a=list.querySelector('.sc-active,.sc-editing');if(a)a.scrollIntoView({behavior:'smooth',block:'center'});},50);
 }
-function renderScOutdoor(ends,startEnd,endEnd,bodyId,curEnd){let html='',running=0,tens=0,xs=0;for(let e=startEnd;e<endEnd;e++){const ea=ends[e]||[];const isActive=e===curEnd&&editingEnd===null;const isEditing=editingEnd!==null&&editingEnd.endIdx===e;const v=ea.map(x=>getVal(x));const s1=(ea.length>=3)?v[0]+v[1]+v[2]:'';const s2=(ea.length>=6)?v[3]+v[4]+v[5]:'';const et=s2!==''?(Number(s1)||0)+s2:'';if(et!=='')running+=et;const c10=ea.filter(x=>x===10||x==='X').length,cx=ea.filter(x=>x==='X').length;if(ea.length>0){tens+=c10;xs+=cx;}const ra=(isActive||isEditing)&&ea.length<3;const r2=(isActive||isEditing)&&ea.length>=3&&ea.length<6;html+=`<tr><td rowspan="2" class="sc-end-label" onclick="editEnd(${e})">End ${e+1}${isActive?' ▶':isEditing?' ✏':''}</td>${scCellHtml(ea[0],ra&&ea.length===0,isEditing&&ea.length===0,e)}${scCellHtml(ea[1],ra&&ea.length===1,isEditing&&ea.length===1,e)}${scCellHtml(ea[2],ra&&ea.length===2,isEditing&&ea.length===2,e)}<td class="sc-sum-box">${s1}</td><td class="sc-no-entry"></td><td rowspan="2" class="sc-running">${et!==''?running:''}</td><td class="sc-stat">${ea.length>0?c10:''}</td><td class="sc-stat">${ea.length>0?cx:''}</td></tr><tr class="sc-end-sep">${scCellHtml(ea[3],r2&&ea.length===3,isEditing&&ea.length===3,e)}${scCellHtml(ea[4],r2&&ea.length===4,isEditing&&ea.length===4,e)}${scCellHtml(ea[5],r2&&ea.length===5,isEditing&&ea.length===5,e)}<td class="sc-sum-box">${s2}</td><td class="sc-end-total">${et}</td><td class="sc-stat"></td><td class="sc-stat"></td></tr>`;}html+=`<tr class="sc-half-total"><td colspan="5">HALF TOTAL</td><td>${running}</td><td></td><td>${tens}</td><td>${xs}</td></tr>`;document.getElementById(bodyId).innerHTML=html;}
-function renderScIndoor(ends,startEnd,endEnd,bodyId,curEnd){let html='',running=0,tens=0,nines=0;for(let e=startEnd;e<endEnd;e++){const ea=ends[e]||[];const isActive=e===curEnd&&editingEnd===null;const isEditing=editingEnd!==null&&editingEnd.endIdx===e;const v=ea.map(x=>getVal(x));const et=(ea.length>=3)?v[0]+v[1]+v[2]:'';if(et!=='')running+=et;const c10=ea.filter(x=>x===10||x==='X').length,c9=ea.filter(x=>x===9).length;if(ea.length>0){tens+=c10;nines+=c9;}html+=`<tr class="sc-end-sep"><td class="sc-end-label" onclick="editEnd(${e})">End ${e+1}${isActive?' ▶':isEditing?' ✏':''}</td>${scCellHtml(ea[0],isActive&&ea.length===0,isEditing&&ea.length===0,e)}${scCellHtml(ea[1],isActive&&ea.length===1,isEditing&&ea.length===1,e)}${scCellHtml(ea[2],isActive&&ea.length===2,isEditing&&ea.length===2,e)}<td class="sc-end-total">${et}</td><td class="sc-running">${et!==''?running:''}</td><td class="sc-stat">${ea.length>0?c10:''}</td><td class="sc-stat">${ea.length>0?c9:''}</td></tr>`;}html+=`<tr class="sc-half-total"><td colspan="4">HALF TOTAL</td><td>${running}</td><td></td><td>${tens}</td><td>${nines}</td></tr>`;document.getElementById(bodyId).innerHTML=html;}
+function renderScOutdoor(ends,startEnd,endEnd,bodyId,curEnd){let html='',running=0,tens=0,xs=0;for(let e=startEnd;e<endEnd;e++){const ea=ends[e]||[];const isActive=e===curEnd&&editingEnd===null;const isEditing=editingEnd!==null&&editingEnd.endIdx===e;const v=ea.map(x=>getVal(x));const s1=(ea.length>=3)?v[0]+v[1]+v[2]:'';const s2=(ea.length>=6)?v[3]+v[4]+v[5]:'';const et=s2!==''?(Number(s1)||0)+s2:'';if(et!=='')running+=et;const c10=ea.filter(x=>x===10||x==='X').length,cx=ea.filter(x=>x==='X').length;if(ea.length>0){tens+=c10;xs+=cx;}const ra=(isActive||isEditing)&&ea.length<3;const r2=(isActive||isEditing)&&ea.length>=3&&ea.length<6;html+='<tr><td rowspan="2" class="sc-end-label" onclick="editEnd('+e+')">End '+(e+1)+(isActive?' ▶':isEditing?' ✏':'')+'</td>'+scCellHtml(ea[0],ra&&ea.length===0,isEditing&&ea.length===0,e)+scCellHtml(ea[1],ra&&ea.length===1,isEditing&&ea.length===1,e)+scCellHtml(ea[2],ra&&ea.length===2,isEditing&&ea.length===2,e)+'<td class="sc-sum-box">'+s1+'</td><td class="sc-no-entry"></td><td rowspan="2" class="sc-running">'+(et!==''?running:'')+'</td><td class="sc-stat">'+(ea.length>0?c10:'')+'</td><td class="sc-stat">'+(ea.length>0?cx:'')+'</td></tr><tr class="sc-end-sep">'+scCellHtml(ea[3],r2&&ea.length===3,isEditing&&ea.length===3,e)+scCellHtml(ea[4],r2&&ea.length===4,isEditing&&ea.length===4,e)+scCellHtml(ea[5],r2&&ea.length===5,isEditing&&ea.length===5,e)+'<td class="sc-sum-box">'+s2+'</td><td class="sc-end-total">'+et+'</td><td class="sc-stat"></td><td class="sc-stat"></td></tr>';}html+='<tr class="sc-half-total"><td colspan="5">HALF TOTAL</td><td>'+running+'</td><td></td><td>'+tens+'</td><td>'+xs+'</td></tr>';document.getElementById(bodyId).innerHTML=html;}
+function renderScIndoor(ends,startEnd,endEnd,bodyId,curEnd){let html='',running=0,tens=0,nines=0;for(let e=startEnd;e<endEnd;e++){const ea=ends[e]||[];const isActive=e===curEnd&&editingEnd===null;const isEditing=editingEnd!==null&&editingEnd.endIdx===e;const v=ea.map(x=>getVal(x));const et=(ea.length>=3)?v[0]+v[1]+v[2]:'';if(et!=='')running+=et;const c10=ea.filter(x=>x===10||x==='X').length,c9=ea.filter(x=>x===9).length;if(ea.length>0){tens+=c10;nines+=c9;}html+='<tr class="sc-end-sep"><td class="sc-end-label" onclick="editEnd('+e+')">End '+(e+1)+(isActive?' ▶':isEditing?' ✏':'')+'</td>'+scCellHtml(ea[0],isActive&&ea.length===0,isEditing&&ea.length===0,e)+scCellHtml(ea[1],isActive&&ea.length===1,isEditing&&ea.length===1,e)+scCellHtml(ea[2],isActive&&ea.length===2,isEditing&&ea.length===2,e)+'<td class="sc-end-total">'+et+'</td><td class="sc-running">'+(et!==''?running:'')+'</td><td class="sc-stat">'+(ea.length>0?c10:'')+'</td><td class="sc-stat">'+(ea.length>0?c9:'')+'</td></tr>';}html+='<tr class="sc-half-total"><td colspan="4">HALF TOTAL</td><td>'+running+'</td><td></td><td>'+tens+'</td><td>'+nines+'</td></tr>';document.getElementById(bodyId).innerHTML=html;}
 window.editEnd=(endIdx)=>{const archer=getCurrentArcher(),ea=scores[archer.id].ends[endIdx]||[];if(ea.length===0&&endIdx!==getNextIncompleteEnd())return;editingEnd={endIdx,originalArrows:[...ea]};scores[archer.id].ends[endIdx]=[...ea];renderScoreList();renderPad();updateQualHeader();};
 function updateHeader(){updateQualHeader();}
 function updateQualHeader(){
   const cfg=getConfig(),archer=getCurrentArcher();const endIdx=editingEnd!==null?editingEnd.endIdx:getNextIncompleteEnd();
-  let endLabel;if(discipline==='Custom'){const tc=getCustomTargetConfig(endIdx);const typeStr=tc.type==='Kill'?` — 🎯 Kill`:tc.type==='3D'?` — 🦌 3D`:` — 🌄 Field`;endLabel=`TARGET ${endIdx+1}${typeStr}${editingEnd?' — EDITING':''}`;} else{endLabel=`${(cfg.label==='Target'?t('target').toUpperCase():cfg.label==='End'?t('end').toUpperCase():t('station').toUpperCase())} ${endIdx+1}${editingEnd?' — EDITING':''}`;}
+  let endLabel;if(discipline==='Custom'){const tc=getCustomTargetConfig(endIdx);const typeStr=tc.type==='Kill'?' — 🎯 Kill':tc.type==='3D'?' — 🦌 3D':' — 🌄 Field';endLabel='TARGET '+(endIdx+1)+typeStr+(editingEnd?' — EDITING':'');}else{endLabel=(cfg.label==='Target'?t('target').toUpperCase():cfg.label==='End'?t('end').toUpperCase():t('station').toUpperCase())+' '+(endIdx+1)+(editingEnd?' — EDITING':'');}
   document.getElementById('s-end-label').textContent=endLabel;document.getElementById('s-archer-name').textContent=archer.name;document.getElementById('s-archer-slot').textContent=archer.slot;
   const s=scores[archer.id]||{};let g1l,g2l;if(discipline==='3D'){g1l='11';g2l='10';}else if(discipline==='Field'){g1l='6';g2l='5';}else if(discipline==='Indoor'){g1l='10';g2l='9';}else if(discipline==='Custom'){g1l=t('kills');g2l=t('elevens');}else{g1l='X';g2l='10';}
   document.getElementById('s-grand-total').textContent=s.total||0;
@@ -603,13 +422,14 @@ function updateQualHeader(){
   let total=0,done=0;if(discipline==='Custom'){const numEnds=getTotalCustomEnds();total=numEnds*targetArchers.length;targetArchers.forEach(a=>{for(let e=0;e<numEnds;e++){if(isEndComplete(a.id,e))done++;}});}else{total=cfg.ends*targetArchers.length;done=targetArchers.reduce((s,a)=>s+scores[a.id].ends.filter(e=>e.length===cfg.arrows).length,0);}
   document.getElementById('s-progress').style.width=(total>0?done/total*100:0)+'%';
 }
+
 function renderPad(){
   const archer=getCurrentArcher();const endIdx=editingEnd!==null?editingEnd.endIdx:getNextIncompleteEnd();const arrowsForEnd=getCustomArrowsForEnd(endIdx);const curArrows=scores[archer.id].ends[endIdx]||[];const padScores=getPadScores(endIdx);const isFull=curArrows.length>=arrowsForEnd;const isEditing=editingEnd!==null;const allDone=targetArchers.every(a=>isArcherDone(a.id));
   let cols;if(discipline==='Custom'){const tc=getCustomTargetConfig(endIdx);cols=tc.type==='Kill'?'repeat(3,1fr)':tc.type==='3D'?'repeat(3,1fr)':'repeat(4,1fr)';}else{cols=padScores.length<=5?'repeat(3,1fr)':'repeat(4,1fr)';}
-  let btns=padScores.map(s=>{let label,scoreArg,cls;if(s==='Kill'||s==='Body'||s==='Miss'){const tc=getCustomTargetConfig(endIdx);const pts=s==='Kill'?tc.kill:s==='Body'?tc.body:tc.miss;label=`${s}\n${pts}pts`;scoreArg=`'${s}'`;cls=s==='Kill'?'pad-kill':s==='Body'?'pad-body':'pad-miss';}else{label=s===0?'M':s;scoreArg=s==='X'?"'X'":s;cls=s===0?'pad-done':padBtnClass(s);}return`<button class="pad-btn ${cls}" onclick="handleScore(${scoreArg})" ${isFull&&!isEditing?'disabled style="opacity:0.4"':''} style="white-space:pre-line;font-size:${s==='Kill'||s==='Body'||s==='Miss'?'14px':'20px'};">${label}</button>`;}).join('');
-  btns+=`<button class="pad-btn pad-back" onclick="handleBack()" style="grid-column:span 2;">BACKSPACE ←</button>`;
-  let nextLabel,nextDisabled;if(isEditing){nextLabel=t('done_editing');nextDisabled=false;}else if(allDone){nextLabel=t('view_summary');nextDisabled=false;}else{nextLabel=`${curArrows.length}/${arrowsForEnd}`;nextDisabled=true;}
-  if(!nextDisabled)btns+=`<button class="pad-btn pad-next" onclick="handleNext()" style="grid-column:span 2;">${nextLabel}</button>`;
+  let btns=padScores.map(s=>{let label,scoreArg,cls;if(s==='Kill'||s==='Body'||s==='Miss'){const tc=getCustomTargetConfig(endIdx);const pts=s==='Kill'?tc.kill:s==='Body'?tc.body:tc.miss;label=s+'\n'+pts+'pts';scoreArg="'"+s+"'";cls=s==='Kill'?'pad-kill':s==='Body'?'pad-body':'pad-miss';}else{label=s===0?'M':s;scoreArg=s==='X'?"'X'":s;cls=s===0?'pad-done':padBtnClass(s);}return'<button class="pad-btn '+cls+'" onclick="handleScore('+scoreArg+')" '+(isFull&&!isEditing?'disabled style="opacity:0.4"':'')+' style="white-space:pre-line;font-size:'+(s==='Kill'||s==='Body'||s==='Miss'?'14px':'20px')+';">'+label+'</button>';}).join('');
+  btns+='<button class="pad-btn pad-back" onclick="handleBack()" style="grid-column:span 2;">BACKSPACE ←</button>';
+  let nextLabel,nextDisabled;if(isEditing){nextLabel=t('done_editing');nextDisabled=false;}else if(allDone){nextLabel=t('view_summary');nextDisabled=false;}else{nextLabel=curArrows.length+'/'+arrowsForEnd;nextDisabled=true;}
+  if(!nextDisabled)btns+='<button class="pad-btn pad-next" onclick="handleNext()" style="grid-column:span 2;">'+nextLabel+'</button>';
   const pad=document.getElementById('score-pad');pad.style.gridTemplateColumns=cols;pad.innerHTML=btns;
 }
 window.handleScore=async(val)=>{
@@ -624,11 +444,68 @@ window.handleNext=async()=>{if(editingEnd!==null){editingEnd=null;await saveQual
 function recalcStats(archerId){const cfg=getConfig(),ends=scores[archerId].ends,all=ends.flat();scores[archerId].total=all.reduce((s,v)=>s+getVal(v),0);scores[archerId].tens=all.filter(v=>v===10||v==='X'||v===11).length;scores[archerId].xs=all.filter(v=>v==='X').length;if(discipline==='Outdoor'){scores[archerId].h1=ends.slice(0,6).flat().reduce((s,v)=>s+getVal(v),0);scores[archerId].h2=ends.slice(6,12).flat().reduce((s,v)=>s+getVal(v),0);scores[archerId].g1=all.filter(v=>v==='X').length;scores[archerId].g2=all.filter(v=>v===10).length;}else if(discipline==='Indoor'){scores[archerId].h1=ends.slice(0,10).flat().reduce((s,v)=>s+getVal(v),0);scores[archerId].h2=ends.slice(10,20).flat().reduce((s,v)=>s+getVal(v),0);scores[archerId].g1=all.filter(v=>v===10||v==='X').length;scores[archerId].g2=all.filter(v=>v===9).length;}else if(discipline==='3D'){scores[archerId].h1=0;scores[archerId].h2=0;scores[archerId].g1=all.filter(v=>v===11).length;scores[archerId].g2=all.filter(v=>v===10).length;}else if(discipline==='Field'){scores[archerId].h1=0;scores[archerId].h2=0;scores[archerId].g1=all.filter(v=>v===6).length;scores[archerId].g2=all.filter(v=>v===5).length;}else if(discipline==='Custom'){scores[archerId].h1=0;scores[archerId].h2=0;scores[archerId].g1=0;scores[archerId].g2=0;let kills=0,elevens=0,sixes=0;ends.forEach((ea,i)=>{const tc=getCustomTargetConfig(i);ea.forEach(v=>{if(tc.type==='Kill'&&v===tc.kill)kills++;else if(tc.type==='3D'&&v===11)elevens++;else if(tc.type==='Field'&&v===6)sixes++;});});scores[archerId].kills=kills;scores[archerId].elevens=elevens;scores[archerId].sixes=sixes;}}
 async function saveQualScores(){if(!compId)return;try{const payload={scores:{}};targetArchers.forEach(a=>{const key=String(a.id).replace(/\./g,'_');const s=scores[a.id];const endsObj={};s.ends.forEach((end,i)=>{endsObj[String(i)]=end;});payload.scores[key]={total:s.total,tens:s.tens,xs:s.xs,g1:s.g1||0,g2:s.g2||0,h1:s.h1||0,h2:s.h2||0,kills:s.kills||0,elevens:s.elevens||0,sixes:s.sixes||0,ends:endsObj};});await setDoc(doc(db,'competitions',compId),payload,{merge:true});}catch(e){toast(t('save_failed'),'error');}}
 
-/* ── QUALIFICATION SUMMARY ── */
+/* ── SUMMARY ── */
 let summaryArcherIdx=0;
-function showQualSummary(){document.getElementById('scoring-screen').style.display='none';document.getElementById('summary-screen').style.display='flex';document.getElementById('sum-title').textContent=`${t('target')} ${targetNum} — ${t('complete')}`;summaryArcherIdx=0;renderSummaryTabs();renderSummaryScorecard(0);}
-function renderSummaryTabs(){const tabs=document.getElementById('summary-archer-tabs');if(targetArchers.length<=1){tabs.style.display='none';return;}tabs.style.display='flex';tabs.innerHTML=targetArchers.map((a,i)=>`<button onclick="switchSummaryArcher(${i})" style="flex:1;padding:8px 6px;border:none;border-radius:6px;background:${i===summaryArcherIdx?'var(--blue)':'transparent'};color:${i===summaryArcherIdx?'#fff':'var(--muted)'};font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">${a.slot} · ${a.name.split(' ')[0]}</button>`).join('');}
+function showQualSummary(){document.getElementById('scoring-screen').style.display='none';document.getElementById('summary-screen').style.display='flex';document.getElementById('sum-title').textContent=t('target')+' '+targetNum+' — '+t('complete');summaryArcherIdx=0;renderSummaryTabs();renderSummaryScorecard(0);}
+function renderSummaryTabs(){const tabs=document.getElementById('summary-archer-tabs');if(targetArchers.length<=1){tabs.style.display='none';return;}tabs.style.display='flex';tabs.innerHTML=targetArchers.map((a,i)=>'<button onclick="switchSummaryArcher('+i+')" style="flex:1;padding:8px 6px;border:none;border-radius:6px;background:'+(i===summaryArcherIdx?'var(--blue)':'transparent')+';color:'+(i===summaryArcherIdx?'#fff':'var(--muted)')+';font-family:\'Barlow Condensed\',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">'+a.slot+' · '+a.name.split(' ')[0]+'</button>').join('');}
 window.switchSummaryArcher=(idx)=>{summaryArcherIdx=idx;renderSummaryTabs();renderSummaryScorecard(idx);};
 function renderSummaryScorecard(idx){
   const a=targetArchers[idx],s=scores[a.id],list=document.getElementById('summary-list');
-  if(discipline==='Custom'){const grey='background-image:repeating-linear-gradient(135deg,transparent,transparent 4px,#e0e0e0 4px,#e0e0e0 5px);';let running=0,rows='';s.ends.forEach((end,i)=>{const tc=getCustomTargetConfig(i);const arrows=tc.arrows||3;const tot=end.reduce((x,v)=>x+getVal(v),0);if(end.length>0)running+=tot;const typeColor=tc.type==='Kill'?'#c62828':tc.type==='3D'?'#4a148c':'#1565c0';const typeShort=tc.type==='Kill'?`Kill\n${tc.kill}/${tc.body}/${tc.miss}`:tc.type==='3D'?'3D':'Field';function arrowCell(idx){if(idx>=arrows)return`<td style="${grey}width:36px;border:1px solid #ccc;"></td>`;const v=end[idx];const display=v===undefined||v===''?'':(v===0?'M':(tc.type==='Kill'?valueToLabel(v,i):v));const bg=tc.type==='Kill'&&v===tc.kill?'background:#c8e6c9;color:#1b5e20;font-weight:700;':tc.type==='Kill'&&v===tc.body?'background:#fff3e0;color:#e65100;font-weight:700;':'';return`<td style="${bg}width:36px;text-align:center;border:1px solid #ccc;">${display}</td>`;}rows+=`<tr style="border-bottom:1px solid #ccc;"><td style="background:#f0f0f0;font-weight:700;font-size:11px;width:40px;text-align:center;border-right:1.5px solid #999;">T${i+1}</td><td style="font-size:9px;font-weight:700;color:${typeColor};width:48px;text-align:center;white-space:pre-line;line-height:1.3;border:1px solid #ccc;">${typeShort}</td>${arrowCell(0)}${arrowCell(1)}${arrowCell(2)}<td style="background:#e3f2fd;font-weight:700;color:#1565c0;text-align:center;width:40px;border-left:1.5px solid #999;border:1px solid #ccc;">${end.length>0?tot:''}</td><td style="background:#fff8e1;font-weight:700;color:#c62828;text-align:center;width:46px;border-left:1.5px solid #999;border:1px solid #ccc;">${end.length>0?running:''}</td></tr>`;});const tableHtml=`<table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:13px;"><colgroup><col style="width:40px"><col style="width:48px"><col style="width:36px"><col style="width:36px"><col style="width:36px"><col style="width:40px"><col style="width:46px"></colgroup><thead><tr style="background:#555;color:#fff;font-size:10px;font-weight:700;height:24px;"><th>Target</th><th>Type</th><th>A1</th><th>A2</th><th>A3</th><th>End</th><th>Running</th></tr></thead><tbody>${rows}</tbody></table>`;list.innerHTML=`<div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:11px;color:#aaa;">${a.slot} · ${a.bow} · ${a.age} · Custom</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;">${a.name}</div></div><div style="font-family:'Barlow Condens
+  if(discipline==='Custom'){const grey='background-image:repeating-linear-gradient(135deg,transparent,transparent 4px,#e0e0e0 4px,#e0e0e0 5px);';let running=0,rows='';s.ends.forEach((end,i)=>{const tc=getCustomTargetConfig(i);const arrows=tc.arrows||3;const tot=end.reduce((x,v)=>x+getVal(v),0);if(end.length>0)running+=tot;const typeColor=tc.type==='Kill'?'#c62828':tc.type==='3D'?'#4a148c':'#1565c0';const typeShort=tc.type==='Kill'?'Kill\n'+tc.kill+'/'+tc.body+'/'+tc.miss:tc.type==='3D'?'3D':'Field';function arrowCell(ai){if(ai>=arrows)return'<td style="'+grey+'width:36px;border:1px solid #ccc;"></td>';const v=end[ai];const display=v===undefined||v===''?'':(v===0?'M':(tc.type==='Kill'?valueToLabel(v,i):v));const bg=tc.type==='Kill'&&v===tc.kill?'background:#c8e6c9;color:#1b5e20;font-weight:700;':tc.type==='Kill'&&v===tc.body?'background:#fff3e0;color:#e65100;font-weight:700;':'';return'<td style="'+bg+'width:36px;text-align:center;border:1px solid #ccc;">'+display+'</td>';}rows+='<tr style="border-bottom:1px solid #ccc;"><td style="background:#f0f0f0;font-weight:700;font-size:11px;width:40px;text-align:center;border-right:1.5px solid #999;">T'+(i+1)+'</td><td style="font-size:9px;font-weight:700;color:'+typeColor+';width:48px;text-align:center;white-space:pre-line;line-height:1.3;border:1px solid #ccc;">'+typeShort+'</td>'+arrowCell(0)+arrowCell(1)+arrowCell(2)+'<td style="background:#e3f2fd;font-weight:700;color:#1565c0;text-align:center;width:40px;border:1px solid #ccc;">'+(end.length>0?tot:'')+'</td><td style="background:#fff8e1;font-weight:700;color:#c62828;text-align:center;width:46px;border:1px solid #ccc;">'+(end.length>0?running:'')+'</td></tr>';});list.innerHTML='<div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:11px;color:#aaa;">'+a.slot+' · '+a.bow+' · '+a.age+' · Custom</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:18px;font-weight:900;">'+a.name+'</div></div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:36px;font-weight:900;color:var(--accent);">'+s.total+'</div></div><table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:13px;"><colgroup><col style="width:40px"><col style="width:48px"><col style="width:36px"><col style="width:36px"><col style="width:36px"><col style="width:40px"><col style="width:46px"></colgroup><thead><tr style="background:#555;color:#fff;font-size:10px;font-weight:700;height:24px;"><th>Target</th><th>Type</th><th>A1</th><th>A2</th><th>A3</th><th>End</th><th>Running</th></tr></thead><tbody>'+rows+'</tbody></table>';return;}
+  if(discipline==='3D'||discipline==='Field'){const cfg=getConfig();const endRows=s.ends.map((end,i)=>{const tot=end.reduce((x,v)=>x+getVal(v),0);const chips=end.map(v=>'<span class="arrow-chip '+chipClass(v,i)+'" style="font-size:12px;padding:2px 7px;">'+(v===0?'M':v)+'</span>').join('');return'<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #eee;"><div style="font-size:11px;color:#888;width:70px;">'+cfg.label+' '+(i+1)+'</div><div style="display:flex;gap:3px;flex:1;">'+chips+'</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:900;color:#1565c0;">'+tot+'</div></div>';}).join('');list.innerHTML='<div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:11px;color:#aaa;">'+a.slot+' · '+a.bow+' · '+a.age+'</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:18px;font-weight:900;">'+a.name+'</div></div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:36px;font-weight:900;color:var(--accent);">'+s.total+'</div></div><div>'+endRows+'</div>';return;}
+  function sumCell(val){const v=val===undefined||val===''?'':(val===0?'M':val);const cls=(val==='X'||val===10||val===9||val===11)?'sc-gold':'';return'<td class="'+cls+'">'+v+'</td>';}
+  if(discipline==='Outdoor'){list.innerHTML='<div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:11px;color:#aaa;">'+a.slot+' · '+a.bow+' · '+a.age+'</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:18px;font-weight:900;">'+a.name+'</div></div><div style="text-align:right;"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:36px;font-weight:900;color:#FFD700;">'+s.total+'</div><div style="font-size:11px;color:#aaa;">X:'+s.xs+' · 10+X:'+s.tens+'</div></div></div><div class="sc-half-header"><div class="sc-half-title">1st HALF (Ends 1–6)</div><div>10+X</div><div>X</div></div><table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:32px"><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sum-body-1"></tbody></table><div class="sc-half-header" style="margin-top:6px;"><div class="sc-half-title">2nd HALF (Ends 7–12)</div><div>10+X</div><div>X</div></div><table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:32px"><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sum-body-2"></tbody></table><div style="height:10px;"></div>';function sumOut(ends,ss,e,bid){let html='',r=0,tn=0,x=0;for(let i=ss;i<e;i++){const ea=ends[i]||[];const v=ea.map(x=>getVal(x));const s1=ea.length>=3?v[0]+v[1]+v[2]:'';const s2=ea.length>=6?v[3]+v[4]+v[5]:'';const et=s2!==''?(Number(s1)||0)+s2:'';if(et!=='')r+=et;const c10=ea.filter(x=>x===10||x==='X').length,cx=ea.filter(x=>x==='X').length;if(ea.length>0){tn+=c10;x+=cx;}html+='<tr><td rowspan="2" class="sc-end-label">End '+(i+1)+'</td>'+sumCell(ea[0])+sumCell(ea[1])+sumCell(ea[2])+'<td class="sc-sum-box">'+s1+'</td><td class="sc-no-entry"></td><td rowspan="2" class="sc-running">'+(et!==''?r:'')+'</td><td class="sc-stat">'+(ea.length>0?c10:'')+'</td><td class="sc-stat">'+(ea.length>0?cx:'')+'</td></tr><tr class="sc-end-sep">'+sumCell(ea[3])+sumCell(ea[4])+sumCell(ea[5])+'<td class="sc-sum-box">'+s2+'</td><td class="sc-end-total">'+et+'</td><td class="sc-stat"></td><td class="sc-stat"></td></tr>';}html+='<tr class="sc-half-total"><td colspan="5">HALF TOTAL</td><td>'+r+'</td><td></td><td>'+tn+'</td><td>'+x+'</td></tr>';document.getElementById(bid).innerHTML=html;}sumOut(s.ends,0,6,'sum-body-1');sumOut(s.ends,6,12,'sum-body-2');}else{list.innerHTML='<div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:11px;color:#aaa;">'+a.slot+' · '+a.bow+' · '+a.age+'</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:18px;font-weight:900;">'+a.name+'</div></div><div style="text-align:right;"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:36px;font-weight:900;color:#FFD700;">'+s.total+'</div><div style="font-size:11px;color:#aaa;">10:'+s.g1+' · 9:'+s.g2+'</div></div></div><div class="sc-half-header"><div class="sc-half-title">1st HALF (Ends 1–10)</div><div>10</div><div>9</div></div><table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sum-body-1"></tbody></table><div class="sc-half-header" style="margin-top:6px;"><div class="sc-half-title">2nd HALF (Ends 11–20)</div><div>10</div><div>9</div></div><table class="sc-table"><colgroup><col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup><tbody id="sum-body-2"></tbody></table><div style="height:10px;"></div>';function sumIn(ends,ss,e,bid){let html='',r=0,tn=0,n=0;for(let i=ss;i<e;i++){const ea=ends[i]||[];const v=ea.map(x=>getVal(x));const et=ea.length>=3?v[0]+v[1]+v[2]:'';if(et!=='')r+=et;const c10=ea.filter(x=>x===10||x==='X').length,c9=ea.filter(x=>x===9).length;if(ea.length>0){tn+=c10;n+=c9;}html+='<tr class="sc-end-sep"><td class="sc-end-label">End '+(i+1)+'</td>'+sumCell(ea[0])+sumCell(ea[1])+sumCell(ea[2])+'<td class="sc-end-total">'+et+'</td><td class="sc-running">'+(et!==''?r:'')+'</td><td class="sc-stat">'+(ea.length>0?c10:'')+'</td><td class="sc-stat">'+(ea.length>0?c9:'')+'</td></tr>';}html+='<tr class="sc-half-total"><td colspan="4">HALF TOTAL</td><td>'+r+'</td><td></td><td>'+tn+'</td><td>'+n+'</td></tr>';document.getElementById(bid).innerHTML=html;}sumIn(s.ends,0,10,'sum-body-1');sumIn(s.ends,10,20,'sum-body-2');}
+}
+window.goBackToScoring=()=>{document.getElementById('summary-screen').style.display='none';if(matchData){document.getElementById('login-screen').style.display='flex';matchData=null;matchCatKey=null;matchRoundKey=null;matchIdx=null;matchSets=[];cumArrows1=[];cumArrows2=[];window._tbWinner=null;showLoginStep('login-step-1');}else{document.getElementById('scoring-screen').style.display='flex';renderTabs();renderScoreList();renderPad();updateQualHeader();}};
+
+/* ── MATCH SCORING ── */
+function getMatchSetScore(si,ai){const s=matchSets[si];if(!s)return 0;return ai===0?s.score1||0:s.score2||0;}
+function getMatchArrows(si,ai){const s=matchSets[si];if(!s)return[];return ai===0?(s.arrows1||[]):(s.arrows2||[]);}
+function setMatchArrows(si,ai,arrows){if(!matchSets[si])matchSets[si]={score1:0,score2:0,arrows1:[],arrows2:[]};if(ai===0){matchSets[si].arrows1=arrows;matchSets[si].score1=arrows.reduce((s,v)=>s+getVal(v),0);}else{matchSets[si].arrows2=arrows;matchSets[si].score2=arrows.reduce((s,v)=>s+getVal(v),0);}}
+function calcMatchPoints(){let p1=0,p2=0;matchSets.slice(0,MAX_SETS).forEach((s,i)=>{if(!s)return;if(s.arrows1.length<getArrowsPerSet()||s.arrows2.length<getArrowsPerSet())return;if(s.score1>s.score2)p1+=2;else if(s.score2>s.score1)p2+=2;else{p1+=1;p2+=1;}});return{p1,p2};}
+function getTBArrows(si){return si===MAX_SETS?1:getArrowsPerSet();}
+function isMatchWon(){const{p1,p2}=calcMatchPoints();return p1>=SETS_TO_WIN||p2>=SETS_TO_WIN;}
+function getActiveMatchSet(){if(isMatchWon())return -1;const maxSets=isTiebreakNeeded()?MAX_SETS+1:MAX_SETS;for(let i=0;i<maxSets;i++){if(getMatchArrows(i,matchActiveArcher).length<getTBArrows(i))return i;}return maxSets-1;}
+function checkMatchDone(){const{p1,p2}=calcMatchPoints();if(p1>=SETS_TO_WIN||p2>=SETS_TO_WIN)return true;if(matchSets.length>=MAX_SETS){const all5done=matchSets.slice(0,MAX_SETS).every(s=>s&&s.arrows1.length===getArrowsPerSet()&&s.arrows2.length===getArrowsPerSet());if(!all5done)return false;if(p1===5&&p2===5){const tb=matchSets[MAX_SETS];if(!tb||tb.arrows1.length<1||tb.arrows2.length<1)return false;return true;}return true;}return false;}
+function isTiebreakNeeded(){if(matchSets.length<MAX_SETS)return false;const all5done=matchSets.slice(0,MAX_SETS).every(s=>s&&s.arrows1.length===getArrowsPerSet()&&s.arrows2.length===getArrowsPerSet());if(!all5done)return false;const{p1,p2}=calcMatchPoints();return p1===5&&p2===5;}
+window.startMatch=()=>{document.getElementById('login-screen').style.display='none';document.getElementById('match-screen').style.display='flex';document.getElementById('m-comp-name').textContent=compData.name||'';const rl={R1:'Round of '+((compData.elimination?.[matchCatKey]?.bracketSize||2)*2),QF:'Quarter Final',SF:'Semi Final',F:'🏆 Final',B:'🥉 Bronze'};document.getElementById('m-match-label').textContent=rl[matchRoundKey]||matchRoundKey;document.getElementById('m-format-label').textContent=matchFormat==='sets'?'Set System · First to 6 pts':'Cumulative · 15 arrows';document.getElementById('sp-a1-label').textContent=matchData.archer1?.name?.split(' ')[0]||'A1';document.getElementById('sp-a2-label').textContent=matchData.archer2?.name?.split(' ')[0]||'A2';matchActiveArcher=0;cumTB1=null;cumTB2=null;window._cumTBWinner=null;renderMatchTabs();renderMatchSets();renderMatchPad();updateMatchHeader();};
+function renderMatchTabs(){const tabs=document.getElementById('match-archer-tabs');tabs.innerHTML=[matchData.archer1,matchData.archer2].map((a,i)=>'<button onclick="switchMatchArcher('+i+')" style="flex:1;padding:8px 6px;border:none;border-radius:6px;background:'+(i===matchActiveArcher?'var(--blue)':'transparent')+';color:'+(i===matchActiveArcher?'#fff':'var(--muted)')+';font-family:\'Barlow Condensed\',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">'+(a?.name||'Archer '+(i+1))+'</button>').join('');}
+window.switchMatchArcher=(idx)=>{matchActiveArcher=idx;renderMatchTabs();renderMatchSets();renderMatchPad();updateMatchHeader();};
+function updateMatchHeader(){const archer=matchActiveArcher===0?matchData.archer1:matchData.archer2;if(matchFormat==='sets'){const{p1,p2}=calcMatchPoints();document.getElementById('sp-a1').textContent=p1;document.getElementById('sp-a2').textContent=p2;const si=getActiveMatchSet();document.getElementById('m-set-label').textContent=t('set')+' '+(si+1);const arr=getMatchArrows(si,matchActiveArcher);document.getElementById('m-arrow-count').textContent=arr.length+'/'+getTBArrows(si);}else{const t1=cumArrows1.reduce((s,v)=>s+getVal(v),0);const t2=cumArrows2.reduce((s,v)=>s+getVal(v),0);document.getElementById('sp-a1').textContent=t1;document.getElementById('sp-a2').textContent=t2;const myCum=matchActiveArcher===0?cumArrows1:cumArrows2;const end=Math.floor(myCum.length/getArrowsPerSet())+1;document.getElementById('m-set-label').textContent=t('end')+' '+Math.min(end,getCumEnds());document.getElementById('m-arrow-count').textContent=(myCum.length%getArrowsPerSet()||0)+'/'+getArrowsPerSet();}document.getElementById('m-archer-name').textContent=archer?.name||'—';}
+function arrowChip(v,isActive){if(v===undefined)return'<span style="width:28px;height:28px;border-radius:6px;background:var(--surface2);border:1px dashed var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);">·</span>';const cls=chipClass(v);const act=isActive?'outline:2px solid var(--accent);outline-offset:1px;':'';return'<span class="arrow-chip '+cls+'" style="min-width:28px;text-align:center;'+act+'">'+(v===0?'M':v)+'</span>';}
+function renderMatchSets(){
+  const list=document.getElementById('sets-list');const a1=matchData.archer1,a2=matchData.archer2;const activeSi=getActiveMatchSet();
+  if(matchFormat==='sets'){
+    const totalSets=isTiebreakNeeded()?MAX_SETS+1:MAX_SETS;
+    let html='<div style="display:grid;grid-template-columns:1fr auto auto auto 1fr;gap:4px;padding:6px 10px;background:var(--surface2);border-radius:8px;margin-bottom:6px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;color:var(--muted);"><div>'+(a1?.name||'A1')+'</div><div style="min-width:34px;text-align:center;">SET</div><div style="min-width:32px;text-align:center;"></div><div style="min-width:34px;text-align:center;">SET</div><div style="text-align:right;">'+(a2?.name||'A2')+'</div></div>';
+    for(let i=0;i<totalSets;i++){const isTB=i===MAX_SETS;const arr1=getMatchArrows(i,0),arr2=getMatchArrows(i,1);const s1=getMatchSetScore(i,0),s2=getMatchSetScore(i,1);const done1=arr1.length===getTBArrows(i),done2=arr2.length===getTBArrows(i);const bothDone=done1&&done2;const isActive1=i===activeSi&&matchActiveArcher===0&&!done1;const isActive2=i===activeSi&&matchActiveArcher===1&&!done2;let c1='var(--muted2)',c2='var(--muted2)';if(bothDone){if(s1>s2){c1='var(--green)';}else if(s2>s1){c2='var(--green)';}else{c1='var(--accent)';c2='var(--accent)';}}const ac=getTBArrows(i);const chips1=Array.from({length:ac},(_,ai)=>arrowChip(arr1[ai],isActive1&&ai===arr1.length)).join('');const chips2=Array.from({length:ac},(_,ai)=>arrowChip(arr2[ai],isActive2&&ai===arr2.length)).join('');const pts1=bothDone&&!isTB?(s1>s2?2:s1===s2?1:0):'';const pts2=bothDone&&!isTB?(s2>s1?2:s1===s2?1:0):'';const matchWon=isMatchWon()&&!bothDone&&i>0;const borderCol=isTB?'var(--red)':bothDone?'var(--green)':i===activeSi?'var(--accent)':matchWon?'var(--surface2)':'var(--border)';const setBg=i===activeSi&&!bothDone?'rgba(255,215,0,0.04)':matchWon?'rgba(0,0,0,0.2)':'transparent';const setLabel=isTB?'TB':(t('set').charAt(0))+(i+1);html+='<div style="display:grid;grid-template-columns:1fr auto auto auto 1fr;gap:4px;align-items:center;padding:6px 8px;margin-bottom:4px;background:'+setBg+';border:1px solid '+borderCol+';border-radius:8px;"><div style="display:flex;gap:3px;flex-wrap:wrap;">'+chips1+'</div><div style="min-width:34px;text-align:center;font-family:\'Barlow Condensed\',sans-serif;font-size:18px;font-weight:900;color:'+c1+';">'+(bothDone?s1:'')+'</div><div style="min-width:32px;text-align:center;"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;font-weight:700;color:'+(isTB?'var(--red)':'var(--muted2)')+';">'+setLabel+'</div>'+(bothDone&&!isTB?'<div style="font-size:9px;color:var(--muted2);">'+pts1+'–'+pts2+'</div>':'')+'</div><div style="min-width:34px;text-align:center;font-family:\'Barlow Condensed\',sans-serif;font-size:18px;font-weight:900;color:'+c2+';">'+(bothDone?s2:'')+'</div><div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end;">'+chips2+'</div></div>';if(isTB&&bothDone&&s1===s2){html+='<div style="background:var(--surface2);border:1px solid var(--red);border-radius:8px;padding:12px;margin-bottom:4px;"><div style="font-size:11px;color:var(--red);margin-bottom:8px;font-weight:700;text-align:center;">⚡ TIED — WHO IS CLOSEST TO CENTER?</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><button onclick="setTBWinner(0)" style="padding:10px;border-radius:8px;border:2px solid '+(window._tbWinner===0?'var(--green)':'var(--border)')+';background:'+(window._tbWinner===0?'rgba(67,160,71,0.2)':'var(--surface3)')+';color:'+(window._tbWinner===0?'var(--green)':'var(--text)')+';font-family:\'Barlow Condensed\',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">'+(a1?.name||'A1')+'</button><button onclick="setTBWinner(1)" style="padding:10px;border-radius:8px;border:2px solid '+(window._tbWinner===1?'var(--green)':'var(--border)')+';background:'+(window._tbWinner===1?'rgba(67,160,71,0.2)':'var(--surface3)')+';color:'+(window._tbWinner===1?'var(--green)':'var(--text)')+';font-family:\'Barlow Condensed\',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">'+(a2?.name||'A2')+'</button></div></div>';}}
+    list.innerHTML=html;
+  }else{
+    let html='<div style="display:grid;grid-template-columns:1fr auto auto auto 1fr;gap:4px;padding:6px 10px;background:var(--surface2);border-radius:8px;margin-bottom:6px;font-family:\'Barlow Condensed\',sans-serif;font-size:11px;font-weight:700;color:var(--muted);"><div>'+(a1?.name||'A1')+'</div><div style="text-align:center;">END</div><div></div><div style="text-align:center;">END</div><div style="text-align:right;">'+(a2?.name||'A2')+'</div></div>';
+    for(let e=0;e<getCumEnds();e++){const si=e*getArrowsPerSet();const ea1=cumArrows1.slice(si,si+getArrowsPerSet()),ea2=cumArrows2.slice(si,si+getArrowsPerSet());const t1=ea1.reduce((s,v)=>s+getVal(v),0),t2=ea2.reduce((s,v)=>s+getVal(v),0);const d1=ea1.length===getArrowsPerSet(),d2=ea2.length===getArrowsPerSet();const isActive1=matchActiveArcher===0&&e===Math.floor(cumArrows1.length/getArrowsPerSet())&&!d1;const isActive2=matchActiveArcher===1&&e===Math.floor(cumArrows2.length/getArrowsPerSet())&&!d2;const borderCol=isActive1||isActive2?'var(--accent)':d1&&d2?'var(--green)':'var(--border)';const chips1=Array.from({length:getArrowsPerSet()},(_,ai)=>arrowChip(ea1[ai],isActive1&&ai===ea1.length)).join('');const chips2=Array.from({length:getArrowsPerSet()},(_,ai)=>arrowChip(ea2[ai],isActive2&&ai===ea2.length)).join('');html+='<div style="display:grid;grid-template-columns:1fr auto auto auto 1fr;gap:4px;align-items:center;padding:6px 8px;margin-bottom:4px;border:1px solid '+borderCol+';border-radius:8px;"><div style="display:flex;gap:3px;">'+chips1+'</div><div style="min-width:34px;text-align:center;font-family:\'Barlow Condensed\',sans-serif;font-size:17px;font-weight:900;color:var(--accent);">'+(d1?t1:'')+'</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:var(--muted2);min-width:28px;text-align:center;">E'+(e+1)+'</div><div style="min-width:34px;text-align:center;font-family:\'Barlow Condensed\',sans-serif;font-size:17px;font-weight:900;color:var(--accent);">'+(d2?t2:'')+'</div><div style="display:flex;gap:3px;justify-content:flex-end;">'+chips2+'</div></div>';}
+    const allCumDone=cumArrows1.length>=getCumEnds()*getArrowsPerSet()&&cumArrows2.length>=getCumEnds()*getArrowsPerSet();
+    if(allCumDone){const tot1=cumArrows1.reduce((s,v)=>s+getVal(v),0);const tot2=cumArrows2.reduce((s,v)=>s+getVal(v),0);if(tot1===tot2){const tb1=cumTB1,tb2=cumTB2;const tbA1=matchActiveArcher===0&&tb1===null;const tbA2=matchActiveArcher===1&&tb2===null;const tbBorder=tbA1||tbA2?'var(--accent)':tb1!==null&&tb2!==null?'var(--green)':'var(--border)';const tbTied=tb1!==null&&tb2!==null&&getVal(tb1)===getVal(tb2);html+='<div style="display:grid;grid-template-columns:1fr auto auto auto 1fr;gap:4px;align-items:center;padding:6px 8px;margin-bottom:4px;border:1px solid '+tbBorder+';border-radius:8px;background:#1a1500;"><div style="display:flex;gap:3px;">'+arrowChip(tb1,tbA1)+'</div><div style="min-width:34px;text-align:center;font-family:\'Barlow Condensed\',sans-serif;font-size:17px;font-weight:900;color:var(--accent);">'+(tb1!==null?getVal(tb1):'')+'</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:var(--muted2);min-width:28px;text-align:center;">TB</div><div style="min-width:34px;text-align:center;font-family:\'Barlow Condensed\',sans-serif;font-size:17px;font-weight:900;color:var(--accent);">'+(tb2!==null?getVal(tb2):'')+'</div><div style="display:flex;gap:3px;justify-content:flex-end;">'+arrowChip(tb2,tbA2)+'</div></div>';if(tbTied){html+='<div style="background:#1a1500;border:1px solid var(--accent);border-radius:8px;padding:10px;margin-bottom:4px;text-align:center;"><div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:8px;letter-spacing:1px;">CLOSER TO CENTER?</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><button onclick="setCumTBWinner(0)" style="padding:10px;border-radius:8px;border:2px solid '+(window._cumTBWinner===0?'var(--green)':'var(--border)')+';background:'+(window._cumTBWinner===0?'rgba(67,160,71,0.2)':'var(--surface2)')+';color:'+(window._cumTBWinner===0?'var(--green)':'var(--text)')+';font-family:\'Barlow Condensed\',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">'+(matchData.archer1?.name||'A1')+'</button><button onclick="setCumTBWinner(1)" style="padding:10px;border-radius:8px;border:2px solid '+(window._cumTBWinner===1?'var(--green)':'var(--border)')+';background:'+(window._cumTBWinner===1?'rgba(67,160,71,0.2)':'var(--surface2)')+';color:'+(window._cumTBWinner===1?'var(--green)':'var(--text)')+';font-family:\'Barlow Condensed\',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">'+(matchData.archer2?.name||'A2')+'</button></div></div>';}}}
+    list.innerHTML=html;
+  }
+  setTimeout(()=>{const rows=list.querySelectorAll('[style*="border:1px solid var(--accent)"]');if(rows.length)rows[rows.length-1].scrollIntoView({behavior:'smooth',block:'center'});},50);
+}
+
+function renderMatchPad(){const padScores=getPadScores(0);let isFull;if(matchFormat==='sets'){const asi=getActiveMatchSet();isFull=asi===-1||isMatchWon()||getMatchArrows(asi,matchActiveArcher).length>=getTBArrows(asi);}else{const aPerT=getArrowsPerSet();const allDoneCum=cumArrows1.length>=getCumEnds()*aPerT&&cumArrows2.length>=getCumEnds()*aPerT;if(allDoneCum){const tot1=cumArrows1.reduce((s,v)=>s+getVal(v),0),tot2=cumArrows2.reduce((s,v)=>s+getVal(v),0);if(tot1!==tot2){isFull=true;}else{isFull=(cumTB1!==null&&matchActiveArcher===0)||(cumTB2!==null&&matchActiveArcher===1);}}else{const myCum=matchActiveArcher===0?cumArrows1:cumArrows2;isFull=myCum.length>=getCumEnds()*aPerT;}}let btns=padScores.map(s=>{const label=s===0?'M':s;const scoreArg=s==='X'?"'X'":s;const cls=s===0?'pad-done':padBtnClass(s);return'<button class="pad-btn '+cls+'" onclick="handleMatchScore('+scoreArg+')" '+(isFull?'disabled style="opacity:0.4"':'')+'>'+label+'</button>';}).join('');btns+='<button class="pad-btn pad-back" onclick="handleMatchBack()" style="grid-column:span 2;">BACKSPACE ←</button>';const aPerT2=getArrowsPerSet();const allCumDoneCheck=cumArrows1.length>=getCumEnds()*aPerT2&&cumArrows2.length>=getCumEnds()*aPerT2;const cumTot1=cumArrows1.reduce((s,v)=>s+getVal(v),0),cumTot2=cumArrows2.reduce((s,v)=>s+getVal(v),0);const cumNeedsTB=allCumDoneCheck&&cumTot1===cumTot2;const cumTBBothDone=cumTB1!==null&&cumTB2!==null;const cumTBStillTied=cumTBBothDone&&getVal(cumTB1)===getVal(cumTB2);const cumTBDone=cumNeedsTB?(cumTBBothDone&&(!cumTBStillTied||window._cumTBWinner!==null)):true;const allDone=matchFormat==='sets'?checkMatchDone():(allCumDoneCheck&&cumTBDone);const tbTied=matchSets[MAX_SETS]&&matchSets[MAX_SETS].score1===matchSets[MAX_SETS].score2&&matchSets[MAX_SETS].arrows1.length>=1&&matchSets[MAX_SETS].arrows2.length>=1;const canSubmit=allDone&&(!tbTied||window._tbWinner!==null);if(canSubmit)btns+='<button class="pad-btn pad-done" onclick="submitMatch()" style="grid-column:span 2;">SUBMIT MATCH ✓</button>';else if(allDone&&tbTied)btns+='<button class="pad-btn" style="grid-column:span 2;background:#333;color:#888;cursor:not-allowed;">SELECT CLOSEST TO CENTER ↑</button>';const pad=document.getElementById('match-pad');pad.style.gridTemplateColumns='repeat(4,1fr)';pad.innerHTML=btns;}
+window.handleMatchScore=async(val)=>{if(matchFormat==='sets'){if(isMatchWon())return;const si=getActiveMatchSet();if(si===-1)return;const arrows=[...getMatchArrows(si,matchActiveArcher)];if(arrows.length>=getTBArrows(si))return;arrows.push(val);setMatchArrows(si,matchActiveArcher,arrows);await saveMatchProgress();if(arrows.length===getTBArrows(si)){const otherArr=getMatchArrows(si,1-matchActiveArcher);if(otherArr.length<getTBArrows(si)){matchActiveArcher=1-matchActiveArcher;renderMatchTabs();}else{matchActiveArcher=0;renderMatchTabs();}}}else{const aPerT=getArrowsPerSet();const allTargetsDone=cumArrows1.length>=getCumEnds()*aPerT&&cumArrows2.length>=getCumEnds()*aPerT;if(allTargetsDone){const tot1=cumArrows1.reduce((s,v)=>s+getVal(v),0);const tot2=cumArrows2.reduce((s,v)=>s+getVal(v),0);if(tot1!==tot2)return;if(matchActiveArcher===0&&cumTB1===null){cumTB1=val;}else if(matchActiveArcher===1&&cumTB2===null){cumTB2=val;}else return;await saveMatchProgress();if(matchActiveArcher===0&&cumTB2===null){matchActiveArcher=1;renderMatchTabs();}else if(matchActiveArcher===1&&cumTB1===null){matchActiveArcher=0;renderMatchTabs();}}else{const myCum=matchActiveArcher===0?cumArrows1:cumArrows2;if(myCum.length>=getCumEnds()*aPerT)return;myCum.push(val);await saveMatchProgress();if(myCum.length%aPerT===0){const targetDone=myCum.length/aPerT;const otherCum=matchActiveArcher===0?cumArrows2:cumArrows1;const otherTargetDone=Math.floor(otherCum.length/aPerT);if(otherTargetDone<targetDone){matchActiveArcher=1-matchActiveArcher;renderMatchTabs();}else if(targetDone<getCumEnds()){matchActiveArcher=0;renderMatchTabs();}}}}renderMatchSets();renderMatchPad();updateMatchHeader();};
+window.handleMatchBack=()=>{if(matchFormat==='sets'){const si=getActiveMatchSet();const arrows=[...getMatchArrows(si,matchActiveArcher)];if(arrows.length>0){arrows.pop();setMatchArrows(si,matchActiveArcher,arrows);}}else{const myCum=matchActiveArcher===0?cumArrows1:cumArrows2;const otherCum=matchActiveArcher===0?cumArrows2:cumArrows1;if(myCum.length>0){myCum.pop();}else if(otherCum.length>0){matchActiveArcher=1-matchActiveArcher;otherCum.pop();renderMatchTabs();}saveMatchProgress();}renderMatchSets();renderMatchPad();updateMatchHeader();};
+async function saveMatchProgress(){if(!compId||!matchCatKey||!matchRoundKey||matchIdx===null)return;try{const snap=await getDoc(doc(db,'competitions',compId));const data=snap.data();const match=data.elimination[matchCatKey].rounds[matchRoundKey][matchIdx];if(matchFormat==='sets'){match.sets=matchSets.map(s=>({score1:s.score1||0,score2:s.score2||0,arrows1:s.arrows1||[],arrows2:s.arrows2||[]}));}else{match.arrows1=cumArrows1;match.score1=cumArrows1.reduce((s,v)=>s+getVal(v),0);match.arrows2=cumArrows2;match.score2=cumArrows2.reduce((s,v)=>s+getVal(v),0);match.tiebreak1=cumTB1!==null?getVal(cumTB1):null;match.tiebreak2=cumTB2!==null?getVal(cumTB2):null;const arrowsPerTarget=getArrowsPerSet();match.sets=[];for(let t=0;t<getCumEnds();t++){const a1=cumArrows1.slice(t*arrowsPerTarget,(t+1)*arrowsPerTarget);const a2=cumArrows2.slice(t*arrowsPerTarget,(t+1)*arrowsPerTarget);if(a1.length>0||a2.length>0)match.sets.push({score1:a1.reduce((s,v)=>s+getVal(v),0),score2:a2.reduce((s,v)=>s+getVal(v),0)});}}data.elimination[matchCatKey].rounds[matchRoundKey][matchIdx]=match;await setDoc(doc(db,'competitions',compId),{elimination:data.elimination},{merge:true});}catch(e){console.error('Save error:',e);}}
+window._tbWinner=null;window.setTBWinner=(idx)=>{window._tbWinner=idx;renderMatchSets();renderMatchPad();};
+window._cumTBWinner=null;window.setCumTBWinner=(idx)=>{window._cumTBWinner=idx;renderMatchSets();renderMatchPad();};
+window.submitMatch=async()=>{let winnerId=null,winnerName='';if(matchFormat==='sets'){const{p1,p2}=calcMatchPoints();if(p1>p2){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';}else if(p2>p1){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';}else if(isTiebreakNeeded()||matchSets[MAX_SETS]){const tb=matchSets[MAX_SETS];if(tb){if(tb.score1>tb.score2){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';}else if(tb.score2>tb.score1){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';}else if(window._tbWinner===0){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';}else if(window._tbWinner===1){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';}}}}else{const t1=cumArrows1.reduce((s,v)=>s+getVal(v),0);const t2=cumArrows2.reduce((s,v)=>s+getVal(v),0);if(t1>t2){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';}else if(t2>t1){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';}else if(cumTB1!==null&&cumTB2!==null){const tb1v=getVal(cumTB1),tb2v=getVal(cumTB2);if(tb1v>tb2v){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';}else if(tb2v>tb1v){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';}else if(window._cumTBWinner===0){winnerId=matchData.archer1?.id;winnerName=matchData.archer1?.name||'A1';}else if(window._cumTBWinner===1){winnerId=matchData.archer2?.id;winnerName=matchData.archer2?.name||'A2';}}}if(winnerId){try{const snap=await getDoc(doc(db,'competitions',compId));const data=snap.data();const match=data.elimination[matchCatKey].rounds[matchRoundKey][matchIdx];match.winnerChoice=winnerId;if(matchFormat==='sets'){match.sets=matchSets.map(s=>({score1:s.score1||0,score2:s.score2||0,arrows1:s.arrows1||[],arrows2:s.arrows2||[]}));const{p1,p2}=calcMatchPoints();match.score1=p1;match.score2=p2;}else{match.arrows1=cumArrows1;match.score1=cumArrows1.reduce((s,v)=>s+getVal(v),0);match.arrows2=cumArrows2;match.score2=cumArrows2.reduce((s,v)=>s+getVal(v),0);}data.elimination[matchCatKey].rounds[matchRoundKey][matchIdx]=match;await setDoc(doc(db,'competitions',compId),{elimination:data.elimination},{merge:true});}catch(e){console.error('Save error:',e);}}else{await saveMatchProgress();}document.getElementById('match-screen').style.display='none';document.getElementById('summary-screen').style.display='flex';document.getElementById('summary-archer-tabs').style.display='none';document.getElementById('sum-title').textContent=t('match_complete');const{p1,p2}=matchFormat==='sets'?calcMatchPoints():{p1:cumArrows1.reduce((s,v)=>s+getVal(v),0),p2:cumArrows2.reduce((s,v)=>s+getVal(v),0)};let html='<div style="background:'+(winnerId?'#1b5e20':'#37474f')+';color:#fff;padding:16px;text-align:center;"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:14px;color:#aaa;margin-bottom:6px;">MATCH RESULT</div><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:18px;font-weight:700;">'+(matchData.archer1?.name||'A1')+'</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:32px;font-weight:900;color:var(--accent);">'+p1+' — '+p2+'</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:18px;font-weight:700;">'+(matchData.archer2?.name||'A2')+'</div></div>'+(winnerId?'<div style="font-size:14px;color:#a5d6a7;margin-top:8px;">🏆 '+t('winner')+': <strong>'+winnerName+'</strong></div>':'<div style="font-size:12px;color:#aaa;margin-top:8px;">Still tied — admin will decide winner</div>')+'</div>';if(matchFormat==='sets'){html+='<div style="padding:12px;">';matchSets.forEach((s,i)=>{if(!s||(!s.arrows1.length&&!s.arrows2.length))return;const c1=s.score1>s.score2?'var(--green)':s.score1<s.score2?'var(--red)':'var(--accent)';const c2=s.score2>s.score1?'var(--green)':s.score2<s.score1?'var(--red)':'var(--accent)';html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #eee;"><span style="font-weight:700;color:'+c1+';font-size:16px;">'+s.score1+'</span><span style="color:#888;font-size:12px;">Set '+(i+1)+'</span><span style="font-weight:700;color:'+c2+';font-size:16px;">'+s.score2+'</span></div>';});html+='</div>';}document.getElementById('summary-list').innerHTML=html;toast('Match submitted ✓','success');};
+window.goBackToScoring=()=>{document.getElementById('summary-screen').style.display='none';if(matchData){document.getElementById('login-screen').style.display='flex';matchData=null;matchCatKey=null;matchRoundKey=null;matchIdx=null;matchSets=[];cumArrows1=[];cumArrows2=[];window._tbWinner=null;showLoginStep('login-step-1');}else{document.getElementById('scoring-screen').style.display='flex';renderTabs();renderScoreList();renderPad();updateQualHeader();}};
+/* ── QR AUTO LOGIN ── */
+async function autoLoginFromQR(qrCompId,qrTargetNum){try{compId=qrCompId;const snap=await getDoc(doc(db,'competitions',qrCompId));if(!snap.exists())return;compData=snap.data();discipline=compData.discipline||'Outdoor';targetConfig=compData.targetConfig||[];const allArchers=compData.archers||[];const allTargets=compData.targets||[];const target=allTargets.find(t=>t.num===qrTargetNum);if(!target)return;targetNum=qrTargetNum;targetArchers=['A','B','C','D'].filter(s=>target[s]).map(s=>{const sd=target[s];const fa=allArchers.find(a=>String(a.id)===String(sd.id)||a.name===sd.name);return{...(fa||sd),slot:s,id:fa?fa.id:sd.id};});if(!targetArchers.length)return;document.getElementById('confirm-archers').innerHTML=targetArchers.map(a=>'<div class="confirm-archer"><div class="confirm-slot">'+a.slot+'</div><div style="flex:1;padding:0 10px;"><div class="confirm-name">'+a.name+'</div><div class="confirm-cat">'+a.bow+' · '+a.age+'</div></div></div>').join('');const card=document.querySelector('.login-card');if(card){const qrBanner=document.createElement('div');qrBanner.style.cssText='background:#1a3300;border:1px solid #43a047;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:#81c784;text-align:center;';qrBanner.innerHTML='📱 <strong>'+(compData.name||'Competition')+'</strong> · Target '+qrTargetNum;card.insertBefore(qrBanner,card.firstChild);}document.getElementById('main-menu').style.display='none';document.getElementById('login-screen').style.display='flex';showLoginStep('login-step-2');}catch(e){console.error('QR auto-login error:',e);}}
+/* ── INIT ── */
+initLang();
+const params=new URLSearchParams(window.location.search);
+const qrComp=params.get('comp');
+const qrTarget=parseInt(params.get('target'));
+if(qrComp&&qrTarget){autoLoginFromQR(qrComp,qrTarget);}
+</script>
+</body>
+</html>
