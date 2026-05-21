@@ -146,6 +146,13 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
 #toast.show{transform:translateX(-50%) translateY(0);}
 #toast.success{border-color:var(--green);color:var(--green);}
 #toast.error{border-color:var(--red);color:var(--red);}
+
+#ios-install-banner{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:2px solid var(--accent);padding:14px 16px;z-index:101;flex-direction:column;gap:8px;}
+#ios-install-banner.show{display:flex;}
+.ios-install-title{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;color:var(--accent);}
+.ios-install-steps{font-size:13px;color:var(--text);line-height:1.8;}
+.ios-install-steps span{color:var(--accent);font-weight:700;}
+.ios-install-close{position:absolute;top:10px;right:14px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -192,6 +199,14 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);heig
   <span class="install-text">📲 <strong>Install ALL IN</strong> for faster access on your home screen</span>
   <button class="install-btn" onclick="installApp()">INSTALL</button>
   <button class="install-dismiss" onclick="dismissInstall()">✕</button>
+</div>
+
+
+<!-- iOS INSTALL BANNER -->
+<div id="ios-install-banner">
+  <button class="ios-install-close" onclick="dismissIosInstall()">✕</button>
+  <div class="ios-install-title">📲 Add to Home Screen</div>
+  <div class="ios-install-steps">1. Tap the <span>Share</span> button ⬆️ at the bottom of Safari<br>2. Scroll down and tap <span>"Add to Home Screen"</span><br>3. Tap <span>"Add"</span> — done!</div>
 </div>
 
 <!-- LOGIN -->
@@ -501,6 +516,15 @@ window.goBackToScoring=()=>{document.getElementById('summary-screen').style.disp
 /* ── QR AUTO LOGIN ── */
 async function autoLoginFromQR(qrCompId,qrTargetNum){try{compId=qrCompId;const snap=await getDoc(doc(db,'competitions',qrCompId));if(!snap.exists())return;compData=snap.data();discipline=compData.discipline||'Outdoor';targetConfig=compData.targetConfig||[];const allArchers=compData.archers||[];const allTargets=compData.targets||[];const target=allTargets.find(t=>t.num===qrTargetNum);if(!target)return;targetNum=qrTargetNum;targetArchers=['A','B','C','D'].filter(s=>target[s]).map(s=>{const sd=target[s];const fa=allArchers.find(a=>String(a.id)===String(sd.id)||a.name===sd.name);return{...(fa||sd),slot:s,id:fa?fa.id:sd.id};});if(!targetArchers.length)return;document.getElementById('confirm-archers').innerHTML=targetArchers.map(a=>'<div class="confirm-archer"><div class="confirm-slot">'+a.slot+'</div><div style="flex:1;padding:0 10px;"><div class="confirm-name">'+a.name+'</div><div class="confirm-cat">'+a.bow+' · '+a.age+'</div></div></div>').join('');const card=document.querySelector('.login-card');if(card){const qrBanner=document.createElement('div');qrBanner.style.cssText='background:#1a3300;border:1px solid #43a047;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:#81c784;text-align:center;';qrBanner.innerHTML='📱 <strong>'+(compData.name||'Competition')+'</strong> · Target '+qrTargetNum;card.insertBefore(qrBanner,card.firstChild);}document.getElementById('main-menu').style.display='none';document.getElementById('login-screen').style.display='flex';showLoginStep('login-step-2');}catch(e){console.error('QR auto-login error:',e);}}
 /* ── INIT ── */
+
+/* ── iOS INSTALL ── */
+function isIOS(){return/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;}
+function isInStandaloneMode(){return window.navigator.standalone===true||window.matchMedia('(display-mode:standalone)').matches;}
+window.dismissIosInstall=()=>{document.getElementById('ios-install-banner').classList.remove('show');localStorage.setItem('iosInstallDismissed','1');};
+// Show iOS banner on first visit if not installed and not dismissed
+if(isIOS()&&!isInStandaloneMode()&&!localStorage.getItem('iosInstallDismissed')){
+  setTimeout(()=>document.getElementById('ios-install-banner').classList.add('show'),2000);
+}
 initLang();
 const params=new URLSearchParams(window.location.search);
 const qrComp=params.get('comp');
