@@ -1343,9 +1343,6 @@ window.renderResults=()=>{
   const n=sortedCats.length;
   const numCols=n<=1?1:n===2?2:n<=6?3:4;
   const html=`<div style="columns:${numCols};column-gap:14px;">${catCards}</div>`;
-  const newHash=html.length+html.slice(0,200);
-  if(container._lastHash===newHash)return;
-  container._lastHash=newHash;
   const scrollEl=document.querySelector('.content');
   const st=scrollEl?scrollEl.scrollTop:0;
   container.innerHTML=html;
