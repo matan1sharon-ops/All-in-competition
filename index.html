@@ -1563,7 +1563,7 @@ window.printBlankScorecards=()=>{
         // Build 4 archer blocks
         const blocks=slots.map(archer=>{
           if(!archer)return`<div class="archer-block" style="background:#f9f9f9;"></div>`;
-          return buildOutdoorBlock(archer,endRange,disc);
+          return buildOutdoorBlock(archer,endRange,disc,t.num);
         });
         pages+=`<div class="page">
           <div class="page-header">
@@ -1647,7 +1647,7 @@ window.printBlankScorecards=()=>{
     });
   }
 
-  function buildOutdoorBlock(archer,endRange,disc){
+  function buildOutdoorBlock(archer,endRange,disc,targetNum){
     const isOut=disc==='Outdoor';
     const statLabel=isOut?'10+X / X':'10 / 9';
     let rows='';
@@ -1665,18 +1665,18 @@ window.printBlankScorecards=()=>{
     });
     return`<div class="archer-block">
       <div class="archer-name-bar">
-        <span class="slot">${window._printWithNames?archer.slot:''}</span>
+        <span class="slot">${window._printWithNames?'T'+(targetNum||'?')+(archer.slot||'?'):''}</span>
         <span class="name">${window._printWithNames?archer.name:''}</span>
         <span class="cat">${window._printWithNames?(archer.bow||'')+' · '+(archer.age||'')+' · '+(archer.gender||''):''}</span>
       </div>
-      <table style="flex:1;">
+      <table style="flex:1;table-layout:fixed;width:100%;">
         <thead><tr>
-          <th>End</th>
+          <th style="width:28px;">End</th>
           <th colspan="3">Arrows</th>
-          <th style="width:20px;">Sub</th>
-          <th style="width:16px;"></th>
-          <th>Run.</th>
-          <th colspan="2" style="font-size:7px;">${statLabel}</th>
+          <th style="width:24px;">Sub</th>
+          <th style="width:24px;">End</th>
+          <th style="width:50px;">Run.</th>
+          <th style="width:24px;font-size:7px;" colspan="2">${statLabel}</th>
         </tr></thead>
         <tbody>${rows}
         <tr class="half-total"><td colspan="6">HALF TOTAL</td><td></td><td></td><td></td></tr>
