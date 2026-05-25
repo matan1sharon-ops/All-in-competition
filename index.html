@@ -1752,15 +1752,15 @@ window.printBlankScorecards=()=>{
         <span class="name">${window._printWithNames?archer.name:''}</span>
         <span class="cat">${window._printWithNames?(archer.bow||'')+' · '+(archer.age||'')+' · Custom':''}</span>
       </div>
-      <table style="flex:1;table-layout:fixed;">
+      <table style="flex:1;table-layout:fixed;width:100%;">
         <thead><tr>
           <th style="width:26px;">Tgt</th>
           <th style="width:44px;">Type</th>
           <th>A1</th>
           <th>A2</th>
           <th>A3</th>
-          <th style="width:30px;">End</th>
-          <th style="width:34px;">Run.</th>
+          <th style="width:42px;">End</th>
+          <th style="width:50px;">Run.</th>
         </tr></thead>
         <tbody>${rows}
         <tr class="half-total"><td colspan="5">TOTAL</td><td></td><td></td></tr>
