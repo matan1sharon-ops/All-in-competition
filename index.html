@@ -1513,7 +1513,7 @@ window.printBlankScorecards=()=>{
     .page-header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #333;padding-bottom:4px;margin-bottom:6px;}
     .page-title{font-size:14px;font-weight:700;}
     .page-sub{font-size:10px;color:#555;}
-    .grid-2x2{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:5mm;height:calc(297mm - 30mm);}
+    .grid-2x2{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:4mm;height:calc(297mm - 46mm);}
     .archer-block{border:1px solid #ccc;border-radius:4px;overflow:hidden;display:flex;flex-direction:column;}
     .archer-name-bar{background:#37474f;color:#fff;padding:3px 6px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
     .archer-name-bar .slot{font-size:14px;font-weight:700;}
@@ -1532,7 +1532,7 @@ window.printBlankScorecards=()=>{
     .half-total{background:#37474f;color:#fff;font-weight:700;font-size:9px;height:16px;}
     .sig{border-top:1px solid #aaa;margin-top:3px;padding-top:2px;font-size:8px;color:#aaa;display:flex;justify-content:space-between;}
     /* 3D/Field side by side */
-    .grid-sidebyside{display:grid;grid-template-columns:1fr 1fr;gap:5mm;height:calc(297mm - 30mm);}
+    .grid-sidebyside{display:grid;grid-template-columns:1fr 1fr;gap:4mm;height:calc(297mm - 46mm);}
     .stn-lbl{background:#f0f0f0;font-weight:700;font-size:9px;width:22px;}
     .stn-end{background:#e3f2fd;width:22px;}
     .stn-run{background:#fff8e1;width:26px;}
@@ -1570,11 +1570,11 @@ window.printBlankScorecards=()=>{
             <div><div class="page-title">${compName}</div><div class="page-sub">${disc} · ${t.bow||''}</div></div>
             <div style="text-align:right;"><div class="page-title">TARGET ${t.num}</div><div class="page-sub">${halfLabels[halfIdx]} · Page ${halfIdx+1} of 2</div></div>
           </div>
-          <div class="grid-2x2">${blocks.join('')}</div>
-          <div class="qr-wrap" style="margin-top:4px;">
+          <div class="qr-wrap" style="margin-bottom:4px;">
             <div class="qr-placeholder" data-url="${scoringUrl}?comp=${currentCompId}&target=${t.num}"></div>
             <div class="qr-info"><strong>Scan to score</strong><br>TARGET ${t.num}</div>
           </div>
+          <div class="grid-2x2">${blocks.join('')}</div>
         </div>`;
       });
     });
