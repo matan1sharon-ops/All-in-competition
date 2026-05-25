@@ -1777,4 +1777,1783 @@ setTimeout(()=>{if(!currentCompId)document.getElementById('conn-status').textCon
 document.querySelectorAll('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 </script>
 </body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALL IN — Competition Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--surface:#141414;--surface2:#1e1e1e;--surface3:#252525;--border:#2a2a2a;--border2:#333;--accent:#FFD700;--accent2:#FFA500;--red:#e53935;--blue:#1e88e5;--green:#43a047;--purple:#7b1fa2;--text:#f0f0f0;--muted:#666;--muted2:#888;--radius:10px;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.app{display:flex;height:100vh;overflow:hidden;}
+.sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:0;overflow:hidden;}
+.sidebar-logo{padding:20px 16px 16px;border-bottom:1px solid var(--border);}
+.sidebar-logo .brand{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;letter-spacing:4px;color:var(--accent);}
+.sidebar-logo .sub{font-size:9px;font-weight:600;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+.comp-selector{padding:12px;border-bottom:1px solid var(--border);}
+.comp-selector select{width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 10px;border-radius:6px;font-family:'Barlow',sans-serif;font-size:12px;outline:none;cursor:pointer;}
+.new-comp-btn{width:100%;margin-top:6px;padding:8px;background:var(--accent);color:#000;border:none;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;cursor:pointer;}
+.new-comp-btn:hover{filter:brightness(1.1);}
+.nav{flex:1;padding:8px;overflow-y:auto;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted2);transition:all 0.15s;margin-bottom:2px;border:1px solid transparent;}
+.nav-item:hover{background:var(--surface2);color:var(--text);}
+.nav-item.active{background:var(--surface3);color:var(--accent);border-color:var(--border2);}
+.nav-item .icon{font-size:16px;width:20px;text-align:center;}
+.nav-item .badge{margin-left:auto;background:var(--accent);color:#000;font-size:9px;font-weight:900;padding:1px 5px;border-radius:8px;}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);text-align:center;}
+.lang-toggle{display:flex;gap:4px;justify-content:center;margin-bottom:6px;}
+.lang-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--muted2);padding:3px 10px;border-radius:4px;font-size:10px;font-weight:700;cursor:pointer;}
+.lang-btn.active{background:var(--accent);color:#000;border-color:var(--accent);}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+.topbar-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;letter-spacing:1px;color:var(--text);}
+.content{flex:1;overflow-y:auto;padding:24px;overflow-anchor:none;display:flex;flex-direction:column;}
+.panel{display:none;}
+.panel.active{display:flex;flex-direction:column;flex:1;}
+#elim-content{overflow-anchor:none;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;}
+.card-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted2);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.card-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group label{font-size:10px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:0.5px;}
+.form-group input,.form-group select,.form-group textarea{background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:14px;outline:none;transition:border-color 0.15s;}
+.form-group input:focus,.form-group select:focus{border-color:var(--accent);}
+.form-group select option{background:var(--surface2);}
+.btn{padding:10px 18px;border-radius:8px;border:none;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.5px;cursor:pointer;transition:filter 0.15s,transform 0.1s;}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:var(--accent);color:#000;}
+.btn-primary:hover{filter:brightness(1.1);}
+.btn-secondary{background:var(--surface3);color:var(--text);border:1px solid var(--border2);}
+.btn-secondary:hover{border-color:var(--muted2);}
+.btn-danger{background:var(--red);color:#fff;}
+.btn-success{background:var(--green);color:#fff;}
+.btn-sm{padding:6px 12px;font-size:11px;}
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead tr{background:var(--surface2);}
+thead th{padding:10px 12px;text-align:left;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted2);border-bottom:1px solid var(--border2);}
+tbody tr{border-bottom:1px solid var(--border);transition:background 0.1s;background:#fff;}
+tbody tr:hover{background:#f5f5f5;}
+tbody td{padding:10px 12px;color:#111;}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px;}
+.tag-recurve{background:#1565c0;color:#fff;}
+.tag-compound{background:#4a148c;color:#fff;}
+.tag-barebow{background:#1b5e20;color:#fff;}
+.tag-traditional{background:#e65100;color:#fff;}
+.tag-longbow{background:#37474f;color:#fff;}
+.tag-m{background:#1565c0;color:#fff;}
+.tag-f{background:#880e4f;color:#fff;}
+.target-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+.target-card{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:12px;}
+.target-card .target-num{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--accent);margin-bottom:4px;}
+.target-slot{background:var(--surface3);border:1px dashed var(--border2);border-radius:6px;padding:8px 10px;margin-bottom:4px;min-height:36px;cursor:pointer;transition:border-color 0.15s;}
+.target-slot:hover{border-color:var(--muted2);}
+.target-slot.filled{border-style:solid;border-color:var(--border2);background:var(--surface);}
+.target-slot .slot-label{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:1px;margin-bottom:3px;}
+.target-slot .slot-name{font-size:12px;font-weight:600;color:var(--text);}
+.target-slot .slot-cat{font-size:10px;color:var(--muted2);}
+.target-slot.empty .slot-name{color:var(--muted);font-style:italic;font-size:11px;}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:20px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;}
+.stat-val{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:var(--accent);}
+.stat-label{font-size:10px;font-weight:600;color:var(--muted2);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;}
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;align-items:center;justify-content:center;}
+.modal-backdrop.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:24px;width:90%;max-width:520px;max-height:90vh;overflow-y:auto;}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;letter-spacing:1px;color:var(--accent);margin-bottom:20px;}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted2);}
+.empty-state .empty-icon{font-size:48px;margin-bottom:12px;}
+.empty-state p{font-size:14px;line-height:1.6;}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;}
+.status-live{background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+#toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:12px 18px;font-size:13px;font-weight:600;z-index:999;transform:translateY(80px);transition:transform 0.3s ease;box-shadow:0 8px 32px rgba(0,0,0,0.5);}
+#toast.show{transform:translateY(0);}
+#toast.success{border-color:var(--green);color:var(--green);}
+#toast.error{border-color:var(--red);color:var(--red);}
+.session-block{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:16px;}
+.session-time{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--accent);min-width:60px;}
+.session-info{flex:1;}
+.session-name{font-size:14px;font-weight:600;}
+.session-sub{font-size:11px;color:var(--muted2);margin-top:2px;}
+.ts-row{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.ts-type-field{border-left:4px solid #1565c0;}
+.ts-type-3d{border-left:4px solid #4a148c;}
+.ts-type-kill{border-left:4px solid #e53935;}
+.target-slot.drag-over{border-color:var(--accent)!important;background:rgba(255,215,0,0.1)!important;}
+.target-slot.dragging{opacity:0.4;}
+.target-slot[draggable="true"]{cursor:grab;}
+.target-slot[draggable="true"]:active{cursor:grabbing;}
+@media(max-width:768px){.sidebar{width:60px;}.sidebar-logo .brand,.sidebar-logo .sub,.nav-item span:not(.icon),.comp-selector,.sidebar-footer{display:none;}.nav-item{justify-content:center;padding:12px;}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><div class="brand">ALL IN</div><div class="sub">Competition Admin</div></div>
+    <div class="comp-selector">
+      <select id="comp-select" onchange="selectCompetition(this.value)"><option value="">— Select Competition —</option></select>
+      <button class="new-comp-btn" onclick="openNewCompModal()" data-t="new_comp">+ NEW COMPETITION</button>
+    </div>
+    <nav class="nav">
+      <div class="nav-item active" onclick="showPanel('dashboard')" data-panel="dashboard"><span class="icon">📊</span><span>Dashboard</span></div>
+      <div class="nav-item" onclick="showPanel('entries')" data-panel="entries"><span class="icon">🏹</span><span>Entry List</span><span class="badge" id="entry-badge">0</span></div>
+      <div class="nav-item" onclick="showPanel('targets')" data-panel="targets"><span class="icon">🎯</span><span>Target Assignment</span></div>
+      <div class="nav-item" id="nav-targetsetup" onclick="showPanel('targetsetup')" data-panel="targetsetup" style="display:none;"><span class="icon">⚙️</span><span>Target Setup</span></div>
+      <div class="nav-item" onclick="showPanel('schedule')" data-panel="schedule"><span class="icon">⏰</span><span>Schedule</span></div>
+      <div class="nav-item" onclick="showPanel('results')" data-panel="results"><span class="icon">📋</span><span>Live Results</span></div>
+      <div class="nav-item" onclick="showPanel('scorecards')" data-panel="scorecards"><span class="icon">📄</span><span>Scorecards</span></div>
+      <div class="nav-item" onclick="showPanel('elimination')" data-panel="elimination"><span class="icon">⚔️</span><span>Elimination</span></div>
+      <a href="history.html" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font-size:13px;font-weight:600;color:var(--muted2);text-decoration:none;margin-top:4px;border:1px solid transparent;transition:all 0.15s;" onmouseover="this.style.background='var(--surface2)';this.style.color='var(--text)'" onmouseout="this.style.background='';this.style.color='var(--muted2)'"><span style="font-size:16px;width:20px;text-align:center;">🗄</span><span>History</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="lang-toggle"><button class="lang-btn active" onclick="setAdminLang('en')">EN</button><button class="lang-btn" onclick="setAdminLang('he')">עב</button></div>
+      <div id="conn-status">🔴 Not connected</div>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+      <div id="topbar-actions"><button class="btn btn-secondary btn-sm" id="btn-archive-comp" onclick="archiveCompetition()" style="display:none;">🗄 ARCHIVE</button><button class="btn btn-danger btn-sm" id="btn-delete-comp" onclick="deleteCompetition()" style="display:none;">🗑 DELETE</button></div>
+    </div>
+    <div class="content">
+      <!-- DASHBOARD -->
+      <div id="panel-dashboard" class="panel active">
+        <div id="no-comp-msg" class="empty-state"><div class="empty-icon">🏆</div><p><span data-t="no_comp_selected">No competition selected.</span><br><span data-t="create_or_select">Create a new competition or select an existing one.</span></p><br><button class="btn btn-primary" onclick="openNewCompModal()" data-t="create_competition">+ CREATE COMPETITION</button></div>
+        <div id="dash-content" style="display:none;">
+          <div class="stats-row">
+            <div class="stat-card"><div class="stat-val" id="d-total">0</div><div class="stat-label">Total Archers</div></div>
+            <div class="stat-card"><div class="stat-val" id="d-assigned">0</div><div class="stat-label">Assigned</div></div>
+            <div class="stat-card"><div class="stat-val" id="d-targets">0</div><div class="stat-label">Targets</div></div>
+            <div class="stat-card"><div class="stat-val" id="d-scored">0</div><div class="stat-label">Scored</div></div>
+          </div>
+          <div class="card"><div class="card-title" id="comp-info-title">Competition Info</div><div class="form-grid" id="comp-info-grid"></div></div>
+          <div class="card"><div class="card-title" id="cat-breakdown-title">Categories Breakdown</div><div class="table-wrap"><table><thead><tr><th id="th-bow">Bow</th><th id="th-age">Age</th><th id="th-m">M</th><th id="th-f">F</th><th id="th-total">Total</th><th id="th-targets-needed">Targets Needed</th></tr></thead><tbody id="cat-breakdown"></tbody></table></div></div>
+        </div>
+      </div>
+      <!-- ENTRIES -->
+      <div id="panel-entries" class="panel">
+        <div class="card">
+          <div class="card-title" data-t="add_archer_title">Add Archer</div>
+          <div class="form-grid">
+            <div class="form-group"><label data-t="first_name">First Name</label><input type="text" id="e-fname" data-placeholder-t="first_name" placeholder="First name"></div>
+            <div class="form-group"><label data-t="last_name">Last Name</label><input type="text" id="e-lname" data-placeholder-t="last_name" placeholder="Last name"></div>
+            <div class="form-group"><label data-t="club">Club</label><input type="text" id="e-club" data-placeholder-t="club_name" placeholder="Club name"></div>
+            <div class="form-group"><label data-t="bow_type">Bow Type</label><select id="e-bow"><option>Recurve</option><option>Compound</option><option>Barebow</option><option>Traditional</option><option>Longbow</option></select></div>
+            <div class="form-group"><label data-t="age_category">Age Category</label><select id="e-age"><option>U12</option><option>U14</option><option>U18</option><option>U21</option><option>Senior</option><option>Master 50+</option><option>Master 60+</option></select></div>
+            <div class="form-group"><label data-t="gender">Gender</label><select id="e-gender"><option value="M">Male</option><option value="F">Female</option></select></div>
+          </div>
+          <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="addArcher()" data-t="add_archer">+ ADD ARCHER</button>
+            <button class="btn btn-secondary" onclick="openImportModal()" data-t="import_csv">📥 IMPORT CSV</button>
+            <button class="btn btn-secondary" onclick="downloadCSVTemplate()" data-t="template">📋 TEMPLATE</button>
+            <button class="btn btn-secondary" onclick="copyRegLink()" data-t="reg_link">🔗 REGISTRATION LINK</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span id="entry-list-title">Entry List</span> <span id="entry-count" style="color:var(--accent);margin-left:8px;">0 archers</span></div>
+          <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;">
+            <input type="text" id="search-archer" placeholder="🔍 Search..." style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;flex:1;min-width:160px;" oninput="renderEntries()">
+            <select id="filter-bow" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;" onchange="renderEntries()">
+              <option value="">All Bows</option><option>Recurve</option><option>Compound</option><option>Barebow</option><option>Traditional</option><option>Longbow</option>
+            </select>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>#</th><th id="th-name">Name</th><th id="th-club">Club</th><th id="th-bow2">Bow</th><th id="th-age2">Age</th><th id="th-gender">Gender</th><th id="th-target">Target</th><th></th></tr></thead><tbody id="entries-table"></tbody></table></div>
+        </div>
+      </div>
+      <!-- TARGETS -->
+      <div id="panel-targets" class="panel">
+        <div class="card">
+          <div class="card-title">Target Assignment</div>
+          <p style="font-size:13px;color:var(--muted2);margin-bottom:16px;">Targets are generated automatically from the entry list — 4 slots per target (A/B/C/D).</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="generateTargets()" data-t="auto_generate">⚡ AUTO GENERATE FROM ENTRIES</button>
+            <button class="btn btn-secondary" id="btn-assign-odd" onclick="generateOddTargets()" style="display:none;" data-t="assign_odd">🔢 ASSIGN ODD NUMBERS</button>
+            <button class="btn btn-secondary" onclick="clearAssignments()" data-t="clear_all">CLEAR ALL</button>
+            <button class="btn btn-secondary" onclick="printStartList()" data-t="print_start">🖨 PRINT START LIST</button>
+            <button class="btn btn-secondary" onclick="printFieldOfPlay()" data-t="field_of_play">🏟 FIELD OF PLAY</button>
+          </div>
+        </div>
+        <div id="target-grid"></div>
+      </div>
+      <!-- TARGET SETUP (Custom discipline only) -->
+      <div id="panel-targetsetup" class="panel">
+        <div class="card">
+          <div class="card-title">⚙️ Custom Target Setup</div>
+          <p style="font-size:13px;color:var(--muted2);margin-bottom:16px;">Configure each target for your custom competition. Field and 3D use standard scoring. Kill targets let you set zone scores.</p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:20px;">
+            <div class="form-group" style="min-width:140px;">
+              <label>Number of Targets</label>
+              <input type="number" id="ts-count" min="1" max="30" value="24" oninput="renderTargetSetupGrid()" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:14px;outline:none;">
+            </div>
+            <button class="btn btn-primary" onclick="saveTargetConfig()" data-t="save_config">💾 SAVE CONFIG</button>
+            <button class="btn btn-secondary" onclick="applyAllType()" data-t="apply_all">APPLY TYPE TO ALL</button>
+            <select id="ts-apply-type" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;">
+              <option value="Field">All Field</option>
+              <option value="3D">All 3D</option>
+              <option value="Kill">All Kill</option>
+            </select>
+          </div>
+          <div id="ts-grid"></div>
+        </div>
+      </div>
+      <!-- SCHEDULE -->
+      <div id="panel-schedule" class="panel">
+        <div class="card">
+          <div class="card-title" id="schedule-title">Add Session</div>
+          <div class="form-grid">
+            <div class="form-group"><label id="lbl-session-name">Session Name</label><input type="text" id="s-name" placeholder="e.g. Qualification Round 1"></div>
+            <div class="form-group"><label id="lbl-s-date">Date</label><input type="date" id="s-date"></div>
+            <div class="form-group"><label id="lbl-start-time">Start Time</label><input type="time" id="s-time"></div>
+            <div class="form-group"><label id="lbl-distance">Distance</label><select id="s-dist"><option>70m</option><option>60m</option><option>50m</option><option>30m</option><option>18m</option><option>25m</option><option>3D</option><option>Field</option><option>Custom</option></select></div>
+            <div class="form-group"><label id="lbl-ends">Ends</label><input type="number" id="s-ends" value="12" min="1" max="30"></div>
+            <div class="form-group"><label id="lbl-arrows-end">Arrows/End</label><input type="number" id="s-arrows" value="6" min="1" max="6"></div>
+          </div>
+          <div style="margin-top:14px;"><button class="btn btn-primary" onclick="addSession()" data-t="add_session">+ ADD SESSION</button></div>
+        </div>
+        <div id="sessions-list"></div>
+      </div>
+      <!-- RESULTS -->
+      <div id="panel-results" class="panel">
+        <div class="card">
+          <div class="card-title"><span class="status-dot status-live"></span> <span id="live-results-title">Live Results</span></div>
+          <div style="margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-secondary btn-sm" onclick="exportResultsPDF()" data-t="export_pdf">📄 EXPORT PDF</button>
+            <button class="btn btn-secondary btn-sm" onclick="openDisplayScreen()" data-t="display_screen">🖥 DISPLAY SCREEN</button>
+            <button class="btn btn-secondary btn-sm" onclick="copyResultsLink()" data-t="share_results">🔗 SHARE RESULTS</button>
+          </div>
+          <div id="results-by-category"></div>
+        </div>
+      </div>
+      <!-- SCORECARDS -->
+      <div id="panel-scorecards" class="panel">
+        <div class="card">
+          <div class="card-title">📄 Scorecards</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+            <button class="btn btn-primary" onclick="printAllScorecards()" data-t="print_all">🖨 PRINT ALL</button>
+            <button class="btn btn-secondary" onclick="printBlankScorecards()" data-t="print_blank">🖨 PRINT BLANK</button>
+            <button class="btn btn-secondary btn-sm" id="btn-names-toggle" onclick="toggleNamesOnScorecard()" style="background:var(--accent);color:#000;border-color:var(--accent);" title="Toggle names on blank scorecards">👤 WITH NAMES</button>
+            <select id="sc-filter-bow" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;" onchange="renderScorecards()">
+              <option value="">All Bows</option><option>Recurve</option><option>Compound</option><option>Barebow</option><option>Traditional</option><option>Longbow</option>
+            </select>
+          </div>
+          <div id="scorecards-list"></div>
+        </div>
+      </div>
+      <!-- ELIMINATION -->
+      <div id="panel-elimination" class="panel" style="height:100%;flex-direction:column;">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:0;flex-shrink:0;">
+          <div class="card-title">⚔️ Elimination Rounds</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;">
+            <button class="btn btn-secondary btn-sm" onclick="copyMatchLink()" style="margin-left:auto;">🔗 SHARE MATCH SCORING LINK</button>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+            
+            <div class="form-group" style="min-width:140px;"><label id="lbl-elim-bracket">Bracket</label><select id="elim-bracket" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;width:100%;"><option value="8">1/8 — Top 16</option><option value="4">1/4 — Top 8</option><option value="2">1/2 — Top 4</option></select></div>
+            
+            <button class="btn btn-success" onclick="generateAllElimination()" data-t="generate_all">⚡ GENERATE ALL</button>
+          </div>
+        </div>
+        <div id="elim-content" style="flex:1;overflow-y:auto;overflow-anchor:none;margin-top:12px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- MODALS -->
+<div class="modal-backdrop" id="modal-new-comp"><div class="modal"><div class="modal-title">🏆 New Competition</div><div class="form-grid"><div class="form-group" style="grid-column:1/-1"><label data-t="comp_name">Competition Name</label><input type="text" id="nc-name" data-placeholder-t="comp_name_ph" placeholder="e.g. National Championship 2025"></div><div class="form-group"><label data-t="date">Date</label><input type="date" id="nc-date"></div><div class="form-group"><label>Number of Days</label><select id="nc-numdays"><option value="1">1 day</option><option value="2">2 days</option><option value="3">3 days</option><option value="4">4 days</option><option value="5">5 days</option></select></div><div class="form-group"><label data-t="location">Location</label><input type="text" id="nc-location" data-placeholder-t="venue_city" placeholder="Venue / City"></div><div class="form-group"><label data-t="discipline">Discipline</label><select id="nc-discipline"><option>Outdoor</option><option>Indoor</option><option>3D</option><option>Field</option><option>Custom</option></select></div><div class="form-group"><label data-t="organizer">Organizer</label><input type="text" id="nc-organizer" data-placeholder-t="club_fed" placeholder="Club / Federation"></div></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-new-comp')" data-t="cancel">Cancel</button><button class="btn btn-primary" onclick="createCompetition()" data-t="create">CREATE →</button></div></div></div>
+<div class="modal-backdrop" id="modal-assign"><div class="modal"><div class="modal-title" id="assign-modal-title">Assign Archer</div><div class="form-group"><label>Select Archer</label><select id="assign-archer-select" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:14px;outline:none;width:100%;"></select></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-assign')">Cancel</button><button class="btn btn-danger btn-sm" onclick="removeFromSlot()" id="btn-remove-slot" style="display:none;">Remove</button><button class="btn btn-primary" onclick="confirmAssign()">ASSIGN →</button></div></div></div>
+<div class="modal-backdrop" id="modal-import"><div class="modal"><div class="modal-title">📥 Import Archers (CSV)</div>
+<div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;margin-bottom:12px;font-size:11px;color:var(--muted2);font-family:monospace;line-height:1.8;">FirstName, LastName, Club, <span style="color:var(--accent);">Bow</span>, <span style="color:var(--accent);">Age</span>, <span style="color:var(--accent);">Gender</span><br><span style="color:var(--muted);">Bow: Recurve / Compound / Barebow / Traditional / Longbow</span><br><span style="color:var(--muted);">Age: U12 / U14 / U18 / U21 / Senior / Master 50+ / Master 60+</span><br><span style="color:var(--muted);">Gender: M / F</span></div>
+<div id="csv-drop-zone" style="border:2px dashed var(--border2);border-radius:8px;padding:20px;text-align:center;margin-bottom:12px;cursor:pointer;transition:border-color 0.15s;" onclick="document.getElementById('csv-file-input').click()" ondragover="event.preventDefault();this.style.borderColor='var(--accent)'" ondragleave="this.style.borderColor='var(--border2)'" ondrop="handleCSVDrop(event)">
+  <div style="font-size:28px;margin-bottom:6px;">📂</div>
+  <div style="font-size:13px;font-weight:600;color:var(--text);">Click to choose CSV file</div>
+  <div style="font-size:11px;color:var(--muted2);margin-top:4px;">or drag and drop your file here</div>
+  <input type="file" id="csv-file-input" accept=".csv,.txt" style="display:none;" onchange="handleCSVFile(this)">
+</div>
+<div style="font-size:11px;color:var(--muted2);margin-bottom:6px;text-align:center;">— or paste text directly —</div>
+<textarea id="import-csv" rows="5" style="width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:12px;border-radius:8px;font-family:monospace;font-size:12px;outline:none;resize:vertical;" placeholder="John,Smith,City Archers,Recurve,Senior,M&#10;Jane,Doe,National Club,Compound,U21,F"></textarea>
+<div id="csv-preview" style="margin-top:8px;font-size:12px;color:var(--green);display:none;"></div>
+<div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-import')" data-t="cancel">Cancel</button><button class="btn btn-secondary" onclick="downloadCSVTemplate()" data-t="get_template">📋 GET TEMPLATE</button><button class="btn btn-primary" onclick="importCSV()" data-t="import_btn">IMPORT →</button></div></div></div>
+<div id="toast"></div>
+<div class="modal-backdrop" id="modal-edit-archer"><div class="modal"><div class="modal-title">✏️ Edit Archer</div><input type="hidden" id="edit-archer-id"><div class="form-grid"><div class="form-group"><label data-t="first_name">First Name</label><input type="text" id="edit-fname"></div><div class="form-group"><label data-t="last_name">Last Name</label><input type="text" id="edit-lname"></div><div class="form-group"><label data-t="club">Club</label><input type="text" id="edit-club"></div><div class="form-group"><label data-t="bow_type">Bow Type</label><select id="edit-bow"><option>Recurve</option><option>Compound</option><option>Barebow</option><option>Traditional</option><option>Longbow</option></select></div><div class="form-group"><label data-t="age_category">Age Category</label><select id="edit-age"><option>U12</option><option>U14</option><option>U18</option><option>U21</option><option>Senior</option><option>Master 50+</option><option>Master 60+</option></select></div><div class="form-group"><label data-t="gender">Gender</label><select id="edit-gender"><option value="M">Male</option><option value="F">Female</option></select></div></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-edit-archer')" data-t="cancel">Cancel</button><button class="btn btn-primary" onclick="saveEditArcher()" data-t="save">SAVE →</button></div></div></div>
+<div class="modal-backdrop" id="modal-move-archer"><div class="modal" style="max-width:460px;"><div class="modal-title" id="move-modal-title">Move Archer</div><div id="move-modal-body"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-move-archer')" data-t="cancel">Cancel</button></div></div></div>
+<div class="modal-backdrop" id="modal-match"><div class="modal" style="max-width:460px;"><div class="modal-title" id="match-modal-title">Match Result</div><div id="match-modal-body"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-match')" data-t="cancel">Cancel</button><button class="btn btn-primary" onclick="saveMatchResult()" data-t="save_result">SAVE RESULT →</button></div></div></div>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getFirestore,collection,doc,addDoc,setDoc,getDoc,getDocs,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig={apiKey:"AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To",authDomain:"all-in-competition.firebaseapp.com",projectId:"all-in-competition",storageBucket:"all-in-competition.firebasestorage.app",messagingSenderId:"620146958631",appId:"1:620146958631:web:1e88019d1436372689c902"};
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+let currentCompId=null,currentDiscipline='Outdoor',archers=[],targets=[],sessions=[],scores={};
+let assignPending={ti:null,slot:null},lang='en';
+
+/* ── LANGUAGE / TRANSLATION ── */
+let currentLang='en';
+let T={};
+
+window.t=function(key){return T[currentLang]?.[key]||T['en']?.[key]||key;};
+function t(key){return window.t(key);}
+
+T={
+  en:{
+    // Nav
+    dashboard:'Dashboard',
+    entries:'Entry List',
+    targets:'Target Assignment',
+    targetsetup:'Target Setup',
+    schedule:'Schedule',
+    results:'Live Results',
+    scorecards:'Scorecards',
+    elimination:'Elimination',
+    history:'History',
+    // Buttons
+    new_comp:'+ NEW COMPETITION',
+    add_archer:'+ ADD ARCHER',
+    import_csv:'📥 IMPORT CSV',
+    get_template:'📋 GET TEMPLATE',
+    template:'📋 TEMPLATE',
+    reg_link:'🔗 REGISTRATION LINK',
+    auto_generate:'⚡ AUTO GENERATE FROM ENTRIES',
+    assign_odd:'🔢 ASSIGN ODD NUMBERS',
+    clear_all:'CLEAR ALL',
+    print_start:'🖨 PRINT START LIST',
+    field_of_play:'🏟 FIELD OF PLAY',
+    save_config:'💾 SAVE CONFIG',
+    apply_all:'APPLY TYPE TO ALL',
+    add_session:'+ ADD SESSION',
+    export_pdf:'📄 EXPORT PDF',
+    display_screen:'🖥 DISPLAY SCREEN',
+    share_results:'🔗 SHARE RESULTS',
+    print_all:'🖨 PRINT ALL',
+    print_blank:'🖨 PRINT BLANK',
+    generate_bracket:'⚡ GENERATE BRACKET',
+    generate_all:'⚡ GENERATE ALL',
+    share_match:'🔗 SHARE MATCH SCORING LINK',
+    delete_comp:'🗑 DELETE',
+    archive_comp:'🗄 ARCHIVE',
+    // Forms
+    comp_name:'Competition Name',
+    date:'Date',
+    location:'Location',
+    discipline:'Discipline',
+    organizer:'Organizer',
+    first_name:'First Name',
+    last_name:'Last Name',
+    club:'Club',
+    bow_type:'Bow Type',
+    age_category:'Age Category',
+    gender:'Gender',
+    session_name:'Session Name',
+    start_time:'Start Time',
+    distance:'Distance',
+    ends:'Ends',
+    arrows_end:'Arrows/End',
+    add_session_title:'Add Session',
+    session_name_ph:'e.g. Qualification Round 1',
+    num_targets:'Number of Targets',
+    // Table headers
+    name:'Name',
+    score:'Score',
+    target:'Target',
+    bow:'Bow',
+    age:'Age',
+    rank:'Rank',
+    // Labels
+    total_archers:'Total Archers',
+    assigned:'Assigned',
+    scored:'Scored',
+    comp_info:'Competition Info',
+    categories:'Categories Breakdown',
+    targets_needed:'Targets Needed',
+    male_short:'M',
+    female_short:'F',
+    club:'Club',
+    gender_h:'Gender',
+    archers_count:'archers',
+    results_will_appear:'Results will appear here as archers complete their rounds.',
+    entry_list:'Entry List',
+    // Modals
+    new_competition:'🏆 New Competition',
+    import_archers:'📥 Import Archers (CSV)',
+    assign_archer:'Assign Archer',
+    select_archer:'Select Archer',
+    edit_archer:'✏️ Edit Archer',
+    move_archer:'Move Archer',
+    match_result:'Match Result',
+    enter_result:'Enter Result',
+    save_result:'SAVE RESULT →',
+    // Actions
+    cancel:'Cancel',
+    create:'CREATE →',
+    import_btn:'IMPORT →',
+    assign:'ASSIGN →',
+    save:'SAVE →',
+    remove:'Remove',
+    advance_qf:'⚡ ADVANCE TO QUARTER FINALS',
+    advance_sf:'⚡ ADVANCE TO SEMI FINALS',
+    generate_final:'⚡ GENERATE FINAL + BRONZE',
+    // Status
+    not_connected:'🔴 Not connected',
+    connecting:'🟡 Connecting...',
+    connected:'🟢 Connected',
+    firebase_ready:'🟢 Firebase ready',
+    // Empty states
+    no_comp_selected:'No competition selected.',
+    create_or_select:'Create a new competition or select an existing one.',
+    create_competition:'+ CREATE COMPETITION',
+    no_archers_yet:'No archers yet.',
+    no_scores_yet:'No scores yet.',
+    no_targets_yet:'No targets yet.',
+    no_sessions_yet:'No sessions yet.',
+    no_brackets:'No elimination brackets yet.',
+    // Toast
+    select_comp_first:'Select a competition first',
+    enter_name:'Enter a competition name',
+    comp_created:'Competition created! ✓',
+    archer_added:'added ✓',
+    archer_removed:'Archer removed',
+    archer_updated:'updated ✓',
+    assignment_saved:'Assignment saved ✓',
+    removed_ok:'Removed ✓',
+    moved_ok:'moved to',
+    targets_generated:'targets generated ✓',
+    session_added:'Session added ✓',
+    archived_ok:'Competition archived ✓',
+    deleted_ok:'Competition deleted',
+    saved_ok:'targets saved ✓',
+    link_copied:'Registration link copied! ✓',
+    results_link_copied:'Results link copied! ✓',
+    match_link_copied:'Match scoring link copied! ✓',
+    template_downloaded:'Template downloaded ✓',
+    imported_ok:'archers imported ✓',
+    no_data:'No data to import',
+    result_saved:'Result saved ✓',
+    bracket_generated:'Bracket generated!',
+    next_round:'Next round generated ✓',
+    bracket_deleted:'Bracket deleted',
+    category:'Category',
+    bracket:'Bracket',
+    semi_finals:'Semi Finals',
+    quarter_finals:'Quarter Finals',
+    round_of:'Round of',
+    final:'Final',
+    bronze:'Bronze Medal',
+    match:'Match',
+    cumulative_lbl:'Cumulative',
+    sets_lbl:'Set System',
+    // Misc
+    enter_fname_lname:'Enter first and last name',
+    add_archers_first:'Add archers first',
+    no_archers:'No archers',
+    select_category:'Select a category',
+    not_enough:'Not enough archers (minimum 3)',
+    all_bows:'All Bows',
+    men:'Men',
+    women:'Women',
+    half_total:'Half Total',
+    running:'Running',
+    tiebreak:'Tiebreak Arrow (if needed)',
+    winner:'WINNER ✓ (required)',
+    delete_bracket:'✕ DELETE',
+    complete:'✓ COMPLETE',
+    pending:'PENDING',
+    set_points:'Set Points',
+    first_to_6:'(First to 6 wins)',
+    total:'Total',
+    search:'🔍 Search...',
+    sign_below:'Sign below after verifying scores',
+    scorer_sig:'Scorer signature',
+    witness_sig:'Witness signature',
+    archer_sig:'Archer signature',
+    scan_to_score:'Scan to score',
+    comp_name_ph:'e.g. National Championship 2025',
+    venue_city:'Venue / City',
+    club_fed:'Club / Federation',
+    club_name:'Club name',
+    add_archer_title:'Add Archer',
+  },
+  he:{
+    // Nav
+    dashboard:'לוח בקרה',
+    entries:'רשימת משתתפים',
+    targets:'שיבוץ מטרות',
+    targetsetup:'הגדרת מטרות',
+    schedule:'לוח זמנים',
+    results:'תוצאות חיות',
+    scorecards:'כרטיסי ניקוד',
+    elimination:'מקצי הדחות',
+    history:'היסטוריה',
+    // Buttons
+    new_comp:'+ תחרות חדשה',
+    add_archer:'+ הוסף קשת',
+    import_csv:'📥 ייבוא CSV',
+    get_template:'📋 קבל תבנית',
+    template:'📋 תבנית',
+    reg_link:'🔗 קישור הרשמה',
+    auto_generate:'⚡ יצירת קבוצות אוטומטית',
+    assign_odd:'🔢 שיבוץ מספרים אי-זוגיים',
+    clear_all:'נקה הכל',
+    print_start:'🖨 הדפס רשימת פתיחה',
+    field_of_play:'🏟 מגרש תחרות',
+    save_config:'💾 שמור הגדרות',
+    apply_all:'החל סוג על כולם',
+    add_session:'+ הוסף סבב',
+    export_pdf:'📄 ייצא PDF',
+    display_screen:'🖥 מסך תצוגה',
+    share_results:'🔗 שתף תוצאות',
+    print_all:'🖨 הדפס הכל',
+    print_blank:'🖨 הדפס ריק',
+    generate_bracket:'⚡ צור סולם',
+    generate_all:'⚡ צור הכל',
+    share_match:'🔗 קישור ניקוד מקצה',
+    delete_comp:'🗑 מחק',
+    archive_comp:'🗄 העבר לארכיון',
+    // Forms
+    comp_name:'שם התחרות',
+    date:'תאריך',
+    location:'מיקום',
+    discipline:'סוג תחרות',
+    organizer:'מארגן',
+    first_name:'שם פרטי',
+    last_name:'שם משפחה',
+    club:'מועדון',
+    bow_type:'סוג קשת',
+    age_category:'קטגוריית גיל',
+    gender:'מין',
+    session_name:'שם הסבב',
+    start_time:'שעת התחלה',
+    distance:'מרחק',
+    ends:'סבבים',
+    arrows_end:'חצים לסבב',
+    add_session_title:'הוספת סבב',
+    session_name_ph:'לדוגמה: סבב כשירות 1',
+    num_targets:'מספר מטרות',
+    // Table headers
+    name:'שם תחרות',
+    score:'ניקוד',
+    target:'מטרה',
+    bow:'קשת',
+    age:'גיל',
+    rank:'דירוג',
+    // Labels
+    total_archers:'סה״כ קשתים',
+    assigned:'משובצים',
+    scored:'עם ניקוד',
+    comp_info:'פרטי התחרות',
+    categories:'פירוט קטגוריות',
+    targets_needed:'מטרות נדרשות',
+    male_short:'ז',
+    female_short:'נ',
+    club:'מועדון',
+    gender_h:'מין',
+    archers_count:'קשתים',
+    results_will_appear:'התוצאות יופיעו כאן לאחר סיום הניקוד.',
+    entry_list:'רשימת משתתפים',
+    // Modals
+    new_competition:'🏆 תחרות חדשה',
+    import_archers:'📥 ייבוא קשתים (CSV)',
+    assign_archer:'שבץ קשת',
+    select_archer:'בחר קשת',
+    edit_archer:'✏️ עריכת קשת',
+    move_archer:'העבר קשת',
+    match_result:'תוצאת מקצה',
+    enter_result:'הזן תוצאה',
+    save_result:'שמור תוצאה →',
+    // Actions
+    cancel:'ביטול',
+    create:'צור →',
+    import_btn:'ייבא →',
+    assign:'שבץ →',
+    save:'שמור →',
+    remove:'הסר',
+    advance_qf:'⚡ המשך לרבע גמר',
+    advance_sf:'⚡ המשך לחצי גמר',
+    generate_final:'⚡ צור גמר + גמר קטן',
+    // Status
+    not_connected:'🔴 לא מחובר',
+    connecting:'🟡 מתחבר...',
+    connected:'🟢 מחובר',
+    firebase_ready:'🟢 Firebase מוכן',
+    // Empty states
+    no_comp_selected:'לא נבחרה תחרות.',
+    create_or_select:'צור תחרות חדשה או בחר קיימת.',
+    create_competition:'+ צור תחרות',
+    no_archers_yet:'אין קשתים עדיין.',
+    no_scores_yet:'אין ניקוד עדיין.',
+    no_targets_yet:'אין מטרות עדיין.',
+    no_sessions_yet:'אין סבבים עדיין.',
+    no_brackets:'אין סולמות חתימה עדיין.',
+    // Toast
+    select_comp_first:'בחר תחרות תחילה',
+    enter_name:'הזן שם תחרות',
+    comp_created:'התחרות נוצרה! ✓',
+    archer_added:'נוסף ✓',
+    archer_removed:'הקשת הוסר',
+    archer_updated:'עודכן ✓',
+    assignment_saved:'השיבוץ נשמר ✓',
+    removed_ok:'הוסר ✓',
+    moved_ok:'הועבר ל',
+    targets_generated:'מטרות נוצרו ✓',
+    session_added:'סבב נוסף ✓',
+    archived_ok:'התחרות הועברה לארכיון ✓',
+    deleted_ok:'התחרות נמחקה',
+    saved_ok:'מטרות נשמרו ✓',
+    link_copied:'קישור הרשמה הועתק! ✓',
+    results_link_copied:'קישור תוצאות הועתק! ✓',
+    match_link_copied:'קישור ניקוד הועתק! ✓',
+    template_downloaded:'תבנית הורדה ✓',
+    imported_ok:'קשתים יובאו ✓',
+    no_data:'אין נתונים לייבוא',
+    result_saved:'התוצאה נשמרה ✓',
+    bracket_generated:'הסולם נוצר!',
+    next_round:'הסיבוב הבא נוצר ✓',
+    bracket_deleted:'הסולם נמחק',
+    category:'קטגוריה',
+    bracket:'בחירת שלבי הדחות',
+    semi_finals:'חצי גמר',
+    quarter_finals:'רבע גמר',
+    round_of:'סיבוב של',
+    final:'גמר',
+    bronze:'גמר קטן',
+    match:'מקצה',
+    cumulative_lbl:'צבירה',
+    sets_lbl:'שיטת סטים',
+    // Misc
+    enter_fname_lname:'הזן שם פרטי ושם משפחה',
+    add_archers_first:'הוסף קשתים תחילה',
+    no_archers:'אין קשתים',
+    select_category:'בחר קטגוריה',
+    not_enough:'אין מספיק קשתים (מינימום 3)',
+    all_bows:'כל הקשתות',
+    men:'גברים',
+    women:'נשים',
+    half_total:'סה״כ מחצית',
+    running:'מצטבר',
+    tiebreak:'חץ שיווי (במידת הצורך)',
+    winner:'מנצח ✓ (חובה)',
+    delete_bracket:'✕ מחק',
+    complete:'✓ הושלם',
+    pending:'ממתין',
+    set_points:'נקודות סט',
+    first_to_6:'(ראשון ל-6 מנצח)',
+    total:'סה״כ',
+    search:'🔍 חיפוש...',
+    sign_below:'חתום לאחר אימות הניקוד',
+    scorer_sig:'חתימת מנקד',
+    witness_sig:'חתימת עד',
+    archer_sig:'חתימת קשת',
+    scan_to_score:'סרוק לניקוד',
+    comp_name_ph:'לדוגמה: אליפות ישראל 2025',
+    venue_city:'מקום / עיר',
+    club_fed:'מועדון / התאחדות',
+    club_name:'שם מועדון',
+    add_archer_title:'הוספת קשת',
+  }
+};
+
+window.setAdminLang=function(lang){
+  currentLang=lang;
+  localStorage.setItem('adminLang',lang);
+  document.querySelectorAll('.lang-btn').forEach(b=>{
+    b.classList.toggle('active',
+      (lang==='en'&&b.textContent.trim()==='EN')||
+      (lang==='he'&&b.textContent.trim()==='עב')
+    );
+  });
+  // Re-render current panel
+  applyTranslations();
+};
+
+function applyTranslations(){
+  const lang=currentLang;
+  const tr=(key)=>T[lang]?.[key]||T['en']?.[key]||key;
+  // Nav item labels
+  document.querySelectorAll('.nav-item[data-panel]').forEach(el=>{
+    const panel=el.getAttribute('data-panel');
+    const span=el.querySelector('span:not(.icon):not(.badge)');
+    if(span)span.textContent=tr(panel);
+  });
+  // History link
+  const histLink=document.querySelector('a[href="history.html"] span:last-child');
+  if(histLink)histLink.textContent=tr('history');
+  // Topbar title
+  const activePanel=document.querySelector('.nav-item.active')?.getAttribute('data-panel');
+  if(activePanel)document.getElementById('topbar-title').textContent=tr(activePanel)||tr('dashboard');
+  // New comp button
+  const newCompBtn=document.querySelector('.new-comp-btn');
+  if(newCompBtn)newCompBtn.textContent=tr('new_comp');
+  // Archive/delete
+  const archBtn=document.getElementById('btn-archive-comp');
+  const delBtn=document.getElementById('btn-delete-comp');
+  if(archBtn)archBtn.textContent=tr('archive_comp');
+  if(delBtn)delBtn.textContent=tr('delete_comp');
+  // All buttons with data-t
+  document.querySelectorAll('button[data-t]').forEach(btn=>{
+    btn.textContent=tr(btn.getAttribute('data-t'));
+  });
+  // All labels with data-t
+  document.querySelectorAll('label[data-t]').forEach(el=>{
+    el.textContent=tr(el.getAttribute('data-t'));
+  });
+  // All spans/divs with data-t
+  document.querySelectorAll('span[data-t],div[data-t]').forEach(el=>{
+    el.textContent=tr(el.getAttribute('data-t'));
+  });
+  // Placeholders
+  document.querySelectorAll('[data-placeholder-t]').forEach(el=>{
+    el.placeholder=tr(el.getAttribute('data-placeholder-t'));
+  });
+  // Search
+  const searchEl=document.getElementById('search-archer');
+  if(searchEl)searchEl.placeholder=tr('search');
+  // Elimination panel labels
+  const lblEB=document.getElementById('lbl-elim-bracket');if(lblEB)lblEB.textContent=tr('bracket');
+  // Live Results title
+  const lrTitle=document.getElementById('live-results-title');
+  if(lrTitle)lrTitle.textContent=tr('results');
+  // Schedule panel
+  const schTitle=document.getElementById('schedule-title');if(schTitle)schTitle.textContent=tr('add_session_title');
+  const lblSN=document.getElementById('lbl-session-name');if(lblSN)lblSN.textContent=tr('session_name');
+  const lblSD=document.getElementById('lbl-s-date');if(lblSD)lblSD.textContent=tr('date');
+  const lblST=document.getElementById('lbl-start-time');if(lblST)lblST.textContent=tr('start_time');
+  const lblDist=document.getElementById('lbl-distance');if(lblDist)lblDist.textContent=tr('distance');
+  const lblEnds=document.getElementById('lbl-ends');if(lblEnds)lblEnds.textContent=tr('ends');
+  const lblAE=document.getElementById('lbl-arrows-end');if(lblAE)lblAE.textContent=tr('arrows_end');
+  const sNameEl=document.getElementById('s-name');if(sNameEl)sNameEl.placeholder=tr('session_name_ph');
+  // Entry list headers
+  const thName=document.getElementById('th-name');if(thName)thName.textContent=tr('name');
+  const thClub=document.getElementById('th-club');if(thClub)thClub.textContent=tr('club');
+  const thBow2=document.getElementById('th-bow2');if(thBow2)thBow2.textContent=tr('bow');
+  const thAge2=document.getElementById('th-age2');if(thAge2)thAge2.textContent=tr('age');
+  const thGender=document.getElementById('th-gender');if(thGender)thGender.textContent=tr('gender_h');
+  const thTarget=document.getElementById('th-target');if(thTarget)thTarget.textContent=tr('target');
+  const elTitle=document.getElementById('entry-list-title');if(elTitle)elTitle.textContent=tr('entry_list');
+  // Dashboard table headers
+  const thBow=document.getElementById('th-bow');if(thBow)thBow.textContent=tr('bow');
+  const thAge=document.getElementById('th-age');if(thAge)thAge.textContent=tr('age');
+  const thM=document.getElementById('th-m');if(thM)thM.textContent=tr('male_short');
+  const thF=document.getElementById('th-f');if(thF)thF.textContent=tr('female_short');
+  const thTotal=document.getElementById('th-total');if(thTotal)thTotal.textContent=tr('total');
+  const thTN=document.getElementById('th-targets-needed');if(thTN)thTN.textContent=tr('targets_needed');
+  // Dashboard titles
+  const catTitle=document.getElementById('cat-breakdown-title');
+  if(catTitle)catTitle.textContent=tr('categories');
+  const compInfoTitle=document.getElementById('comp-info-title');
+  if(compInfoTitle)compInfoTitle.textContent=tr('comp_info');
+  // Modal titles
+  const mnc=document.querySelector('#modal-new-comp .modal-title');if(mnc)mnc.textContent=tr('new_competition');
+  const mim=document.querySelector('#modal-import .modal-title');if(mim)mim.textContent=tr('import_archers');
+  const med=document.querySelector('#modal-edit-archer .modal-title');if(med)med.textContent=tr('edit_archer');
+  // Add Archer card title
+  const addCard=document.querySelector('#panel-entries .card .card-title');
+  if(addCard)addCard.textContent=tr('add_archer_title');
+  // No comp message
+  const noCompP=document.querySelector('#no-comp-msg p');
+  if(noCompP)noCompP.innerHTML=tr('no_comp_selected')+'<br>'+tr('create_or_select');
+  const noCompBtn=document.querySelector('#no-comp-msg button');
+  if(noCompBtn)noCompBtn.textContent=tr('create_competition');
+  // Stat labels
+  const statLabels=document.querySelectorAll('.stat-label');
+  const statKeys=['total_archers','assigned','targets_stat','scored'];
+  statLabels.forEach((el,i)=>{if(statKeys[i])el.textContent=tr(statKeys[i]);});
+  // Filter all bows
+  const filterBow=document.getElementById('filter-bow');
+  if(filterBow&&filterBow.options[0])filterBow.options[0].textContent=tr('all_bows');
+  const scFilter=document.getElementById('sc-filter-bow');
+  if(scFilter&&scFilter.options[0])scFilter.options[0].textContent=tr('all_bows');
+}
+
+function initAdminLang(){
+  const saved=localStorage.getItem('adminLang')||'en';
+  currentLang=saved;
+  document.querySelectorAll('.lang-btn').forEach(b=>{
+    b.classList.toggle('active',
+      (saved==='en'&&b.textContent.trim()==='EN')||
+      (saved==='he'&&b.textContent.trim()==='עב')
+    );
+  });
+  applyTranslations();
+}
+
+const BOW_ORDER=['Recurve','Compound','Barebow','Traditional','Longbow'];
+const AGE_ORDER=['U12','U14','U18','U21','Senior','Master 50+','Master 60+'];
+const BOW_COLORS={Recurve:'#1565c0',Compound:'#4a148c',Barebow:'#1b5e20',Traditional:'#e65100',Longbow:'#37474f','Trad/Longbow':'#e65100',Mixed:'#546e7a'};
+function getGoldLabels(){if(currentDiscipline==='3D')return{g1:'11',g2:'10'};if(currentDiscipline==='Field')return{g1:'6',g2:'5'};if(currentDiscipline==='Indoor')return{g1:'10',g2:'9'};if(currentDiscipline==='Custom')return{g1:'Kills',g2:'11s'};return{g1:'X',g2:'10'};}
+async function saveArchers(){if(currentCompId)await setDoc(doc(db,'competitions',currentCompId),{archers},{merge:true});}
+async function saveTargets(){if(currentCompId)await setDoc(doc(db,'competitions',currentCompId),{targets},{merge:true});}
+async function saveSessions(){if(currentCompId)await setDoc(doc(db,'competitions',currentCompId),{sessions},{merge:true});}
+async function loadCompetitions(){
+  const snap=await getDocs(collection(db,'competitions'));
+  const sel=document.getElementById('comp-select');
+  sel.innerHTML='<option value="">— Select Competition —</option>';
+  const now=Date.now();
+  const sevenDays=7*24*60*60*1000;
+  for(const d of snap.docs){
+    const c=d.data();
+    // Auto-archive if competition date was 7+ days ago
+    if(!c.archived&&c.date){
+      const compDate=new Date(c.date).getTime();
+      if(!isNaN(compDate)&&(now-compDate)>sevenDays){
+        await setDoc(doc(db,'competitions',d.id),{archived:true},{merge:true});
+        continue;
+      }
+    }
+    if(c.archived) continue; // skip archived
+    const o=document.createElement('option');
+    o.value=d.id;o.textContent=c.name+(c.date?` (${c.date})`:'');
+    sel.appendChild(o);
+  }
+}
+window.openNewCompModal=()=>{
+  document.getElementById('nc-date').value=new Date().toISOString().split('T')[0];
+  // Translate modal content directly
+  const isHe=currentLang==='he';
+  const modal=document.getElementById('modal-new-comp');
+  modal.querySelector('.modal-title').textContent=isHe?'🏆 תחרות חדשה':'🏆 New Competition';
+  const labels=modal.querySelectorAll('label');
+  const labelKeys=isHe?['שם התחרות','תאריך','מספר ימים','מיקום','סוג תחרות','מארגן']:['Competition Name','Date','Number of Days','Location','Discipline','Organizer'];
+  labels.forEach((l,i)=>{if(labelKeys[i])l.textContent=labelKeys[i];});
+  const inputs=modal.querySelectorAll('input[type=text]');
+  const phKeys=isHe?['לדוגמה: אליפות ישראל 2025','מקום / עיר','מועדון / התאחדות']:['e.g. National Championship 2025','Venue / City','Club / Federation'];
+  inputs.forEach((inp,i)=>{if(phKeys[i])inp.placeholder=phKeys[i];});
+  const btns=modal.querySelectorAll('.modal-actions button');
+  if(btns[0])btns[0].textContent=isHe?'ביטול':'Cancel';
+  if(btns[1])btns[1].textContent=isHe?'צור →':'CREATE →';
+  openModal('modal-new-comp');
+};
+window.createCompetition=async()=>{const name=document.getElementById('nc-name').value.trim();const date=document.getElementById('nc-date').value;const location=document.getElementById('nc-location').value.trim();const discipline=document.getElementById('nc-discipline').value;const organizer=document.getElementById('nc-organizer').value.trim();const numDays=parseInt(document.getElementById('nc-numdays').value)||1;if(!name){toast(t('enter_name'),'error');return;}if(!date){toast('Please set a start date','error');return;}const ref=await addDoc(collection(db,'competitions'),{name,date,numDays,location,discipline,organizer,createdAt:Date.now(),archers:[],targets:[],sessions:[],targetConfig:[]});closeModal('modal-new-comp');toast(t('comp_created'),'success');await loadCompetitions();
+initAdminLang();document.getElementById('comp-select').value=ref.id;selectCompetition(ref.id);};
+
+function updateNavForDiscipline(disc){
+  const navTs=document.getElementById('nav-targetsetup');
+  if(navTs)navTs.style.display=disc==='Custom'?'flex':'none';
+  const btnOdd=document.getElementById('btn-assign-odd');
+  if(btnOdd)btnOdd.style.display=(disc==='3D'||disc==='Field'||disc==='Custom')?'inline-flex':'none';
+}
+
+window.selectCompetition=async(id)=>{if(!id){currentCompId=null;document.getElementById('no-comp-msg').style.display='block';document.getElementById('dash-content').style.display='none';return;}currentCompId=id;const snap=await getDoc(doc(db,'competitions',id));if(!snap.exists())return;const data=snap.data();archers=data.archers||[];targets=data.targets||[];sessions=data.sessions||[];scores=data.scores||{};currentDiscipline=data.discipline||'Outdoor';window._targetConfig=data.targetConfig||[];document.getElementById('no-comp-msg').style.display='none';document.getElementById('dash-content').style.display='block';document.getElementById('conn-status').textContent=t('connected');document.getElementById('btn-delete-comp').style.display='inline-block';document.getElementById('btn-archive-comp').style.display='inline-block';updateNavForDiscipline(currentDiscipline);renderAll();onSnapshot(doc(db,'competitions',id),snap=>{const d=snap.data();scores=d.scores||{};archers=d.archers||[];currentDiscipline=d.discipline||'Outdoor';window._targetConfig=d.targetConfig||[];window._scorecards=d.scorecards||{};updateNavForDiscipline(currentDiscipline);const newElimJson=JSON.stringify(d.elimination||{});const elimChanged=newElimJson!==window._lastElimJson;window._lastElimJson=newElimJson;window._elimData=d.elimination||{};const onElimPanel=document.getElementById('panel-elimination')?.classList.contains('active');const onResultsPanel=document.getElementById('panel-results')?.classList.contains('active');renderResults();renderDashboard();renderScorecards();if(onElimPanel){document.getElementById('d-scored').textContent=archers.filter(a=>(getScore(a.id)?.total||0)>0).length;}if(elimChanged&&onElimPanel){renderElimContent();}});};
+
+function getScore(archerId){const key=String(archerId).replace(/\./g,'_');return scores[key]||scores[String(archerId)]||{};}
+function getDistanceLabel(bow,discipline){if(discipline==='Outdoor'){if(bow==='Recurve')return '70m / 60m / 30m';if(bow==='Compound')return '50m';if(bow==='Barebow')return '50m';if(bow==='Trad/Longbow')return '30m';}return '';}
+function renderAll(){renderDashboard();renderEntries();renderTargets();renderSessions();renderResults();renderScorecards();}
+function renderDashboard(){if(!currentCompId)return;document.getElementById('d-total').textContent=archers.length;document.getElementById('d-assigned').textContent=archers.filter(a=>a.target).length;document.getElementById('d-targets').textContent=targets.length;document.getElementById('d-scored').textContent=archers.filter(a=>(getScore(a.id)?.total||0)>0).length;document.getElementById('entry-badge').textContent=archers.length;document.getElementById('entry-count').textContent=archers.length+' '+t('archers_count');getDoc(doc(db,'competitions',currentCompId)).then(s=>{const d=s.data();document.getElementById('comp-info-grid').innerHTML=`<div class="form-group"><label>${t('name')}</label><input value="${d.name||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label>${t('date')}</label><input value="${d.date||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label>${t('location')}</label><input value="${d.location||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label>${t('discipline')}</label><input value="${d.discipline||''}" readonly style="opacity:0.7;"></div><div class="form-group"><label>${t('organizer')}</label><input value="${d.organizer||''}" readonly style="opacity:0.7;"></div>`;});const cats={};archers.forEach(a=>{const k=`${a.bow}|${a.age}`;if(!cats[k])cats[k]={bow:a.bow,age:a.age,M:0,F:0};cats[k][a.gender]++;});document.getElementById('cat-breakdown').innerHTML=BOW_ORDER.flatMap(bow=>AGE_ORDER.map(age=>{const c=cats[`${bow}|${age}`];if(!c)return'';const total=(c.M||0)+(c.F||0);const tgts=Math.ceil(total/4);return`<tr><td><span class="tag tag-${bow.toLowerCase()}">${bow}</span></td><td>${age}</td><td>${c.M||0}</td><td>${c.F||0}</td><td><strong>${total}</strong></td><td style="color:var(--accent)">${tgts}</td></tr>`;})).join('')||`<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">${t('no_archers_yet')}</td></tr>`;}
+window.addArcher=async()=>{if(!currentCompId){toast(t('select_comp_first'),'error');return;}const fname=document.getElementById('e-fname').value.trim();const lname=document.getElementById('e-lname').value.trim();if(!fname||!lname){toast(t('enter_fname_lname'),'error');return;}archers.push({id:String(Date.now()),fname,lname,name:`${fname} ${lname}`,club:document.getElementById('e-club').value.trim(),bow:document.getElementById('e-bow').value,age:document.getElementById('e-age').value,gender:document.getElementById('e-gender').value,target:null,slot:null});await saveArchers();document.getElementById('e-fname').value='';document.getElementById('e-lname').value='';renderAll();toast(`${fname} ${lname} ${t('archer_added')}`,'success');};
+window.deleteArcher=async(id)=>{if(!confirm('Remove this archer?'))return;archers=archers.filter(a=>a.id!==id);targets.forEach(t=>['A','B','C','D'].forEach(s=>{if(t[s]?.id===id)t[s]=null;}));await saveArchers();await saveTargets();renderAll();toast(t('archer_removed'),'success');};
+window.renderEntries=()=>{
+  // Translate Add Archer labels
+  const isHe=currentLang==='he';
+  const panel=document.getElementById('panel-entries');
+  if(panel){
+    const addCard=panel.querySelector('.card-title');
+    if(addCard)addCard.textContent=isHe?'הוספת קשת':'Add Archer';
+    const labels=panel.querySelectorAll('.card:first-child label');
+    const lk=isHe?['שם פרטי','שם משפחה','מועדון','סוג קשת','קטגוריית גיל','מין']:['First Name','Last Name','Club','Bow Type','Age Category','Gender'];
+    labels.forEach((l,i)=>{if(lk[i])l.textContent=lk[i];});
+    const fname=document.getElementById('e-fname');if(fname)fname.placeholder=isHe?'שם פרטי':'First name';
+    const lname=document.getElementById('e-lname');if(lname)lname.placeholder=isHe?'שם משפחה':'Last name';
+    const club=document.getElementById('e-club');if(club)club.placeholder=isHe?'שם מועדון':'Club name';
+  }
+  /* original renderEntries code */const search=(document.getElementById('search-archer')?.value||'').toLowerCase();const bowF=document.getElementById('filter-bow')?.value||'';const filtered=archers.filter(a=>(a.name.toLowerCase().includes(search)||(a.club||'').toLowerCase().includes(search))&&(!bowF||a.bow===bowF));document.getElementById('entry-count').textContent=archers.length+' '+t('archers_count');document.getElementById('entry-badge').textContent=archers.length;document.getElementById('entries-table').innerHTML=filtered.map((a)=>`<tr><td style="color:#999;">${archers.indexOf(a)+1}</td><td style="color:#111;font-weight:600;">${a.fname} ${a.lname}</td><td style="color:#555;">${a.club||'—'}</td><td><span class="tag tag-${a.bow.toLowerCase()}">${a.bow}</span></td><td style="color:#111;">${a.age}</td><td><span class="tag tag-${a.gender.toLowerCase()}">${a.gender}</span></td><td style="color:#1565c0;font-weight:700;">${a.target?`T${a.target}${a.slot}`:'<span style="color:#999">—</span>'}</td><td style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="openEditArcher('${a.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteArcher('${a.id}')">✕</button></td></tr>`).join('')||`<tr><td colspan="8" style="text-align:center;color:#999;padding:24px">${t('no_archers_yet')}</td></tr>`;};
+window.openImportModal=()=>{
+  const isHe=currentLang==='he';
+  const modal=document.getElementById('modal-import');
+  modal.querySelector('.modal-title').textContent=isHe?'📥 ייבוא קשתים (CSV)':'📥 Import Archers (CSV)';
+  const btns=modal.querySelectorAll('.modal-actions button');
+  if(btns[0])btns[0].textContent=isHe?'ביטול':'Cancel';
+  if(btns[1])btns[1].textContent=isHe?'📋 קבל תבנית':'📋 GET TEMPLATE';
+  if(btns[2])btns[2].textContent=isHe?'ייבא →':'IMPORT →';
+  const textarea=modal.querySelector('textarea');
+  if(textarea)textarea.placeholder=isHe?'יוחנן,כהן,מועדון חיפה,Recurve,Senior,M':'John,Smith,City Archers,Recurve,Senior,M';
+  /* original code below */
+  document.getElementById('import-csv').value='';
+  document.getElementById('csv-preview').style.display='none';
+  document.getElementById('csv-drop-zone').style.borderColor='var(--border2)';
+  const fi=document.getElementById('csv-file-input');
+  if(fi)fi.value='';
+  openModal('modal-import');
+};
+
+window.handleCSVFile=(input)=>{
+  const file=input.files[0];
+  if(!file)return;
+  // Try UTF-8 first, then Windows-1255 for Hebrew Excel files
+  const tryRead=(encoding)=>new Promise(resolve=>{
+    const reader=new FileReader();
+    reader.onload=(e)=>resolve(e.target.result);
+    reader.readAsText(file,encoding);
+  });
+  (async()=>{
+    let text=await tryRead('UTF-8');
+    // Detect garbled Hebrew — if result has replacement chars or looks wrong, try Windows-1255
+    const hasGarbled=text.includes('\uFFFD')||(text.includes('\xd7')||/[\x80-\xBF]{3,}/.test(text));
+    if(hasGarbled) text=await tryRead('windows-1255');
+    // Also try ISO-8859-8 (another Hebrew encoding)
+    if(text.includes('\uFFFD')) text=await tryRead('ISO-8859-8');
+    document.getElementById('import-csv').value=text;
+    const lines=text.trim().split('\n').filter(l=>l.trim());
+    const firstLine=lines[0]?.toLowerCase()||'';
+    const isHeader=firstLine.includes('firstname')||firstLine.includes('first name')||firstLine.includes('name');
+    const dataLines=isHeader?lines.slice(1):lines;
+    const preview=document.getElementById('csv-preview');
+    preview.textContent=`✓ ${file.name} loaded — ${dataLines.length} archer${dataLines.length!==1?'s':''} detected`;
+    preview.style.display='block';
+    document.getElementById('csv-drop-zone').style.borderColor='var(--green)';
+    document.getElementById('csv-drop-zone').innerHTML=`<div style="font-size:20px;">✅</div><div style="font-size:13px;font-weight:600;color:var(--green);">${file.name}</div><div style="font-size:11px;color:var(--muted2);margin-top:4px;">${dataLines.length} archers ready to import</div>`;
+  })();
+};
+
+window.handleCSVDrop=(e)=>{
+  e.preventDefault();
+  document.getElementById('csv-drop-zone').style.borderColor='var(--border2)';
+  const file=e.dataTransfer.files[0];
+  if(!file)return;
+  const input=document.getElementById('csv-file-input');
+  const dt=new DataTransfer();
+  dt.items.add(file);
+  input.files=dt.files;
+  handleCSVFile(input);
+};
+window.importCSV=async()=>{
+  if(!currentCompId){toast(t('select_comp_first'),'error');return;}
+  const raw=document.getElementById('import-csv').value.trim();
+  if(!raw){toast(t('no_data'),'error');return;}
+  const lines=raw.split('\n').filter(l=>l.trim());
+  // Skip header row if detected
+  const firstLine=lines[0]?.toLowerCase()||'';
+  const isHeader=firstLine.includes('firstname')||firstLine.includes('first name')||firstLine.includes('name')||firstLine.includes('bow');
+  const dataLines=isHeader?lines.slice(1):lines;
+  let added=0,skipped=0;
+  dataLines.forEach(line=>{
+    // Handle quoted CSV values (from Excel export)
+    const parts=line.split(',').map(p=>p.trim().replace(/^"|"$/g,'').trim());
+    const[fname,lname,club,bow,age,gender='M']=parts;
+    if(!fname||!lname||fname.toLowerCase()==='firstname'){skipped++;return;}
+    // Skip valid options row
+    if(fname.includes('/')||fname.toLowerCase().includes('recurve')){skipped++;return;}
+    const bowNorm=BOW_ORDER.find(b=>b.toLowerCase()===bow?.toLowerCase())||'Recurve';
+    const ageNorm=AGE_ORDER.find(a=>a.toLowerCase()===age?.toLowerCase())||age||'Senior';
+    archers.push({id:String(Date.now()+added),fname,lname,name:`${fname} ${lname}`,club:club||'',bow:bowNorm,age:ageNorm,gender:(gender||'M').toUpperCase().charAt(0),target:null,slot:null});
+    added++;
+  });
+  await saveArchers();
+  closeModal('modal-import');
+  renderAll();
+  if(added>0)toast(`${added} ${t('imported_ok')}${skipped>0?' ('+skipped+' skipped)':''}`, 'success');
+  else toast('No archers imported — check format','error');
+};
+window.generateTargets=async()=>{if(!currentCompId){toast(t('select_comp_first'),'error');return;}if(!archers.length){toast(t('add_archers_first'),'error');return;}targets=[];archers.forEach(a=>{a.target=null;a.slot=null;});const slots=['A','B','C','D'];let targetNum=1;function assignGroup(group,bowLabel){if(!group.length)return;let cur=null,si=0;group.forEach(archer=>{if(si===0){cur={num:targetNum++,bow:bowLabel,A:null,B:null,C:null,D:null};targets.push(cur);}cur[slots[si]]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};const orig=archers.find(a=>a.id===archer.id);if(orig){orig.target=cur.num;orig.slot=slots[si];}si++;if(si>=4)si=0;});}function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}if(currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom'){assignGroup(shuffle(archers),'Mixed');}else if(currentDiscipline==='Outdoor'){assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['Senior','U21'].includes(a.age))),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['U18','Master 50+','Master 60+'].includes(a.age))),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Compound')),'Compound');assignGroup(shuffle(archers.filter(a=>a.bow==='Barebow')),'Barebow');assignGroup(shuffle(archers.filter(a=>a.bow==='Recurve'&&['U14','U12'].includes(a.age))),'Recurve');assignGroup(shuffle(archers.filter(a=>a.bow==='Traditional'||a.bow==='Longbow')),'Trad/Longbow');}else if(currentDiscipline==='Indoor'){
+  // Split by bow + age group (same logic as Outdoor)
+  const indoorBowGroups=[
+    {bow:'Recurve',ages:['Senior','U21'],label:'Recurve'},
+    {bow:'Recurve',ages:['U18','Master 50+','Master 60+'],label:'Recurve'},
+    {bow:'Recurve',ages:['U12','U14'],label:'Recurve'},
+    {bow:'Compound',ages:AGE_ORDER,label:'Compound'},
+    {bow:'Barebow',ages:AGE_ORDER,label:'Barebow'},
+    {bow:'Traditional',ages:AGE_ORDER,label:'Trad/Longbow'},
+    {bow:'Longbow',ages:AGE_ORDER,label:'Trad/Longbow'},
+  ];
+  // Collect already-assigned IDs to avoid double-assignment
+  const assigned=new Set();
+  indoorBowGroups.forEach(g=>{
+    const group=shuffle(archers.filter(a=>a.bow===g.bow&&g.ages.includes(a.age)&&!assigned.has(a.id)));
+    group.forEach(a=>assigned.add(a.id));
+    assignGroup(group,g.label);
+  });
+}await saveTargets();await saveArchers();renderAll();toast(`${targets.length} ${t('targets_generated')}`,'success');};
+window.generateOddTargets=async()=>{
+  if(!currentCompId){toast(t('select_comp_first'),'error');return;}
+  if(!archers.length){toast(t('add_archers_first'),'error');return;}
+  targets=[];archers.forEach(a=>{a.target=null;a.slot=null;});
+  const slots=['A','B','C','D'];
+  // Build odd numbers first (1,3,5...), then even (2,4,6...)
+  const maxTargets=Math.ceil(archers.length/4);
+  const oddNums=[],evenNums=[];
+  for(let i=1;i<=maxTargets*2;i++){if(i%2!==0)oddNums.push(i);else evenNums.push(i);}
+  const allNums=[...oddNums,...evenNums];
+  let numIdx=0;
+  function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+  function assignGroup(group){
+    if(!group.length)return;
+    let cur=null,si=0;
+    group.forEach(archer=>{
+      if(si===0){
+        const num=allNums[numIdx++];
+        cur={num,bow:'Mixed',A:null,B:null,C:null,D:null};
+        targets.push(cur);
+      }
+      cur[slots[si]]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};
+      const orig=archers.find(a=>a.id===archer.id);
+      if(orig){orig.target=cur.num;orig.slot=slots[si];}
+      si++;if(si>=4)si=0;
+    });
+  }
+  assignGroup(shuffle(archers));
+  // Sort targets by num for display
+  targets.sort((a,b)=>a.num-b.num);
+  await saveTargets();await saveArchers();renderAll();
+  toast(`${targets.length} ${t('targets_generated')}`,'success');
+};
+window.editTargetNum=async(ti)=>{
+  const target=targets[ti];
+  if(!target)return;
+  const newNumStr=prompt(`Change Target ${target.num} to number:`,target.num);
+  if(newNumStr===null)return;
+  const newNum=parseInt(newNumStr);
+  if(isNaN(newNum)||newNum<1){toast('Invalid target number','error');return;}
+  if(newNum===target.num)return;
+  // Cascading swap
+  let currentTi=ti;
+  let currentNewNum=newNum;
+  while(true){
+    const conflictTi=targets.findIndex((t,i)=>i!==currentTi&&t.num===currentNewNum);
+    const oldNum=targets[currentTi].num;
+    // Update archer assignments for this target
+    archers.forEach(a=>{if(a.target===oldNum)a.target=currentNewNum;});
+    targets[currentTi].num=currentNewNum;
+    if(conflictTi===-1)break;// no conflict, done
+    // There's a conflict — ask what to do with the displaced target
+    const displacedNewStr=prompt(`Target ${currentNewNum} already exists.\nChange that target to number:`,'');
+    if(displacedNewStr===null){
+      // User cancelled — revert all changes and reload
+      toast('Number change cancelled','error');
+      await saveTargets();await saveArchers();renderAll();return;
+    }
+    const displacedNew=parseInt(displacedNewStr);
+    if(isNaN(displacedNew)||displacedNew<1){toast('Invalid number','error');await saveTargets();await saveArchers();renderAll();return;}
+    currentTi=conflictTi;
+    currentNewNum=displacedNew;
+  }
+  // Sort targets by num after all changes
+  targets.sort((a,b)=>a.num-b.num);
+  await saveTargets();await saveArchers();renderAll();
+  toast('Target numbers updated ✓','success');
+};
+window.archiveCompetition=async()=>{if(!currentCompId)return;const snap=await getDoc(doc(db,'competitions',currentCompId));const name=snap.data()?.name||'this competition';if(!confirm(`Archive "${name}"?\n\nIt will move to History and disappear from the active list.`))return;await setDoc(doc(db,'competitions',currentCompId),{archived:true},{merge:true});currentCompId=null;archers=[];targets=[];sessions=[];scores={};document.getElementById('no-comp-msg').style.display='block';document.getElementById('dash-content').style.display='none';document.getElementById('btn-delete-comp').style.display='none';document.getElementById('btn-archive-comp').style.display='none';updateNavForDiscipline('');await loadCompetitions();document.getElementById('comp-select').value='';toast(t('archived_ok'),'success');};
+window.deleteCompetition=async()=>{if(!currentCompId)return;const snap=await getDoc(doc(db,'competitions',currentCompId));const name=snap.data()?.name||'this competition';if(!confirm(`DELETE "${name}"?\n\nThis cannot be undone.`))return;const{deleteDoc}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");await deleteDoc(doc(db,'competitions',currentCompId));currentCompId=null;archers=[];targets=[];sessions=[];scores={};document.getElementById('no-comp-msg').style.display='block';document.getElementById('dash-content').style.display='none';document.getElementById('btn-delete-comp').style.display='none';document.getElementById('btn-archive-comp').style.display='none';updateNavForDiscipline('');await loadCompetitions();document.getElementById('comp-select').value='';toast(t('deleted_ok'),'success');};
+window.clearAssignments=async()=>{if(!confirm('Clear all target assignments?'))return;targets=[];archers.forEach(a=>{a.target=null;a.slot=null;});await saveTargets();await saveArchers();renderAll();toast(t('clear_all')+' ✓','success');};
+/* ── DRAG GROUP HELPERS ── */
+function getDragGroup(archer){
+  if(!archer)return null;
+  if(currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom') return 'Mixed';
+  if(currentDiscipline==='Indoor') return archer.bow; // bow type only for Indoor drag
+  // Outdoor — bow + age subgroup
+  if(archer.bow==='Recurve'){
+    if(['Senior','U21'].includes(archer.age)) return 'Recurve-70m';
+    if(['U18','Master 50+','Master 60+'].includes(archer.age)) return 'Recurve-60m';
+    return 'Recurve-30m';
+  }
+  if(archer.bow==='Traditional'||archer.bow==='Longbow') return 'Trad/Longbow';
+  return archer.bow;
+}
+
+function canDrop(draggedArcher,targetSlotArcher){
+  // Empty slot — check dragged archer's group matches the target
+  const dg=getDragGroup(draggedArcher);
+  if(!targetSlotArcher) return true; // empty slot — group check done at target level
+  return dg===getDragGroup(targetSlotArcher);
+}
+
+let dragState=null; // {fromTi, fromSlot, archer}
+
+function renderTargets(){const grid=document.getElementById('target-grid');if(!targets.length){grid.innerHTML='<div class="empty-state"><div class="empty-icon">🎯</div><p>No targets yet.<br>Add archers then click <strong>AUTO GENERATE FROM ENTRIES</strong>.</p></div>';return;}const allBows=[...new Set(targets.map(t=>t.bow))];let html='';allBows.forEach(bow=>{const group=targets.filter(t=>t.bow===bow);const color=BOW_COLORS[bow]||'#555';const archerCount=group.reduce((n,t)=>n+['A','B','C','D'].filter(s=>t[s]).length,0);const tRange=group.length>1?`T${group[0].num}–T${group[group.length-1].num}`:`T${group[0].num}`;const distLabel=getDistanceLabel(bow,currentDiscipline);html+=`<div style="margin-bottom:24px;"><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px 14px;background:${color}22;border:1px solid ${color}44;border-radius:8px;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:2px;color:${color};">${bow==='Mixed'?'🎯 MIXED':bow==='Trad/Longbow'?'🏹 TRAD / LONGBOW':bow.toUpperCase()}</span>${distLabel?`<span style="font-size:12px;font-weight:700;color:var(--accent);background:rgba(255,215,0,0.15);padding:2px 8px;border-radius:4px;">${distLabel}</span>`:''}<span style="font-size:11px;color:#888;">${archerCount} archers · ${group.length} target${group.length!==1?'s':''} (${tRange})</span></div><div class="target-grid">`;
+group.forEach(t=>{const globalTi=targets.indexOf(t);const slotsHtml=['A','B','C','D'].map(s=>{const archer=t[s];
+const isDraggable=!!archer;
+const slotEl=`<div class="target-slot ${archer?'filled':'empty'}"
+  ${isDraggable?`draggable="true"`:''}
+  data-ti="${globalTi}" data-slot="${s}"
+  onclick="${archer?`openMoveModal('${archer.id}',${globalTi},'${s}')`:`openAssignModal(${globalTi},'${s}')`}"
+  ondragstart="${isDraggable?`handleDragStart(event,${globalTi},'${s}')`:''}"
+  ondragover="handleDragOver(event,${globalTi},'${s}')"
+  ondragleave="handleDragLeave(event)"
+  ondrop="handleDrop(event,${globalTi},'${s}')"
+  ondragend="handleDragEnd(event)">
+  <div class="slot-label">${s}</div>
+  ${archer?`<div class="slot-name" style="cursor:grab;">${archer.name} <span style="font-size:9px;color:var(--accent);">⠿</span></div><div class="slot-cat">${archer.age} · ${archer.gender}</div>`:`<div class="slot-name">Tap to assign</div>`}
+</div>`;return slotEl;}).join('');
+html+=`<div class="target-card"><div class="target-num" style="display:flex;align-items:center;gap:6px;">T${t.num}<button onclick="editTargetNum(${globalTi})" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:12px;padding:2px 4px;border-radius:4px;" title="Change target number">✏️</button></div>${slotsHtml}</div>`;});html+='</div></div>';});grid.innerHTML=html;}
+
+window.handleDragStart=(e,ti,slot)=>{
+  const archer=targets[ti]?.[slot];
+  if(!archer){e.preventDefault();return;}
+  dragState={fromTi:ti,fromSlot:slot,archer};
+  e.dataTransfer.effectAllowed='move';
+  e.dataTransfer.setData('text/plain',`${ti}:${slot}`);
+  setTimeout(()=>e.target.classList.add('dragging'),0);
+};
+
+window.handleDragOver=(e,ti,slot)=>{
+  e.preventDefault();
+  if(!dragState)return;
+  const targetArcher=targets[ti]?.[slot];
+  const dg=getDragGroup(dragState.archer);
+  const is3DFieldCustom=currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom';
+  let allowed=false;
+  if(is3DFieldCustom){
+    allowed=true;
+  }else if(currentDiscipline==='Indoor'){
+    if(targetArcher){
+      allowed=dg===getDragGroup(targetArcher);
+    }else{
+      // Empty slot — check siblings in target or target bow label
+      const sibs=['A','B','C','D'].map(s=>targets[ti]?.[s]).filter(Boolean);
+      if(sibs.length>0){allowed=sibs.some(a=>getDragGroup(a)===dg);}
+      else{
+        // No siblings — check target bow label matches drag group
+        const tb=targets[ti]?.bow;
+        const tradBows=['Traditional','Longbow'];
+        if(tb==='Trad/Longbow')allowed=tradBows.includes(dragState.archer.bow);
+        else allowed=dragState.archer.bow===tb;
+      }
+    }
+  }else{
+    // Outdoor
+    if(targetArcher){
+      allowed=dg===getDragGroup(targetArcher);
+    }else{
+      const sibs=['A','B','C','D'].map(s=>targets[ti]?.[s]).filter(Boolean);
+      if(sibs.length>0){allowed=sibs.some(a=>getDragGroup(a)===dg);}
+      else{
+        // Empty target — check bow label
+        const tb=targets[ti]?.bow;
+        const tradBows=['Traditional','Longbow'];
+        if(tb==='Trad/Longbow')allowed=tradBows.includes(dragState.archer.bow);
+        else allowed=dragState.archer.bow===tb;
+      }
+    }
+  }
+  if(allowed){e.dataTransfer.dropEffect='move';e.currentTarget.classList.add('drag-over');}
+  else{e.dataTransfer.dropEffect='none';}
+};
+
+window.handleDragLeave=(e)=>{
+  e.currentTarget.classList.remove('drag-over');
+};
+
+window.handleDrop=async(e,toTi,toSlot)=>{
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if(!dragState)return;
+  const{fromTi,fromSlot,archer}=dragState;
+  if(fromTi===toTi&&fromSlot===toSlot){dragState=null;return;}
+  // Validate group
+  const targetArcher=targets[toTi]?.[toSlot];
+  const dg=getDragGroup(archer);
+  const tg=targetArcher?getDragGroup(targetArcher):null;
+  const is3DFieldCustom=currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom';
+  let allowed=false;
+  if(is3DFieldCustom){
+    allowed=true;
+  }else if(currentDiscipline==='Indoor'){
+    if(targetArcher){allowed=dg===tg;}
+    else{
+      const sibs=['A','B','C','D'].map(s=>targets[toTi]?.[s]).filter(Boolean);
+      if(sibs.length>0){allowed=sibs.some(a=>getDragGroup(a)===dg);}
+      else{
+        const tb=targets[toTi]?.bow;
+        const tradBows=['Traditional','Longbow'];
+        allowed=tb==='Trad/Longbow'?tradBows.includes(archer.bow):archer.bow===tb;
+      }
+    }
+  }else{
+    if(targetArcher){allowed=dg===tg;}
+    else{
+      const sibs=['A','B','C','D'].map(s=>targets[toTi]?.[s]).filter(Boolean);
+      if(sibs.length>0){allowed=sibs.some(a=>getDragGroup(a)===dg);}
+      else{
+        const tb=targets[toTi]?.bow;
+        const tradBows=['Traditional','Longbow'];
+        allowed=tb==='Trad/Longbow'?tradBows.includes(archer.bow):archer.bow===tb;
+      }
+    }
+  }
+  if(!allowed){toast('Cannot move — different group','error');dragState=null;return;}
+  // Perform swap
+  const fromArcher=targets[fromTi][fromSlot];
+  const toArcher=targets[toTi][toSlot];
+  // Update target slots
+  targets[toTi][toSlot]=fromArcher?{...fromArcher}:null;
+  targets[fromTi][fromSlot]=toArcher?{...toArcher}:null;
+  // Update archer records
+  if(fromArcher){const a=archers.find(x=>x.id===fromArcher.id);if(a){a.target=targets[toTi].num;a.slot=toSlot;}}
+  if(toArcher){const a=archers.find(x=>x.id===toArcher.id);if(a){a.target=targets[fromTi].num;a.slot=fromSlot;}}
+  dragState=null;
+  await saveTargets();await saveArchers();
+  renderTargets();renderEntries();
+  toast(toArcher?'Archers swapped ✓':'Archer moved ✓','success');
+};
+
+window.handleDragEnd=(e)=>{
+  e.target.classList.remove('dragging');
+  document.querySelectorAll('.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  dragState=null;
+};
+window.openAssignModal=(ti,slot)=>{assignPending={ti,slot};const t=targets[ti];document.getElementById('assign-modal-title').textContent=`Target ${t.num} — Slot ${slot}`;const unassigned=archers.filter(a=>!a.target||(a.target===t.num&&a.slot===slot));document.getElementById('assign-archer-select').innerHTML='<option value="">— Unassign —</option>'+unassigned.map(a=>`<option value="${a.id}" ${t[slot]?.id===a.id?'selected':''}>${a.name} (${a.bow} · ${a.age})</option>`).join('');document.getElementById('btn-remove-slot').style.display=t[slot]?'block':'none';openModal('modal-assign');};
+window.confirmAssign=async()=>{const{ti,slot}=assignPending;const archerId=document.getElementById('assign-archer-select').value;const t=targets[ti];if(t[slot]){const old=archers.find(a=>a.id===t[slot].id);if(old){old.target=null;old.slot=null;}}if(archerId){const archer=archers.find(a=>a.id===archerId);if(archer){if(archer.target){const oldT=targets.find(x=>x.num===archer.target);if(oldT)oldT[archer.slot]=null;}t[slot]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};archer.target=t.num;archer.slot=slot;}}else{t[slot]=null;}await saveTargets();await saveArchers();closeModal('modal-assign');renderTargets();renderEntries();toast(t('assignment_saved'),'success');};
+window.removeFromSlot=async()=>{const{ti,slot}=assignPending;const t=targets[ti];if(t[slot]){const old=archers.find(a=>a.id===t[slot].id);if(old){old.target=null;old.slot=null;}t[slot]=null;}await saveTargets();await saveArchers();closeModal('modal-assign');renderTargets();renderEntries();toast(t('removed_ok'),'success');};
+window.printFieldOfPlay=()=>{if(!targets.length){toast(t('no_targets_yet'),'error');return;}const groups=[];const genGroups=(fn)=>{let cl=null,cc=null,ct=[];targets.forEach(t=>{const{label,color}=fn(t);if(label!==cl){if(ct.length)groups.push({label:cl,color:cc,targets:[...ct]});cl=label;cc=color;ct=[];}ct.push(t);});if(ct.length)groups.push({label:cl,color:cc,targets:[...ct]});};if(currentDiscipline==='Outdoor'){genGroups(t=>{if(t.bow==='Recurve'){const ages=['A','B','C','D'].filter(s=>t[s]).map(s=>t[s].age);const has3=ages.some(a=>['U14','U12'].includes(a));const has6=ages.some(a=>['U18','Master 50+','Master 60+'].includes(a));if(has3)return{label:'RECURVE 30m',color:'#1976d2'};if(has6)return{label:'RECURVE 60m',color:'#1565c0'};return{label:'RECURVE 70m',color:'#0d47a1'};}const m={'Compound':{label:'COMPOUND 50m',color:'#4a148c'},'Barebow':{label:'BAREBOW 50m',color:'#1b5e20'},'Trad/Longbow':{label:'TRAD/LB 30m',color:'#e65100'}};return m[t.bow]||{label:t.bow.toUpperCase(),color:'#546e7a'};});}else{genGroups(t=>{const bm={'Recurve':'RECURVE','Compound':'COMPOUND','Barebow':'BAREBOW','Trad/Longbow':'TRAD / LONGBOW','Mixed':'MIXED'};const cm={'Recurve':'#1565c0','Compound':'#4a148c','Barebow':'#1b5e20','Trad/Longbow':'#e65100','Mixed':'#546e7a'};return{label:bm[t.bow]||t.bow.toUpperCase(),color:cm[t.bow]||'#555'};});}const fz={'RECURVE 70m':'122cm','RECURVE 60m':'122cm','RECURVE 30m':'80cm','COMPOUND 50m':'80cm (10-6)','BAREBOW 50m':'122cm','TRAD/LB 30m':'80cm','RECURVE':'40cm','COMPOUND':'40cm (10-6)','BAREBOW':'40cm','TRAD / LONGBOW':'40cm','MIXED':'varies'};const hc=groups.map(g=>`<td colspan="${g.targets.length}" style="background:${g.color};color:#fff;text-align:center;padding:8px;font-family:Arial,sans-serif;font-size:13px;font-weight:700;border:2px solid #fff;">${g.label}${fz[g.label]?`<div style="font-size:11px;font-weight:400;color:rgba(255,255,255,0.85);margin-top:3px;">⬤ ${fz[g.label]}</div>`:''}</td>`).join('');const tc=groups.map(g=>g.targets.map(t=>`<td style="text-align:center;padding:14px 8px;font-family:Arial,sans-serif;font-size:18px;font-weight:900;border:1px solid #ccc;min-width:48px;background:${g.color}18;color:#111;">T${t.num}</td>`).join('')).join('');const win=window.open('','_blank');win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Field of Play</title><style>body{margin:16px;font-family:Arial,sans-serif;}table{border-collapse:collapse;width:100%;}@media print{@page{size:A4 landscape;margin:8mm;}body{margin:8px;}}</style></head><body><h2>🏟 Field of Play</h2><div style="font-size:12px;color:#666;margin-bottom:16px;">${currentDiscipline} · ${targets.length} targets · ${archers.length} archers</div><table><thead><tr>${hc}</tr></thead><tbody><tr>${tc}</tr></tbody></table></body></html>`);win.document.close();setTimeout(()=>win.print(),400);};
+window.printStartList=()=>{if(!targets.length){toast(t('no_targets_yet'),'error');return;}const allBows=[...new Set(targets.map(t=>t.bow))];allBows.sort((a,b)=>{const ai=BOW_ORDER.indexOf(a),bi=BOW_ORDER.indexOf(b);if(ai===-1&&bi===-1)return 0;if(ai===-1)return 1;if(bi===-1)return -1;return ai-bi;});let rows='';allBows.forEach(bow=>{const group=targets.filter(t=>t.bow===bow);if(!group.length)return;rows+=`<tr style="background:#37474f;color:#fff;"><td colspan="5"><strong>${bow.toUpperCase()}</strong></td></tr>`;group.forEach(t=>{['A','B','C','D'].forEach(s=>{const a=t[s];if(!a&&!['A','B','C','D'].some(sl=>t[sl]))return;rows+=`<tr><td style="font-weight:700;color:#1565c0;">T${t.num}${s}</td><td style="font-weight:600;">${a?a.name:'—'}</td><td>${a?a.age:'—'}</td><td>${a?a.gender:'—'}</td><td>${a?a.bow:'—'}</td></tr>`;});});});const win=window.open('','_blank');win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Start List</title><style>body{font-family:Arial,sans-serif;margin:20px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ccc;padding:8px 12px;font-size:13px;}thead{background:#37474f;color:#fff;}tbody tr:nth-child(even){background:#f9f9f9;}@media print{@page{size:A4 portrait;margin:10mm;}}</style></head><body><h2>🏹 Start List</h2><div style="font-size:12px;color:#666;margin-bottom:16px;">${currentDiscipline} · ${targets.length} targets · ${archers.length} archers</div><table><thead><tr><th>Target</th><th>Name</th><th>Age</th><th>Gender</th><th>Bow</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);win.document.close();setTimeout(()=>win.print(),400);};
+window.addSession=async()=>{if(!currentCompId){toast(t('select_comp_first'),'error');return;}const name=document.getElementById('s-name').value.trim();if(!name){toast(t('session_name'),'error');return;}sessions.push({id:Date.now(),name,date:document.getElementById('s-date').value,time:document.getElementById('s-time').value,dist:document.getElementById('s-dist').value,ends:parseInt(document.getElementById('s-ends').value),arrows:parseInt(document.getElementById('s-arrows').value)});await saveSessions();renderSessions();toast(t('session_added'),'success');};
+window.deleteSession=async(id)=>{sessions=sessions.filter(s=>s.id!==id);await saveSessions();renderSessions();};
+function renderSessions(){const list=document.getElementById('sessions-list');list.innerHTML=sessions.length?sessions.map(s=>`<div class="session-block"><div class="session-time">${s.time||'--:--'}</div><div class="session-info"><div class="session-name">${s.name}</div><div class="session-sub">${s.date||''} · ${s.dist} · ${s.ends} ends × ${s.arrows} arrows</div></div><button class="btn btn-danger btn-sm" onclick="deleteSession(${s.id})">✕</button></div>`).join(''):'<div class="empty-state"><div class="empty-icon">⏰</div><p>No sessions yet.</p></div>';}
+
+/* ── TARGET SETUP (Custom discipline) ── */
+window.renderTargetSetupGrid=()=>{
+  const count=parseInt(document.getElementById('ts-count')?.value)||24;
+  const existing=window._targetConfig||[];
+  const typeColors={Field:'#1565c0','3D':'#4a148c',Kill:'#e53935'};
+  let html='';
+  for(let i=0;i<count;i++){
+    const t=existing[i]||{type:'Field',arrows:3,kill:10,body:5,miss:0};
+    const color=typeColors[t.type]||'#555';
+    html+=`<div class="ts-row ts-type-${t.type.toLowerCase()}" id="ts-row-${i}" style="border-left:4px solid ${color};">
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--accent);min-width:40px;">T${i+1}</span>
+      <div class="form-group" style="min-width:110px;">
+        <label>Type</label>
+        <select id="ts-type-${i}" onchange="updateTargetRow(${i})" style="background:var(--surface3);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:6px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;">
+          <option value="Field" ${t.type==='Field'?'selected':''}>🌄 Field</option>
+          <option value="3D" ${t.type==='3D'?'selected':''}>🦌 3D</option>
+          <option value="Kill" ${t.type==='Kill'?'selected':''}>🎯 Kill</option>
+        </select>
+      </div>
+      <div class="form-group" style="min-width:90px;">
+        <label>Arrows</label>
+        <select id="ts-arrows-${i}" style="background:var(--surface3);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:6px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;">
+          <option value="1" ${t.arrows===1?'selected':''}>1 arrow</option>
+          <option value="2" ${t.arrows===2?'selected':''}>2 arrows</option>
+          <option value="3" ${t.arrows===3?'selected':''}>3 arrows</option>
+        </select>
+      </div>
+      <div id="ts-kill-${i}" style="display:${t.type==='Kill'?'flex':'none'};gap:8px;flex-wrap:wrap;align-items:flex-end;">
+        <div class="form-group" style="min-width:72px;"><label>🎯 Kill</label><input type="number" id="ts-kill-val-${i}" value="${t.kill!==undefined?t.kill:10}" style="background:var(--surface3);border:1px solid var(--green);color:var(--text);padding:8px;border-radius:6px;font-size:14px;font-weight:700;outline:none;width:100%;text-align:center;"></div>
+        <div class="form-group" style="min-width:72px;"><label>💛 Body</label><input type="number" id="ts-body-val-${i}" value="${t.body!==undefined?t.body:5}" style="background:var(--surface3);border:1px solid var(--accent);color:var(--text);padding:8px;border-radius:6px;font-size:14px;font-weight:700;outline:none;width:100%;text-align:center;"></div>
+        <div class="form-group" style="min-width:72px;"><label>❌ Miss</label><input type="number" id="ts-miss-val-${i}" value="${t.miss!==undefined?t.miss:0}" style="background:var(--surface3);border:1px solid var(--red);color:var(--text);padding:8px;border-radius:6px;font-size:14px;font-weight:700;outline:none;width:100%;text-align:center;"></div>
+      </div>
+      <div id="ts-info-${i}" style="display:${t.type!=='Kill'?'flex':'none'};align-items:center;">
+        <span style="font-size:12px;color:var(--muted2);background:var(--surface3);padding:6px 10px;border-radius:6px;">${t.type==='Field'?'Scoring: 6 / 5 / 4 / 3 / 2 / 1 / 0':'Scoring: 11 / 10 / 8 / 5 / 0'}</span>
+      </div>
+    </div>`;
+  }
+  document.getElementById('ts-grid').innerHTML=html||'<p style="color:var(--muted2);">Set number of targets above.</p>';
+};
+
+window.updateTargetRow=(i)=>{
+  const type=document.getElementById(`ts-type-${i}`)?.value;
+  const killDiv=document.getElementById(`ts-kill-${i}`);
+  const infoDiv=document.getElementById(`ts-info-${i}`);
+  const row=document.getElementById(`ts-row-${i}`);
+  const typeColors={Field:'#1565c0','3D':'#4a148c',Kill:'#e53935'};
+  if(killDiv)killDiv.style.display=type==='Kill'?'flex':'none';
+  if(infoDiv){
+    infoDiv.style.display=type!=='Kill'?'flex':'none';
+    infoDiv.innerHTML=`<span style="font-size:12px;color:var(--muted2);background:var(--surface3);padding:6px 10px;border-radius:6px;">${type==='Field'?'Scoring: 6 / 5 / 4 / 3 / 2 / 1 / 0':'Scoring: 11 / 10 / 8 / 5 / 0'}</span>`;
+  }
+  if(row)row.style.borderLeftColor=typeColors[type]||'#555';
+  // Auto-set arrows based on type
+  const arrowsSel=document.getElementById(`ts-arrows-${i}`);
+  if(arrowsSel){
+    if(type==='Kill') arrowsSel.value='1';
+    else if(type==='3D') arrowsSel.value='2';
+    else arrowsSel.value='3';
+  }
+};
+
+window.applyAllType=()=>{
+  const type=document.getElementById('ts-apply-type')?.value;
+  if(!type)return;
+  const count=parseInt(document.getElementById('ts-count')?.value)||24;
+  for(let i=0;i<count;i++){
+    const sel=document.getElementById(`ts-type-${i}`);
+    if(sel){sel.value=type;updateTargetRow(i);}
+  }
+};
+
+window.saveTargetConfig=async()=>{
+  if(!currentCompId){toast(t('select_comp_first'),'error');return;}
+  const count=parseInt(document.getElementById('ts-count')?.value)||24;
+  const config=[];
+  for(let i=0;i<count;i++){
+    const type=document.getElementById(`ts-type-${i}`)?.value||'Field';
+    const arrows=parseInt(document.getElementById(`ts-arrows-${i}`)?.value)||3;
+    const kill=parseInt(document.getElementById(`ts-kill-val-${i}`)?.value);
+    const body=parseInt(document.getElementById(`ts-body-val-${i}`)?.value);
+    const miss=parseInt(document.getElementById(`ts-miss-val-${i}`)?.value)||0;
+    config.push({num:i+1,type,arrows,kill:isNaN(kill)?10:kill,body:isNaN(body)?5:body,miss:isNaN(miss)?0:miss});
+  }
+  window._targetConfig=config;
+  await setDoc(doc(db,'competitions',currentCompId),{targetConfig:config},{merge:true});
+  toast(`${count} ${t('saved_ok')}`,'success');
+};
+
+function initTargetSetup(){
+  if(!currentCompId)return;
+  const config=window._targetConfig||[];
+  const countEl=document.getElementById('ts-count');
+  if(countEl&&config.length>0)countEl.value=config.length;
+  renderTargetSetupGrid();
+}
+
+/* ── RESULTS ── */
+window.renderResults=()=>{
+  const container=document.getElementById('results-by-category');
+  if(!container)return;
+  if(!archers.length){container.innerHTML='<p style="color:var(--muted2)">No archers yet.</p>';return;}
+  const labels=getGoldLabels();
+  const showHalves=currentDiscipline==='Outdoor'||currentDiscipline==='Indoor';
+  const scoredArchers=archers.filter(a=>(getScore(a.id)?.total||0)>0).map(a=>{const s=getScore(a.id);return{...a,total:s.total||0,g1:s.g1||0,g2:s.g2||0,h1:s.h1||0,h2:s.h2||0,xs:s.xs||0,tens:s.tens||0,kills:s.kills||0,elevens:s.elevens||0,sixes:s.sixes||0};});
+  if(!scoredArchers.length){container.innerHTML=`<div style="text-align:center;padding:40px;color:var(--muted2);">${t('no_scores_yet')}<br>${t('results_will_appear')}</div>`;return;}
+  const catMap={};
+  scoredArchers.forEach(a=>{const key=`${a.bow}||${a.age}||${a.gender}`;if(!catMap[key])catMap[key]={bow:a.bow,age:a.age,gender:a.gender,archers:[]};catMap[key].archers.push(a);});
+  const sortedCats=Object.values(catMap).sort((a,b)=>{const bi=BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);if(bi!==0)return bi;const ai=AGE_ORDER.indexOf(a.age)-AGE_ORDER.indexOf(b.age);if(ai!==0)return ai;return a.gender.localeCompare(b.gender);});
+  const medal=i=>i===0?'🥇':i===1?'🥈':i===2?'🥉':`<span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--muted2);">${i+1}</span>`;
+  let catCards='';
+  sortedCats.forEach(cat=>{
+    const isCustomDisc=currentDiscipline==='Custom';
+    const ranked=[...cat.archers].sort((a,b)=>b.total-a.total||(b.xs||0)-(a.xs||0)||(b.tens||0)-(a.tens||0));
+    const color=BOW_COLORS[cat.bow]||'#555';
+    const gLabel=cat.gender==='M'?t('men'):t('women');
+    catCards+=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;break-inside:avoid;margin-bottom:14px;"><div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${color}22;border-bottom:1px solid ${color}44;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:1px;color:${color};">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</span><span style="font-size:11px;color:var(--muted2);margin-left:auto;">${ranked.length} ${t('archers_count')}</span></div><div class="table-wrap"><table><thead><tr><th style="width:36px;text-align:center;"></th><th>${t('name')}</th><th style="text-align:center;">${t('score')}</th>${showHalves?'<th style="text-align:center;">H1</th><th style="text-align:center;">H2</th>':''}<th style="text-align:center;">${isCustomDisc?'Kills':labels.g1}</th><th style="text-align:center;">${isCustomDisc?'11s':labels.g2}</th>${isCustomDisc?'<th style="text-align:center;">6s</th>':''}</tr></thead><tbody>${ranked.map((a,i)=>`<tr style="${i===0?'background:#fffde7;':i===1?'background:#f9f9f9;':i===2?'background:#fff8f0;':''}"><td style="text-align:center;font-size:16px;padding:8px 4px;">${medal(i)}</td><td style="color:#111;font-weight:${i<3?'700':'600'};font-size:${i===0?'14px':'13px'};">${a.name}</td><td style="font-weight:900;font-size:${i===0?'16px':'14px'};color:${i===0?'#c62828':i===1?'#37474f':i===2?'#bf360c':'#111'};text-align:center;">${a.total}</td>${showHalves?`<td style="color:#555;text-align:center;font-size:12px;">${a.h1||'—'}</td><td style="color:#555;text-align:center;font-size:12px;">${a.h2||'—'}</td>`:''}<td style="color:#111;text-align:center;font-size:12px;">${isCustomDisc?(a.kills||0):a.g1||'—'}</td><td style="color:#111;text-align:center;font-size:12px;">${isCustomDisc?(a.elevens||0):a.g2||'—'}</td>${isCustomDisc?`<td style="color:#111;text-align:center;font-size:12px;">${a.sixes||0}</td>`:''}</tr>`).join('')}</tbody></table></div></div>`;
+  });
+  const n=sortedCats.length;
+  const numCols=n<=1?1:n===2?2:n<=6?3:4;
+  const html=`<div style="columns:${numCols};column-gap:14px;">${catCards}</div>`;
+  const scrollEl=document.querySelector('.content');
+  const st=scrollEl?scrollEl.scrollTop:0;
+  container.innerHTML=html;
+  if(scrollEl)requestAnimationFrame(()=>{scrollEl.scrollTop=st;});
+};
+
+function getArcherEnds(archerId){const s=getScore(archerId);if(!s||!s.ends)return null;const cfg_ends=currentDiscipline==='Outdoor'?12:currentDiscipline==='Indoor'?20:currentDiscipline==='Custom'?(window._targetConfig?.length||24):24;const endsArr=Array.from({length:cfg_ends},()=>[]);Object.keys(s.ends).forEach(i=>{endsArr[parseInt(i)]=s.ends[i]||[];});return endsArr;}
+function getVal(v){return v==='X'?10:(parseInt(v)||0);}
+
+function buildAdminScorecard(archer){
+  const s=getScore(archer.id);if(!s||!s.total)return null;
+  const ends=getArcherEnds(archer.id);if(!ends)return null;
+  const isOut=currentDiscipline==='Outdoor';
+  const isIn=currentDiscipline==='Indoor';
+  const isCustom=currentDiscipline==='Custom';
+  function cellStyle(val){return(val==='X'||val===10||val===9||val===11)?'background:#fff9c4;color:#5d4037;font-weight:700;':'';}
+  function d(ea,i){return ea[i]===0?'M':(ea[i]===undefined||ea[i]===''?'':ea[i]);}
+  let tableHtml='';
+  if(isCustom){
+    const config=window._targetConfig||[];
+    const grey='background-image:repeating-linear-gradient(135deg,transparent,transparent 4px,#e0e0e0 4px,#e0e0e0 5px);';
+    let rows='',running=0;
+    ends.forEach((ea,i)=>{
+      const tc=config[i]||{type:'Field',arrows:3};
+      const arrows=tc.arrows||3;
+      const tot=ea.reduce((x,v)=>x+getVal(v),0);
+      if(ea.length>0)running+=tot;
+      // Type label short
+      const typeColor=tc.type==='Kill'?'#c62828':tc.type==='3D'?'#4a148c':'#1565c0';
+      const typeShort=tc.type==='Kill'?`Kill\n${tc.kill}/${tc.body}/${tc.miss}`:tc.type==='3D'?'3D':'Field';
+      // Always 3 arrow cells — grey out unused ones
+      function arrowCell(idx){
+        if(idx>=arrows) return`<td style="${grey}width:36px;"></td>`;
+        const v=ea[idx];
+        const display=v===undefined||v===''?'':(v===0?'M':v);
+        const highlight=(v===tc?.kill)?'background:#c8e6c9;color:#1b5e20;font-weight:700;':
+                        (v===tc?.body)?'background:#fff3e0;color:#e65100;font-weight:700;':'';
+        return`<td style="${highlight}width:36px;text-align:center;">${display}</td>`;
+      }
+      rows+=`<tr style="border-bottom:1px solid #ccc;">
+        <td style="background:#f0f0f0;font-weight:700;font-size:11px;width:40px;text-align:center;border-right:1.5px solid #999;">T${i+1}</td>
+        <td style="font-size:9px;font-weight:700;color:${typeColor};width:48px;text-align:center;white-space:pre-line;line-height:1.3;">${typeShort}</td>
+        ${arrowCell(0)}${arrowCell(1)}${arrowCell(2)}
+        <td style="background:#e3f2fd;font-weight:700;color:#1565c0;text-align:center;width:40px;border-left:1.5px solid #999;">${ea.length>0?tot:''}</td>
+        <td style="background:#fff8e1;font-weight:700;color:#c62828;text-align:center;width:46px;border-left:1.5px solid #999;">${ea.length>0?running:''}</td>
+      </tr>`;
+    });
+    tableHtml=`<table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:12px;">
+      <colgroup><col style="width:40px"><col style="width:48px"><col style="width:36px"><col style="width:36px"><col style="width:36px"><col style="width:40px"><col style="width:46px"></colgroup>
+      <thead><tr style="background:#555;color:#fff;font-size:10px;font-weight:700;height:24px;">
+        <th>Target</th><th>Type</th><th>A1</th><th>A2</th><th>A3</th><th>End</th><th>Running</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  } else if(isOut){
+    function buildHalfOut(startEnd,endEnd){let rows='',running=0,tens=0,xs=0;for(let e=startEnd;e<endEnd;e++){const ea=ends[e]||[];const v=ea.map(x=>getVal(x));const s1=ea.length>=3?v[0]+v[1]+v[2]:'';const s2=ea.length>=6?v[3]+v[4]+v[5]:'';const et=s2!==''?(Number(s1)||0)+s2:'';if(et!=='')running+=et;const c10=ea.filter(x=>x===10||x==='X').length,cx=ea.filter(x=>x==='X').length;if(ea.length>0){tens+=c10;xs+=cx;}rows+=`<tr><td rowspan="2" style="background:#f0f0f0;font-weight:700;font-size:10px;border-right:2px solid #999;width:42px;">End ${e+1}</td><td style="${cellStyle(ea[0])}">${d(ea,0)}</td><td style="${cellStyle(ea[1])}">${d(ea,1)}</td><td style="${cellStyle(ea[2])}">${d(ea,2)}</td><td style="background:#f5f5f5;font-size:11px;width:30px;">${s1}</td><td style="background:#eee;width:32px;"></td><td rowspan="2" style="background:#fff8e1;font-weight:700;color:#c62828;border-left:2px solid #999;border-right:2px solid #999;width:42px;">${et!==''?running:''}</td><td style="font-size:11px;color:#555;width:26px;">${ea.length>0?c10:''}</td><td style="font-size:11px;color:#555;width:26px;">${ea.length>0?cx:''}</td></tr><tr style="border-bottom:1.5px solid #aaa;"><td style="${cellStyle(ea[3])}">${d(ea,3)}</td><td style="${cellStyle(ea[4])}">${d(ea,4)}</td><td style="${cellStyle(ea[5])}">${d(ea,5)}</td><td style="background:#f5f5f5;font-size:11px;">${s2}</td><td style="background:#e3f2fd;font-weight:700;color:#1565c0;border-left:2px solid #999;">${et}</td><td></td><td></td></tr>`;}rows+=`<tr style="background:#37474f;color:#fff;font-weight:700;"><td colspan="5">HALF TOTAL</td><td>${running}</td><td></td><td>${tens}</td><td>${xs}</td></tr>`;return rows;}const cols='<colgroup><col style="width:42px"><col><col><col><col style="width:30px"><col style="width:32px"><col style="width:42px"><col style="width:26px"><col style="width:26px"></colgroup>';const thead='<tr style="background:#555;color:#fff;font-size:10px;font-weight:700;"><th colspan="4" style="text-align:left;padding:3px 6px;">ARROWS</th><th>SUB</th><th>END</th><th>RUNNING</th><th>10+X</th><th>X</th></tr>';tableHtml=`<div style="background:#37474f;color:#fff;padding:2px 6px;font-size:10px;font-weight:700;">1st HALF (Ends 1–6)</div><table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:12px;">${cols}<tbody>${thead}${buildHalfOut(0,6)}</tbody></table><div style="background:#37474f;color:#fff;padding:2px 6px;font-size:10px;font-weight:700;margin-top:4px;">2nd HALF (Ends 7–12)</div><table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:12px;">${cols}<tbody>${thead}${buildHalfOut(6,12)}</tbody></table>`;
+  } else if(isIn){
+    function buildHalfIn(startEnd,endEnd){let rows='',running=0,tens=0,nines=0;for(let e=startEnd;e<endEnd;e++){const ea=ends[e]||[];const v=ea.map(x=>getVal(x));const et=ea.length>=3?v[0]+v[1]+v[2]:'';if(et!=='')running+=et;const c10=ea.filter(x=>x===10||x==='X').length,c9=ea.filter(x=>x===9).length;if(ea.length>0){tens+=c10;nines+=c9;}rows+=`<tr style="border-bottom:1px solid #ccc;"><td style="background:#f0f0f0;font-weight:700;font-size:10px;border-right:2px solid #999;width:42px;">End ${e+1}</td><td style="${cellStyle(ea[0])}">${d(ea,0)}</td><td style="${cellStyle(ea[1])}">${d(ea,1)}</td><td style="${cellStyle(ea[2])}">${d(ea,2)}</td><td style="background:#e3f2fd;font-weight:700;color:#1565c0;border-left:2px solid #999;width:36px;">${et}</td><td style="background:#fff8e1;font-weight:700;color:#c62828;border-left:2px solid #999;border-right:2px solid #999;width:42px;">${et!==''?running:''}</td><td style="font-size:11px;color:#555;width:26px;">${ea.length>0?c10:''}</td><td style="font-size:11px;color:#555;width:26px;">${ea.length>0?c9:''}</td></tr>`;}rows+=`<tr style="background:#37474f;color:#fff;font-weight:700;"><td colspan="4">HALF TOTAL</td><td>${running}</td><td></td><td>${tens}</td><td>${nines}</td></tr>`;return rows;}const cols='<colgroup><col style="width:42px"><col><col><col><col style="width:36px"><col style="width:42px"><col style="width:26px"><col style="width:26px"></colgroup>';const thead='<tr style="background:#555;color:#fff;font-size:10px;font-weight:700;"><th colspan="4" style="text-align:left;padding:3px 6px;">ARROWS</th><th>END</th><th>RUNNING</th><th>10</th><th>9</th></tr>';tableHtml=`<div style="background:#37474f;color:#fff;padding:2px 6px;font-size:10px;font-weight:700;">1st HALF (Ends 1–10)</div><table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:12px;">${cols}<tbody>${thead}${buildHalfIn(0,10)}</tbody></table><div style="background:#37474f;color:#fff;padding:2px 6px;font-size:10px;font-weight:700;margin-top:4px;">2nd HALF (Ends 11–20)</div><table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:12px;">${cols}<tbody>${thead}${buildHalfIn(10,20)}</tbody></table>`;
+  } else {
+    let rows='',running=0;const label=currentDiscipline==='3D'?'Station':'Target';ends.forEach((ea,i)=>{const tot=ea.reduce((x,v)=>x+getVal(v),0);if(ea.length>0)running+=tot;const cells=ea.map(v=>`<td>${v===0?'M':v}</td>`).join('');rows+=`<tr style="border-bottom:1px solid #ccc;"><td style="background:#f0f0f0;font-size:10px;font-weight:700;width:52px;">${label} ${i+1}</td>${cells}<td style="background:#e3f2fd;font-weight:700;color:#1565c0;">${ea.length>0?tot:''}</td><td style="background:#fff8e1;font-weight:700;color:#c62828;">${ea.length>0?running:''}</td></tr>`;});tableHtml=`<table style="width:100%;border-collapse:collapse;border:1.5px solid #999;font-size:12px;"><tbody>${rows}</tbody></table>`;
+  }
+  const tgt=getTarget(archer);
+  return`<div style="background:#37474f;color:#fff;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><div><div style="font-size:10px;color:#aaa;">${currentDiscipline} · ${tgt} · ${archer.bow} · ${archer.age} · ${archer.gender}</div><div style="font-size:16px;font-weight:700;">${archer.name}</div></div><div style="text-align:right;"><div style="font-size:28px;font-weight:900;color:#FFD700;">${s.total}</div></div></div>${tableHtml}`;
+}
+
+function getTarget(a){if(a.target&&a.slot)return`T${a.target}${a.slot}`;for(const t of targets){for(const s of['A','B','C','D']){if(t[s]&&String(t[s].id)===String(a.id))return`T${t.num}${s}`;}}return'—';}
+function renderScorecards(){const list=document.getElementById('scorecards-list');if(!list)return;if(!currentCompId){list.innerHTML='<p style="color:var(--muted2)">Select a competition first.</p>';return;}if(!archers.length){list.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted2);">No archers yet.</div>';return;}const bowF=document.getElementById('sc-filter-bow')?.value||'';const filtered=archers.filter(a=>(!bowF||a.bow===bowF)&&(getScore(a.id)?.total||0)>0);if(!filtered.length){list.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted2);">No scores yet.</div>';return;}const grouped={};BOW_ORDER.forEach(bow=>{const group=filtered.filter(a=>a.bow===bow);if(group.length)grouped[bow]=group;});const mixed=filtered.filter(a=>!BOW_ORDER.includes(a.bow));if(mixed.length)grouped['Mixed']=mixed;let html='';Object.entries(grouped).forEach(([bow,group])=>{const color=BOW_COLORS[bow]||'#555';html+=`<div style="margin-bottom:20px;"><div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:8px 14px;background:${color}22;border:1px solid ${color}44;border-radius:8px;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;letter-spacing:2px;color:${color};">${bow.toUpperCase()}</span><span style="font-size:11px;color:var(--muted2);">${group.length} archer${group.length!==1?'s':''}</span></div>`;group.sort((a,b)=>(getScore(b.id)?.total||0)-(getScore(a.id)?.total||0));group.forEach(archer=>{const s=getScore(archer.id);const tgt=getTarget(archer);html+=`<div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;margin-bottom:8px;overflow:hidden;"><div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;"><div><div style="font-size:11px;color:var(--muted2);">${tgt} · ${archer.age} · ${archer.gender}</div><div style="font-size:14px;font-weight:700;">${archer.name}</div></div><div style="display:flex;align-items:center;gap:10px;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:var(--accent);">${s?.total||'—'}</div><button class="btn btn-secondary btn-sm" onclick="viewScorecard('${archer.id}')">VIEW 📄</button><button class="btn btn-primary btn-sm" onclick="printScorecard('${archer.id}')">🖨 PRINT</button></div></div></div>`;});html+='</div>';});list.innerHTML=html;}
+window.viewScorecard=(archerId)=>{const archer=archers.find(a=>a.id===archerId);if(!archer)return;const html=buildAdminScorecard(archer);if(!html){toast('No score data yet','error');return;}const win=window.open('','_blank');win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${archer.name}</title><style>body{margin:12px;font-family:Arial,sans-serif;color:#111;}td,th{border:1px solid #ccc;text-align:center;height:22px;padding:0 2px;}</style></head><body>${html}</body></html>`);win.document.close();};
+window.printScorecard=(archerId)=>{const archer=archers.find(a=>a.id===archerId);if(!archer)return;const html=buildAdminScorecard(archer);if(!html){toast('No score data yet','error');return;}const win=window.open('','_blank');win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${archer.name}</title><style>body{margin:8px;font-family:Arial,sans-serif;color:#111;}td,th{border:1px solid #ccc;text-align:center;height:22px;padding:0 2px;}@media print{@page{size:A4 portrait;margin:8mm;}}</style></head><body>${html}</body></html>`);win.document.close();setTimeout(()=>win.print(),400);};
+window.printAllScorecards=()=>{if(!archers.length){toast(t('no_archers'),'error');return;}const bowF=document.getElementById('sc-filter-bow')?.value||'';const filtered=archers.filter(a=>(!bowF||a.bow===bowF)&&(getScore(a.id)?.total||0)>0);if(!filtered.length){toast(t('no_scores_yet'),'error');return;}const sorted=[...filtered].sort((a,b)=>{const bi=BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);if(bi!==0)return bi;return(getScore(b.id)?.total||0)-(getScore(a.id)?.total||0);});const sections=sorted.map((archer,i)=>{const html=buildAdminScorecard(archer);if(!html)return'';const pageBreak=i<sorted.length-1?'page-break-after:always;':'';return`<div style="${pageBreak}">${html}</div>`;}).join('');const win=window.open('','_blank');win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>All Scorecards</title><style>body{margin:8px;font-family:Arial,sans-serif;color:#111;}td,th{border:1px solid #ccc;text-align:center;height:22px;padding:0 2px;}@media print{@page{size:A4 portrait;margin:8mm;}}</style></head><body>${sections}</body></html>`);win.document.close();setTimeout(()=>win.print(),400);};
+window.downloadCSVTemplate=()=>{const rows=[['FirstName','LastName','Club','Bow','Age','Gender'],['','','','Recurve / Compound / Barebow / Traditional / Longbow','U12 / U14 / U18 / U21 / Senior / Master 50+ / Master 60+','M / F'],['John','Smith','City Archers','Recurve','Senior','M'],['Jane','Doe','National Club','Compound','U21','F'],['David','Cohen','Maccabi','Barebow','Senior','M'],['Sara','Levi','Hapoel','Traditional','U18','F']];const csv=rows.map(r=>'"'+r.join('","')+'"').join('\n');const bom='\uFEFF'; const blob=new Blob([bom+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='archers_template.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);toast(t('template_downloaded'),'success');};
+window.copyRegLink=()=>{if(!currentCompId){toast(t('select_comp_first'),'error');return;}const url=`https://matan1sharon-ops.github.io/All-in-competition/register.html?comp=${currentCompId}`;navigator.clipboard.writeText(url).then(()=>toast(t('link_copied'),'success')).catch(()=>prompt('Copy this registration link:',url));};
+window.copyResultsLink=()=>{if(!currentCompId){toast(t('select_comp_first'),'error');return;}const url=`https://matan1sharon-ops.github.io/All-in-competition/results.html?comp=${currentCompId}`;navigator.clipboard.writeText(url).then(()=>toast(t('results_link_copied'),'success')).catch(()=>prompt('Copy this results link:',url));};
+window.copyMatchLink=()=>{if(!currentCompId){toast(t('select_comp_first'),'error');return;}const url=`https://matan1sharon-ops.github.io/All-in-competition/matches.html`;navigator.clipboard.writeText(url).then(()=>toast(t('match_link_copied'),'success')).catch(()=>prompt('Copy this link:',url));};
+window.openDisplayScreen=()=>{if(!currentCompId){toast(t('select_comp_first'),'error');return;}window.open(`https://matan1sharon-ops.github.io/All-in-competition/results.html?comp=${currentCompId}`,'_blank');};
+window.exportResultsPDF=()=>{const labels=getGoldLabels();const showHalves=currentDiscipline==='Outdoor'||currentDiscipline==='Indoor';const scoredArchers=archers.filter(a=>(getScore(a.id)?.total||0)>0).map(a=>{const s=getScore(a.id);return{...a,total:s.total||0,g1:s.g1||0,g2:s.g2||0,h1:s.h1||0,h2:s.h2||0,xs:s.xs||0,tens:s.tens||0,kills:s.kills||0,elevens:s.elevens||0,sixes:s.sixes||0};});if(!scoredArchers.length){toast(t('no_scores_yet'),'error');return;}const catMap={};scoredArchers.forEach(a=>{const key=`${a.bow}||${a.age}||${a.gender}`;if(!catMap[key])catMap[key]={bow:a.bow,age:a.age,gender:a.gender,archers:[]};catMap[key].archers.push(a);});const sortedCats=Object.values(catMap).sort((a,b)=>{const bi=BOW_ORDER.indexOf(a.bow)-BOW_ORDER.indexOf(b.bow);if(bi!==0)return bi;const ai=AGE_ORDER.indexOf(a.age)-AGE_ORDER.indexOf(b.age);if(ai!==0)return ai;return a.gender.localeCompare(b.gender);});let sections='';sortedCats.forEach(cat=>{const ranked=[...cat.archers].sort((a,b)=>b.total-a.total||(b.xs||0)-(a.xs||0)||(b.tens||0)-(a.tens||0));const gLabel=cat.gender==='M'?t('men'):t('women');const rows=ranked.map((a,i)=>`<tr><td style="text-align:center;font-weight:700;">${i+1}</td><td style="font-weight:600;">${a.name}</td><td style="font-weight:700;font-size:14px;">${a.total}</td>${showHalves?`<td>${a.h1||'—'}</td><td>${a.h2||'—'}</td>`:''}<td>${a.g1||'—'}</td><td>${a.g2||'—'}</td></tr>`).join('');sections+=`<h3 style="margin:16px 0 6px;color:#37474f;">${cat.bow} · ${cat.age} · ${gLabel}</h3><table style="width:100%;border-collapse:collapse;margin-bottom:8px;"><thead style="background:#37474f;color:#fff;"><tr><th style="padding:6px 8px;width:40px;">Rank</th><th style="padding:6px 8px;">Name</th><th style="padding:6px 8px;">Score</th>${showHalves?'<th style="padding:6px 8px;">H1</th><th style="padding:6px 8px;">H2</th>':''}<th style="padding:6px 8px;">${labels.g1}</th><th style="padding:6px 8px;">${labels.g2||''}</th></tr></thead><tbody>${rows}</tbody></table>`;});const win=window.open('','_blank');win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Results</title><style>body{font-family:Arial,sans-serif;margin:20px;}td,th{border:1px solid #ccc;padding:5px 8px;}tbody tr:nth-child(even){background:#f9f9f9;}@media print{@page{size:A4 portrait;margin:10mm;}}</style></head><body><h2 style="margin-bottom:4px;">🏹 Results — ${currentDiscipline}</h2>${sections}</body></html>`);win.document.close();setTimeout(()=>win.print(),400);};
+window.openMoveModal=(archerId,fromTi,fromSlot)=>{const archer=archers.find(a=>a.id===archerId);if(!archer)return;const is3DField=currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom';const validTargets=[];targets.forEach((t,ti)=>{const bowMatch=is3DField||t.bow===archer.bow||t.bow==='Trad/Longbow'&&(archer.bow==='Traditional'||archer.bow==='Longbow');if(!bowMatch)return;['A','B','C','D'].forEach(s=>{if(!t[s])validTargets.push({ti,t,slot:s,label:`T${t.num}${s}`});});});document.getElementById('move-modal-title').textContent=`Move ${archer.name}`;document.getElementById('move-modal-body').innerHTML=`<div style="margin-bottom:12px;padding:10px;background:var(--surface2);border-radius:8px;"><div style="font-size:11px;color:var(--muted2);margin-bottom:4px;">CURRENT POSITION</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:var(--accent);">T${targets[fromTi].num}${fromSlot}</div><div style="font-size:12px;color:var(--muted2);">${archer.bow} · ${archer.age} · ${archer.gender==='M'?'Male':'Female'}</div></div><div style="font-size:11px;color:var(--muted2);margin-bottom:8px;font-weight:700;">MOVE TO:</div>${validTargets.length?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:6px;max-height:300px;overflow-y:auto;">${validTargets.map(v=>`<button onclick="moveArcherTo('${archerId}',${fromTi},'${fromSlot}',${v.ti},'${v.slot}')" style="padding:10px 6px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">${v.label}</button>`).join('')}</div>`:'<div style="color:var(--muted2);text-align:center;padding:20px;">No available slots for this archer\'s category.</div>'}<div style="margin-top:12px;"><button class="btn btn-danger btn-sm" onclick="removeArcherFromTarget('${archerId}',${fromTi},'${fromSlot}')">Remove from target</button></div>`;openModal('modal-move-archer');};
+window.moveArcherTo=async(archerId,fromTi,fromSlot,toTi,toSlot)=>{const archer=archers.find(a=>a.id===archerId);if(!archer)return;if(targets[fromTi])targets[fromTi][fromSlot]=null;const destArcher=targets[toTi]?.[toSlot];if(destArcher){const da=archers.find(a=>a.id===destArcher.id);if(da){da.target=targets[fromTi].num;da.slot=fromSlot;}targets[fromTi][fromSlot]=destArcher;}targets[toTi][toSlot]={id:archer.id,name:archer.name,bow:archer.bow,age:archer.age,gender:archer.gender};archer.target=targets[toTi].num;archer.slot=toSlot;await saveTargets();await saveArchers();closeModal('modal-move-archer');renderTargets();renderEntries();toast(`${archer.name} ${t('moved_ok')} T${targets[toTi].num}${toSlot} ✓`,'success');};
+window.removeArcherFromTarget=async(archerId,fromTi,fromSlot)=>{const archer=archers.find(a=>a.id===archerId);if(archer){archer.target=null;archer.slot=null;}if(targets[fromTi])targets[fromTi][fromSlot]=null;await saveTargets();await saveArchers();closeModal('modal-move-archer');renderTargets();renderEntries();toast('Archer removed from target ✓','success');};
+window.openEditArcher=(id)=>{
+  const isHe=currentLang==='he';
+  const modal=document.getElementById('modal-edit-archer');
+  modal.querySelector('.modal-title').textContent=isHe?'✏️ עריכת קשת':'✏️ Edit Archer';
+  const labels=modal.querySelectorAll('label');
+  const labelKeys=isHe?['שם פרטי','שם משפחה','מועדון','סוג קשת','קטגוריית גיל','מין']:['First Name','Last Name','Club','Bow Type','Age Category','Gender'];
+  labels.forEach((l,i)=>{if(labelKeys[i])l.textContent=labelKeys[i];});
+  const btns=modal.querySelectorAll('.modal-actions button');
+  if(btns[0])btns[0].textContent=isHe?'ביטול':'Cancel';
+  if(btns[1])btns[1].textContent=isHe?'שמור →':'SAVE →';
+  /* original code below */const archer=archers.find(a=>a.id===id);if(!archer)return;document.getElementById('edit-archer-id').value=id;document.getElementById('edit-fname').value=archer.fname||archer.name?.split(' ')[0]||'';document.getElementById('edit-lname').value=archer.lname||archer.name?.split(' ').slice(1).join(' ')||'';document.getElementById('edit-club').value=archer.club||'';document.getElementById('edit-bow').value=archer.bow||'Recurve';document.getElementById('edit-age').value=archer.age||'Senior';document.getElementById('edit-gender').value=archer.gender||'M';openModal('modal-edit-archer');};
+window.saveEditArcher=async()=>{const id=document.getElementById('edit-archer-id').value;const archer=archers.find(a=>a.id===id);if(!archer)return;const fname=document.getElementById('edit-fname').value.trim();const lname=document.getElementById('edit-lname').value.trim();if(!fname||!lname){toast(t('enter_fname_lname'),'error');return;}archer.fname=fname;archer.lname=lname;archer.name=`${fname} ${lname}`;archer.club=document.getElementById('edit-club').value.trim();archer.bow=document.getElementById('edit-bow').value;archer.age=document.getElementById('edit-age').value;archer.gender=document.getElementById('edit-gender').value;targets.forEach(t=>['A','B','C','D'].forEach(s=>{if(t[s]&&t[s].id===id){t[s].name=archer.name;t[s].bow=archer.bow;t[s].age=archer.age;t[s].gender=archer.gender;}}));await saveArchers();await saveTargets();closeModal('modal-edit-archer');renderAll();toast(`${archer.name} ${t('archer_updated')}`,'success');};
+
+window.showPanel=(name)=>{
+  document.querySelectorAll('.panel').forEach(p=>{p.classList.remove('active');p.style.display='';});
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(`panel-${name}`).classList.add('active');
+  document.querySelector(`[data-panel="${name}"]`).classList.add('active');
+  document.getElementById('topbar-title').textContent={dashboard:t('dashboard'),entries:t('entries'),targets:t('targets'),targetsetup:t('targetsetup'),schedule:t('schedule'),results:t('results'),scorecards:t('scorecards'),elimination:t('elimination')}[name]||name;
+  if(name==='scorecards')renderScorecards();
+  if(name==='targetsetup')initTargetSetup();
+  if(name==='elimination'){document.getElementById('panel-elimination').style.display='flex';initElimination();}
+  setTimeout(applyTranslations,50);
+};
+
+function openModal(id){document.getElementById(id).classList.add('open');applyTranslations();}
+window.closeModal=(id)=>{document.getElementById(id).classList.remove('open');};
+function toast(msg,type='success'){const el=document.getElementById('toast');el.textContent=(type==='success'?'✓ ':'✕ ')+msg;el.className=`show ${type}`;setTimeout(()=>el.classList.remove('show'),3000);}
+window.setLang=(l)=>{lang=l;document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent.trim()===(l==='en'?'EN':'עב')));};
+
+/* ── ELIMINATION ── */
+function getElimFormat(bow){if(currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom')return 'cumulative';if(bow==='Compound')return 'cumulative';return 'sets';}
+function getMatchSlots(){if(currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom')return 4;return 5;}
+function initElimination(){if(!currentCompId){document.getElementById('elim-content').innerHTML='<p style="color:var(--muted2)">Select a competition first.</p>';return;}renderElimContent();}
+function getActualBracketSize(archerCount,maxBracket){if(archerCount<3)return null;if(archerCount<=4)return 2;if(archerCount<=8)return Math.min(maxBracket,4);return Math.min(maxBracket,8);}
+function buildBracketMatches(seeds,bracketSize,firstRound){const totalSlots=bracketSize*2;const matches=[];const slots=Array.from({length:totalSlots},(_,i)=>seeds[i]||null);for(let i=0;i<totalSlots/2;i++){const a1=slots[i];const a2=slots[totalSlots-1-i];const isBye=a1&&!a2;if(isBye){matches.push({id:`${firstRound}_m${i+1}`,round:firstRound,position:i+1,archer1:{id:a1.id,name:a1.name,seed:i+1,qualScore:a1.qualScore},archer2:null,isBye:true,sets:[],score1:null,score2:null,tiebreak1:null,tiebreak2:null,winnerChoice:a1.id});}else{matches.push({id:`${firstRound}_m${i+1}`,round:firstRound,position:i+1,archer1:{id:a1.id,name:a1.name,seed:i+1,qualScore:a1.qualScore},archer2:{id:a2.id,name:a2.name,seed:totalSlots-i,qualScore:a2.qualScore},sets:[],score1:null,score2:null,tiebreak1:null,tiebreak2:null,winnerChoice:null});}}return matches;}
+async function generateBracketForCategory(catKey,maxBracket){const[bow,age,gender]=catKey.split('||');const format=getElimFormat(bow);const catArchers=archers.filter(a=>a.bow===bow&&a.age===age&&a.gender===gender&&(getScore(a.id)?.total||0)>0).map(a=>({...a,qualScore:getScore(a.id)?.total||0,g1:getScore(a.id)?.g1||0,g2:getScore(a.id)?.g2||0,xs:getScore(a.id)?.xs||0,tens:getScore(a.id)?.tens||0})).sort((a,b)=>b.qualScore-a.qualScore||(b.xs||0)-(a.xs||0)||(b.tens||0)-(a.tens||0));if(catArchers.length<3)return null;const bracketSize=getActualBracketSize(catArchers.length,maxBracket);if(!bracketSize)return null;const firstRound=bracketSize===8?'R1':bracketSize===4?'QF':'SF';const totalSlots=bracketSize*2;const seeds=catArchers.slice(0,totalSlots);const matches=buildBracketMatches(seeds,bracketSize,firstRound);return{catKey,bow,age,gender,format,bracketSize,rounds:{[firstRound]:matches},currentRound:firstRound,createdAt:Date.now()};}
+window.generateElimination=async()=>{const maxBracket=parseInt(document.getElementById('elim-bracket').value);const elimData=await generateBracketForCategory(catKey,maxBracket);if(!elimData){toast(t('not_enough'),'error');return;}await setDoc(doc(db,'competitions',currentCompId),{elimination:{[catKey]:elimData}},{merge:true});const slots=elimData.bracketSize*2;const actual=archers.filter(a=>{const[b,ag,g]=catKey.split('||');return a.bow===b&&a.age===ag&&a.gender===g&&(getScore(a.id)?.total||0)>0;}).length;const byes=slots-Math.min(actual,slots);toast(`Bracket generated! ${Math.min(actual,slots)} archers${byes>0?`, ${byes} bye${byes>1?'s':''}`:''} ✓`,'success');renderElimContent();};
+window.generateAllElimination=async()=>{const maxBracket=parseInt(document.getElementById('elim-bracket').value);if(!currentCompId){toast(t('select_comp_first'),'error');return;}const scored=archers.filter(a=>(getScore(a.id)?.total||0)>0);const catMap={};scored.forEach(a=>{const key=`${a.bow}||${a.age}||${a.gender}`;if(!catMap[key])catMap[key]=0;catMap[key]++;});const eligible=Object.entries(catMap).filter(([k,n])=>n>=3);if(!eligible.length){toast('No categories with 3+ scored archers','error');return;}const existing=window._elimData||{};let generated=0,skipped=0;const newElim={...existing};for(const[catKey]of eligible){if(existing[catKey]){skipped++;continue;}const data=await generateBracketForCategory(catKey,maxBracket);if(data){newElim[catKey]=data;generated++;}}if(!generated){toast(`No new brackets — ${skipped} already exist`,'error');return;}await setDoc(doc(db,'competitions',currentCompId),{elimination:newElim},{merge:true});toast(`${generated} ${t('bracket_generated')}${skipped>0?' ('+skipped+' skipped)':''} ✓`,'success');renderElimContent();};
+
+function renderElimContent(){if(!currentCompId)return;const container=document.getElementById('elim-content');const elimData=window._elimData||{};if(!Object.keys(elimData).length){container.innerHTML=`<p style="color:var(--muted2);text-align:center;padding:20px;">${t('no_brackets')}</p>`;return;}let html='';const sortedEntries=Object.entries(elimData).sort((a,b)=>a[0].localeCompare(b[0]));sortedEntries.forEach(([catKey,data])=>{const gLabel=data.gender==='M'?t('men'):t('women');const fmt=data.format||'sets';const slots=(currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom')?4:5;const isCum=fmt==='cumulative';const slotLabels=isCum?Array.from({length:slots},(_,i)=>`T${i+1}`):Array.from({length:slots},(_,i)=>`S${i+1}`);const totalLabel=isCum?t('total'):'PTS';const formatLabel=isCum?t('cumulative_lbl'):t('sets_lbl');html+=`<div data-cat="${catKey}" style="margin-bottom:24px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;"><div><span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--accent);">${data.bow} · ${data.age} · ${gLabel}</span><span style="font-size:11px;color:var(--muted2);margin-left:12px;">1/${data.bracketSize} · ${formatLabel}</span></div><button class="btn btn-danger btn-sm" onclick="deleteElimination('${catKey}')">${t('delete_bracket')}</button></div>`;const roundOrder2=['R1','QF','SF','F','B'];const sortedRounds=roundOrder2.filter(rk=>data.rounds?.[rk]?.length>0).map(rk=>[rk,data.rounds[rk]]);sortedRounds.forEach(([roundKey,matches])=>{const roundLabel=roundKey==='R1'?`${t('round_of')} ${data.bracketSize*2}`:roundKey==='QF'?(data.bracketSize===4?`${t('round_of')} ${data.bracketSize*2}`:t('quarter_finals')):roundKey==='SF'?t('semi_finals'):roundKey==='F'?'🏆 '+t('final'):roundKey==='B'?'🥉 '+t('bronze'):t('match');html+=`<div style="margin-bottom:12px;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--muted2);margin-bottom:8px;text-transform:uppercase;">${roundLabel}</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:8px;">`;matches.forEach(match=>{const won1=match.winnerChoice===match.archer1?.id;const won2=match.winnerChoice===match.archer2?.id;const hasTB=(match.tiebreak1!==null&&match.tiebreak1!==undefined)||(match.sets&&match.sets[5]&&(match.sets[5].score1>0||match.sets[5].score2>0));const headerCols=slotLabels.map(l=>`<span style="display:inline-block;width:30px;text-align:center;font-size:9px;font-weight:700;color:var(--muted2);">${l}</span>`).join('');const tbHeaderCol=hasTB?`<span style="display:inline-block;width:26px;text-align:center;font-size:9px;font-weight:700;color:var(--muted2);">TB</span>`:'';const totalHeaderCol=`<span style="display:inline-block;min-width:28px;text-align:right;font-size:9px;font-weight:700;color:var(--muted2);">${totalLabel}</span>`;html+=`<div style="background:var(--surface2);border:1px solid ${match.winnerChoice?'var(--green)':'var(--border2)'};border-radius:8px;padding:12px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;color:var(--muted2);">${t('match')} ${match.position}</span>${match.winnerChoice?`<span style="font-size:11px;color:var(--green);font-weight:700;">✓ ${t('complete')}</span>`:`<span style="font-size:11px;color:var(--accent);">${t('pending')}</span>`}</div><div style="display:flex;padding:1px 8px 3px;margin-bottom:1px;"><span style="width:20px;"></span><span style="width:130px;"></span>${headerCols}${tbHeaderCol}${totalHeaderCol}</div>${renderMatchRow(match.archer1,match,won1,1,fmt,slots,hasTB)}<div style="height:2px;"></div>${renderMatchRow(match.archer2,match,won2,2,fmt,slots,hasTB)}${!match.winnerChoice?`<button class="btn btn-primary btn-sm" style="width:100%;margin-top:8px;" onclick="openMatchModal('${catKey}','${roundKey}',${match.position-1})">${t('enter_result')}</button>`:''}</div>`;});html+='</div></div>';});const r1done=(data.rounds?.R1||[]).length>0&&(data.rounds?.R1||[]).every(m=>m.winnerChoice);const qfdone=(data.rounds?.QF||[]).length>0&&(data.rounds?.QF||[]).every(m=>m.winnerChoice);const sfdone=(data.rounds?.SF||[]).length>0&&(data.rounds?.SF||[]).every(m=>m.winnerChoice);if(r1done&&!data.rounds?.QF&&!data.rounds?.SF&&!data.rounds?.F)html+=`<button class="btn btn-success" style="margin-top:8px;" onclick="advanceRound('${catKey}')">${t('advance_qf')}</button>`;else if(qfdone&&!data.rounds?.SF&&!data.rounds?.F)html+=`<button class="btn btn-success" style="margin-top:8px;" onclick="advanceRound('${catKey}')">${t('advance_sf')}</button>`;else if(sfdone&&!data.rounds?.F)html+=`<button class="btn btn-success" style="margin-top:8px;" onclick="advanceRound('${catKey}')">${t('generate_final')}</button>`;html+='</div>';});const newHash=html.replace(/\s+/g,' ');if(container._lastHash===newHash)return;container._lastHash=newHash;const st=container.scrollTop;container.style.overflow='hidden';container.innerHTML=html;container.style.overflow='';container.scrollTop=st;}
+
+function renderMatchRow(archer,match,won,num,fmt,slots,hasTB){if(!archer&&match.isBye)return`<div style="padding:6px 8px;background:var(--surface3);border-radius:6px;color:var(--accent);font-size:12px;font-weight:700;">BYE ✓</div>`;if(!archer)return`<div style="padding:6px 8px;background:var(--surface3);border-radius:6px;color:var(--muted);font-size:12px;">TBD</div>`;const sets=match.sets||[];const isCum=fmt==='cumulative';let score;if(isCum){score=num===1?match.score1:match.score2;}else{score=sets.reduce((pts,s)=>{const v=num===1?s.score1:s.score2;const o=num===1?s.score2:s.score1;const hasData=(s.arrows1&&s.arrows1.length>0)||(s.arrows2&&s.arrows2.length>0)||v>0||o>0;if(!hasData)return pts;return pts+(v>o?2:v===o?1:0);},0);if(sets.length===0)score=null;}let scoreCells='';for(let i=0;i<slots;i++){const s=sets[i];const rawVal=s!=null?(num===1?s.score1:s.score2):null;const rawOther=s!=null?(num===1?s.score2:s.score1):null;const hasArrows=s!=null&&((s.arrows1&&s.arrows1.length>0)||(s.arrows2&&s.arrows2.length>0)||rawVal>0||rawOther>0);let displayVal,color;if(!hasArrows){displayVal=null;color='var(--muted)';}else{displayVal=rawVal;const isWin=rawVal>rawOther;const isTie=rawVal===rawOther;color=isWin?'var(--green)':isTie?'var(--accent)':'var(--muted2)';}scoreCells+=`<span style="display:inline-block;width:30px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:${color};">${displayVal!==null?displayVal:'—'}</span>`;}let tbCell='';if(hasTB){let tbVal;if(match.tiebreak1!==null&&match.tiebreak1!==undefined){tbVal=num===1?match.tiebreak1:match.tiebreak2;}else if(match.sets&&match.sets[5]){tbVal=num===1?match.sets[5].score1:match.sets[5].score2;}tbCell=`<span style="display:inline-block;width:26px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--accent);">${tbVal!==null&&tbVal!==undefined?tbVal:'—'}</span>`;}const totalCell=score!==null&&score!==undefined?`<span style="display:inline-block;min-width:28px;text-align:right;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:${won?'var(--green)':'var(--accent)'};">${score}</span>`:`<span style="display:inline-block;min-width:28px;"></span>`;return`<div style="display:flex;align-items:center;padding:5px 8px;width:100%;box-sizing:border-box;background:${won?'rgba(67,160,71,0.15)':'var(--surface3)'};border-radius:6px;border:1px solid ${won?'var(--green)':'transparent'};"><span style="font-size:10px;color:var(--muted2);width:20px;">#${archer.seed||'?'}</span><span style="width:130px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;${won?'color:var(--green)':''};flex-shrink:0;">${archer.name}</span>${scoreCells}${tbCell}${totalCell}<span style="width:20px;text-align:center;font-size:13px;flex-shrink:0;">${won?'🏆':''}</span></div>`;}
+
+let pendingMatch=null;
+window.openMatchModal=(catKey,roundKey,matchIdx)=>{const data=(window._elimData||{})[catKey];if(!data)return;const match=data.rounds[roundKey][matchIdx];pendingMatch={catKey,roundKey,matchIdx,match,data};const fmt=data.format;const isSet=fmt==='sets';const slots=(currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom')?4:5;const slotLabel=i=>(currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom')?`TARGET ${i+1}`:`SET ${i+1}`;let setsHtml='';if(isSet){let sp1=0,sp2=0;(match.sets||[]).forEach(s=>{if(s.score1>s.score2)sp1+=2;else if(s.score2>s.score1)sp2+=2;else{sp1+=1;sp2+=1;}});setsHtml=`<div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span id="set-points-display" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;">Set Points: ${sp1} — ${sp2}</span><span style="font-size:11px;color:var(--muted2);">(First to 6 wins)</span></div>`;for(let i=0;i<slots;i++){const s=match.sets?.[i]||{};setsHtml+=`<div style="display:grid;grid-template-columns:1fr auto auto 1fr;gap:8px;align-items:center;margin-bottom:6px;"><input type="number" id="ms1_${i}" value="${s.score1||''}" min="0" max="30" oninput="calcSetPoints()" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:6px;font-size:14px;outline:none;text-align:center;"><span style="color:var(--muted2);font-size:12px;">${slotLabel(i)}</span><span style="color:var(--muted2);">—</span><input type="number" id="ms2_${i}" value="${s.score2||''}" min="0" max="30" oninput="calcSetPoints()" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:6px;font-size:14px;outline:none;text-align:center;"></div>`;}setsHtml+='</div>';}else{setsHtml=`<div style="margin-bottom:12px;">`;for(let i=0;i<slots;i++){const s=match.sets?.[i]||{};setsHtml+=`<div style="display:grid;grid-template-columns:1fr auto auto 1fr;gap:8px;align-items:center;margin-bottom:6px;"><input type="number" id="ms1_${i}" value="${s.score1!==undefined&&s.score1!==null?s.score1:''}" min="0" max="300" oninput="calcCumTotal()" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:6px;font-size:14px;outline:none;text-align:center;"><span style="color:var(--muted2);font-size:12px;">${slotLabel(i)}</span><span style="color:var(--muted2);">—</span><input type="number" id="ms2_${i}" value="${s.score2!==undefined&&s.score2!==null?s.score2:''}" min="0" max="300" oninput="calcCumTotal()" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:6px;font-size:14px;outline:none;text-align:center;"></div>`;}setsHtml+=`<div style="display:flex;justify-content:space-between;margin-top:8px;padding:6px 8px;background:var(--surface3);border-radius:6px;"><span style="font-size:11px;font-weight:700;color:var(--muted2);">TOTAL</span><span id="cum-total-1" style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--accent);">—</span><span style="color:var(--muted2);">—</span><span id="cum-total-2" style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--accent);">—</span></div></div>`;}
+document.getElementById('match-modal-title').textContent=`Match ${match.position} — ${match.archer1?.name||'?'} vs ${match.archer2?.name||'?'}`;
+document.getElementById('match-modal-body').innerHTML=`${setsHtml}<div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:12px;margin-bottom:12px;"><div style="font-size:11px;color:var(--muted2);margin-bottom:8px;font-weight:700;">TIEBREAK ARROW (if needed)</div><div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;"><input type="number" id="tb1" value="${match.tiebreak1||''}" min="0" max="10" placeholder="Score" style="background:var(--surface3);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:6px;font-size:14px;outline:none;text-align:center;"><span style="color:var(--muted2);">—</span><input type="number" id="tb2" value="${match.tiebreak2||''}" min="0" max="10" placeholder="Score" style="background:var(--surface3);border:1px solid var(--border2);color:var(--text);padding:8px;border-radius:6px;font-size:14px;outline:none;text-align:center;"></div></div><div style="background:var(--surface2);border:1px solid var(--accent);border-radius:8px;padding:12px;"><div style="font-size:11px;color:var(--accent);margin-bottom:10px;font-weight:700;">WINNER ✓ (required)</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><button id="winner-btn-1" onclick="selectWinner(1)" style="padding:12px;border-radius:8px;border:2px solid ${match.winnerChoice===match.archer1?.id?'var(--green)':'var(--border2)'};background:${match.winnerChoice===match.archer1?.id?'rgba(67,160,71,0.2)':'var(--surface3)'};color:${match.winnerChoice===match.archer1?.id?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">${match.archer1?.name||'Archer 1'}</button><button id="winner-btn-2" onclick="selectWinner(2)" style="padding:12px;border-radius:8px;border:2px solid ${match.winnerChoice===match.archer2?.id?'var(--green)':'var(--border2)'};background:${match.winnerChoice===match.archer2?.id?'rgba(67,160,71,0.2)':'var(--surface3)'};color:${match.winnerChoice===match.archer2?.id?'var(--green)':'var(--text)'};font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;">${match.archer2?.name||'Archer 2'}</button></div></div>`;
+openModal('modal-match');};
+
+let selectedWinner=null;
+window.selectWinner=(num)=>{const match=pendingMatch?.match;if(!match)return;selectedWinner=num===1?match.archer1?.id:match.archer2?.id;const btn1=document.getElementById('winner-btn-1');const btn2=document.getElementById('winner-btn-2');if(btn1&&btn2){btn1.style.borderColor=num===1?'var(--green)':'var(--border2)';btn1.style.background=num===1?'rgba(67,160,71,0.2)':'var(--surface3)';btn1.style.color=num===1?'var(--green)':'var(--text)';btn2.style.borderColor=num===2?'var(--green)':'var(--border2)';btn2.style.background=num===2?'rgba(67,160,71,0.2)':'var(--surface3)';btn2.style.color=num===2?'var(--green)':'var(--text)';}};
+window.calcSetPoints=()=>{const slots=(currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom')?4:5;let sp1=0,sp2=0;for(let i=0;i<slots;i++){const v1=document.getElementById(`ms1_${i}`)?.value;const v2=document.getElementById(`ms2_${i}`)?.value;if(v1===''||v2===''||v1===null||v2===null)continue;const s1=parseInt(v1)||0,s2=parseInt(v2)||0;if(s1>s2)sp1+=2;else if(s2>s1)sp2+=2;else{sp1+=1;sp2+=1;}}const el=document.getElementById('set-points-display');if(el){el.textContent=`Set Points: ${sp1} — ${sp2}`;el.style.color=sp1>=6?'var(--green)':sp2>=6?'var(--red)':'var(--text)';}};
+window.calcCumTotal=()=>{const slots=(currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom')?4:5;let t1=0,t2=0,any1=false,any2=false;for(let i=0;i<slots;i++){const v1=document.getElementById(`ms1_${i}`)?.value;const v2=document.getElementById(`ms2_${i}`)?.value;if(v1!==''&&v1!==undefined){t1+=parseInt(v1)||0;any1=true;}if(v2!==''&&v2!==undefined){t2+=parseInt(v2)||0;any2=true;}}const el1=document.getElementById('cum-total-1');const el2=document.getElementById('cum-total-2');if(el1)el1.textContent=any1?t1:'—';if(el2)el2.textContent=any2?t2:'—';};
+window.saveMatchResult=async()=>{if(!pendingMatch){closeModal('modal-match');return;}if(!selectedWinner&&!pendingMatch.match.winnerChoice){toast('Select a winner','error');return;}const{catKey,roundKey,matchIdx,match,data}=pendingMatch;const isSet=data.format==='sets';const winner=selectedWinner||match.winnerChoice;const slots=(currentDiscipline==='3D'||currentDiscipline==='Field'||currentDiscipline==='Custom')?4:5;let score1=null,score2=null,sets=[];if(isSet){for(let i=0;i<slots;i++){const v1=document.getElementById(`ms1_${i}`)?.value;const v2=document.getElementById(`ms2_${i}`)?.value;if(v1!==''&&v2!=='')sets.push({score1:parseInt(v1)||0,score2:parseInt(v2)||0});}let sp1=0,sp2=0;sets.forEach(s=>{if(s.score1>s.score2)sp1+=2;else if(s.score2>s.score1)sp2+=2;else{sp1+=1;sp2+=1;}});score1=sp1;score2=sp2;}else{for(let i=0;i<slots;i++){const v1=document.getElementById(`ms1_${i}`)?.value;const v2=document.getElementById(`ms2_${i}`)?.value;if(v1!==''&&v1!==undefined&&v2!==''&&v2!==undefined)sets.push({score1:parseInt(v1)||0,score2:parseInt(v2)||0});}score1=sets.reduce((t,s)=>t+s.score1,0)||null;score2=sets.reduce((t,s)=>t+s.score2,0)||null;}const tb1=document.getElementById('tb1')?.value;const tb2=document.getElementById('tb2')?.value;const updatedMatch={...match,sets,score1,score2,tiebreak1:tb1?parseInt(tb1):null,tiebreak2:tb2?parseInt(tb2):null,winnerChoice:winner};const updatedData=JSON.parse(JSON.stringify(data));updatedData.rounds[roundKey][matchIdx]=updatedMatch;await setDoc(doc(db,'competitions',currentCompId),{elimination:{[catKey]:updatedData}},{merge:true});closeModal('modal-match');selectedWinner=null;toast(t('result_saved'),'success');};
+window.advanceRound=async(catKey)=>{const data=(window._elimData||{})[catKey];if(!data)return;const roundOrder=['R1','QF','SF'];let lastRound=null,finalNext=false;for(let i=0;i<roundOrder.length;i++){const r=roundOrder[i];if(data.rounds[r]&&data.rounds[r].length>0&&data.rounds[r].every(m=>m.winnerChoice)){lastRound=r;if(r==='SF')finalNext=true;}}if(!lastRound){toast('No completed round found','error');return;}const winners=(data.rounds[lastRound]||[]).map(m=>m.winnerChoice===m.archer1.id?m.archer1:m.archer2);const losers=(data.rounds[lastRound]||[]).map(m=>m.winnerChoice===m.archer1.id?m.archer2:m.archer1);let newMatches=[];if(finalNext||lastRound==='SF'){newMatches=[{id:'f_m1',round:'F',position:1,archer1:winners[0],archer2:winners[1],sets:[],winner:null,score1:null,score2:null,tiebreak1:null,tiebreak2:null,winnerChoice:null}];const bronzeMatches=[{id:'b_m1',round:'B',position:1,archer1:losers[0],archer2:losers[1],sets:[],winner:null,score1:null,score2:null,tiebreak1:null,tiebreak2:null,winnerChoice:null}];data.rounds['F']=newMatches;data.rounds['B']=bronzeMatches;}else{const nextRound=lastRound==='R1'?'QF':lastRound==='QF'?'SF':'SF';for(let i=0;i<winners.length;i+=2){newMatches.push({id:`${nextRound}_m${i/2+1}`,round:nextRound,position:i/2+1,archer1:winners[i],archer2:winners[i+1]||null,sets:[],winner:null,score1:null,score2:null,tiebreak1:null,tiebreak2:null,winnerChoice:null});}data.rounds[nextRound]=newMatches;}await setDoc(doc(db,'competitions',currentCompId),{elimination:{[catKey]:data}},{merge:true});toast(t('next_round'),'success');};
+window.deleteElimination=async(catKey)=>{if(!confirm('Delete this bracket?'))return;const elim={...(window._elimData||{})};delete elim[catKey];await setDoc(doc(db,'competitions',currentCompId),{elimination:elim},{merge:true});toast(t('bracket_deleted'),'success');};
+
+
+
+window._printWithNames=true;
+window.toggleNamesOnScorecard=()=>{
+  window._printWithNames=!window._printWithNames;
+  const btn=document.getElementById('btn-names-toggle');
+  if(btn){
+    btn.textContent=window._printWithNames?'👤 WITH NAMES':'👤 NO NAMES';
+    btn.style.background=window._printWithNames?'var(--accent)':'var(--surface3)';
+    btn.style.color=window._printWithNames?'#000':'var(--text)';
+    btn.style.borderColor=window._printWithNames?'var(--accent)':'var(--border2)';
+  }
+};
+window.printBlankScorecards=()=>{
+  if(!currentCompId){toast(t('select_comp_first'),'error');return;}
+  if(!targets.length){toast('Generate targets first','error');return;}
+
+  const disc=currentDiscipline;
+  const compInfo=document.getElementById('comp-info-grid');
+  const compName=document.querySelector('#comp-info-grid input')?.value||'Competition';
+
+  // Build styles
+  const baseUrl=window.location.href.replace(/\/[^/]*$|\?.*$/,'').replace('admin.html','');
+  const scoringUrl=baseUrl+'/scoring.html';
+  const style=`
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:Arial,sans-serif;font-size:11px;background:#fff;color:#111;}
+    .page{width:210mm;min-height:297mm;padding:6mm;display:flex;flex-direction:column;}
+    .page+.page{page-break-before:always;}
+    .page-header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #333;padding-bottom:4px;margin-bottom:6px;}
+    .page-title{font-size:14px;font-weight:700;}
+    .page-sub{font-size:10px;color:#555;}
+    .grid-2x2{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:4mm;flex:1;}
+    .archer-block{border:1px solid #ccc;border-radius:4px;overflow:hidden;display:flex;flex-direction:column;height:100%;}
+    .archer-name-bar{background:#37474f;color:#fff;padding:3px 6px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+    .archer-name-bar .slot{font-size:14px;font-weight:700;}
+    .archer-name-bar .name{font-size:11px;font-weight:700;flex:1;margin:0 6px;}
+    .archer-name-bar .cat{font-size:9px;color:#aaa;}
+    table{width:100%;border-collapse:collapse;flex:1;}
+    td,th{border:1px solid #ccc;text-align:center;padding:0;}
+    th{background:#555;color:#fff;font-size:8px;font-weight:700;height:16px;}
+    .end-lbl{background:#f0f0f0;font-weight:700;font-size:9px;width:28px;}
+    .arr-cell{height:14px;}
+    .sub-cell{background:#f5f5f5;}
+    .stripe{background-image:repeating-linear-gradient(135deg,transparent,transparent 3px,#e0e0e0 3px,#e0e0e0 4px);}
+    .end-total{background:#e3f2fd;}
+    .running{background:#fff8e1;}
+    .stat{background:#fafafa;}
+    .half-total{background:#37474f;color:#fff;font-weight:700;font-size:9px;height:16px;}
+    .sig{border-top:1px solid #aaa;margin-top:3px;padding-top:2px;font-size:8px;color:#aaa;display:flex;justify-content:space-between;}
+    /* 3D/Field side by side */
+    .grid-sidebyside{display:grid;grid-template-columns:1fr 1fr;gap:4mm;flex:1;}
+    .stn-lbl{background:#f0f0f0;font-weight:700;font-size:9px;width:28px;}
+    .stn-end{background:#e3f2fd;}
+    .stn-run{background:#fff8e1;}
+    @media print{@page{size:A4 portrait;margin:0;}body{margin:0;}}
+    .qr-wrap{display:flex;align-items:center;gap:6px;padding:2px 6px;background:#f9f9f9;border-top:1px solid #eee;flex-shrink:0;}
+    .qr-placeholder{width:64px;height:64px;flex-shrink:0;}
+    .qr-placeholder img{width:64px!important;height:64px!important;}
+    .qr-info{font-size:8px;color:#555;line-height:1.5;}
+    .qr-info strong{font-size:9px;color:#111;}
+  `;
+
+  let pages='';
+
+  if(disc==='Outdoor'||disc==='Indoor'){
+    const ends=disc==='Outdoor'?12:20;
+    const half=ends/2;
+    const halfLabels=disc==='Outdoor'?[`Ends 1–6`,`Ends 7–12`]:[`Ends 1–10`,`Ends 11–20`];
+    // For each target, 2 pages (half1, half2), each with 2x2 grid of 4 archers
+    targets.forEach(t=>{
+      const slots=['A','B','C','D'].map(s=>t[s]).filter(Boolean);
+      if(!slots.length)return;
+      // Pad to 4
+      while(slots.length<4)slots.push(null);
+      [0,1].forEach(halfIdx=>{
+        const startEnd=halfIdx*half+1;
+        const endEnd=(halfIdx+1)*half;
+        const endRange=Array.from({length:half},(_,i)=>startEnd+i);
+        // Build 4 archer blocks
+        const blocks=slots.map(archer=>{
+          if(!archer)return`<div class="archer-block" style="background:#f9f9f9;"></div>`;
+          return buildOutdoorBlock(archer,endRange,disc);
+        });
+        pages+=`<div class="page">
+          <div class="page-header">
+            <div><div class="page-title">${compName}</div><div class="page-sub">${disc} · ${t.bow||''}</div></div>
+            <div style="text-align:right;"><div class="page-title">TARGET ${t.num}</div><div class="page-sub">${halfLabels[halfIdx]} · Page ${halfIdx+1} of 2</div></div>
+          </div>
+          <div class="qr-wrap" style="margin-bottom:4px;">
+            <div class="qr-placeholder" data-url="${scoringUrl}?comp=${currentCompId}&target=${t.num}"></div>
+            <div class="qr-info"><strong>Scan to score</strong><br>TARGET ${t.num}</div>
+          </div>
+          <div class="grid-2x2">${blocks.join('')}</div>
+        </div>`;
+      });
+    });
+  } else if(disc==='3D'||disc==='Field'){
+    const arrows=disc==='3D'?2:3;
+    const stations=24;
+    // One page per target with its 2 archers + QR
+    targets.forEach(t=>{
+      const tArchers=['A','B','C','D'].map(s=>t[s]?{...t[s],targetNum:t.num,slot:s}:null);
+      const hasArchers=tArchers.some(a=>a);
+      if(!hasArchers)return;
+      // Split into 2 archers per page
+      // Only include pairs that have at least one archer
+      const filledArchers=tArchers.filter(a=>a);
+      if(!filledArchers.length)return;
+      // Split into groups of 2
+      const pairs=[];
+      for(let pi=0;pi<filledArchers.length;pi+=2)pairs.push([filledArchers[pi]||null,filledArchers[pi+1]||null]);
+      pairs.forEach((pair,pi)=>{
+        if(!pair.some(a=>a))return;
+        while(pair.length<2)pair.push(null);
+        const blocks=pair.map(archer=>{
+          if(!archer)return`<div style="background:#f9f9f9;border:1px solid #eee;border-radius:4px;"></div>`;
+          return build3DFieldBlock(archer,stations,arrows,disc);
+        });
+        pages+=`<div class="page">
+          <div class="page-header">
+            <div><div class="page-title">${compName}</div><div class="page-sub">${disc} · Scoring: ${disc==='3D'?'11/10/8/5/0':'6/5/4/3/2/1/0'}</div></div>
+            <div style="text-align:right;"><div class="page-title">TARGET ${t.num}</div><div class="page-sub">Page ${pi+1} of 2</div></div>
+          </div>
+          <div class="qr-wrap" style="margin-bottom:6px;">
+            <div class="qr-placeholder" data-url="${scoringUrl}?comp=${currentCompId}&target=${t.num}"></div>
+            <div class="qr-info"><strong>Scan to score</strong><br>TARGET ${t.num}</div>
+          </div>
+          <div class="grid-sidebyside">${blocks.join('')}</div>
+        </div>`;
+      });
+    });
+  } else if(disc==='Custom'){
+    const config=window._targetConfig||[];
+    targets.forEach(t=>{
+      const tArchers=['A','B','C','D'].map(s=>t[s]?{...t[s],targetNum:t.num,slot:s}:null);
+      const hasArchers=tArchers.some(a=>a);
+      if(!hasArchers)return;
+      // Only include pairs that have at least one archer
+      const filledArchers=tArchers.filter(a=>a);
+      if(!filledArchers.length)return;
+      // Split into groups of 2
+      const pairs=[];
+      for(let pi=0;pi<filledArchers.length;pi+=2)pairs.push([filledArchers[pi]||null,filledArchers[pi+1]||null]);
+      pairs.forEach((pair,pi)=>{
+        if(!pair.some(a=>a))return;
+        while(pair.length<2)pair.push(null);
+        const blocks=pair.map(archer=>{
+          if(!archer)return`<div style="background:#f9f9f9;border:1px solid #eee;border-radius:4px;"></div>`;
+          return buildCustomBlock(archer,config);
+        });
+        pages+=`<div class="page">
+          <div class="page-header">
+            <div><div class="page-title">${compName}</div><div class="page-sub">Custom</div></div>
+            <div style="text-align:right;"><div class="page-title">TARGET ${t.num}</div><div class="page-sub">Page ${pi+1} of 2</div></div>
+          </div>
+          <div class="qr-wrap" style="margin-bottom:6px;">
+            <div class="qr-placeholder" data-url="${scoringUrl}?comp=${currentCompId}&target=${t.num}"></div>
+            <div class="qr-info"><strong>Scan to score</strong><br>TARGET ${t.num}</div>
+          </div>
+          <div class="grid-sidebyside">${blocks.join('')}</div>
+        </div>`;
+      });
+    });
+  }
+
+  function buildOutdoorBlock(archer,endRange,disc){
+    const isOut=disc==='Outdoor';
+    const statLabel=isOut?'10+X / X':'10 / 9';
+    let rows='';
+    endRange.forEach(e=>{
+      rows+=`<tr>
+        <td rowspan="2" class="end-lbl">End ${e}</td>
+        <td class="arr-cell"></td><td class="arr-cell"></td><td class="arr-cell"></td>
+        <td class="sub-cell"></td><td class="stripe"></td>
+        <td rowspan="2" class="running"></td>
+        <td rowspan="2" class="stat"></td><td rowspan="2" class="stat"></td>
+      </tr><tr style="border-bottom:1.5px solid #999;">
+        <td class="arr-cell"></td><td class="arr-cell"></td><td class="arr-cell"></td>
+        <td class="sub-cell"></td><td class="end-total"></td>
+      </tr>`;
+    });
+    return`<div class="archer-block">
+      <div class="archer-name-bar">
+        <span class="slot">${window._printWithNames?archer.slot:''}</span>
+        <span class="name">${window._printWithNames?archer.name:''}</span>
+        <span class="cat">${window._printWithNames?(archer.bow||'')+' · '+(archer.age||'')+' · '+(archer.gender||''):''}</span>
+      </div>
+      <table style="flex:1;">
+        <thead><tr>
+          <th>End</th>
+          <th colspan="3">Arrows</th>
+          <th style="width:20px;">Sub</th>
+          <th style="width:16px;"></th>
+          <th>Run.</th>
+          <th colspan="2" style="font-size:7px;">${statLabel}</th>
+        </tr></thead>
+        <tbody>${rows}
+        <tr class="half-total"><td colspan="6">HALF TOTAL</td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+
+      <div class="sig"><span>Scorer: _________________</span><span>Witness: _________________</span></div>
+    </div>`;
+  }
+
+  function build3DFieldBlock(archer,stations,arrows,disc){
+    const scoring=disc==='3D'?'11/10/8/5/0':'6/5/4/3/2/1/0';
+    // Build station order starting from archer's target, wrapping around
+    const startNum=archer.targetNum||1;
+    const stationOrder=[];
+    for(let i=0;i<stations;i++){
+      stationOrder.push(((startNum-1+i)%stations)+1);
+    }
+    let rows='';
+    stationOrder.forEach((stn,idx)=>{
+      const bg=idx%2===0?'':'background:#fafafa;';
+      const borderBot=((idx+1)%6===0)?'border-bottom:1.5px solid #999;':'';
+      const arrowCells=Array.from({length:arrows},()=>`<td class="arr-cell" style="${bg}"></td>`).join('');
+      rows+=`<tr style="${borderBot}"><td class="stn-lbl">${stn}</td>${arrowCells}<td class="stn-end"></td><td class="stn-run"></td></tr>`;
+    });
+    const arrHeaders=Array.from({length:arrows},(_,i)=>`<th>A${i+1}</th>`).join('');
+    return`<div class="archer-block">
+      <div class="archer-name-bar">
+        <span class="slot">${window._printWithNames?'T'+archer.targetNum+archer.slot:''}</span>
+        <span class="name">${window._printWithNames?archer.name:''}</span>
+        <span class="cat">${window._printWithNames?(archer.bow||'')+' · '+(archer.age||'')+' · '+scoring:''}</span>
+      </div>
+      <table style="flex:1;table-layout:fixed;">
+        <thead><tr><th>Stn</th>${arrHeaders}<th>End</th><th>Run.</th></tr></thead>
+        <tbody>${rows}
+        <tr class="half-total"><td colspan="${arrows+1}">TOTAL</td><td></td><td></td></tr>
+        </tbody>
+      </table>
+
+      <div class="sig"><span>Archer: _________________</span><span>Scorer: _________________</span></div>
+    </div>`;
+  }
+
+  function buildCustomBlock(archer,config){
+    // Build target order starting from archer's target, wrapping around
+    const startNum=archer.targetNum||1;
+    const totalTargets=config.length;
+    const targetOrder=[];
+    for(let i=0;i<totalTargets;i++){
+      targetOrder.push((startNum-1+i)%totalTargets);// 0-based index into config
+    }
+    let rows='';
+    targetOrder.forEach((cfgIdx,orderIdx)=>{
+      const tc=config[cfgIdx]||{type:'Field',arrows:3,kill:10,body:5,miss:0};
+      const arrows=tc.arrows||3;
+      const typeColor=tc.type==='Kill'?'#c62828':tc.type==='3D'?'#4a148c':'#1565c0';
+      const typeShort=tc.type==='Kill'?`K(${tc.kill}/${tc.body}/${tc.miss})`:tc.type==='3D'?'3D':'Fld';
+      const bg=(orderIdx%2===0)?'':'background:#fafafa;';
+      const borderBot=((orderIdx+1)%6===0)?'border-bottom:1.5px solid #999;':'';
+      const arrCells=Array.from({length:3},(_,ai)=>
+        ai<arrows?`<td class="arr-cell" style="${bg}"></td>`:`<td style="background-image:repeating-linear-gradient(135deg,transparent,transparent 3px,#e0e0e0 3px,#e0e0e0 4px);"></td>`
+      ).join('');
+      rows+=`<tr style="${borderBot}">
+        <td class="stn-lbl">T${cfgIdx+1}</td>
+        <td style="font-size:8px;font-weight:700;color:${typeColor};">${typeShort}</td>
+        ${arrCells}
+        <td class="stn-end"></td><td class="stn-run"></td>
+      </tr>`;
+    });
+    return`<div class="archer-block">
+      <div class="archer-name-bar">
+        <span class="slot">${window._printWithNames?'T'+archer.targetNum+archer.slot:''}</span>
+        <span class="name">${window._printWithNames?archer.name:''}</span>
+        <span class="cat">${window._printWithNames?(archer.bow||'')+' · '+(archer.age||'')+' · Custom':''}</span>
+      </div>
+      <table style="flex:1;table-layout:fixed;">
+        
+        <thead><tr><th>Tgt</th><th>Type</th><th>A1</th><th>A2</th><th>A3</th><th>End</th><th>Run.</th></tr></thead>
+        <tbody>${rows}
+        <tr class="half-total"><td colspan="5">TOTAL</td><td></td><td></td></tr>
+        </tbody>
+      </table>
+
+      <div class="sig"><span>Archer: _________________</span><span>Scorer: _________________</span></div>
+    </div>`;
+  }
+
+  if(!pages){toast('No targets with archers assigned','error');return;}
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Blank Scorecards — ${compName}</title><style>${style}</style><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script></head><body>${pages}<script>window.onload=function(){var els=document.querySelectorAll(".qr-placeholder");els.forEach(function(el){new QRCode(el,{text:el.dataset.url,width:64,height:64,correctLevel:QRCode.CorrectLevel.M});});setTimeout(function(){window.print();},800);};<\/script></body></html>`);
+  win.document.close();
+};
+
+/* ── INIT ── */
+loadCompetitions();
+document.getElementById('conn-status').textContent=t('connecting');
+setTimeout(()=>{if(!currentCompId)document.getElementById('conn-status').textContent=t('firebase_ready');},1500);
+document.querySelectorAll('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+</script>
+</body>
 </html>
