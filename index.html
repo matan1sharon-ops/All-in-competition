@@ -1571,6 +1571,10 @@ window.printBlankScorecards=()=>{
             <div style="text-align:right;"><div class="page-title">TARGET ${t.num}</div><div class="page-sub">${halfLabels[halfIdx]} · Page ${halfIdx+1} of 2</div></div>
           </div>
           <div class="grid-2x2">${blocks.join('')}</div>
+          <div class="qr-wrap" style="margin-top:4px;">
+            <div class="qr-placeholder" data-url="${scoringUrl}?comp=${currentCompId}&target=${t.num}"></div>
+            <div class="qr-info"><strong>Scan to score</strong><br>TARGET ${t.num}</div>
+          </div>
         </div>`;
       });
     });
@@ -1649,10 +1653,7 @@ window.printBlankScorecards=()=>{
         <tr class="half-total"><td colspan="6">HALF TOTAL</td><td></td><td></td><td></td></tr>
         </tbody>
       </table>
-      <div class="qr-wrap">
-        <div class="qr-placeholder" data-url="${scoringUrl}?comp=${currentCompId}&target=${archer.target||''}"></div>
-        <div class="qr-info"><strong>Scan to score</strong><br>T${archer.target||'?'}${archer.slot} · ${archer.name}</div>
-      </div>
+
       <div class="sig"><span>Scorer: _________________</span><span>Witness: _________________</span></div>
     </div>`;
   }
@@ -1685,10 +1686,7 @@ window.printBlankScorecards=()=>{
         <tr class="half-total"><td colspan="${arrows+1}">TOTAL</td><td></td><td></td></tr>
         </tbody>
       </table>
-      <div class="qr-wrap">
-        <div class="qr-placeholder" data-url="${scoringUrl}?comp=${currentCompId}&target=${archer.targetNum||''}"></div>
-        <div class="qr-info"><strong>Scan to score</strong><br>T${archer.targetNum||'?'}${archer.slot} · ${archer.name}</div>
-      </div>
+
       <div class="sig"><span>Archer: _________________</span><span>Scorer: _________________</span></div>
     </div>`;
   }
@@ -1731,10 +1729,7 @@ window.printBlankScorecards=()=>{
         <tr class="half-total"><td colspan="5">TOTAL</td><td></td><td></td></tr>
         </tbody>
       </table>
-      <div class="qr-wrap">
-        <div class="qr-placeholder" data-url="${scoringUrl}?comp=${currentCompId}&target=${archer.targetNum||''}"></div>
-        <div class="qr-info"><strong>Scan to score</strong><br>T${archer.targetNum||'?'}${archer.slot} · ${archer.name}</div>
-      </div>
+
       <div class="sig"><span>Archer: _________________</span><span>Scorer: _________________</span></div>
     </div>`;
   }
