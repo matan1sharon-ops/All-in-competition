@@ -1522,18 +1522,18 @@ window.printBlankScorecards=()=>{
     table{width:100%;border-collapse:collapse;flex:1;}
     td,th{border:1px solid #ccc;text-align:center;padding:0;}
     th{background:#555;color:#fff;font-size:8px;font-weight:700;height:16px;}
-    .end-lbl{background:#f0f0f0;font-weight:700;font-size:9px;}
+    .end-lbl{background:#f0f0f0;font-weight:700;font-size:9px;width:28px;}
     .arr-cell{height:14px;}
-    .sub-cell{background:#f5f5f5;width:20px;}
-    .stripe{background-image:repeating-linear-gradient(135deg,transparent,transparent 3px,#e0e0e0 3px,#e0e0e0 4px);width:16px;}
-    .end-total{background:#e3f2fd;width:24px;}
+    .sub-cell{background:#f5f5f5;}
+    .stripe{background-image:repeating-linear-gradient(135deg,transparent,transparent 3px,#e0e0e0 3px,#e0e0e0 4px);}
+    .end-total{background:#e3f2fd;}
     .running{background:#fff8e1;}
-    .stat{background:#fafafa;width:20px;}
+    .stat{background:#fafafa;}
     .half-total{background:#37474f;color:#fff;font-weight:700;font-size:9px;height:16px;}
     .sig{border-top:1px solid #aaa;margin-top:3px;padding-top:2px;font-size:8px;color:#aaa;display:flex;justify-content:space-between;}
     /* 3D/Field side by side */
     .grid-sidebyside{display:grid;grid-template-columns:1fr 1fr;gap:4mm;flex:1;}
-    .stn-lbl{background:#f0f0f0;font-weight:700;font-size:9px;}
+    .stn-lbl{background:#f0f0f0;font-weight:700;font-size:9px;width:28px;}
     .stn-end{background:#e3f2fd;}
     .stn-run{background:#fff8e1;}
     @media print{@page{size:A4 portrait;margin:0;}body{margin:0;}}
@@ -1741,7 +1741,7 @@ window.printBlankScorecards=()=>{
       ).join('');
       rows+=`<tr style="${borderBot}">
         <td class="stn-lbl">T${cfgIdx+1}</td>
-        <td style="font-size:8px;font-weight:700;color:${typeColor};width:28px;">${typeShort}</td>
+        <td style="font-size:8px;font-weight:700;color:${typeColor};">${typeShort}</td>
         ${arrCells}
         <td class="stn-end"></td><td class="stn-run"></td>
       </tr>`;
