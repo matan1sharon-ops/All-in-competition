@@ -1508,8 +1508,8 @@ window.printBlankScorecards=()=>{
   const style=`
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:Arial,sans-serif;font-size:11px;background:#fff;color:#111;}
-    .page{width:210mm;min-height:297mm;padding:8mm;page-break-after:always;}
-    .page:last-child{page-break-after:auto;}
+    .page{width:210mm;min-height:297mm;padding:8mm;}
+    .page+.page{page-break-before:always;}
     .page-header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #333;padding-bottom:4px;margin-bottom:6px;}
     .page-title{font-size:14px;font-weight:700;}
     .page-sub{font-size:10px;color:#555;}
