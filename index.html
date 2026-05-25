@@ -1522,20 +1522,20 @@ window.printBlankScorecards=()=>{
     table{width:100%;border-collapse:collapse;flex:1;}
     td,th{border:1px solid #ccc;text-align:center;padding:0;}
     th{background:#555;color:#fff;font-size:8px;font-weight:700;height:16px;}
-    .end-lbl{background:#f0f0f0;font-weight:700;font-size:9px;width:28px;}
-    .arr-cell{height:14px;min-width:16px;}
+    .end-lbl{background:#f0f0f0;font-weight:700;font-size:9px;}
+    .arr-cell{height:14px;}
     .sub-cell{background:#f5f5f5;width:20px;}
     .stripe{background-image:repeating-linear-gradient(135deg,transparent,transparent 3px,#e0e0e0 3px,#e0e0e0 4px);width:16px;}
     .end-total{background:#e3f2fd;width:24px;}
-    .running{background:#fff8e1;width:28px;}
+    .running{background:#fff8e1;}
     .stat{background:#fafafa;width:20px;}
     .half-total{background:#37474f;color:#fff;font-weight:700;font-size:9px;height:16px;}
     .sig{border-top:1px solid #aaa;margin-top:3px;padding-top:2px;font-size:8px;color:#aaa;display:flex;justify-content:space-between;}
     /* 3D/Field side by side */
     .grid-sidebyside{display:grid;grid-template-columns:1fr 1fr;gap:4mm;flex:1;}
-    .stn-lbl{background:#f0f0f0;font-weight:700;font-size:9px;width:22px;}
-    .stn-end{background:#e3f2fd;width:22px;}
-    .stn-run{background:#fff8e1;width:26px;}
+    .stn-lbl{background:#f0f0f0;font-weight:700;font-size:9px;}
+    .stn-end{background:#e3f2fd;}
+    .stn-run{background:#fff8e1;}
     @media print{@page{size:A4 portrait;margin:0;}body{margin:0;}}
     .qr-wrap{display:flex;align-items:center;gap:6px;padding:2px 6px;background:#f9f9f9;border-top:1px solid #eee;flex-shrink:0;}
     .qr-placeholder{width:64px;height:64px;flex-shrink:0;}
@@ -1671,11 +1671,11 @@ window.printBlankScorecards=()=>{
       </div>
       <table style="flex:1;">
         <thead><tr>
-          <th style="width:28px;">End</th>
+          <th>End</th>
           <th colspan="3">Arrows</th>
           <th style="width:20px;">Sub</th>
           <th style="width:16px;"></th>
-          <th style="width:28px;">Run.</th>
+          <th>Run.</th>
           <th colspan="2" style="font-size:7px;">${statLabel}</th>
         </tr></thead>
         <tbody>${rows}
@@ -1709,8 +1709,8 @@ window.printBlankScorecards=()=>{
         <span class="name">${window._printWithNames?archer.name:''}</span>
         <span class="cat">${window._printWithNames?(archer.bow||'')+' · '+(archer.age||'')+' · '+scoring:''}</span>
       </div>
-      <table style="flex:1;">
-        <thead><tr><th style="width:22px;">Stn</th>${arrHeaders}<th style="width:22px;">End</th><th style="width:26px;">Run.</th></tr></thead>
+      <table style="flex:1;table-layout:fixed;">
+        <thead><tr><th>Stn</th>${arrHeaders}<th>End</th><th>Run.</th></tr></thead>
         <tbody>${rows}
         <tr class="half-total"><td colspan="${arrows+1}">TOTAL</td><td></td><td></td></tr>
         </tbody>
@@ -1752,8 +1752,9 @@ window.printBlankScorecards=()=>{
         <span class="name">${window._printWithNames?archer.name:''}</span>
         <span class="cat">${window._printWithNames?(archer.bow||'')+' · '+(archer.age||'')+' · Custom':''}</span>
       </div>
-      <table style="flex:1;">
-        <thead><tr><th style="width:22px;">Tgt</th><th style="width:28px;">Type</th><th>A1</th><th>A2</th><th>A3</th><th style="width:22px;">End</th><th style="width:26px;">Run.</th></tr></thead>
+      <table style="flex:1;table-layout:fixed;">
+        
+        <thead><tr><th>Tgt</th><th>Type</th><th>A1</th><th>A2</th><th>A3</th><th>End</th><th>Run.</th></tr></thead>
         <tbody>${rows}
         <tr class="half-total"><td colspan="5">TOTAL</td><td></td><td></td></tr>
         </tbody>
