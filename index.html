@@ -1670,7 +1670,7 @@ window.printBlankScorecards=()=>{
         <span class="name">${window._printWithNames?archer.name:''}</span>
         <span class="cat">${window._printWithNames?(archer.bow||'')+' · '+(archer.age||'')+' · '+(archer.gender||''):''}</span>
       </div>
-      <table style="flex:1;table-layout:fixed;width:100%;">
+      <table style="flex:1;table-layout:fixed;width:100%;max-height:calc(100% - 30px);">
         <colgroup><col style="width:28px"><col style="width:22px"><col style="width:22px"><col style="width:22px"><col style="width:22px"><col style="width:22px"><col style="width:44px"><col style="width:20px"><col style="width:20px"></colgroup>
         <thead><tr>
           <th style="width:28px;">End</th>
