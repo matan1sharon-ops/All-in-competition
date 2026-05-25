@@ -1587,7 +1587,12 @@ window.printBlankScorecards=()=>{
       const hasArchers=tArchers.some(a=>a);
       if(!hasArchers)return;
       // Split into 2 archers per page
-      const pairs=[[tArchers[0],tArchers[1]],[tArchers[2],tArchers[3]]];
+      // Only include pairs that have at least one archer
+      const filledArchers=tArchers.filter(a=>a);
+      if(!filledArchers.length)return;
+      // Split into groups of 2
+      const pairs=[];
+      for(let pi=0;pi<filledArchers.length;pi+=2)pairs.push([filledArchers[pi]||null,filledArchers[pi+1]||null]);
       pairs.forEach((pair,pi)=>{
         if(!pair.some(a=>a))return;
         while(pair.length<2)pair.push(null);
@@ -1614,7 +1619,12 @@ window.printBlankScorecards=()=>{
       const tArchers=['A','B','C','D'].map(s=>t[s]?{...t[s],targetNum:t.num,slot:s}:null);
       const hasArchers=tArchers.some(a=>a);
       if(!hasArchers)return;
-      const pairs=[[tArchers[0],tArchers[1]],[tArchers[2],tArchers[3]]];
+      // Only include pairs that have at least one archer
+      const filledArchers=tArchers.filter(a=>a);
+      if(!filledArchers.length)return;
+      // Split into groups of 2
+      const pairs=[];
+      for(let pi=0;pi<filledArchers.length;pi+=2)pairs.push([filledArchers[pi]||null,filledArchers[pi+1]||null]);
       pairs.forEach((pair,pi)=>{
         if(!pair.some(a=>a))return;
         while(pair.length<2)pair.push(null);
