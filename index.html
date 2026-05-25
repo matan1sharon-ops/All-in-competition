@@ -1581,41 +1581,60 @@ window.printBlankScorecards=()=>{
   } else if(disc==='3D'||disc==='Field'){
     const arrows=disc==='3D'?2:3;
     const stations=24;
-    // Group archers 4 per page
-    const allArchers=[];
-    targets.forEach(t=>['A','B','C','D'].forEach(s=>{if(t[s])allArchers.push({...t[s],targetNum:t.num,slot:s});}));
-    for(let i=0;i<allArchers.length;i+=4){
-      const quad=allArchers.slice(i,i+4);
-      while(quad.length<4)quad.push(null);
-      const blocks=quad.map(archer=>{
-        if(!archer)return`<div style="background:#f9f9f9;border:1px solid #eee;border-radius:4px;"></div>`;
-        return build3DFieldBlock(archer,stations,arrows,disc);
+    // One page per target with its 2 archers + QR
+    targets.forEach(t=>{
+      const tArchers=['A','B','C','D'].map(s=>t[s]?{...t[s],targetNum:t.num,slot:s}:null);
+      const hasArchers=tArchers.some(a=>a);
+      if(!hasArchers)return;
+      // Split into 2 archers per page
+      const pairs=[[tArchers[0],tArchers[1]],[tArchers[2],tArchers[3]]];
+      pairs.forEach((pair,pi)=>{
+        if(!pair.some(a=>a))return;
+        while(pair.length<2)pair.push(null);
+        const blocks=pair.map(archer=>{
+          if(!archer)return`<div style="background:#f9f9f9;border:1px solid #eee;border-radius:4px;"></div>`;
+          return build3DFieldBlock(archer,stations,arrows,disc);
+        });
+        pages+=`<div class="page">
+          <div class="page-header">
+            <div><div class="page-title">${compName}</div><div class="page-sub">${disc} · Scoring: ${disc==='3D'?'11/10/8/5/0':'6/5/4/3/2/1/0'}</div></div>
+            <div style="text-align:right;"><div class="page-title">TARGET ${t.num}</div><div class="page-sub">Page ${pi+1} of 2</div></div>
+          </div>
+          <div class="qr-wrap" style="margin-bottom:6px;">
+            <div class="qr-placeholder" data-url="${scoringUrl}?comp=${currentCompId}&target=${t.num}"></div>
+            <div class="qr-info"><strong>Scan to score</strong><br>TARGET ${t.num}</div>
+          </div>
+          <div class="grid-sidebyside">${blocks.join('')}</div>
+        </div>`;
       });
-      pages+=`<div class="page">
-        <div class="page-header">
-          <div><div class="page-title">${compName}</div><div class="page-sub">${disc} · Scoring: ${disc==='3D'?'11/10/8/5/0':'6/5/4/3/2/1/0'}</div></div>
-        </div>
-        <div class="grid-2x2">${blocks.join('')}</div>
-      </div>`;
-    }
+    });
   } else if(disc==='Custom'){
     const config=window._targetConfig||[];
-    const allArchers=[];
-    targets.forEach(t=>['A','B','C','D'].forEach(s=>{if(t[s])allArchers.push({...t[s],targetNum:t.num,slot:s});}));
-    for(let i=0;i<allArchers.length;i+=4){
-      const quad=allArchers.slice(i,i+4);
-      while(quad.length<4)quad.push(null);
-      const blocks=quad.map(archer=>{
-        if(!archer)return`<div style="background:#f9f9f9;border:1px solid #eee;border-radius:4px;"></div>`;
-        return buildCustomBlock(archer,config);
+    targets.forEach(t=>{
+      const tArchers=['A','B','C','D'].map(s=>t[s]?{...t[s],targetNum:t.num,slot:s}:null);
+      const hasArchers=tArchers.some(a=>a);
+      if(!hasArchers)return;
+      const pairs=[[tArchers[0],tArchers[1]],[tArchers[2],tArchers[3]]];
+      pairs.forEach((pair,pi)=>{
+        if(!pair.some(a=>a))return;
+        while(pair.length<2)pair.push(null);
+        const blocks=pair.map(archer=>{
+          if(!archer)return`<div style="background:#f9f9f9;border:1px solid #eee;border-radius:4px;"></div>`;
+          return buildCustomBlock(archer,config);
+        });
+        pages+=`<div class="page">
+          <div class="page-header">
+            <div><div class="page-title">${compName}</div><div class="page-sub">Custom</div></div>
+            <div style="text-align:right;"><div class="page-title">TARGET ${t.num}</div><div class="page-sub">Page ${pi+1} of 2</div></div>
+          </div>
+          <div class="qr-wrap" style="margin-bottom:6px;">
+            <div class="qr-placeholder" data-url="${scoringUrl}?comp=${currentCompId}&target=${t.num}"></div>
+            <div class="qr-info"><strong>Scan to score</strong><br>TARGET ${t.num}</div>
+          </div>
+          <div class="grid-sidebyside">${blocks.join('')}</div>
+        </div>`;
       });
-      pages+=`<div class="page">
-        <div class="page-header">
-          <div><div class="page-title">${compName}</div><div class="page-sub">Custom</div></div>
-        </div>
-        <div class="grid-2x2">${blocks.join('')}</div>
-      </div>`;
-    }
+    });
   }
 
   function buildOutdoorBlock(archer,endRange,disc){
