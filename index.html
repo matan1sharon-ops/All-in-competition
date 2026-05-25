@@ -1525,7 +1525,7 @@ window.printBlankScorecards=()=>{
     .end-lbl{background:#f0f0f0;font-weight:700;font-size:9px;width:28px;}
     .arr-cell{height:14px;}
     .sub-cell{background:#f5f5f5;}
-    .stripe{background-image:repeating-linear-gradient(135deg,transparent,transparent 3px,#e0e0e0 3px,#e0e0e0 4px);}
+    .stripe{background:#e0e0e0;}
     .end-total{background:#e3f2fd;}
     .running{background:#fff8e1;}
     .stat{background:#fafafa;}
@@ -1537,7 +1537,6 @@ window.printBlankScorecards=()=>{
     .stn-end{background:#e3f2fd;}
     .stn-run{background:#fff8e1;}
     @media print{@page{size:A4 portrait;margin:0;}body{margin:0;}}
-    *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}
     .qr-wrap{display:flex;align-items:center;gap:6px;padding:2px 6px;background:#f9f9f9;border-top:1px solid #eee;flex-shrink:0;}
     .qr-placeholder{width:64px;height:64px;flex-shrink:0;}
     .qr-placeholder img{width:64px!important;height:64px!important;}
@@ -1738,7 +1737,7 @@ window.printBlankScorecards=()=>{
       const bg=(orderIdx%2===0)?'':'background:#fafafa;';
       const borderBot=((orderIdx+1)%6===0)?'border-bottom:1.5px solid #999;':'';
       const arrCells=Array.from({length:3},(_,ai)=>
-        ai<arrows?`<td class="arr-cell" style="${bg}"></td>`:`<td style="background-image:repeating-linear-gradient(135deg,transparent,transparent 3px,#e0e0e0 3px,#e0e0e0 4px);"></td>`
+        ai<arrows?`<td class="arr-cell" style="${bg}"></td>`:`<td style="background:#d0d0d0;"></td>`
       ).join('');
       rows+=`<tr style="${borderBot}">
         <td class="stn-lbl">T${cfgIdx+1}</td>
@@ -1774,7 +1773,7 @@ window.printBlankScorecards=()=>{
 
   if(!pages){toast('No targets with archers assigned','error');return;}
   const win=window.open('','_blank');
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Blank Scorecards — ${compName}</title><style>${style}</style><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script></head><body>${pages}<script>window.onload=function(){var els=document.querySelectorAll(".qr-placeholder");els.forEach(function(el){new QRCode(el,{text:el.dataset.url,width:64,height:64,correctLevel:QRCode.CorrectLevel.M});});setTimeout(function(){window.print();},800);};<\/script></body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Blank Scorecards — ${compName}</title><style>${style}</style><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script></head><body>${pages}<script>window.onload=function(){var seen={};document.querySelectorAll(".qr-placeholder").forEach(function(el){var url=el.dataset.url;if(seen[url]){el.innerHTML=seen[url].innerHTML;return;}new QRCode(el,{text:url,width:64,height:64,correctLevel:QRCode.CorrectLevel.L});seen[url]=el;});setTimeout(function(){window.print();},400);};<\/script></body></html>`);
   win.document.close();
 };
 
