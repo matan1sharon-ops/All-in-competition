@@ -1652,9 +1652,9 @@ window.printBlankScorecards=()=>{
     const isOut=disc==='Outdoor';
     const statLabel=isOut?'10+X / X':'10 / 9';
     // Column widths — edit these to adjust each column
-    const W={end:30, a1:22, a2:22, a3:22, sub:22, endTot:22, run:50, s1:22, s2:22};
+    const W={end:30, a1:22, a2:22, a3:22, sub:22, endTot:22, run:30, s1:22, s2:22};
     // Row heights — edit these to adjust
-    const RH={header:16, row1:12, row2:12, total:16};
+    const RH={header:16, row1:10, row2:10, total:14};
     let rows='';
     endRange.forEach(e=>{
       rows+=`<tr style="height:${RH.row1}px;">
