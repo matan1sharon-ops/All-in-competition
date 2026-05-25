@@ -1563,7 +1563,8 @@ window.printBlankScorecards=()=>{
         // Build 4 archer blocks
         const blocks=slots.map(archer=>{
           if(!archer)return`<div class="archer-block" style="background:#f9f9f9;"></div>`;
-          return buildOutdoorBlock(archer,endRange,disc,t.num);
+          const slotLetter=['A','B','C','D'][slots.indexOf(archer)]||'';
+          return buildOutdoorBlock(archer,endRange,disc,t.num,slotLetter);
         });
         pages+=`<div class="page">
           <div class="page-header">
@@ -1647,7 +1648,7 @@ window.printBlankScorecards=()=>{
     });
   }
 
-  function buildOutdoorBlock(archer,endRange,disc,targetNum){
+  function buildOutdoorBlock(archer,endRange,disc,targetNum,slotLetter){
     const isOut=disc==='Outdoor';
     const statLabel=isOut?'10+X / X':'10 / 9';
     let rows='';
@@ -1665,7 +1666,7 @@ window.printBlankScorecards=()=>{
     });
     return`<div class="archer-block">
       <div class="archer-name-bar">
-        <span class="slot">${window._printWithNames?'T'+(targetNum||'?')+(archer.slot||'?'):''}</span>
+        <span class="slot">${window._printWithNames?'T'+(targetNum||'?')+(slotLetter||'?'):''}</span>
         <span class="name">${window._printWithNames?archer.name:''}</span>
         <span class="cat">${window._printWithNames?(archer.bow||'')+' · '+(archer.age||'')+' · '+(archer.gender||''):''}</span>
       </div>
@@ -1673,10 +1674,10 @@ window.printBlankScorecards=()=>{
         <thead><tr>
           <th style="width:28px;">End</th>
           <th colspan="3">Arrows</th>
-          <th style="width:24px;">Sub</th>
-          <th style="width:24px;">End</th>
-          <th style="width:50px;">Run.</th>
-          <th style="width:24px;font-size:7px;" colspan="2">${statLabel}</th>
+          <th style="width:22px;">Sub</th>
+          <th style="width:22px;">End</th>
+          <th style="width:44px;">Run.</th>
+          <th style="width:40px;font-size:7px;" colspan="2">${statLabel}</th>
         </tr></thead>
         <tbody>${rows}
         <tr class="half-total"><td colspan="6">HALF TOTAL</td><td></td><td></td><td></td></tr>
