@@ -259,6 +259,7 @@ tbody td{padding:10px 12px;color:#111;}
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
             <button class="btn btn-primary" onclick="printAllScorecards()" data-t="print_all">🖨 PRINT ALL</button>
             <button class="btn btn-secondary" onclick="printBlankScorecards()" data-t="print_blank">🖨 PRINT BLANK</button>
+            <button class="btn btn-secondary btn-sm" id="btn-names-toggle" onclick="toggleNamesOnScorecard()" style="background:var(--accent);color:#000;border-color:var(--accent);" title="Toggle names on blank scorecards">👤 WITH NAMES</button>
             <select id="sc-filter-bow" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:8px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;" onchange="renderScorecards()">
               <option value="">All Bows</option><option>Recurve</option><option>Compound</option><option>Barebow</option><option>Traditional</option><option>Longbow</option>
             </select>
@@ -1481,6 +1482,18 @@ window.advanceRound=async(catKey)=>{const data=(window._elimData||{})[catKey];if
 window.deleteElimination=async(catKey)=>{if(!confirm('Delete this bracket?'))return;const elim={...(window._elimData||{})};delete elim[catKey];await setDoc(doc(db,'competitions',currentCompId),{elimination:elim},{merge:true});toast(t('bracket_deleted'),'success');};
 
 
+
+window._printWithNames=true;
+window.toggleNamesOnScorecard=()=>{
+  window._printWithNames=!window._printWithNames;
+  const btn=document.getElementById('btn-names-toggle');
+  if(btn){
+    btn.textContent=window._printWithNames?'👤 WITH NAMES':'👤 NO NAMES';
+    btn.style.background=window._printWithNames?'var(--accent)':'var(--surface3)';
+    btn.style.color=window._printWithNames?'#000':'var(--text)';
+    btn.style.borderColor=window._printWithNames?'var(--accent)':'var(--border2)';
+  }
+};
 window.printBlankScorecards=()=>{
   if(!currentCompId){toast(t('select_comp_first'),'error');return;}
   if(!targets.length){toast('Generate targets first','error');return;}
@@ -1619,9 +1632,9 @@ window.printBlankScorecards=()=>{
     });
     return`<div class="archer-block">
       <div class="archer-name-bar">
-        <span class="slot">${archer.slot}</span>
-        <span class="name">${archer.name}</span>
-        <span class="cat">${archer.bow||''} · ${archer.age||''} · ${archer.gender||''}</span>
+        <span class="slot">${window._printWithNames?archer.slot:''}</span>
+        <span class="name">${window._printWithNames?archer.name:''}</span>
+        <span class="cat">${window._printWithNames?(archer.bow||'')+' · '+(archer.age||'')+' · '+(archer.gender||''):''}</span>
       </div>
       <table style="flex:1;">
         <thead><tr>
@@ -1662,9 +1675,9 @@ window.printBlankScorecards=()=>{
     const arrHeaders=Array.from({length:arrows},(_,i)=>`<th>A${i+1}</th>`).join('');
     return`<div class="archer-block">
       <div class="archer-name-bar">
-        <span class="slot">T${archer.targetNum}${archer.slot}</span>
-        <span class="name">${archer.name}</span>
-        <span class="cat">${archer.bow||''} · ${archer.age||''} · ${scoring}</span>
+        <span class="slot">${window._printWithNames?'T'+archer.targetNum+archer.slot:''}</span>
+        <span class="name">${window._printWithNames?archer.name:''}</span>
+        <span class="cat">${window._printWithNames?(archer.bow||'')+' · '+(archer.age||'')+' · '+scoring:''}</span>
       </div>
       <table style="flex:1;">
         <thead><tr><th style="width:22px;">Stn</th>${arrHeaders}<th style="width:22px;">End</th><th style="width:26px;">Run.</th></tr></thead>
@@ -1708,9 +1721,9 @@ window.printBlankScorecards=()=>{
     });
     return`<div class="archer-block">
       <div class="archer-name-bar">
-        <span class="slot">T${archer.targetNum}${archer.slot}</span>
-        <span class="name">${archer.name}</span>
-        <span class="cat">${archer.bow||''} · ${archer.age||''} · Custom</span>
+        <span class="slot">${window._printWithNames?'T'+archer.targetNum+archer.slot:''}</span>
+        <span class="name">${window._printWithNames?archer.name:''}</span>
+        <span class="cat">${window._printWithNames?(archer.bow||'')+' · '+(archer.age||'')+' · Custom':''}</span>
       </div>
       <table style="flex:1;">
         <thead><tr><th style="width:22px;">Tgt</th><th style="width:28px;">Type</th><th>A1</th><th>A2</th><th>A3</th><th style="width:22px;">End</th><th style="width:26px;">Run.</th></tr></thead>
