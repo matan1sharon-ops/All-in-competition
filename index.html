@@ -279,6 +279,8 @@ tbody td{padding:10px 12px;color:#111;}
             <div class="form-group" style="min-width:140px;"><label id="lbl-elim-bracket">Bracket</label><select id="elim-bracket" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;width:100%;"><option value="8">1/8 — Top 16</option><option value="4">1/4 — Top 8</option><option value="2">1/2 — Top 4</option></select></div>
             
             <button class="btn btn-success" onclick="generateAllElimination()" data-t="generate_all">⚡ GENERATE ALL</button>
+<button class="btn btn-secondary" onclick="printEliminationScorecards()">🖨 PRINT SCORECARDS</button>
+<button class="btn btn-secondary btn-sm" id="btn-elim-names-toggle" onclick="toggleElimNames()" style="background:var(--accent);color:#000;border-color:var(--accent);">👤 WITH NAMES</button>
           </div>
         </div>
         <div id="elim-content" style="flex:1;overflow-y:auto;overflow-anchor:none;margin-top:12px;"></div>
@@ -1785,7 +1787,166 @@ window.printBlankScorecards=()=>{
   win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Blank Scorecards — ${compName}</title><style>${style}</style><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script></head><body>${pages}<script>window.onload=function(){var seen={};document.querySelectorAll(".qr-placeholder").forEach(function(el){var url=el.dataset.url;if(seen[url]){el.innerHTML=seen[url].innerHTML;return;}new QRCode(el,{text:url,width:64,height:64,correctLevel:QRCode.CorrectLevel.L});seen[url]=el;});setTimeout(function(){window.print();},400);};<\/script></body></html>`);
   win.document.close();
 };
+window._elimPrintWithNames=true;
+window.toggleElimNames=()=>{
+  window._elimPrintWithNames=!window._elimPrintWithNames;
+  const btn=document.getElementById('btn-elim-names-toggle');
+  if(btn){
+    btn.textContent=window._elimPrintWithNames?'👤 WITH NAMES':'👤 NO NAMES';
+    btn.style.background=window._elimPrintWithNames?'var(--accent)':'var(--surface3)';
+    btn.style.color=window._elimPrintWithNames?'#000':'var(--text)';
+    btn.style.borderColor=window._elimPrintWithNames?'var(--accent)':'var(--border2)';
+  }
+};
 
+window.printEliminationScorecards=()=>{
+  if(!currentCompId){toast(t('select_comp_first'),'error');return;}
+  const elimData=window._elimData||{};
+  if(!Object.keys(elimData).length){toast('No elimination brackets yet','error');return;}
+  const compName=document.querySelector('#comp-info-grid input')?.value||'Competition';
+  const withNames=window._elimPrintWithNames;
+  const roundOrder=['R1','QF','SF','F','B'];
+  const roundLabels={R1:'Round of 16',QF:'Quarter Final',SF:'Semi Final',F:'Final',B:'Bronze Medal'};
+
+  const style=`
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:Arial,sans-serif;font-size:11px;background:#fff;color:#111;}
+    .page{width:297mm;min-height:210mm;padding:6mm;display:flex;flex-direction:column;}
+    .page+.page{page-break-before:always;}
+    @media print{@page{size:A4 landscape;margin:0;}body{margin:0;}}
+    table{width:100%;border-collapse:collapse;table-layout:fixed;}
+    td,th{border:1px solid #ccc;text-align:center;padding:0 2px;}
+  `;
+
+  function buildCard(catKey,data,match,roundKey){
+    const fmt=data.format||'sets';
+    const isCum=fmt==='cumulative';
+    const slots=isCum?4:5;
+    const slotLabels=isCum?['T1','T2','T3','T4']:['S1','S2','S3','S4','S5'];
+    const gLabel=data.gender==='M'?'Men':'Women';
+    const roundLabel=roundLabels[roundKey]||roundKey;
+    const a1=match.archer1;
+    const a2=match.archer2;
+    const a1name=withNames?(a1?.name||'TBD'):'Archer A';
+    const a2name=withNames?(a2?.name||'TBD'):'Archer B';
+    const a1seed=withNames&&a1?.seed?`#${a1.seed} · ${a1.qualScore||0} pts`:'';
+    const a2seed=withNames&&a2?.seed?`#${a2.seed} · ${a2.qualScore||0} pts`:'';
+
+    // Build score rows
+    let rows='';
+    for(let i=0;i<slots;i++){
+      rows+=`<tr style="height:22px;">
+        <td style="background:#f0f0f0;font-weight:700;font-size:10px;width:30px;">${slotLabels[i]}</td>
+        ${isCum?'':`<td style="width:28px;"></td><td style="width:28px;"></td><td style="width:28px;"></td>`}
+        <td style="background:#e0e0e0;width:60px;font-weight:700;"></td>
+        <td style="background:#e0e0e0;width:60px;font-weight:700;"></td>
+        ${isCum?'':`<td style="width:28px;"></td><td style="width:28px;"></td><td style="width:28px;"></td>`}
+        <td style="background:#e0e0e0;width:60px;font-weight:700;"></td>
+        <td style="background:#e0e0e0;width:60px;font-weight:700;"></td>
+      </tr>`;
+    }
+
+    // Header row
+    const arrowHeaders=isCum?'':
+      `<th style="width:28px;">A1</th><th style="width:28px;">A2</th><th style="width:28px;">A3</th>`;
+    const arrowHeaders2=isCum?'':
+      `<th style="width:28px;">A1</th><th style="width:28px;">A2</th><th style="width:28px;">A3</th>`;
+
+    return`<div class="page">
+      <!-- HEADER -->
+      <div style="background:#37474f;color:#fff;padding:5px 10px;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <div style="font-size:13px;font-weight:700;">${compName}</div>
+        <div style="font-size:13px;font-weight:700;">${data.bow} · ${data.age} · ${gLabel} &nbsp;|&nbsp; ${roundLabel} · Match ${match.position}</div>
+        <div style="font-size:11px;color:#aaa;">${isCum?'Cumulative':'Sets System'}</div>
+      </div>
+      <!-- ARCHER NAMES -->
+      <div style="display:grid;grid-template-columns:1fr 50px 1fr;border-bottom:2px solid #37474f;margin-bottom:4px;">
+        <div style="background:#f5f5f5;padding:5px 10px;">
+          <div style="font-size:9px;color:#555;">${a1seed}</div>
+          <div style="font-size:14px;font-weight:700;">${a1name}</div>
+        </div>
+        <div style="background:#37474f;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;">VS</div>
+        <div style="background:#f5f5f5;padding:5px 10px;text-align:right;">
+          <div style="font-size:9px;color:#555;">${a2seed}</div>
+          <div style="font-size:14px;font-weight:700;">${a2name}</div>
+        </div>
+      </div>
+      <!-- SCORING TABLE -->
+      <table style="margin-bottom:4px;">
+        <colgroup>
+          <col style="width:30px">
+          ${isCum?'':`<col style="width:28px"><col style="width:28px"><col style="width:28px">`}
+          <col style="width:60px"><col style="width:60px">
+          ${isCum?'':`<col style="width:28px"><col style="width:28px"><col style="width:28px">`}
+          <col style="width:60px"><col style="width:60px">
+        </colgroup>
+        <thead>
+          <tr style="background:#555;color:#fff;height:18px;">
+            <th style="font-size:10px;">${isCum?'Target':'Set'}</th>
+            ${arrowHeaders}
+            <th style="background:#e0e0e0;color:#111;font-size:10px;">Total A</th>
+            <th style="background:#e0e0e0;color:#111;font-size:10px;">Pts A</th>
+            ${arrowHeaders2}
+            <th style="background:#e0e0e0;color:#111;font-size:10px;">Total B</th>
+            <th style="background:#e0e0e0;color:#111;font-size:10px;">Pts B</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+          <tr style="height:20px;background:#37474f;color:#fff;font-weight:700;font-size:10px;">
+            <td colspan="${isCum?3:6}" style="text-align:right;padding-right:8px;">${isCum?'TOTAL':'SET POINTS TOTAL'}</td>
+            <td style="background:#e0e0e0;"></td>
+            <td style="background:#e0e0e0;"></td>
+            ${isCum?'':`<td colspan="3"></td>`}
+            <td style="background:#e0e0e0;"></td>
+            <td style="background:#e0e0e0;"></td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- TIEBREAK + WINNER -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:4px;">
+        <div style="border:1px solid #ccc;padding:4px 8px;">
+          <div style="font-size:8px;color:#888;margin-bottom:6px;font-weight:700;">TIEBREAK ARROW (if needed)</div>
+          <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;">
+            <div style="border-bottom:1px solid #999;height:20px;"></div>
+            <span style="font-size:9px;color:#555;">—</span>
+            <div style="border-bottom:1px solid #999;height:20px;"></div>
+          </div>
+        </div>
+        <div style="border:1px solid #ccc;padding:4px 8px;">
+          <div style="font-size:8px;color:#888;margin-bottom:4px;font-weight:700;">WINNER ✓</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="display:flex;align-items:center;gap:6px;"><div style="width:14px;height:14px;border:1.5px solid #555;border-radius:2px;flex-shrink:0;"></div><span style="font-size:10px;font-weight:700;">${a1name}</span></div>
+            <div style="display:flex;align-items:center;gap:6px;"><div style="width:14px;height:14px;border:1.5px solid #555;border-radius:2px;flex-shrink:0;"></div><span style="font-size:10px;font-weight:700;">${a2name}</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- SIGNATURES -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+        <div><div style="border-bottom:1px solid #999;min-height:28px;"></div><div style="font-size:8px;color:#aaa;margin-top:3px;">Archer A signature</div></div>
+        <div><div style="border-bottom:1px solid #999;min-height:28px;"></div><div style="font-size:8px;color:#aaa;margin-top:3px;text-align:center;">Scorer signature</div></div>
+        <div><div style="border-bottom:1px solid #999;min-height:28px;"></div><div style="font-size:8px;color:#aaa;margin-top:3px;text-align:right;">Archer B signature</div></div>
+      </div>
+    </div>`;
+  }
+
+  let pages='';
+  Object.entries(elimData).forEach(([catKey,data])=>{
+    roundOrder.forEach(rk=>{
+      const matches=data.rounds?.[rk]||[];
+      matches.forEach(match=>{
+        if(!match.archer1||match.isBye)return;
+        pages+=buildCard(catKey,data,match,rk);
+      });
+    });
+  });
+
+  if(!pages){toast('No matches to print','error');return;}
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Elimination Scorecards</title><style>${style}</style></head><body>${pages}</body></html>`);
+  win.document.close();
+  setTimeout(()=>win.print(),400);
+};
 /* ── INIT ── */
 loadCompetitions();
 document.getElementById('conn-status').textContent=t('connecting');
