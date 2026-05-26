@@ -1834,7 +1834,7 @@ window.printEliminationScorecards=()=>{
     for(let i=0;i<slots;i++){
       rows+=`<tr style="height:26px;"><td style="background:#f0f0f0;font-weight:700;font-size:10px;">${slotLabels[i]}</td>${isCum?'':`<td></td><td></td><td></td>`}<td style="background:#e0e0e0;"></td><td style="background:#e0e0e0;"></td>${isCum?'':`<td></td><td></td><td></td>`}<td style="background:#e0e0e0;"></td><td style="background:#e0e0e0;"></td></tr>`;
     }
-    const totalColspan=isCum?3:6;const extraCols=isCum?'':`<td colspan="3"></td>`;
+    const totalColspan=isCum?2:5;const extraCols=isCum?'':`<td colspan="3"></td>`;
     return`<div class="page">
       <div style="background:#37474f;color:#fff;padding:5px 10px;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><div style="font-size:13px;font-weight:700;">${compName}</div><div style="font-size:13px;font-weight:700;">${data.bow} · ${data.age} · ${gLabel} | ${roundLabel} · Match ${match.position}</div><div style="font-size:11px;color:#aaa;">${isCum?'Cumulative':'Sets System'}</div></div>
       <div style="display:grid;grid-template-columns:1fr 50px 1fr;border-bottom:2px solid #37474f;margin-bottom:4px;">
