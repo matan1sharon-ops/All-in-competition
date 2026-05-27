@@ -531,5 +531,10 @@ const qrComp=params.get('comp');
 const qrTarget=parseInt(params.get('target'));
 if(qrComp&&qrTarget){autoLoginFromQR(qrComp,qrTarget);}
 </script>
+ <script>
+document.addEventListener('touchstart',function(e){if(e.touches.length>1)e.preventDefault();},{passive:false});
+let lastTap=0;
+document.addEventListener('touchend',function(e){const now=Date.now();if(now-lastTap<300)e.preventDefault();lastTap=now;},{passive:false});
+</script> 
 </body>
 </html>
