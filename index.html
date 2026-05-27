@@ -1840,11 +1840,11 @@ window.printEliminationScorecards=()=>{
     const a2name=withNames?(a2?.name||'TBD'):'Archer B';
     const a1seed=withNames&&a1?.seed?`#${a1.seed} · ${a1.qualScore||0} pts`:'';
     const a2seed=withNames&&a2?.seed?`#${a2.seed} · ${a2.qualScore||0} pts`:'';
-    const arrowCols=isCum?'':'<col><col><col>';
-    const arrowHeaders=isCum?'':`<th>A1</th><th>A2</th><th>A3</th>`;
+    const arrowCols='<col><col><col>';
+const arrowHeaders=`<th>A1</th><th>A2</th><th>A3</th>`;
     let rows='';
     for(let i=0;i<slots;i++){
-      rows+=`<tr style="height:26px;"><td style="background:#f0f0f0;font-weight:700;font-size:10px;">${slotLabels[i]}</td>${isCum?'':`<td></td><td></td><td></td>`}<td style="background:#e0e0e0;"></td><td style="background:#e0e0e0;"></td>${isCum?'':`<td></td><td></td><td></td>`}<td style="background:#e0e0e0;"></td><td style="background:#e0e0e0;"></td></tr>`;
+      rows+=`<tr style="height:26px;"><td style="background:#f0f0f0;font-weight:700;font-size:10px;">${slotLabels[i]}</td><td></td><td></td><td></td><td style="background:#e0e0e0;"></td><td style="background:#e0e0e0;"></td><td></td><td></td><td></td><td style="background:#e0e0e0;"></td><td style="background:#e0e0e0;"></td></tr>`;
     }
     const totalColspan=isCum?2:4;const extraCols=isCum?'':`<td colspan="3"></td>`;
     return`<div class="page">
