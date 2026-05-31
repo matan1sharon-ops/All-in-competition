@@ -845,7 +845,7 @@ window.openNewCompModal=()=>{
   const isHe=currentLang==='he';
   const modal=document.getElementById('modal-new-comp');
   modal.querySelector('.modal-title').textContent=isHe?'🏆 תחרות חדשה':'🏆 New Competition';
-  const labels=modal.querySelectorAll('label');
+  const labels=modal.querySelectorAll('.form-group>label');
   const labelKeys=isHe?['שם התחרות','תאריך','מספר ימים','מיקום','סוג תחרות','מארגן']:['Competition Name','Date','Number of Days','Location','Discipline','Organizer'];
   labels.forEach((l,i)=>{if(labelKeys[i])l.textContent=labelKeys[i];});
   const inputs=modal.querySelectorAll('input[type=text]');
