@@ -1,113 +1,384 @@
 <!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"><title>Register Patcher</title>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ALL IN — Registration</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Segoe UI',sans-serif;background:#0a0a0a;color:#f0f0f0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
-.card{background:#141414;border:1px solid #2a2a2a;border-radius:14px;padding:32px;width:100%;max-width:560px;}
-.logo{font-size:28px;font-weight:900;letter-spacing:4px;color:#FFD700;font-family:'Arial Black',sans-serif;margin-bottom:4px;}
-.sub{font-size:11px;color:#888;letter-spacing:2px;text-transform:uppercase;margin-bottom:28px;}
-.drop-zone{border:2px dashed #333;border-radius:8px;padding:24px;text-align:center;cursor:pointer;transition:all 0.15s;margin-bottom:16px;}
-.drop-zone:hover{border-color:#FFD700;background:#1a1500;}
-input[type=file]{display:none;}
-.patch-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #252525;font-size:12px;color:#aaa;}
-.patch-item:last-child{border-bottom:none;}
-.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:#444;}
-.dot-ok{background:#43a047;box-shadow:0 0 6px #43a047;}
-.dot-err{background:#e53935;}
-.btn{width:100%;padding:14px;background:#FFD700;color:#000;border:none;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer;margin-top:16px;}
-.btn:disabled{background:#333;color:#555;cursor:not-allowed;}
-.btn-dl{background:#43a047;color:#fff;margin-top:10px;display:none;}
-.status{margin-top:14px;padding:12px;border-radius:8px;font-size:13px;font-weight:600;display:none;}
-.status.success{background:#1b5e2022;border:1px solid #43a047;color:#81c784;}
-.status.error{background:#b71c1c22;border:1px solid #e53935;color:#ef9a9a;}
+:root{--bg:#111;--surface:#1e1e1e;--surface2:#2a2a2a;--border:#333;--accent:#FFD700;--red:#e53935;--green:#43a047;--text:#f0f0f0;--muted:#888;--radius:12px;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 24px;width:100%;max-width:420px;}
+.logo{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;letter-spacing:4px;color:var(--accent);text-align:center;margin-bottom:4px;}
+.sub{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:8px;}
+.lang-toggle{display:flex;justify-content:center;gap:6px;margin-bottom:20px;}
+.lang-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:5px 16px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s;}
+.lang-btn.active{background:var(--accent);color:#000;border-color:var(--accent);}
+.comp-name{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:var(--text);text-align:center;margin-bottom:24px;padding:10px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);}
+.form-group{margin-bottom:14px;}
+.form-group label{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;}
+.form-group input,.form-group select{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:12px 14px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:16px;outline:none;transition:border-color 0.15s;}
+.form-group input:focus,.form-group select:focus{border-color:var(--accent);}
+.form-group select option{background:var(--surface2);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.submit-btn{width:100%;padding:16px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:20px;letter-spacing:1px;cursor:pointer;margin-top:8px;transition:filter 0.15s,transform 0.1s;}
+.submit-btn:active{transform:scale(0.97);filter:brightness(0.9);}
+.submit-btn:disabled{background:#333;color:#555;cursor:not-allowed;}
+.success-screen{display:none;padding:4px 0;}
+.success-banner{background:linear-gradient(135deg,#1b5e20,#2e7d32);border-radius:12px;padding:20px;text-align:center;margin-bottom:16px;}
+.success-icon{font-size:48px;margin-bottom:8px;}
+.success-title{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:900;color:#fff;letter-spacing:2px;margin-bottom:4px;}
+.success-sub{font-size:13px;color:#a5d6a7;line-height:1.5;}
+.success-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+.success-card-title{font-size:9px;font-weight:700;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;}
+.success-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.success-row:last-child{border-bottom:none;}
+.success-row-icon{font-size:16px;width:22px;text-align:center;flex-shrink:0;}
+.success-row-label{color:var(--muted);font-size:11px;min-width:70px;}
+.success-row-val{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--text);}
+.link-btn{display:flex;align-items:center;gap:10px;width:100%;padding:14px 16px;border-radius:10px;border:none;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:0.5px;text-decoration:none;margin-bottom:8px;transition:filter 0.15s;}
+.link-btn:active{filter:brightness(0.9);}
+.link-btn-scoring{background:#1e88e5;color:#fff;}
+.link-btn-results{background:var(--surface2);color:var(--accent);border:1px solid var(--accent);}
+.link-btn-icon{font-size:20px;}
+.screenshot-hint{text-align:center;font-size:11px;color:var(--muted);margin:8px 0 12px;line-height:1.5;}
+.error-msg{background:#b71c1c22;border:1px solid var(--red);color:var(--red);padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none;}
+.loading{display:none;text-align:center;padding:20px 0;color:var(--muted);}
+#register-another-btn{width:100%;padding:12px;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:var(--radius);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;cursor:pointer;}
 </style>
 </head>
 <body>
 <div class="card">
   <div class="logo">ALL IN</div>
-  <div class="sub">Register.html Patcher — Custom Categories</div>
-  <div class="drop-zone" id="dz" onclick="document.getElementById('fi').click()"
-       ondragover="event.preventDefault();this.style.borderColor='#FFD700'"
-       ondragleave="this.style.borderColor='#333'"
-       ondrop="handleDrop(event)">
-    <div style="font-size:32px;margin-bottom:6px;">📂</div>
-    <p style="font-size:13px;"><strong>Click to choose</strong> or drag & drop register.html</p>
-    <p id="fn" style="margin-top:6px;color:#FFD700;font-weight:600;"></p>
+  <div class="sub" id="sub-title">Competition Registration</div>
+
+  <div class="lang-toggle">
+    <button class="lang-btn active" id="lang-en" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" id="lang-he" onclick="setLang('he')">עברית</button>
   </div>
-  <input type="file" id="fi" accept=".html" onchange="loadFile(this)">
-  <div style="background:#1e1e1e;border:1px solid #333;border-radius:8px;padding:12px;margin-bottom:16px;">
-    <div class="patch-item"><div class="dot" id="d1"></div><span>Filter bow dropdown to allowedBows from competition</span></div>
-    <div class="patch-item"><div class="dot" id="d2"></div><span>Filter age dropdown to allowedAges from competition</span></div>
+
+  <div class="loading" id="loading">⏳ Loading...</div>
+  <div class="error-msg" id="error-msg"></div>
+
+  <div id="form-section" style="display:none;">
+    <div class="comp-name" id="comp-display">—</div>
+    <div class="form-group">
+      <label id="lbl-fname">First Name</label>
+      <input type="text" id="fname" autocomplete="given-name">
+    </div>
+    <div class="form-group">
+      <label id="lbl-lname">Last Name</label>
+      <input type="text" id="lname" autocomplete="family-name">
+    </div>
+    <div class="form-group">
+      <label id="lbl-club">Club</label>
+      <input type="text" id="club" autocomplete="organization">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label id="lbl-bow">Bow Type</label>
+        <select id="bow">
+          <option>Recurve</option><option>Compound</option><option>Barebow</option>
+          <option>Traditional</option><option>Longbow</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label id="lbl-gender">Gender</label>
+        <select id="gender">
+          <option value="M" id="opt-male">Male</option>
+          <option value="F" id="opt-female">Female</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label id="lbl-age">Age Category</label>
+      <select id="age">
+        <option>U12</option><option>U14</option><option>U18</option><option>U21</option>
+        <option selected>Senior</option><option>Master 50+</option><option>Master 60+</option>
+      </select>
+    </div>
+    <button class="submit-btn" id="submit-btn" onclick="submitRegistration()">REGISTER →</button>
   </div>
-  <button class="btn" id="pb" onclick="applyPatch()" disabled>⚡ APPLY PATCH</button>
-  <button class="btn btn-dl" id="db" onclick="download()">⬇️ DOWNLOAD PATCHED register.html</button>
-  <div class="status" id="st"></div>
+
+  <div class="success-screen" id="success-screen">
+    <div class="success-banner">
+      <div class="success-icon">🏹</div>
+      <div class="success-title" id="success-title-text">REGISTERED!</div>
+      <div class="success-sub" id="success-sub-text">You have been successfully registered.</div>
+    </div>
+
+    <!-- Archer details -->
+    <div class="success-card">
+      <div class="success-card-title" id="sc-archer-title">Your Details</div>
+      <div id="success-archer-rows"></div>
+    </div>
+
+    <!-- Competition details -->
+    <div class="success-card">
+      <div class="success-card-title" id="sc-comp-title">Competition</div>
+      <div id="success-comp-rows"></div>
+    </div>
+
+    <!-- Screenshot hint -->
+    <div class="screenshot-hint" id="sc-hint">📸 Screenshot this page to keep your registration details</div>
+
+    <!-- Links -->
+    <a id="link-scoring" class="link-btn link-btn-scoring" href="#" target="_blank">
+      <span class="link-btn-icon">📱</span>
+      <span id="lbl-scoring">Score your round</span>
+    </a>
+    <a id="link-results" class="link-btn link-btn-results" href="#" target="_blank">
+      <span class="link-btn-icon">🏆</span>
+      <span id="lbl-results">Live Results</span>
+    </a>
+
+    <button id="register-another-btn" onclick="registerAnother()">+ Register Another Archer</button>
+  </div>
 </div>
-<script>
-let src=null,patched=null;
 
-function handleDrop(e){e.preventDefault();document.getElementById('dz').style.borderColor='#333';const f=e.dataTransfer.files[0];if(f)loadFile({files:[f]});}
-function loadFile(inp){
-  const f=inp.files[0];if(!f)return;
-  const r=new FileReader();
-  r.onload=e=>{src=e.target.result;document.getElementById('fn').textContent='✓ '+f.name+' loaded';document.getElementById('dz').style.borderColor='#43a047';document.getElementById('pb').disabled=false;['d1','d2'].forEach(id=>document.getElementById(id).className='dot');document.getElementById('db').style.display='none';document.getElementById('st').style.display='none';};
-  r.readAsText(f);
-}
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getFirestore,doc,getDoc,setDoc}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-function applyPatch(){
-  if(!src)return;
-  let c=src;
+const firebaseConfig={apiKey:"AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To",authDomain:"all-in-competition.firebaseapp.com",projectId:"all-in-competition",storageBucket:"all-in-competition.firebasestorage.app",messagingSenderId:"620146958631",appId:"1:620146958631:web:1e88019d1436372689c902"};
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
 
-  // PATCH 1: Filter bow dropdown after loading competition
-  // Find the line that sets comp-display and add bow filtering after it
-  const old1 = `document.getElementById('comp-display').textContent=
-      \`🏆 \${compData.name}\`+(compData.date?\`  ·  \${compData.date}\`:'')+(compData.location?\`  ·  \${compData.location}\`:'');
-    document.title=\`\${t('sub_title')} — \${compData.name}\`;`;
-  const new1 = `document.getElementById('comp-display').textContent=
-      \`🏆 \${compData.name}\`+(compData.date?\`  ·  \${compData.date}\`:'')+(compData.location?\`  ·  \${compData.location}\`:'');
-    document.title=\`\${t('sub_title')} — \${compData.name}\`;
-    // Filter bow types if allowedBows set (Custom discipline)
-    if(compData.allowedBows&&compData.allowedBows.length){
-      const bowSel=document.getElementById('bow');
-      [...bowSel.options].forEach(o=>{o.style.display=compData.allowedBows.includes(o.value)?'':'none';});
-      if(!compData.allowedBows.includes(bowSel.value))bowSel.value=compData.allowedBows[0];
-    }
-    // Filter age categories if allowedAges set
-    if(compData.allowedAges&&compData.allowedAges.length){
-      const ageSel=document.getElementById('age');
-      [...ageSel.options].forEach(o=>{o.style.display=compData.allowedAges.includes(o.value)?'':'none';});
-      if(!compData.allowedAges.includes(ageSel.value))ageSel.value=compData.allowedAges[0];
-    }`;
+const params=new URLSearchParams(window.location.search);
+const compId=params.get('comp');
+let compData=null;
+let currentLang=localStorage.getItem('registerLang')||'en';
 
-  const ok1=c.includes(old1.split('\n')[0].trim().substring(0,40));
-  // Try simpler match
-  const simpleOld1 = "document.title=`${t('sub_title')} — ${compData.name}`;";
-  const simpleNew1 = `document.title=\`\${t('sub_title')} — \${compData.name}\`;
-    if(compData.allowedBows&&compData.allowedBows.length){const bowSel=document.getElementById('bow');[...bowSel.options].forEach(o=>{o.style.display=compData.allowedBows.includes(o.value)?'':'none';});if(!compData.allowedBows.includes(bowSel.value))bowSel.value=compData.allowedBows[0];}
-    if(compData.allowedAges&&compData.allowedAges.length){const ageSel=document.getElementById('age');[...ageSel.options].forEach(o=>{o.style.display=compData.allowedAges.includes(o.value)?'':'none';});if(!compData.allowedAges.includes(ageSel.value))ageSel.value=compData.allowedAges[0];}`;
-
-  if(c.includes(simpleOld1)){
-    c=c.replace(simpleOld1,simpleNew1);
-    document.getElementById('d1').className='dot dot-ok';
-    document.getElementById('d2').className='dot dot-ok';
-  } else {
-    document.getElementById('d1').className='dot dot-err';
-    document.getElementById('d2').className='dot dot-err';
+const T={
+  en:{
+    sub_title:'Competition Registration',
+    loading:'⏳ Loading...',
+    no_comp:'No competition specified. Please use the link provided by the organizer.',
+    not_found:'Competition not found. Please check your registration link.',
+    conn_error:'Connection error. Please try again.',
+    first_name:'First Name',
+    first_name_ph:'First name',
+    last_name:'Last Name',
+    last_name_ph:'Last name',
+    club:'Club',
+    club_ph:'Club name (optional)',
+    bow_type:'Bow Type',
+    gender:'Gender',
+    male:'Male',
+    female:'Female',
+    age_category:'Age Category',
+    register_btn:'REGISTER →',
+    registering:'REGISTERING...',
+    enter_fname:'Please enter your first name.',
+    enter_lname:'Please enter your last name.',
+    already_registered:'is already registered for this competition.',
+    reg_failed:'Registration failed. Please try again.',
+    registered:'REGISTERED!',
+    success_sub:'You have been successfully registered for the competition.',
+    register_another:'+ Register Another Archer',
+    your_details:'Your Details',
+    competition_lbl:'Competition',
+    screenshot_hint:'📸 Screenshot this page to keep your registration details',
+    score_your_round:'📱 Score your round',
+    live_results:'🏆 Live Results',
+    bow_lbl:'Bow',
+    age_lbl:'Age',
+    gender_lbl:'Gender',
+    club_lbl:'Club',
+  },
+  he:{
+    sub_title:'הרשמה לתחרות',
+    loading:'⏳ טוען...',
+    no_comp:'לא צוינה תחרות. אנא השתמש בקישור שסיפק המארגן.',
+    not_found:'התחרות לא נמצאה. אנא בדוק את קישור ההרשמה.',
+    conn_error:'שגיאת חיבור. אנא נסה שוב.',
+    first_name:'שם פרטי',
+    first_name_ph:'שם פרטי',
+    last_name:'שם משפחה',
+    last_name_ph:'שם משפחה',
+    club:'מועדון',
+    club_ph:'שם מועדון (לא חובה)',
+    bow_type:'סוג קשת',
+    gender:'מין',
+    male:'זכר',
+    female:'נקבה',
+    age_category:'קטגוריית גיל',
+    register_btn:'הרשמה →',
+    registering:'...נרשם',
+    enter_fname:'אנא הזן את שמך הפרטי.',
+    enter_lname:'אנא הזן את שם משפחתך.',
+    already_registered:'כבר רשום לתחרות זו.',
+    reg_failed:'ההרשמה נכשלה. אנא נסה שוב.',
+    registered:'נרשמת!',
+    success_sub:'נרשמת בהצלחה לתחרות.',
+    register_another:'+ הרשם קשת נוסף',
+    your_details:'הפרטים שלך',
+    competition_lbl:'תחרות',
+    screenshot_hint:'📸 צלם מסך לשמירת פרטי ההרשמה',
+    score_your_round:'📱 ניקוד הסיבוב שלך',
+    live_results:'🏆 תוצאות חיות',
+    bow_lbl:'קשת',
+    age_lbl:'גיל',
+    gender_lbl:'מין',
+    club_lbl:'מועדון',
   }
+};
 
-  patched=c;
-  const st=document.getElementById('st');
-  const allOk=[...document.querySelectorAll('.dot')].every(d=>d.className.includes('ok'));
-  if(allOk){st.className='status success';st.textContent='✓ All patches applied!';st.style.display='block';document.getElementById('db').style.display='block';}
-  else{st.className='status error';st.textContent='Some patches failed — check file version';st.style.display='block';if(c!==src)document.getElementById('db').style.display='block';}
+function t(key){return T[currentLang]?.[key]||T['en']?.[key]||key;}
+
+function applyLang(){
+  document.getElementById('sub-title').textContent=t('sub_title');
+  document.getElementById('loading').textContent=t('loading');
+  document.getElementById('lbl-fname').textContent=t('first_name');
+  document.getElementById('fname').placeholder=t('first_name_ph');
+  document.getElementById('lbl-lname').textContent=t('last_name');
+  document.getElementById('lname').placeholder=t('last_name_ph');
+  document.getElementById('lbl-club').textContent=t('club');
+  document.getElementById('club').placeholder=t('club_ph');
+  document.getElementById('lbl-bow').textContent=t('bow_type');
+  document.getElementById('lbl-gender').textContent=t('gender');
+  document.getElementById('opt-male').textContent=t('male');
+  document.getElementById('opt-female').textContent=t('female');
+  document.getElementById('lbl-age').textContent=t('age_category');
+  document.getElementById('submit-btn').textContent=t('register_btn');
+  document.getElementById('success-title-text').textContent=t('registered');
+  document.getElementById('success-sub-text').textContent=t('success_sub');
+  document.getElementById('register-another-btn').textContent=t('register_another');
+  const scArcherTitle=document.getElementById('sc-archer-title');if(scArcherTitle)scArcherTitle.textContent=t('your_details');
+  const scCompTitle=document.getElementById('sc-comp-title');if(scCompTitle)scCompTitle.textContent=t('competition_lbl');
+  const scHint=document.getElementById('sc-hint');if(scHint)scHint.textContent=t('screenshot_hint');
+  const lblScoring=document.getElementById('lbl-scoring');if(lblScoring)lblScoring.textContent=t('score_your_round');
+  const lblResults=document.getElementById('lbl-results');if(lblResults)lblResults.textContent=t('live_results');
+  document.getElementById('lang-en').classList.toggle('active',currentLang==='en');
+  document.getElementById('lang-he').classList.toggle('active',currentLang==='he');
+  document.documentElement.lang=currentLang;
 }
 
-function download(){
-  const blob=new Blob([patched],{type:'text/html'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download='register.html';a.click();URL.revokeObjectURL(url);
+window.setLang=function(lang){
+  currentLang=lang;
+  localStorage.setItem('registerLang',lang);
+  applyLang();
+};
+
+function showError(msg){
+  const el=document.getElementById('error-msg');
+  el.textContent=msg;
+  el.style.display='block';
+  document.getElementById('loading').style.display='none';
 }
+
+async function loadCompetition(){
+  document.getElementById('loading').style.display='block';
+  applyLang();
+  if(!compId){showError(t('no_comp'));return;}
+  try{
+    const snap=await getDoc(doc(db,'competitions',compId));
+    if(!snap.exists()){showError(t('not_found'));return;}
+    compData=snap.data();
+    document.getElementById('loading').style.display='none';
+    document.getElementById('form-section').style.display='block';
+    document.getElementById('comp-display').textContent=
+      `🏆 ${compData.name}`+(compData.date?`  ·  ${compData.date}`:'')+(compData.location?`  ·  ${compData.location}`:'');
+    document.title=`${t('sub_title')} — ${compData.name}`;
+  }catch(err){
+    showError(t('conn_error'));
+  }
+}
+
+window.submitRegistration=async()=>{
+  const fname=document.getElementById('fname').value.trim();
+  const lname=document.getElementById('lname').value.trim();
+  const club=document.getElementById('club').value.trim();
+  const bow=document.getElementById('bow').value;
+  const gender=document.getElementById('gender').value;
+  const age=document.getElementById('age').value;
+
+  document.getElementById('error-msg').style.display='none';
+  if(!fname){showError(t('enter_fname'));return;}
+  if(!lname){showError(t('enter_lname'));return;}
+
+  const btn=document.getElementById('submit-btn');
+  btn.disabled=true;
+  btn.textContent=t('registering');
+
+  try{
+    const snap=await getDoc(doc(db,'competitions',compId));
+    const data=snap.data();
+    const archers=data.archers||[];
+
+    const exists=archers.find(a=>
+      a.fname?.toLowerCase()===fname.toLowerCase()&&
+      a.lname?.toLowerCase()===lname.toLowerCase()
+    );
+    if(exists){
+      showError(`${fname} ${lname} ${t('already_registered')}`);
+      btn.disabled=false;
+      btn.textContent=t('register_btn');
+      return;
+    }
+
+    archers.push({
+      id:String(Date.now()),
+      fname,lname,name:`${fname} ${lname}`,
+      club,bow,age,gender,
+      target:null,slot:null,
+      registeredAt:new Date().toISOString()
+    });
+
+    await setDoc(doc(db,'competitions',compId),{archers},{merge:true});
+
+    document.getElementById('form-section').style.display='none';
+    document.getElementById('success-screen').style.display='block';
+    const gLabel=gender==='M'?t('male'):t('female');
+
+    // Archer details rows
+    const archerRows=[
+      {icon:'👤',label:'',val:`<strong style="font-size:18px;">${fname} ${lname}</strong>`},
+      {icon:'🏹',label:t('bow_lbl'),val:bow},
+      {icon:'📅',label:t('age_lbl'),val:age},
+      {icon:'⚧',label:t('gender_lbl'),val:gLabel},
+      ...(club?[{icon:'🏛',label:t('club_lbl'),val:club}]:[]),
+    ];
+    document.getElementById('success-archer-rows').innerHTML=archerRows.map(r=>
+      `<div class="success-row"><span class="success-row-icon">${r.icon}</span><span class="success-row-label">${r.label}</span><span class="success-row-val">${r.val}</span></div>`
+    ).join('');
+
+    // Competition details rows
+    const compRows=[
+      {icon:'🏆',label:'',val:`<strong>${compData.name}</strong>`},
+      ...(compData.date?[{icon:'📅',label:'',val:compData.date}]:[]),
+      ...(compData.location?[{icon:'📍',label:'',val:compData.location}]:[]),
+      ...(compData.discipline?[{icon:'🎯',label:'',val:compData.discipline}]:[]),
+    ];
+    document.getElementById('success-comp-rows').innerHTML=compRows.map(r=>
+      `<div class="success-row"><span class="success-row-icon">${r.icon}</span><span class="success-row-label">${r.label}</span><span class="success-row-val">${r.val}</span></div>`
+    ).join('');
+
+    // Set links
+    const base='https://matan1sharon-ops.github.io/All-in-competition';
+    document.getElementById('link-scoring').href=`${base}/scoring.html?comp=${compId}`;
+    document.getElementById('link-results').href=`${base}/results.html?comp=${compId}`;
+
+  }catch(err){
+    showError(t('reg_failed'));
+    btn.disabled=false;
+    btn.textContent=t('register_btn');
+  }
+};
+
+window.registerAnother=()=>{
+  document.getElementById('success-screen').style.display='none';
+  document.getElementById('form-section').style.display='block';
+  document.getElementById('fname').value='';
+  document.getElementById('lname').value='';
+  document.getElementById('club').value='';
+  document.getElementById('error-msg').style.display='none';
+  document.getElementById('submit-btn').disabled=false;
+  document.getElementById('submit-btn').textContent=t('register_btn');
+};
+
+loadCompetition();
 </script>
 </body>
 </html>
