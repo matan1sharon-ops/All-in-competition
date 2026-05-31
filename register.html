@@ -75,6 +75,14 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
       <label id="lbl-club">Club</label>
       <input type="text" id="club" autocomplete="organization">
     </div>
+    <div class="form-group">
+      <label id="lbl-phone">Phone *</label>
+      <input type="tel" id="phone" autocomplete="tel" placeholder="+972...">
+    </div>
+    <div class="form-group">
+      <label id="lbl-email">Email</label>
+      <input type="email" id="email" autocomplete="email" placeholder="Optional">
+    </div>
     <div class="form-row">
       <div class="form-group">
         <label id="lbl-bow">Bow Type</label>
@@ -163,6 +171,11 @@ const T={
     last_name_ph:'Last name',
     club:'Club',
     club_ph:'Club name (optional)',
+    phone:'Phone',
+    phone_ph:'+972...',
+    email:'Email',
+    email_ph:'Optional',
+    enter_phone:'Please enter your phone number.',
     bow_type:'Bow Type',
     gender:'Gender',
     male:'Male',
@@ -199,6 +212,11 @@ const T={
     last_name_ph:'שם משפחה',
     club:'מועדון',
     club_ph:'שם מועדון (לא חובה)',
+    phone:'טלפון',
+    phone_ph:'050...',
+    email:'אימייל',
+    email_ph:'לא חובה',
+    enter_phone:'אנא הזן מספר טלפון.',
     bow_type:'סוג קשת',
     gender:'מין',
     male:'זכר',
@@ -248,6 +266,10 @@ function applyLang(){
   const scArcherTitle=document.getElementById('sc-archer-title');if(scArcherTitle)scArcherTitle.textContent=t('your_details');
   const scCompTitle=document.getElementById('sc-comp-title');if(scCompTitle)scCompTitle.textContent=t('competition_lbl');
   const scHint=document.getElementById('sc-hint');if(scHint)scHint.textContent=t('screenshot_hint');
+  const lblPhone=document.getElementById('lbl-phone');if(lblPhone)lblPhone.textContent=t('phone');
+  const phoneEl=document.getElementById('phone');if(phoneEl)phoneEl.placeholder=t('phone_ph');
+  const lblEmail=document.getElementById('lbl-email');if(lblEmail)lblEmail.textContent=t('email');
+  const emailEl=document.getElementById('email');if(emailEl)emailEl.placeholder=t('email_ph');
   const lblScoring=document.getElementById('lbl-scoring');if(lblScoring)lblScoring.textContent=t('score_your_round');
   const lblResults=document.getElementById('lbl-results');if(lblResults)lblResults.textContent=t('live_results');
   document.getElementById('lang-en').classList.toggle('active',currentLang==='en');
@@ -281,10 +303,6 @@ async function loadCompetition(){
     document.getElementById('comp-display').textContent=
       `🏆 ${compData.name}`+(compData.date?`  ·  ${compData.date}`:'')+(compData.location?`  ·  ${compData.location}`:'');
     document.title=`${t('sub_title')} — ${compData.name}`;
-    // Filter bow types if allowedBows set (Custom discipline)
-    if(compData.allowedBows&&compData.allowedBows.length){const bowSel=document.getElementById('bow');[...bowSel.options].forEach(o=>{o.style.display=compData.allowedBows.includes(o.value)?'':'none';});if(!compData.allowedBows.includes(bowSel.value))bowSel.value=compData.allowedBows[0];}
-    // Filter age categories if allowedAges set
-    if(compData.allowedAges&&compData.allowedAges.length){const ageSel=document.getElementById('age');[...ageSel.options].forEach(o=>{o.style.display=compData.allowedAges.includes(o.value)?'':'none';});if(!compData.allowedAges.includes(ageSel.value))ageSel.value=compData.allowedAges[0];}
   }catch(err){
     showError(t('conn_error'));
   }
@@ -301,6 +319,9 @@ window.submitRegistration=async()=>{
   document.getElementById('error-msg').style.display='none';
   if(!fname){showError(t('enter_fname'));return;}
   if(!lname){showError(t('enter_lname'));return;}
+  const phone=document.getElementById('phone').value.trim();
+  const email=document.getElementById('email').value.trim();
+  if(!phone){showError(t('enter_phone'));return;}
 
   const btn=document.getElementById('submit-btn');
   btn.disabled=true;
@@ -326,6 +347,7 @@ window.submitRegistration=async()=>{
       id:String(Date.now()),
       fname,lname,name:`${fname} ${lname}`,
       club,bow,age,gender,
+      phone,email,
       target:null,slot:null,
       registeredAt:new Date().toISOString()
     });
@@ -343,6 +365,8 @@ window.submitRegistration=async()=>{
       {icon:'📅',label:t('age_lbl'),val:age},
       {icon:'⚧',label:t('gender_lbl'),val:gLabel},
       ...(club?[{icon:'🏛',label:t('club_lbl'),val:club}]:[]),
+      {icon:'📱',label:t('phone'),val:phone},
+      ...(email?[{icon:'✉️',label:t('email'),val:email}]:[]),
     ];
     document.getElementById('success-archer-rows').innerHTML=archerRows.map(r=>
       `<div class="success-row"><span class="success-row-icon">${r.icon}</span><span class="success-row-label">${r.label}</span><span class="success-row-val">${r.val}</span></div>`
@@ -377,6 +401,8 @@ window.registerAnother=()=>{
   document.getElementById('fname').value='';
   document.getElementById('lname').value='';
   document.getElementById('club').value='';
+  document.getElementById('phone').value='';
+  document.getElementById('email').value='';
   document.getElementById('error-msg').style.display='none';
   document.getElementById('submit-btn').disabled=false;
   document.getElementById('submit-btn').textContent=t('register_btn');
