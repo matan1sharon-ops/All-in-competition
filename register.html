@@ -281,6 +281,11 @@ window.setLang=function(lang){
   currentLang=lang;
   localStorage.setItem('registerLang',lang);
   applyLang();
+  // Re-apply category filtering after language change
+  if(compData){
+    if(compData.allowedBows&&compData.allowedBows.length){const bowSel=document.getElementById('bow');[...bowSel.options].forEach(o=>{o.style.display=compData.allowedBows.includes(o.value)?'':'none';});}
+    if(compData.allowedAges&&compData.allowedAges.length){const ageSel=document.getElementById('age');[...ageSel.options].forEach(o=>{o.style.display=compData.allowedAges.includes(o.value)?'':'none';});}
+  }
 };
 
 function showError(msg){
@@ -303,6 +308,10 @@ async function loadCompetition(){
     document.getElementById('comp-display').textContent=
       `🏆 ${compData.name}`+(compData.date?`  ·  ${compData.date}`:'')+(compData.location?`  ·  ${compData.location}`:'');
     document.title=`${t('sub_title')} — ${compData.name}`;
+    // Filter bow types if allowedBows set (Custom discipline)
+    if(compData.allowedBows&&compData.allowedBows.length){const bowSel=document.getElementById('bow');[...bowSel.options].forEach(o=>{o.style.display=compData.allowedBows.includes(o.value)?'':'none';});if(!compData.allowedBows.includes(bowSel.value))bowSel.value=compData.allowedBows[0];}
+    // Filter age categories if allowedAges set
+    if(compData.allowedAges&&compData.allowedAges.length){const ageSel=document.getElementById('age');[...ageSel.options].forEach(o=>{o.style.display=compData.allowedAges.includes(o.value)?'':'none';});if(!compData.allowedAges.includes(ageSel.value))ageSel.value=compData.allowedAges[0];}
   }catch(err){
     showError(t('conn_error'));
   }
