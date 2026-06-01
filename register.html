@@ -141,6 +141,7 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
       <span id="lbl-results">Live Results</span>
     </a>
 
+    <div id="payment-btn-wrap" style="display:none;margin-bottom:12px;"><a id="payment-link-btn" href="#" target="_blank" class="link-btn" style="background:#FFD700;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:17px;letter-spacing:1px;display:flex;align-items:center;justify-content:center;gap:10px;padding:16px;border-radius:10px;text-decoration:none;">💳 CLICK HERE TO PAY</a></div>
     <button id="register-another-btn" onclick="registerAnother()">+ Register Another Archer</button>
   </div>
 </div>
@@ -396,6 +397,10 @@ window.submitRegistration=async()=>{
     const base='https://matan1sharon-ops.github.io/All-in-competition';
     document.getElementById('link-scoring').href=`${base}/scoring.html?comp=${compId}`;
     document.getElementById('link-results').href=`${base}/results.html?comp=${compId}`;
+    // Payment link
+    const payWrap=document.getElementById('payment-btn-wrap');
+    const payBtn=document.getElementById('payment-link-btn');
+    if(compData.paymentLink&&payWrap&&payBtn){payBtn.href=compData.paymentLink;payWrap.style.display='block';}else if(payWrap){payWrap.style.display='none';}
 
   }catch(err){
     showError(t('reg_failed'));
