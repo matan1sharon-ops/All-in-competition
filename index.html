@@ -909,9 +909,9 @@ window.openImportModal=()=>{
   /* original code below */
   document.getElementById('import-csv').value='';
   document.getElementById('csv-preview').style.display='none';
-  document.getElementById('csv-drop-zone').style.borderColor='var(--border2)';
-  const fi=document.getElementById('csv-file-input');
-  if(fi)fi.value='';
+  const dz=document.getElementById('csv-drop-zone');
+  dz.style.borderColor='var(--border2)';
+  dz.innerHTML=`<div style="font-size:28px;margin-bottom:6px;">📂</div><div style="font-size:13px;font-weight:600;color:var(--text);">Click to choose CSV file</div><div style="font-size:11px;color:var(--muted2);margin-top:4px;">or drag and drop your file here</div><input type="file" id="csv-file-input" accept=".csv,.txt" style="display:none;" onchange="handleCSVFile(this)">`;
   openModal('modal-import');
 };
 
