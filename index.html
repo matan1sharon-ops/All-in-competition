@@ -1679,26 +1679,52 @@ window.printBlankScorecards=()=>{
   function buildOutdoorBlock(archer,endRange,disc,targetNum,slotLetter){
     const isOut=disc==='Outdoor';
     const statLabel=isOut?'10+X / X':'10 / 9';
-    // Column widths — edit these to adjust each column
-    const W={end:30, a1:20, a2:20, a3:20, sub:40, endTot:40, run:50, s1:22, s2:22};
-    // Row heights — edit these to adjust
-    const RH={header:16, row1:18, row2:18, total:16};
+    const W={end:30,a1:20,a2:20,a3:20,sub:40,endTot:40,run:50,s1:22,s2:22};
+    // Row heights: edit row1/row2 for Outdoor, row1 for Indoor
+    const RH=isOut?{header:16,row1:22,row2:22,total:16}:{header:16,row1:34,total:16};
     let rows='';
-    endRange.forEach(e=>{
-      rows+=`<tr style="height:${RH.row1}px;">
-        <td rowspan="2" style="width:${W.end}px;background:#f0f0f0;font-weight:700;font-size:9px;border-right:1.5px solid #999;">End ${e}</td>
-        <td style="width:${W.a1}px;"></td><td style="width:${W.a2}px;"></td><td style="width:${W.a3}px;"></td>
-        <td style="width:${W.sub}px;background:#f5f5f5;"></td>
-        <td style="width:${W.endTot}px;background:#e0e0e0;"></td>
-        <td rowspan="2" style="width:${W.run}px;background:#fff8e1;border-left:1.5px solid #999;border-right:1.5px solid #999;"></td>
-        <td rowspan="2" style="width:${W.s1}px;background:#fafafa;"></td>
-        <td rowspan="2" style="width:${W.s2}px;background:#fafafa;"></td>
-      </tr><tr style="height:${RH.row2}px;border-bottom:1.5px solid #999;">
-        <td style="width:${W.a1}px;"></td><td style="width:${W.a2}px;"></td><td style="width:${W.a3}px;"></td>
-        <td style="width:${W.sub}px;background:#f5f5f5;"></td>
-        <td style="width:${W.endTot}px;background:#e3f2fd;"></td>
-      </tr>`;
-    });
+    if(isOut){
+      // Outdoor: 2 rows per end (6 arrows split 3+3)
+      endRange.forEach(e=>{
+        rows+=`<tr style="height:${RH.row1}px;">
+          <td rowspan="2" style="width:${W.end}px;background:#f0f0f0;font-weight:700;font-size:9px;border-right:1.5px solid #999;">End ${e}</td>
+          <td style="width:${W.a1}px;"></td><td style="width:${W.a2}px;"></td><td style="width:${W.a3}px;"></td>
+          <td style="width:${W.sub}px;background:#f5f5f5;"></td>
+          <td style="width:${W.endTot}px;background:#e0e0e0;"></td>
+          <td rowspan="2" style="width:${W.run}px;background:#fff8e1;border-left:1.5px solid #999;border-right:1.5px solid #999;"></td>
+          <td rowspan="2" style="width:${W.s1}px;background:#fafafa;"></td>
+          <td rowspan="2" style="width:${W.s2}px;background:#fafafa;"></td>
+        </tr><tr style="height:${RH.row2}px;border-bottom:1.5px solid #999;">
+          <td style="width:${W.a1}px;"></td><td style="width:${W.a2}px;"></td><td style="width:${W.a3}px;"></td>
+          <td style="width:${W.sub}px;background:#f5f5f5;"></td>
+          <td style="width:${W.endTot}px;background:#e3f2fd;"></td>
+        </tr>`;
+      });
+    }else{
+      // Indoor: 1 row per end (3 arrows)
+      endRange.forEach(e=>{
+        rows+=`<tr style="height:${RH.row1}px;border-bottom:1px solid #ccc;">
+          <td style="width:${W.end}px;background:#f0f0f0;font-weight:700;font-size:9px;border-right:1.5px solid #999;">End ${e}</td>
+          <td style="width:${W.a1}px;"></td><td style="width:${W.a2}px;"></td><td style="width:${W.a3}px;"></td>
+          <td style="width:${W.endTot}px;background:#e3f2fd;border-left:1.5px solid #999;"></td>
+          <td style="width:${W.run}px;background:#fff8e1;border-left:1.5px solid #999;border-right:1.5px solid #999;"></td>
+          <td style="width:${W.s1}px;background:#fafafa;"></td>
+          <td style="width:${W.s2}px;background:#fafafa;"></td>
+        </tr>`;
+      });
+    }
+    const theadOut=`<tr style="height:${RH.header}px;background:#555;color:#fff;font-size:8px;font-weight:700;">
+          <th style="width:${W.end}px;">End</th><th colspan="3">Arrows</th>
+          <th style="width:${W.sub}px;">Sub</th><th style="width:${W.endTot}px;">End</th>
+          <th style="width:${W.run}px;">Run.</th>
+          <th colspan="2" style="width:${W.s1+W.s2}px;font-size:7px;">${statLabel}</th>
+        </tr>`;
+    const theadIn=`<tr style="height:${RH.header}px;background:#555;color:#fff;font-size:8px;font-weight:700;">
+          <th style="width:${W.end}px;">End</th><th colspan="3">Arrows</th>
+          <th style="width:${W.endTot}px;">End</th><th style="width:${W.run}px;">Run.</th>
+          <th colspan="2" style="width:${W.s1+W.s2}px;font-size:7px;">${statLabel}</th>
+        </tr>`;
+    const totalCols=isOut?6:5;
     return`<div class="archer-block">
       <div class="archer-name-bar">
         <span class="slot">${window._printWithNames?'T'+(targetNum||'?')+(slotLetter||'?'):''}</span>
@@ -1706,17 +1732,10 @@ window.printBlankScorecards=()=>{
         <span class="cat">${window._printWithNames?(archer.bow||'')+' · '+(archer.age||'')+' · '+(archer.gender||''):''}</span>
       </div>
       <table style="table-layout:fixed;width:100%;border-collapse:collapse;">
-        <thead><tr style="height:${RH.header}px;background:#555;color:#fff;font-size:8px;font-weight:700;">
-          <th style="width:${W.end}px;">End</th>
-          <th colspan="3">Arrows</th>
-          <th style="width:${W.sub}px;">Sub</th>
-          <th style="width:${W.endTot}px;">End</th>
-          <th style="width:${W.run}px;">Run.</th>
-          <th colspan="2" style="width:${W.s1+W.s2}px;font-size:7px;">${statLabel}</th>
-        </tr></thead>
+        <thead>${isOut?theadOut:theadIn}</thead>
         <tbody>${rows}
         <tr style="height:${RH.total}px;background:#37474f;color:#fff;font-weight:700;font-size:9px;">
-          <td colspan="6">HALF TOTAL</td><td></td><td></td><td></td>
+          <td colspan="${totalCols}">HALF TOTAL</td><td></td><td></td><td></td>
         </tr>
         </tbody>
       </table>
