@@ -310,6 +310,7 @@ tbody td{padding:10px 12px;color:#111;}
 <div class="modal-backdrop" id="modal-move-archer"><div class="modal" style="max-width:460px;"><div class="modal-title" id="move-modal-title">Move Archer</div><div id="move-modal-body"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-move-archer')" data-t="cancel">Cancel</button></div></div></div>
 <div class="modal-backdrop" id="modal-match"><div class="modal" style="max-width:460px;"><div class="modal-title" id="match-modal-title">Match Result</div><div id="match-modal-body"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-match')" data-t="cancel">Cancel</button><button class="btn btn-primary" onclick="saveMatchResult()" data-t="save_result">SAVE RESULT →</button></div></div></div>
 
+<div class="modal-backdrop" id="modal-score-edit"><div class="modal" style="max-width:400px;"><div class="modal-title" id="score-edit-title">✏️ Edit Score</div><div id="score-edit-body"></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-score-edit')">Cancel</button><button class="btn btn-primary" onclick="saveScoreEdit()">SAVE →</button></div></div></div>
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import{getFirestore,collection,doc,addDoc,setDoc,getDoc,getDocs,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -1336,6 +1337,58 @@ function initTargetSetup(){
 }
 
 /* ── RESULTS ── */
+window.openScoreEdit=(archerId)=>{
+  const archer=archers.find(a=>a.id===archerId);if(!archer)return;
+  const s=getScore(archerId);
+  const disc=currentDiscipline;
+  const labels=getGoldLabels();
+  const isCustom=disc==='Custom';
+  const showHalves=disc==='Outdoor'||disc==='Indoor';
+  document.getElementById('score-edit-title').textContent='✏️ '+archer.name;
+  let fields=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">`;
+  fields+=`<div class="form-group" style="grid-column:1/-1"><label>TOTAL</label><input type="number" id="se-total" value="${s.total||0}" min="0" style="background:var(--surface2);border:1px solid var(--accent);color:var(--text);padding:10px 12px;border-radius:8px;font-size:16px;font-weight:700;outline:none;width:100%;text-align:center;"></div>`;
+  if(showHalves){
+    fields+=`<div class="form-group"><label>H1</label><input type="number" id="se-h1" value="${s.h1||0}" min="0" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-size:14px;outline:none;width:100%;text-align:center;"></div>`;
+    fields+=`<div class="form-group"><label>H2</label><input type="number" id="se-h2" value="${s.h2||0}" min="0" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-size:14px;outline:none;width:100%;text-align:center;"></div>`;
+  }
+  if(isCustom){
+    fields+=`<div class="form-group"><label>KILLS</label><input type="number" id="se-g1" value="${s.kills||0}" min="0" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-size:14px;outline:none;width:100%;text-align:center;"></div>`;
+    fields+=`<div class="form-group"><label>11s</label><input type="number" id="se-g2" value="${s.elevens||0}" min="0" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-size:14px;outline:none;width:100%;text-align:center;"></div>`;
+    fields+=`<div class="form-group"><label>6s</label><input type="number" id="se-g3" value="${s.sixes||0}" min="0" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-size:14px;outline:none;width:100%;text-align:center;"></div>`;
+  }else{
+    fields+=`<div class="form-group"><label>${labels.g1}</label><input type="number" id="se-g1" value="${s.g1||0}" min="0" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-size:14px;outline:none;width:100%;text-align:center;"></div>`;
+    fields+=`<div class="form-group"><label>${labels.g2}</label><input type="number" id="se-g2" value="${s.g2||0}" min="0" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-size:14px;outline:none;width:100%;text-align:center;"></div>`;
+  }
+  fields+='</div>';
+  document.getElementById('score-edit-body').innerHTML=fields;
+  document.getElementById('score-edit-body').dataset.archerId=archerId;
+  openModal('modal-score-edit');
+  setTimeout(()=>document.getElementById('se-total')?.focus(),100);
+};
+window.saveScoreEdit=async()=>{
+  const archerId=document.getElementById('score-edit-body').dataset.archerId;
+  if(!archerId||!currentCompId)return;
+  const disc=currentDiscipline;
+  const isCustom=disc==='Custom';
+  const showHalves=disc==='Outdoor'||disc==='Indoor';
+  const total=parseInt(document.getElementById('se-total')?.value)||0;
+  const g1=parseInt(document.getElementById('se-g1')?.value)||0;
+  const g2=parseInt(document.getElementById('se-g2')?.value)||0;
+  const g3=parseInt(document.getElementById('se-g3')?.value)||0;
+  const h1=showHalves?(parseInt(document.getElementById('se-h1')?.value)||0):0;
+  const h2=showHalves?(parseInt(document.getElementById('se-h2')?.value)||0):0;
+  const key=String(archerId).replace(/\./g,'_');
+  const existing=getScore(archerId);
+  let updated={...existing,total};
+  if(showHalves){updated.h1=h1;updated.h2=h2;}
+  if(isCustom){updated.kills=g1;updated.elevens=g2;updated.sixes=g3;updated.g1=g1;updated.g2=g2;}
+  else{updated.g1=g1;updated.g2=g2;}
+  try{
+    await setDoc(doc(db,'competitions',currentCompId),{scores:{[key]:updated}},{merge:true});
+    closeModal('modal-score-edit');
+    toast('Score updated ✓','success');
+  }catch(e){toast('Save failed','error');}
+};
 window.renderResults=()=>{
   const container=document.getElementById('results-by-category');
   if(!container)return;
@@ -1354,7 +1407,7 @@ window.renderResults=()=>{
     const ranked=[...cat.archers].sort((a,b)=>b.total-a.total||(b.xs||0)-(a.xs||0)||(b.tens||0)-(a.tens||0));
     const color=BOW_COLORS[cat.bow]||'#555';
     const gLabel=cat.gender==='M'?t('men'):t('women');
-    catCards+=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;break-inside:avoid;margin-bottom:14px;"><div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${color}22;border-bottom:1px solid ${color}44;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:1px;color:${color};">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</span><span style="font-size:11px;color:var(--muted2);margin-left:auto;">${ranked.length} ${t('archers_count')}</span></div><div class="table-wrap"><table><thead><tr><th style="width:36px;text-align:center;"></th><th>${t('name')}</th><th style="text-align:center;">${t('score')}</th>${showHalves?'<th style="text-align:center;">H1</th><th style="text-align:center;">H2</th>':''}<th style="text-align:center;">${isCustomDisc?'Kills':labels.g1}</th><th style="text-align:center;">${isCustomDisc?'11s':labels.g2}</th>${isCustomDisc?'<th style="text-align:center;">6s</th>':''}</tr></thead><tbody>${ranked.map((a,i)=>`<tr style="${i===0?'background:#fffde7;':i===1?'background:#f9f9f9;':i===2?'background:#fff8f0;':''}"><td style="text-align:center;font-size:16px;padding:8px 4px;">${medal(i)}</td><td style="color:#111;font-weight:${i<3?'700':'600'};font-size:${i===0?'14px':'13px'};">${a.name}</td><td style="font-weight:900;font-size:${i===0?'16px':'14px'};color:${i===0?'#c62828':i===1?'#37474f':i===2?'#bf360c':'#111'};text-align:center;">${a.total}</td>${showHalves?`<td style="color:#555;text-align:center;font-size:12px;">${a.h1||'—'}</td><td style="color:#555;text-align:center;font-size:12px;">${a.h2||'—'}</td>`:''}<td style="color:#111;text-align:center;font-size:12px;">${isCustomDisc?(a.kills||0):a.g1||'—'}</td><td style="color:#111;text-align:center;font-size:12px;">${isCustomDisc?(a.elevens||0):a.g2||'—'}</td>${isCustomDisc?`<td style="color:#111;text-align:center;font-size:12px;">${a.sixes||0}</td>`:''}</tr>`).join('')}</tbody></table></div></div>`;
+    catCards+=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;break-inside:avoid;margin-bottom:14px;"><div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${color}22;border-bottom:1px solid ${color}44;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:1px;color:${color};">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</span><span style="font-size:11px;color:var(--muted2);margin-left:auto;">${ranked.length} ${t('archers_count')}</span></div><div class="table-wrap"><table><thead><tr><th style="width:36px;text-align:center;"></th><th>${t('name')}</th><th style="text-align:center;">${t('score')}</th>${showHalves?'<th style="text-align:center;">H1</th><th style="text-align:center;">H2</th>':''}<th style="text-align:center;">${isCustomDisc?'Kills':labels.g1}</th><th style="text-align:center;">${isCustomDisc?'11s':labels.g2}</th>${isCustomDisc?'<th style="text-align:center;">6s</th>':''}</tr></thead><tbody>${ranked.map((a,i)=>`<tr style="${i===0?'background:#fffde7;':i===1?'background:#f9f9f9;':i===2?'background:#fff8f0;':''}"><td style="text-align:center;font-size:16px;padding:8px 4px;">${medal(i)}</td><td style="color:#111;font-weight:${i<3?'700':'600'};font-size:${i===0?'14px':'13px'};">${a.name}</td><td style="font-weight:900;font-size:${i===0?'16px':'14px'};color:${i===0?'#c62828':i===1?'#37474f':i===2?'#bf360c':'#111'};text-align:center;cursor:pointer;" onclick="openScoreEdit('${a.id}')" title="Edit score">${a.total} <span style='font-size:9px;opacity:0.4;'>✏️</span></td>${showHalves?`<td style="color:#555;text-align:center;font-size:12px;">${a.h1||'—'}</td><td style="color:#555;text-align:center;font-size:12px;">${a.h2||'—'}</td>`:''}<td style="color:#111;text-align:center;font-size:12px;">${isCustomDisc?(a.kills||0):a.g1||'—'}</td><td style="color:#111;text-align:center;font-size:12px;">${isCustomDisc?(a.elevens||0):a.g2||'—'}</td>${isCustomDisc?`<td style="color:#111;text-align:center;font-size:12px;">${a.sixes||0}</td>`:''}</tr>`).join('')}</tbody></table></div></div>`;
   });
   const n=sortedCats.length;
   const numCols=n<=1?1:n===2?2:n<=6?3:4;
