@@ -1077,6 +1077,21 @@ window.editTargetNum=async(ti)=>{
 };
 window.archiveCompetition=async()=>{if(!currentCompId)return;const snap=await getDoc(doc(db,'competitions',currentCompId));const name=snap.data()?.name||'this competition';if(!confirm(`Archive "${name}"?\n\nIt will move to History and disappear from the active list.`))return;await setDoc(doc(db,'competitions',currentCompId),{archived:true},{merge:true});currentCompId=null;archers=[];targets=[];sessions=[];scores={};document.getElementById('no-comp-msg').style.display='block';document.getElementById('dash-content').style.display='none';document.getElementById('btn-delete-comp').style.display='none';document.getElementById('btn-archive-comp').style.display='none';updateNavForDiscipline('');await loadCompetitions();document.getElementById('comp-select').value='';toast(t('archived_ok'),'success');};
 window.deleteCompetition=async()=>{if(!currentCompId)return;const snap=await getDoc(doc(db,'competitions',currentCompId));const name=snap.data()?.name||'this competition';if(!confirm(`DELETE "${name}"?\n\nThis cannot be undone.`))return;const{deleteDoc}=await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");await deleteDoc(doc(db,'competitions',currentCompId));currentCompId=null;archers=[];targets=[];sessions=[];scores={};document.getElementById('no-comp-msg').style.display='block';document.getElementById('dash-content').style.display='none';document.getElementById('btn-delete-comp').style.display='none';document.getElementById('btn-archive-comp').style.display='none';updateNavForDiscipline('');await loadCompetitions();document.getElementById('comp-select').value='';toast(t('deleted_ok'),'success');};
+window.deleteTarget=async(ti)=>{
+  if(!confirm('Delete this target and unassign all archers?'))return;
+  const t=targets[ti];
+  ['A','B','C','D'].forEach(s=>{if(t[s]){const a=archers.find(a=>a.id===t[s].id);if(a){a.target=null;a.slot=null;}}});
+  targets.splice(ti,1);
+  await saveTargets();await saveArchers();
+  renderTargets();renderEntries();
+  toast('Target deleted ✓','success');
+};
+window.addArcherToTarget=async(ti)=>{
+  const t=targets[ti];
+  const emptySlot=['A','B','C','D'].find(s=>!t[s]);
+  if(!emptySlot){toast('Target is full','error');return;}
+  openAssignModal(ti,emptySlot);
+};
 window.addManualTarget=async()=>{
   if(!currentCompId){toast(t('select_comp_first'),'error');return;}
   // Find next available target number
@@ -1130,7 +1145,7 @@ const slotEl=`<div class="target-slot ${archer?'filled':'empty'}"
   <div class="slot-label">${s}</div>
   ${archer?`<div class="slot-name" style="cursor:grab;">${archer.name} <span style="font-size:9px;color:var(--accent);">⠿</span></div><div class="slot-cat">${archer.age} · ${archer.gender}</div>`:`<div class="slot-name">Tap to assign</div>`}
 </div>`;return slotEl;}).join('');
-html+=`<div class="target-card"><div class="target-num" style="display:flex;align-items:center;gap:6px;">T${t.num}<button onclick="editTargetNum(${globalTi})" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:12px;padding:2px 4px;border-radius:4px;" title="Change target number">✏️</button></div>${slotsHtml}</div>`;});html+='</div></div>';});grid.innerHTML=html;}
+html+=`<div class="target-card"><div class="target-num" style="display:flex;align-items:center;gap:6px;">T${t.num}<button onclick="editTargetNum(${globalTi})" style="background:none;border:none;color:var(--muted2);cursor:pointer;font-size:12px;padding:2px 4px;border-radius:4px;" title="Change target number">✏️</button><button onclick="addArcherToTarget(${globalTi})" style="background:none;border:none;color:var(--green);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;margin-left:auto;" title="Add archer">➕</button><button onclick="deleteTarget(${globalTi})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;" title="Delete target">🗑</button></div>${slotsHtml}</div>`;});html+='</div></div>';});grid.innerHTML=html;}
 
 window.handleDragStart=(e,ti,slot)=>{
   const archer=targets[ti]?.[slot];
