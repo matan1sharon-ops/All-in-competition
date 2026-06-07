@@ -1273,7 +1273,7 @@ window.renderTargetSetupGrid=()=>{
   const typeColors={Field:'#1565c0','3D':'#4a148c',Kill:'#e53935'};
   let html='';
   for(let i=0;i<count;i++){
-    const t=existing[i]||{type:'Field',arrows:3,kill:10,body:5,miss:0};
+    const t=existing[i]||{type:'Field',arrows:3,kill:10,body:-2,miss:0};
     const color=typeColors[t.type]||'#555';
     html+=`<div class="ts-row ts-type-${t.type.toLowerCase()}" id="ts-row-${i}" style="border-left:4px solid ${color};">
       <span style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--accent);min-width:40px;">T${i+1}</span>
@@ -1295,7 +1295,7 @@ window.renderTargetSetupGrid=()=>{
       </div>
       <div id="ts-kill-${i}" style="display:${t.type==='Kill'?'flex':'none'};gap:8px;flex-wrap:wrap;align-items:flex-end;">
         <div class="form-group" style="min-width:72px;"><label>🎯 Kill</label><input type="number" id="ts-kill-val-${i}" value="${t.kill!==undefined?t.kill:10}" style="background:var(--surface3);border:1px solid var(--green);color:var(--text);padding:8px;border-radius:6px;font-size:14px;font-weight:700;outline:none;width:100%;text-align:center;"></div>
-        <div class="form-group" style="min-width:72px;"><label>💛 Body</label><input type="number" id="ts-body-val-${i}" value="${t.body!==undefined?t.body:5}" style="background:var(--surface3);border:1px solid var(--accent);color:var(--text);padding:8px;border-radius:6px;font-size:14px;font-weight:700;outline:none;width:100%;text-align:center;"></div>
+        <div class="form-group" style="min-width:72px;"><label>💛 Body</label><input type="number" id="ts-body-val-${i}" value="${t.body!==undefined?t.body:-2}" style="background:var(--surface3);border:1px solid var(--accent);color:var(--text);padding:8px;border-radius:6px;font-size:14px;font-weight:700;outline:none;width:100%;text-align:center;"></div>
         <div class="form-group" style="min-width:72px;"><label>❌ Miss</label><input type="number" id="ts-miss-val-${i}" value="${t.miss!==undefined?t.miss:0}" style="background:var(--surface3);border:1px solid var(--red);color:var(--text);padding:8px;border-radius:6px;font-size:14px;font-weight:700;outline:none;width:100%;text-align:center;"></div>
       </div>
       <div id="ts-info-${i}" style="display:${t.type!=='Kill'?'flex':'none'};align-items:center;">
