@@ -1435,7 +1435,8 @@ function buildAdminScorecard(archer){
     const grey='background-image:repeating-linear-gradient(135deg,transparent,transparent 4px,#e0e0e0 4px,#e0e0e0 5px);';
     // Remap ends from shoot order to target order
     const totalEnds=config.length;
-    const startOffset=(archer.target||1)-1;
+    const archerTargetNum=archer.target||parseInt((getTarget(archer).match(/\d+/)||['1'])[0])||1;
+    const startOffset=archerTargetNum-1;
     const targetEnds=Array.from({length:totalEnds},(_,i)=>{const endIdx=(i-startOffset+totalEnds)%totalEnds;return ends[endIdx]||[];});
     let rows='',running=0;
     targetEnds.forEach((ea,i)=>{
