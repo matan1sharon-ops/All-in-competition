@@ -61,6 +61,16 @@ body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--text);min-
   <div class="loading" id="loading">⏳ Loading...</div>
   <div class="error-msg" id="error-msg"></div>
 
+  <!-- Schedule intro screen -->
+  <div id="schedule-section" style="display:none;">
+    <div id="schedule-comp-banner" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:16px;text-align:center;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--accent);margin-bottom:4px;" id="schedule-comp-name"></div>
+      <div style="font-size:12px;color:var(--muted);" id="schedule-comp-info"></div>
+    </div>
+    <div id="schedule-sessions" style="margin-bottom:20px;"></div>
+    <button class="link-btn" onclick="showRegistrationForm()" style="width:100%;padding:16px;font-size:18px;font-weight:900;letter-spacing:1px;">📝 REGISTER →</button>
+  </div>
+
   <div id="form-section" style="display:none;">
     <div class="comp-name" id="comp-display">—</div>
     <div class="form-group">
@@ -301,6 +311,10 @@ function showError(msg){
   document.getElementById('loading').style.display='none';
 }
 
+function showRegistrationForm(){
+  document.getElementById('schedule-section').style.display='none';
+  document.getElementById('form-section').style.display='block';
+}
 async function loadCompetition(){
   document.getElementById('loading').style.display='block';
   applyLang();
@@ -310,7 +324,13 @@ async function loadCompetition(){
     if(!snap.exists()){showError(t('not_found'));return;}
     compData=snap.data();
     document.getElementById('loading').style.display='none';
-    document.getElementById('form-section').style.display='block';
+    // Build and show schedule screen first
+    const sessions=compData.sessions||[];
+    document.getElementById('schedule-comp-name').textContent='🏆 '+compData.name;
+    document.getElementById('schedule-comp-info').textContent=(compData.date||'')+(compData.location?' · '+compData.location:'')+(compData.discipline?' · '+compData.discipline:'');
+    const sessHtml=sessions.length?sessions.map(s=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:var(--accent);min-width:56px;">${s.time||'--:--'}</div><div style="flex:1;"><div style="font-size:14px;font-weight:700;">${s.name}</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">${s.date||''} · ${s.dist||''} · ${s.ends||''} ends × ${s.arrows||''} arrows</div></div></div>`).join(''):`<div style="text-align:center;color:var(--muted);padding:20px;font-size:13px;">No schedule yet.</div>`;
+    document.getElementById('schedule-sessions').innerHTML=sessHtml;
+    document.getElementById('schedule-section').style.display='block';
     document.getElementById('comp-display').textContent=
       `🏆 ${compData.name}`+(compData.date?`  ·  ${compData.date}`:'')+(compData.location?`  ·  ${compData.location}`:'');
     document.title=`${t('sub_title')} — ${compData.name}`;
