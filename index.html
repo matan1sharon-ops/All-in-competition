@@ -291,7 +291,7 @@ tbody td{padding:10px 12px;color:#111;}
   </div>
 </div>
 <!-- MODALS -->
-<div class="modal-backdrop" id="modal-new-comp"><div class="modal"><div class="modal-title">🏆 New Competition</div><div class="form-grid"><div class="form-group" style="grid-column:1/-1"><label data-t="comp_name">Competition Name</label><input type="text" id="nc-name" data-placeholder-t="comp_name_ph" placeholder="e.g. National Championship 2025"></div><div class="form-group"><label data-t="date">Date</label><input type="date" id="nc-date"></div><div class="form-group"><label>Number of Days</label><select id="nc-numdays"><option value="1">1 day</option><option value="2">2 days</option><option value="3">3 days</option><option value="4">4 days</option><option value="5">5 days</option></select></div><div class="form-group"><label data-t="location">Location</label><input type="text" id="nc-location" data-placeholder-t="venue_city" placeholder="Venue / City"></div><div class="form-group"><label data-t="discipline">Discipline</label><select id="nc-discipline" onchange="toggleCustomCategories()"><option>Outdoor</option><option>Indoor</option><option>3D</option><option>Field</option><option>Custom</option></select></div><div id="nc-custom-cats" style="display:none;grid-column:1/-1;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:14px;"><div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">🎯 Allowed Bow Types</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;" id="nc-bows"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="Recurve" checked style="accent-color:var(--accent);"> Recurve</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="Compound" checked style="accent-color:var(--accent);"> Compound</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="Barebow" checked style="accent-color:var(--accent);"> Barebow</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="Traditional" checked style="accent-color:var(--accent);"> Traditional</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="Longbow" checked style="accent-color:var(--accent);"> Longbow</label></div><div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">📅 Allowed Age Groups</div><div style="display:flex;flex-wrap:wrap;gap:8px;" id="nc-ages"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="U12" checked style="accent-color:var(--accent);"> U12</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="U14" checked style="accent-color:var(--accent);"> U14</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="U18" checked style="accent-color:var(--accent);"> U18</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="U21" checked style="accent-color:var(--accent);"> U21</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="Senior" checked style="accent-color:var(--accent);"> Senior</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="Master 50+" checked style="accent-color:var(--accent);"> Master 50+</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="Master 60+" checked style="accent-color:var(--accent);"> Master 60+</label></div></div><div class="form-group"><label data-t="organizer">Organizer</label><input type="text" id="nc-organizer" data-placeholder-t="club_fed" placeholder="Club / Federation"></div><div class="form-group" style="grid-column:1/-1"><label>💳 Payment Link <span style="color:var(--muted2);font-weight:400;">(optional)</span></label><input type="url" id="nc-payment" placeholder="https://..."></div></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-new-comp')" data-t="cancel">Cancel</button><button class="btn btn-primary" onclick="createCompetition()" data-t="create">CREATE →</button></div></div></div>
+<div class="modal-backdrop" id="modal-new-comp"><div class="modal"><div class="modal-title">🏆 New Competition</div><div class="form-grid"><div class="form-group" style="grid-column:1/-1"><label data-t="comp_name">Competition Name</label><input type="text" id="nc-name" data-placeholder-t="comp_name_ph" placeholder="e.g. National Championship 2025"></div><div class="form-group"><label data-t="date">Date</label><input type="date" id="nc-date"></div><div class="form-group"><label>Number of Days</label><select id="nc-numdays"><option value="1">1 day</option><option value="2">2 days</option><option value="3">3 days</option><option value="4">4 days</option><option value="5">5 days</option></select></div><div class="form-group"><label data-t="location">Location</label><input type="text" id="nc-location" data-placeholder-t="venue_city" placeholder="Venue / City"></div><div class="form-group"><label data-t="discipline">Discipline</label><select id="nc-discipline" onchange="toggleCustomCategories()"><option>Outdoor</option><option>Indoor</option><option>3D</option><option>Field</option><option>Custom</option></select></div><div id="nc-3d-format" style="display:none;grid-column:1/-1;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:14px;"><div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">🦌 3D Format</div><div style="display:flex;gap:12px;"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="radio" name="format3d" value="24" checked style="accent-color:var(--accent);"> 24 Targets (Full)</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="radio" name="format3d" value="2x12" style="accent-color:var(--accent);"> 2 × 12 Targets</label></div></div><div id="nc-custom-cats" style="display:none;grid-column:1/-1;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:14px;"><div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">🎯 Allowed Bow Types</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;" id="nc-bows"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="Recurve" checked style="accent-color:var(--accent);"> Recurve</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="Compound" checked style="accent-color:var(--accent);"> Compound</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="Barebow" checked style="accent-color:var(--accent);"> Barebow</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="Traditional" checked style="accent-color:var(--accent);"> Traditional</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="Longbow" checked style="accent-color:var(--accent);"> Longbow</label></div><div style="font-size:11px;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">📅 Allowed Age Groups</div><div style="display:flex;flex-wrap:wrap;gap:8px;" id="nc-ages"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="U12" checked style="accent-color:var(--accent);"> U12</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="U14" checked style="accent-color:var(--accent);"> U14</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="U18" checked style="accent-color:var(--accent);"> U18</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="U21" checked style="accent-color:var(--accent);"> U21</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="Senior" checked style="accent-color:var(--accent);"> Senior</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="Master 50+" checked style="accent-color:var(--accent);"> Master 50+</label><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;"><input type="checkbox" value="Master 60+" checked style="accent-color:var(--accent);"> Master 60+</label></div></div><div class="form-group"><label data-t="organizer">Organizer</label><input type="text" id="nc-organizer" data-placeholder-t="club_fed" placeholder="Club / Federation"></div><div class="form-group" style="grid-column:1/-1"><label>💳 Payment Link <span style="color:var(--muted2);font-weight:400;">(optional)</span></label><input type="url" id="nc-payment" placeholder="https://..."></div></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-new-comp')" data-t="cancel">Cancel</button><button class="btn btn-primary" onclick="createCompetition()" data-t="create">CREATE →</button></div></div></div>
 <div class="modal-backdrop" id="modal-assign"><div class="modal"><div class="modal-title" id="assign-modal-title">Assign Archer</div><div class="form-group"><label>Select Archer</label><select id="assign-archer-select" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px 12px;border-radius:8px;font-family:'Barlow',sans-serif;font-size:14px;outline:none;width:100%;"></select></div><div class="modal-actions"><button class="btn btn-secondary" onclick="closeModal('modal-assign')">Cancel</button><button class="btn btn-danger btn-sm" onclick="removeFromSlot()" id="btn-remove-slot" style="display:none;">Remove</button><button class="btn btn-primary" onclick="confirmAssign()">ASSIGN →</button></div></div></div>
 <div class="modal-backdrop" id="modal-import"><div class="modal"><div class="modal-title">📥 Import Archers (CSV)</div>
 <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px;margin-bottom:12px;font-size:11px;color:var(--muted2);font-family:monospace;line-height:1.8;">FirstName, LastName, Club, <span style="color:var(--accent);">Bow</span>, <span style="color:var(--accent);">Age</span>, <span style="color:var(--accent);">Gender</span><br><span style="color:var(--muted);">Bow: Recurve / Compound / Barebow / Traditional / Longbow</span><br><span style="color:var(--muted);">Age: U12 / U14 / U18 / U21 / Senior / Master 50+ / Master 60+</span><br><span style="color:var(--muted);">Gender: M / F</span></div>
@@ -841,6 +841,8 @@ window.toggleCustomCategories=()=>{
   const disc=document.getElementById('nc-discipline')?.value;
   const el=document.getElementById('nc-custom-cats');
   if(el)el.style.display=disc==='Custom'?'block':'none';
+  const el3d=document.getElementById('nc-3d-format');
+  if(el3d)el3d.style.display=disc==='3D'?'block':'none';
 };
 window.openNewCompModal=()=>{
   document.getElementById('nc-date').value=new Date().toISOString().split('T')[0];
@@ -864,7 +866,8 @@ const allowedAges=discipline==='Custom'?[...document.querySelectorAll('#nc-ages 
 if(discipline==='Custom'&&(!allowedBows||!allowedBows.length)){toast('Select at least one bow type','error');return;}
 if(discipline==='Custom'&&(!allowedAges||!allowedAges.length)){toast('Select at least one age group','error');return;}
 const paymentLink=document.getElementById('nc-payment').value.trim()||null;
-const ref=await addDoc(collection(db,'competitions'),{name,date,numDays,location,discipline,organizer,paymentLink,createdAt:Date.now(),archers:[],targets:[],sessions:[],targetConfig:[],allowedBows:allowedBows||null,allowedAges:allowedAges||null});closeModal('modal-new-comp');toast(t('comp_created'),'success');await loadCompetitions();
+const format3D=discipline==='3D'?(document.querySelector('input[name="format3d"]:checked')?.value||'24'):null;
+const ref=await addDoc(collection(db,'competitions'),{name,date,numDays,location,discipline,organizer,paymentLink,format3D,createdAt:Date.now(),archers:[],targets:[],sessions:[],targetConfig:[],allowedBows:allowedBows||null,allowedAges:allowedAges||null});closeModal('modal-new-comp');toast(t('comp_created'),'success');await loadCompetitions();
 initAdminLang();document.getElementById('comp-select').value=ref.id;selectCompetition(ref.id);};
 
 function updateNavForDiscipline(disc){
@@ -876,7 +879,7 @@ function updateNavForDiscipline(disc){
   if(btnAddT)btnAddT.style.display=(disc==='3D'||disc==='Field'||disc==='Custom')?'inline-flex':'none';
 }
 
-window.selectCompetition=async(id)=>{if(!id){currentCompId=null;document.getElementById('no-comp-msg').style.display='block';document.getElementById('dash-content').style.display='none';return;}currentCompId=id;const snap=await getDoc(doc(db,'competitions',id));if(!snap.exists())return;const data=snap.data();archers=data.archers||[];targets=data.targets||[];sessions=data.sessions||[];scores=data.scores||{};currentDiscipline=data.discipline||'Outdoor';window._targetConfig=data.targetConfig||[];document.getElementById('no-comp-msg').style.display='none';document.getElementById('dash-content').style.display='block';document.getElementById('conn-status').textContent=t('connected');document.getElementById('btn-delete-comp').style.display='inline-block';document.getElementById('btn-archive-comp').style.display='inline-block';updateNavForDiscipline(currentDiscipline);renderAll();onSnapshot(doc(db,'competitions',id),snap=>{const d=snap.data();scores=d.scores||{};archers=d.archers||[];currentDiscipline=d.discipline||'Outdoor';window._targetConfig=d.targetConfig||[];window._scorecards=d.scorecards||{};updateNavForDiscipline(currentDiscipline);const newElimJson=JSON.stringify(d.elimination||{});const elimChanged=newElimJson!==window._lastElimJson;window._lastElimJson=newElimJson;window._elimData=d.elimination||{};const onElimPanel=document.getElementById('panel-elimination')?.classList.contains('active');const onResultsPanel=document.getElementById('panel-results')?.classList.contains('active');renderResults();renderDashboard();renderScorecards();if(onElimPanel){document.getElementById('d-scored').textContent=archers.filter(a=>(getScore(a.id)?.total||0)>0).length;}if(elimChanged&&onElimPanel){renderElimContent();}});};
+window.selectCompetition=async(id)=>{if(!id){currentCompId=null;document.getElementById('no-comp-msg').style.display='block';document.getElementById('dash-content').style.display='none';return;}currentCompId=id;const snap=await getDoc(doc(db,'competitions',id));if(!snap.exists())return;const data=snap.data();archers=data.archers||[];targets=data.targets||[];sessions=data.sessions||[];scores=data.scores||{};currentDiscipline=data.discipline||'Outdoor';window._targetConfig=data.targetConfig||[];window._compData=data;document.getElementById('no-comp-msg').style.display='none';document.getElementById('dash-content').style.display='block';document.getElementById('conn-status').textContent=t('connected');document.getElementById('btn-delete-comp').style.display='inline-block';document.getElementById('btn-archive-comp').style.display='inline-block';updateNavForDiscipline(currentDiscipline);renderAll();onSnapshot(doc(db,'competitions',id),snap=>{const d=snap.data();scores=d.scores||{};archers=d.archers||[];currentDiscipline=d.discipline||'Outdoor';window._targetConfig=d.targetConfig||[];window._scorecards=d.scorecards||{};updateNavForDiscipline(currentDiscipline);const newElimJson=JSON.stringify(d.elimination||{});const elimChanged=newElimJson!==window._lastElimJson;window._lastElimJson=newElimJson;window._elimData=d.elimination||{};const onElimPanel=document.getElementById('panel-elimination')?.classList.contains('active');const onResultsPanel=document.getElementById('panel-results')?.classList.contains('active');renderResults();renderDashboard();renderScorecards();if(onElimPanel){document.getElementById('d-scored').textContent=archers.filter(a=>(getScore(a.id)?.total||0)>0).length;}if(elimChanged&&onElimPanel){renderElimContent();}});};
 
 function getScore(archerId){const key=String(archerId).replace(/\./g,'_');return scores[key]||scores[String(archerId)]||{};}
 function getDistanceLabel(bow,discipline){if(discipline==='Outdoor'){if(bow==='Recurve')return '70m / 60m / 30m';if(bow==='Compound')return '50m';if(bow==='Barebow')return '50m';if(bow==='Trad/Longbow')return '30m';}return '';}
@@ -1631,6 +1634,7 @@ window.printBlankScorecards=()=>{
   const disc=currentDiscipline;
   const compInfo=document.getElementById('comp-info-grid');
   const compName=document.querySelector('#comp-info-grid input')?.value||'Competition';
+  const format3D=window._compData?.format3D||'24';
 
   // Build styles
   const baseUrl=window.location.href.replace(/\/[^/]*$|\?.*$/,'').replace('admin.html','');
@@ -1711,6 +1715,7 @@ window.printBlankScorecards=()=>{
     });
   } else if(disc==='3D'||disc==='Field'){
     const arrows=disc==='3D'?2:3;
+    const is2x12=disc==='3D'&&format3D==='2x12';
     const stations=24;
     // One page per target with its 2 archers + QR
     targets.forEach(t=>{
@@ -1724,6 +1729,31 @@ window.printBlankScorecards=()=>{
       // Split into groups of 2
       const pairs=[];
       for(let pi=0;pi<filledArchers.length;pi+=2)pairs.push([filledArchers[pi]||null,filledArchers[pi+1]||null]);
+      if(is2x12){
+        // 2×12 format: Outdoor-style 2x2 grid, 2 pages per target
+        const allArchers=['A','B','C','D'].map(s=>t[s]?{...t[s],targetNum:t.num,slot:s}:null);
+        while(allArchers.length<4)allArchers.push(null);
+        [0,1].forEach(halfIdx=>{
+          const startStn=halfIdx*12+1;
+          const endStn=(halfIdx+1)*12;
+          const stationRange=Array.from({length:12},(_,i)=>startStn+i);
+          const blocks=allArchers.map(archer=>{
+            if(!archer)return`<div class="archer-block" style="background:#f9f9f9;"></div>`;
+            return build3DFieldBlock(archer,12,arrows,disc,stationRange);
+          });
+          pages+=`<div class="page">
+            <div class="page-header">
+              <div><div class="page-title">${compName}</div><div class="page-sub">${disc} · Scoring: 11/10/8/5/0</div></div>
+              <div style="text-align:right;"><div class="page-title">TARGET ${t.num}</div><div class="page-sub">Stations ${startStn}–${endStn} · Page ${halfIdx+1} of 2</div></div>
+            </div>
+            <div class="qr-wrap" style="margin-bottom:4px;">
+              <div class="qr-placeholder" data-url="${scoringUrl}?comp=${currentCompId}&target=${t.num}"></div>
+              <div class="qr-info"><strong>Scan to score</strong><br>TARGET ${t.num}</div>
+            </div>
+            <div class="grid-2x2">${blocks.join('')}</div>
+          </div>`;
+        });
+      } else {
       pairs.forEach((pair,pi)=>{
         if(!pair.some(a=>a))return;
         while(pair.length<2)pair.push(null);
@@ -1743,6 +1773,7 @@ window.printBlankScorecards=()=>{
           <div class="grid-sidebyside">${blocks.join('')}</div>
         </div>`;
       });
+      }
     });
   } else if(disc==='Custom'){
     const config=window._targetConfig||[];
@@ -1845,14 +1876,13 @@ window.printBlankScorecards=()=>{
     </div>`;
   }
 
-  function build3DFieldBlock(archer,stations,arrows,disc){
+  function build3DFieldBlock(archer,stations,arrows,disc,stationRange){
     const scoring=disc==='3D'?'11/10/8/5/0':'6/5/4/3/2/1/0';
     // Build station order starting from archer's target, wrapping around
     const startNum=archer.targetNum||1;
-    const stationOrder=[];
-    for(let i=0;i<stations;i++){
-      stationOrder.push(((startNum-1+i)%stations)+1);
-    }
+    // If stationRange provided (2x12), use it directly; otherwise wrap around
+    const stationOrder=stationRange||[];
+    if(!stationRange){for(let i=0;i<stations;i++){stationOrder.push(((startNum-1+i)%stations)+1);}}
     let rows='';
     stationOrder.forEach((stn,idx)=>{
       const bg=idx%2===0?'':'background:#fafafa;';
