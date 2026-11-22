@@ -353,8 +353,16 @@
       }
 
       /* ── sequence of one end ── */
-      const endLabel = (e) =>
-        e <= settings.practiceEnds ? 'P' + e : String(e - settings.practiceEnds);
+      // Practice ends are not counted as ends: "PRACTICE ROUND" (numbered if there is more than one)
+      const isPractice = (e) => e <= settings.practiceEnds;
+      const endLabel = (e) => {
+        if (isPractice(e))
+          return settings.practiceEnds > 1
+            ? `PRACTICE ROUND ${e}/${settings.practiceEnds}`
+            : 'PRACTICE ROUND';
+        return `END ${e - settings.practiceEnds} / ${settings.ends}`;
+      };
+      const startLabel = (e) => (isPractice(e) ? endLabel(e) : `END ${e - settings.practiceEnds}`);
       const totalEnds = () => settings.practiceEnds + settings.ends;
       function groupsForEnd(e) {
         if (settings.lines === 'AB') return ['AB'];
@@ -447,7 +455,7 @@
           time = '--:--',
           phase = '',
           group = '';
-        const endTxt = `END ${endLabel(c.end)} / ${settings.ends}${c.end <= settings.practiceEnds ? ' (PRACTICE)' : ''}`;
+        const endTxt = endLabel(c.end);
         if (c.kind === 'idle') {
           color = 'c-idle';
           phase = 'WAITING';
@@ -523,10 +531,10 @@
             .join(' · ');
           const k = v.c.kind;
           const main = document.getElementById('btn-main');
-          if (k === 'idle' || k === 'ready') main.textContent = `▶ START END ${endLabel(v.c.end)}`;
+          if (k === 'idle' || k === 'ready') main.textContent = `▶ START ${startLabel(v.c.end)}`;
           else if (k === 'collect')
             main.textContent =
-              v.c.end < totalEnds() ? `▶ START END ${endLabel(v.c.end + 1)}` : '✓ ALL ENDS DONE';
+              v.c.end < totalEnds() ? `▶ START ${startLabel(v.c.end + 1)}` : '✓ ALL ENDS DONE';
           else if (k === 'running') main.textContent = '⏭ NEXT (END PHASE NOW)';
           else main.textContent = '▶ RESUME';
           document.getElementById('btn-pause').textContent =
@@ -638,10 +646,7 @@
         if (!sel) return;
         const cur = sel.value;
         sel.innerHTML = Array.from({ length: totalEnds() }, (_, i) => i + 1)
-          .map(
-            (e) =>
-              `<option value="${e}">End ${endLabel(e)}${e <= settings.practiceEnds ? ' (practice)' : ''}</option>`,
-          )
+          .map((e) => `<option value="${e}">${endLabel(e)}</option>`)
           .join('');
         if (cur) sel.value = cur;
       }
