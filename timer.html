@@ -243,7 +243,7 @@
       </div>
       <div class="d-main">
         <div id="d-group"></div>
-        <div id="d-time">--:--</div>
+        <div id="d-time">--</div>
         <div id="d-phase"></div>
       </div>
       <div class="d-bottom">
@@ -258,7 +258,7 @@
     <div id="control">
       <div class="c-status" id="c-status">
         <div id="c-info">—</div>
-        <div id="c-time">--:--</div>
+        <div id="c-time">--</div>
         <div id="c-sub" style="font-size: 13px; opacity: 0.8"></div>
       </div>
       <div class="c-grid">
@@ -459,14 +459,12 @@
       /* ── render loop: draw + play beeps when entering a new phase ── */
       let lastKey = null,
         lastManualBeep = undefined;
-      const fmt = (sec) => {
-        const s = Math.max(0, Math.ceil(sec));
-        return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
-      };
+      // time shown in whole seconds (e.g. 152), not m:ss
+      const fmt = (sec) => String(Math.max(0, Math.ceil(sec)));
       function view() {
         const c = current();
         let color = 'c-red',
-          time = '--:--',
+          time = '--',
           phase = '',
           group = '';
         const endTxt = endLabel(c.end);
@@ -478,7 +476,7 @@
           time = fmt(settings.callupSec);
         } else if (c.kind === 'collect') {
           phase = 'COLLECT ARROWS';
-          time = '0:00';
+          time = '0';
         } else {
           group = c.seg.group;
           time = fmt(c.remaining);
