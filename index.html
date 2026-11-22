@@ -5010,27 +5010,11 @@
           }
           const data = await generateBracketForCategory(catKey, maxBracket);
           if (!data) continue; // Auto-assign targets to matches
-          const [bow, age, gender] = catKey.split('||');
-          const catTargetNums = [
-            ...new Set(
-              archers
-                .filter((a) => a.bow === bow && a.age === age && a.gender === gender && a.target)
-                .map((a) => a.target),
-            ),
-          ].sort((a, b) => a - b);
-          const allTargetNums = targets.map((t) => t.num).sort((a, b) => a - b);
-          const assignTargets = catTargetNums.length > 0 ? catTargetNums : allTargetNums;
-          if (assignTargets.length > 0) {
-            let ti = 0;
-            ['R1', 'QF', 'SF', 'F', 'B'].forEach((rk) => {
-              (data.rounds[rk] || []).forEach((match) => {
-                if (!match.isBye) {
-                  match.targetNum = assignTargets[ti % assignTargets.length];
-                  ti++;
-                }
-              });
-            });
-          }
+          [['R1'], ['QF'], ['SF'], ['F', 'B']].forEach((rks) => {
+            const ms = rks.flatMap((rk) => data.rounds[rk] || []).filter((m) => !m.isBye);
+            const tn = elimRoundTargets(catKey, ms.length);
+            ms.forEach((m, i) => (m.targetNum = tn[i]));
+          });
           newElim[catKey] = data;
           generated++;
         }
@@ -5398,6 +5382,23 @@
         selectedWinner = null;
         toast(t('result_saved'), 'success');
       };
+      // Targets for n matches shot at the same time in one category: all different.
+      // Starts with the targets the category used in qualification, then continues to the next numbers.
+      function elimRoundTargets(catKey, n) {
+        const [bow, age, gender] = catKey.split('||');
+        let base = [
+          ...new Set(
+            archers
+              .filter((a) => a.bow === bow && a.age === age && a.gender === gender && a.target)
+              .map((a) => Number(a.target)),
+          ),
+        ].sort((a, b) => a - b);
+        if (!base.length) base = targets.map((t) => Number(t.num)).sort((a, b) => a - b);
+        const out = base.slice(0, n);
+        let next = (base.length ? base[base.length - 1] : 0) + 1;
+        while (out.length < n) out.push(next++);
+        return out;
+      }
       window.advanceRound = async (catKey) => {
         const data = (window._elimData || {})[catKey];
         if (!data) return;
@@ -5425,20 +5426,6 @@
         const losers = (data.rounds[lastRound] || []).map((m) =>
           m.winnerChoice === m.archer1.id ? m.archer2 : m.archer1,
         );
-        // Targets for the new round: same as bracket generation, cycle through this category's targets
-        const [cBow, cAge, cGender] = catKey.split('||');
-        const catTargetNums = [
-          ...new Set(
-            archers
-              .filter((a) => a.bow === cBow && a.age === cAge && a.gender === cGender && a.target)
-              .map((a) => a.target),
-          ),
-        ].sort((a, b) => a - b);
-        const roundTargets = catTargetNums.length
-          ? catTargetNums
-          : targets.map((t) => t.num).sort((a, b) => a - b);
-        const targetFor = (i) =>
-          roundTargets.length ? roundTargets[i % roundTargets.length] : null;
         let newMatches = [];
         if (finalNext || lastRound === 'SF') {
           newMatches = [
@@ -5455,7 +5442,7 @@
               tiebreak1: null,
               tiebreak2: null,
               winnerChoice: null,
-              targetNum: targetFor(0),
+              targetNum: elimRoundTargets(catKey, 2)[0],
             },
           ];
           const bronzeMatches = [
@@ -5472,7 +5459,7 @@
               tiebreak1: null,
               tiebreak2: null,
               winnerChoice: null,
-              targetNum: targetFor(1),
+              targetNum: elimRoundTargets(catKey, 2)[1],
             },
           ];
           data.rounds['F'] = newMatches;
@@ -5493,7 +5480,7 @@
               tiebreak1: null,
               tiebreak2: null,
               winnerChoice: null,
-              targetNum: targetFor(i / 2),
+              targetNum: elimRoundTargets(catKey, Math.ceil(winners.length / 2))[i / 2],
             });
           }
           data.rounds[nextRound] = newMatches;
