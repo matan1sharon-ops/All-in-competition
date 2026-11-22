@@ -511,6 +511,8 @@
       const firebaseConfig = location.hostname.endsWith('github.io') ? liveConfig : devConfig;
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
+      // Links point to the same place this page is running from (live site, test site or your computer)
+      const APP_BASE = new URL('.', location.href).href.replace(/\/$/, '');
 
       const params = new URLSearchParams(window.location.search);
       const compId = params.get('comp');
@@ -841,7 +843,7 @@
             .join('');
 
           // Set links
-          const base = 'https://matan1sharon-ops.github.io/All-in-competition';
+          const base = APP_BASE;
           document.getElementById('link-scoring').href = `${base}/scoring.html?comp=${compId}`;
           document.getElementById('link-results').href = `${base}/results.html?comp=${compId}`;
           // Payment link

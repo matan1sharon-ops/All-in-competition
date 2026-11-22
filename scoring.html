@@ -1333,6 +1333,8 @@
       const firebaseConfig = location.hostname.endsWith('github.io') ? liveConfig : devConfig;
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
+      // Links point to the same place this page is running from (live site, test site or your computer)
+      const APP_BASE = new URL('.', location.href).href.replace(/\/$/, '');
       /* ── DATA LAYOUT ──
          competitions/{id}            settings (name, date, discipline, targets, sessions, targetConfig…)
            archers/{archerId}         public archer info
@@ -1852,13 +1854,10 @@
       window.openResults = () => {
         const id = document.getElementById('results-comp-select').value;
         if (!id) return;
-        window.open(
-          'https://matan1sharon-ops.github.io/All-in-competition/results.html?comp=' + id,
-          '_blank',
-        );
+        window.open(APP_BASE + '/results.html?comp=' + id, '_blank');
       };
       window.openHistory = () => {
-        window.open('https://matan1sharon-ops.github.io/All-in-competition/history.html', '_blank');
+        window.open(APP_BASE + '/history.html', '_blank');
       };
       /* ── PWA ── */
       let deferredInstallPrompt = null;
