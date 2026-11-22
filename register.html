@@ -484,7 +484,11 @@
         getFirestore,
         doc,
         getDoc,
-        setDoc,
+        getDocs,
+        collection,
+        query,
+        where,
+        writeBatch,
       } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
       const liveConfig = {
@@ -768,39 +772,34 @@
         btn.textContent = t('registering');
 
         try {
-          const snap = await getDoc(doc(db, 'competitions', compId));
-          const data = snap.data();
-          const archers = data.archers || [];
-
-          const exists = archers.find(
-            (a) =>
-              a.fname?.toLowerCase() === fname.toLowerCase() &&
-              a.lname?.toLowerCase() === lname.toLowerCase(),
-          );
-          if (exists) {
+          const archersCol = collection(db, 'competitions', compId, 'archers');
+          const nameKey = `${fname} ${lname}`.toLowerCase();
+          const dup = await getDocs(query(archersCol, where('nameKey', '==', nameKey)));
+          if (!dup.empty) {
             showError(`${fname} ${lname} ${t('already_registered')}`);
             btn.disabled = false;
             btn.textContent = t('register_btn');
             return;
           }
 
-          archers.push({
-            id: String(Date.now()),
+          // One archer doc + one contact doc (same ID), saved together
+          const archerRef = doc(archersCol);
+          const batch = writeBatch(db);
+          batch.set(archerRef, {
             fname,
             lname,
             name: `${fname} ${lname}`,
+            nameKey,
             club,
             bow,
             age,
             gender,
-            phone,
-            email,
             target: null,
             slot: null,
             registeredAt: new Date().toISOString(),
           });
-
-          await setDoc(doc(db, 'competitions', compId), { archers }, { merge: true });
+          batch.set(doc(db, 'competitions', compId, 'contacts', archerRef.id), { phone, email });
+          await batch.commit();
 
           document.getElementById('form-section').style.display = 'none';
           document.getElementById('success-screen').style.display = 'block';

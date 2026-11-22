@@ -1837,6 +1837,10 @@
         getDoc,
         getDocs,
         onSnapshot,
+        writeBatch,
+        deleteDoc,
+        query,
+        where,
       } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
       const liveConfig = {
         apiKey: 'AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To',
@@ -1858,6 +1862,131 @@
       const firebaseConfig = location.hostname.endsWith('github.io') ? liveConfig : devConfig;
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
+      /* ── DATA LAYOUT ──
+         competitions/{id}            settings (name, date, discipline, targets, sessions, targetConfig…)
+           archers/{archerId}         public archer info
+           contacts/{archerId}        phone, email (admin only)
+           scores/{archerId}          qualification score
+           brackets/{catKey}          elimination bracket settings + roundCounts
+           matches/{catKey~round~i}   one elimination match
+         Pages rebuild the old in-memory shape ({archers:[], scores:{}, elimination:{}}) from these. */
+      const compRef = (id) => doc(db, 'competitions', id);
+      const sub = (id, name) => collection(db, 'competitions', id, name);
+      const safeId = (s) => encodeURIComponent(String(s));
+      const matchDocId = (catKey, roundKey, idx) => safeId(catKey) + '~' + roundKey + '~' + idx;
+      const archerSortKey = (a) =>
+        a.registeredAt ? Date.parse(a.registeredAt) : Number(a.id) || 0;
+      function buildArchers(archerDocs, contactDocs) {
+        const contacts = {};
+        (contactDocs || []).forEach((d) => (contacts[d.id] = d.data()));
+        return archerDocs
+          .map((d) => ({ ...d.data(), ...(contacts[d.id] || {}), id: d.id }))
+          .sort((a, b) => archerSortKey(a) - archerSortKey(b));
+      }
+      function buildScores(scoreDocs) {
+        const s = {};
+        scoreDocs.forEach((d) => (s[d.id] = d.data()));
+        return s;
+      }
+      function buildElimination(bracketDocs, matchDocs) {
+        const elim = {};
+        bracketDocs.forEach((d) => {
+          const { catKey, roundCounts, ...meta } = d.data();
+          const rounds = {};
+          Object.entries(roundCounts || {}).forEach(
+            ([rk, n]) => (rounds[rk] = new Array(n).fill(undefined)),
+          );
+          elim[catKey] = { ...meta, rounds };
+        });
+        matchDocs.forEach((d) => {
+          const { catKey, roundKey, idx, match } = d.data();
+          const r = elim[catKey]?.rounds[roundKey];
+          if (r && idx < r.length) r[idx] = match;
+        });
+        // A bracket whose matches haven't all arrived yet is left out until they do
+        Object.keys(elim).forEach((ck) => {
+          if (Object.values(elim[ck].rounds).some((r) => r.some((m) => m === undefined)))
+            delete elim[ck];
+        });
+        return elim;
+      }
+      function assembleComp(compSnap, archerDocs, contactDocs, scoreDocs, bracketDocs, matchDocs) {
+        return {
+          ...compSnap.data(),
+          archers: buildArchers(archerDocs, contactDocs),
+          scores: buildScores(scoreDocs),
+          elimination: buildElimination(bracketDocs, matchDocs),
+        };
+      }
+      // One-time read of a whole competition
+      async function loadComp(id, withContacts = false) {
+        const [c, a, ct, s, b, m] = await Promise.all([
+          getDoc(compRef(id)),
+          getDocs(sub(id, 'archers')),
+          withContacts ? getDocs(sub(id, 'contacts')) : Promise.resolve({ docs: [] }),
+          getDocs(sub(id, 'scores')),
+          getDocs(sub(id, 'brackets')),
+          getDocs(sub(id, 'matches')),
+        ]);
+        if (!c.exists()) return null;
+        return assembleComp(c, a.docs, ct.docs, s.docs, b.docs, m.docs);
+      }
+      // Live listener on a whole competition; returns an unsubscribe function
+      function watchComp(id, withContacts, onData) {
+        const parts = {
+          comp: null,
+          archers: null,
+          contacts: withContacts ? null : [],
+          scores: null,
+          brackets: null,
+          matches: null,
+        };
+        const emit = () => {
+          if (Object.values(parts).some((v) => v === null)) return;
+          if (!parts.comp.exists()) return onData(null);
+          onData(
+            assembleComp(
+              parts.comp,
+              parts.archers,
+              parts.contacts,
+              parts.scores,
+              parts.brackets,
+              parts.matches,
+            ),
+          );
+        };
+        const names = ['archers', 'scores', 'brackets', 'matches'];
+        if (withContacts) names.push('contacts');
+        const unsubs = [
+          onSnapshot(compRef(id), (s) => {
+            parts.comp = s;
+            emit();
+          }),
+          ...names.map((name) =>
+            onSnapshot(sub(id, name), (s) => {
+              parts[name] = s.docs;
+              emit();
+            }),
+          ),
+        ];
+        return () => unsubs.forEach((u) => u());
+      }
+      // Run write operations in batches (Firestore max 500 per batch)
+      async function commitOps(ops) {
+        for (let i = 0; i < ops.length; i += 400) {
+          const b = writeBatch(db);
+          ops.slice(i, i + 400).forEach((op) => op(b));
+          await b.commit();
+        }
+      }
+      // Delete a competition and everything under it
+      async function deleteCompDeep(id) {
+        for (const name of ['archers', 'contacts', 'scores', 'brackets', 'matches']) {
+          const snap = await getDocs(sub(id, name));
+          await commitOps(snap.docs.map((d) => (b) => b.delete(d.ref)));
+        }
+        await deleteDoc(compRef(id));
+      }
       let currentCompId = null,
         currentDiscipline = 'Outdoor',
         archers = [],
@@ -2407,9 +2536,138 @@
         if (currentDiscipline === 'Custom') return { g1: 'Kills', g2: '11s' };
         return { g1: 'X', g2: '10' };
       }
+      // Last-saved copy of every archer / bracket / match, so saves only write what changed
+      let savedArcherJson = {},
+        savedBracketJson = {},
+        savedMatchJson = {},
+        unwatchComp = null;
+      // Stable JSON (sorted keys, no nameKey) to tell whether an archer/match really changed
+      function canon(v) {
+        const sortKeys = (x) =>
+          Array.isArray(x)
+            ? x.map(sortKeys)
+            : x && typeof x === 'object'
+              ? Object.fromEntries(
+                  Object.keys(x)
+                    .filter((k) => k !== 'nameKey')
+                    .sort()
+                    .map((k) => [k, sortKeys(x[k])]),
+                )
+              : x;
+        return JSON.stringify(sortKeys(v === undefined ? null : v));
+      }
       async function saveArchers() {
-        if (currentCompId)
-          await setDoc(doc(db, 'competitions', currentCompId), { archers }, { merge: true });
+        if (!currentCompId) return;
+        const id = currentCompId;
+        const ops = [];
+        const ids = new Set();
+        archers.forEach((a) => {
+          const aid = String(a.id);
+          ids.add(aid);
+          const json = canon(a);
+          if (savedArcherJson[aid] === json) return;
+          const { id: _id, phone, email, ...pub } = a;
+          pub.nameKey = `${a.fname || ''} ${a.lname || ''}`.trim().toLowerCase();
+          ops.push((b) => b.set(doc(sub(id, 'archers'), aid), pub));
+          ops.push((b) =>
+            b.set(doc(sub(id, 'contacts'), aid), { phone: phone || '', email: email || '' }),
+          );
+          savedArcherJson[aid] = json;
+        });
+        Object.keys(savedArcherJson).forEach((aid) => {
+          if (ids.has(aid)) return;
+          ops.push((b) => b.delete(doc(sub(id, 'archers'), aid)));
+          ops.push((b) => b.delete(doc(sub(id, 'contacts'), aid)));
+          delete savedArcherJson[aid];
+        });
+        await commitOps(ops);
+      }
+      // Elimination brackets: settings in brackets/{catKey}, each match in matches/{catKey~round~i}
+      function bracketMeta(e) {
+        const { rounds, ...meta } = e;
+        const roundCounts = {};
+        Object.entries(rounds || {}).forEach(([rk, arr]) => (roundCounts[rk] = (arr || []).length));
+        return { ...meta, roundCounts };
+      }
+      function recordBracket(ck, e) {
+        const prefix = safeId(ck) + '~';
+        Object.keys(savedMatchJson).forEach((mid) => {
+          if (mid.startsWith(prefix)) delete savedMatchJson[mid];
+        });
+        savedBracketJson[ck] = canon(bracketMeta(e));
+        Object.entries(e.rounds || {}).forEach(([rk, arr]) =>
+          (arr || []).forEach((m, i) => (savedMatchJson[matchDocId(ck, rk, i)] = canon(m))),
+        );
+      }
+      // Take archers from a live update, but keep local changes that aren't saved yet
+      function mergeIncomingArchers(incoming) {
+        const local = new Map(archers.map((a) => [String(a.id), a]));
+        const isDirty = (id) => local.has(id) && canon(local.get(id)) !== savedArcherJson[id];
+        const result = [];
+        const newSaved = {};
+        const seen = new Set();
+        incoming.forEach((a) => {
+          const id = String(a.id);
+          seen.add(id);
+          newSaved[id] = canon(a);
+          if (id in savedArcherJson && !local.has(id)) return; // deleted here, not saved yet
+          result.push(isDirty(id) ? local.get(id) : a);
+        });
+        archers.forEach((a) => {
+          const id = String(a.id);
+          if (seen.has(id)) return;
+          // added here and not saved yet, or changed here while deleted elsewhere
+          if (!(id in savedArcherJson) || isDirty(id)) result.push(a);
+        });
+        savedArcherJson = newSaved;
+        return result;
+      }
+      function setBaselines(data) {
+        data.archers = mergeIncomingArchers(data.archers);
+        savedBracketJson = {};
+        savedMatchJson = {};
+        Object.entries(data.elimination).forEach(([ck, e]) => recordBracket(ck, e));
+      }
+      // Save the given brackets ({catKey: bracketData}); only changed docs are written
+      async function saveBrackets(elimPart) {
+        const id = currentCompId;
+        const ops = [];
+        Object.entries(elimPart).forEach(([ck, e]) => {
+          const meta = bracketMeta(e);
+          if (savedBracketJson[ck] !== canon(meta))
+            ops.push((b) => b.set(doc(sub(id, 'brackets'), safeId(ck)), { ...meta, catKey: ck }));
+          const keep = new Set();
+          Object.entries(e.rounds || {}).forEach(([rk, arr]) =>
+            (arr || []).forEach((m, i) => {
+              const mid = matchDocId(ck, rk, i);
+              keep.add(mid);
+              if (savedMatchJson[mid] !== canon(m))
+                ops.push((b) =>
+                  b.set(doc(sub(id, 'matches'), mid), {
+                    catKey: ck,
+                    roundKey: rk,
+                    idx: i,
+                    match: m,
+                  }),
+                );
+            }),
+          );
+          const prefix = safeId(ck) + '~';
+          Object.keys(savedMatchJson).forEach((mid) => {
+            if (mid.startsWith(prefix) && !keep.has(mid))
+              ops.push((b) => b.delete(doc(sub(id, 'matches'), mid)));
+          });
+        });
+        await commitOps(ops);
+        Object.entries(elimPart).forEach(([ck, e]) => recordBracket(ck, e));
+      }
+      async function deleteBracket(ck) {
+        const id = currentCompId;
+        const ms = await getDocs(query(sub(id, 'matches'), where('catKey', '==', ck)));
+        await commitOps([
+          (b) => b.delete(doc(sub(id, 'brackets'), safeId(ck))),
+          ...ms.docs.map((d) => (b) => b.delete(d.ref)),
+        ]);
       }
       async function saveTargets() {
         if (currentCompId)
@@ -2522,7 +2780,6 @@
           paymentLink,
           format3D,
           createdAt: Date.now(),
-          archers: [],
           targets: [],
           sessions: [],
           targetConfig: [],
@@ -2558,9 +2815,21 @@
           return;
         }
         currentCompId = id;
-        const snap = await getDoc(doc(db, 'competitions', id));
-        if (!snap.exists()) return;
-        const data = snap.data();
+        if (unwatchComp) unwatchComp();
+        archers = [];
+        savedArcherJson = {};
+        let first = true;
+        unwatchComp = watchComp(id, true, (d) => {
+          if (!d || id !== currentCompId) return;
+          setBaselines(d);
+          if (first) {
+            first = false;
+            onCompLoaded(d);
+          }
+          onCompUpdate(d);
+        });
+      };
+      function onCompLoaded(data) {
         archers = data.archers || [];
         targets = data.targets || [];
         sessions = data.sessions || [];
@@ -2575,37 +2844,36 @@
         document.getElementById('btn-archive-comp').style.display = 'inline-block';
         updateNavForDiscipline(currentDiscipline);
         renderAll();
-        onSnapshot(doc(db, 'competitions', id), (snap) => {
-          const d = snap.data();
-          scores = d.scores || {};
-          archers = d.archers || [];
-          currentDiscipline = d.discipline || 'Outdoor';
-          window._targetConfig = d.targetConfig || [];
-          window._scorecards = d.scorecards || {};
-          updateNavForDiscipline(currentDiscipline);
-          const newElimJson = JSON.stringify(d.elimination || {});
-          const elimChanged = newElimJson !== window._lastElimJson;
-          window._lastElimJson = newElimJson;
-          window._elimData = d.elimination || {};
-          const onElimPanel = document
-            .getElementById('panel-elimination')
-            ?.classList.contains('active');
-          const onResultsPanel = document
-            .getElementById('panel-results')
-            ?.classList.contains('active');
-          renderResults();
-          renderDashboard();
-          renderScorecards();
-          if (onElimPanel) {
-            document.getElementById('d-scored').textContent = archers.filter(
-              (a) => (getScore(a.id)?.total || 0) > 0,
-            ).length;
-          }
-          if (elimChanged && onElimPanel) {
-            renderElimContent();
-          }
-        });
-      };
+      }
+      function onCompUpdate(d) {
+        scores = d.scores || {};
+        archers = d.archers || [];
+        currentDiscipline = d.discipline || 'Outdoor';
+        window._targetConfig = d.targetConfig || [];
+        window._scorecards = d.scorecards || {};
+        updateNavForDiscipline(currentDiscipline);
+        const newElimJson = JSON.stringify(d.elimination || {});
+        const elimChanged = newElimJson !== window._lastElimJson;
+        window._lastElimJson = newElimJson;
+        window._elimData = d.elimination || {};
+        const onElimPanel = document
+          .getElementById('panel-elimination')
+          ?.classList.contains('active');
+        const onResultsPanel = document
+          .getElementById('panel-results')
+          ?.classList.contains('active');
+        renderResults();
+        renderDashboard();
+        renderScorecards();
+        if (onElimPanel) {
+          document.getElementById('d-scored').textContent = archers.filter(
+            (a) => (getScore(a.id)?.total || 0) > 0,
+          ).length;
+        }
+        if (elimChanged && onElimPanel) {
+          renderElimContent();
+        }
+      }
 
       function getScore(archerId) {
         const key = String(archerId).replace(/\./g, '_');
@@ -3145,6 +3413,8 @@
         )
           return;
         await setDoc(doc(db, 'competitions', currentCompId), { archived: true }, { merge: true });
+        if (unwatchComp) unwatchComp();
+        unwatchComp = null;
         currentCompId = null;
         archers = [];
         targets = [];
@@ -3164,9 +3434,9 @@
         const snap = await getDoc(doc(db, 'competitions', currentCompId));
         const name = snap.data()?.name || 'this competition';
         if (!confirm(`DELETE "${name}"?\n\nThis cannot be undone.`)) return;
-        const { deleteDoc } =
-          await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-        await deleteDoc(doc(db, 'competitions', currentCompId));
+        if (unwatchComp) unwatchComp();
+        unwatchComp = null;
+        await deleteCompDeep(currentCompId);
         currentCompId = null;
         archers = [];
         targets = [];
@@ -3878,11 +4148,7 @@
           updated.g2 = g2;
         }
         try {
-          await setDoc(
-            doc(db, 'competitions', currentCompId),
-            { scores: { [key]: updated } },
-            { merge: true },
-          );
+          await setDoc(doc(sub(currentCompId, 'scores'), key), updated, { merge: true });
           closeModal('modal-score-edit');
           toast('Score updated ✓', 'success');
         } catch (e) {
@@ -4702,11 +4968,7 @@
           toast(t('not_enough'), 'error');
           return;
         }
-        await setDoc(
-          doc(db, 'competitions', currentCompId),
-          { elimination: { [catKey]: elimData } },
-          { merge: true },
-        );
+        await saveBrackets({ [catKey]: elimData });
         const slots = elimData.bracketSize * 2;
         const actual = archers.filter((a) => {
           const [b, ag, g] = catKey.split('||');
@@ -4776,11 +5038,7 @@
           toast(`No new brackets — ${skipped} already exist`, 'error');
           return;
         }
-        await setDoc(
-          doc(db, 'competitions', currentCompId),
-          { elimination: newElim },
-          { merge: true },
-        );
+        await saveBrackets(newElim);
         toast(
           `${generated} ${t('bracket_generated')}${skipped > 0 ? ' (' + skipped + ' skipped)' : ''} ✓`,
           'success',
@@ -5135,11 +5393,7 @@
         };
         const updatedData = JSON.parse(JSON.stringify(data));
         updatedData.rounds[roundKey][matchIdx] = updatedMatch;
-        await setDoc(
-          doc(db, 'competitions', currentCompId),
-          { elimination: { [catKey]: updatedData } },
-          { merge: true },
-        );
+        await saveBrackets({ [catKey]: updatedData });
         closeModal('modal-match');
         selectedWinner = null;
         toast(t('result_saved'), 'success');
@@ -5230,33 +5484,19 @@
           }
           data.rounds[nextRound] = newMatches;
         }
-        await setDoc(
-          doc(db, 'competitions', currentCompId),
-          { elimination: { [catKey]: data } },
-          { merge: true },
-        );
+        await saveBrackets({ [catKey]: data });
         toast(t('next_round'), 'success');
       };
       window.deleteElimination = async (catKey) => {
         if (!confirm('Delete this bracket?')) return;
-        const elim = { ...(window._elimData || {}) };
-        delete elim[catKey];
-        await setDoc(
-          doc(db, 'competitions', currentCompId),
-          { elimination: elim },
-          { merge: true },
-        );
+        await deleteBracket(catKey);
         toast(t('bracket_deleted'), 'success');
       };
       window.setMatchTarget = async (catKey, roundKey, matchIdx, targetNum) => {
         const data = JSON.parse(JSON.stringify((window._elimData || {})[catKey]));
         if (!data) return;
         data.rounds[roundKey][matchIdx].targetNum = parseInt(targetNum) || null;
-        await setDoc(
-          doc(db, 'competitions', currentCompId),
-          { elimination: { [catKey]: data } },
-          { merge: true },
-        );
+        await saveBrackets({ [catKey]: data });
         toast('Target updated ✓', 'success');
       };
 

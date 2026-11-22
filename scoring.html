@@ -1309,6 +1309,9 @@
         getDoc,
         getDocs,
         setDoc,
+        onSnapshot,
+        writeBatch,
+        deleteDoc,
       } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
       const liveConfig = {
         apiKey: 'AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To',
@@ -1330,6 +1333,131 @@
       const firebaseConfig = location.hostname.endsWith('github.io') ? liveConfig : devConfig;
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
+      /* ── DATA LAYOUT ──
+         competitions/{id}            settings (name, date, discipline, targets, sessions, targetConfig…)
+           archers/{archerId}         public archer info
+           contacts/{archerId}        phone, email (admin only)
+           scores/{archerId}          qualification score
+           brackets/{catKey}          elimination bracket settings + roundCounts
+           matches/{catKey~round~i}   one elimination match
+         Pages rebuild the old in-memory shape ({archers:[], scores:{}, elimination:{}}) from these. */
+      const compRef = (id) => doc(db, 'competitions', id);
+      const sub = (id, name) => collection(db, 'competitions', id, name);
+      const safeId = (s) => encodeURIComponent(String(s));
+      const matchDocId = (catKey, roundKey, idx) => safeId(catKey) + '~' + roundKey + '~' + idx;
+      const archerSortKey = (a) =>
+        a.registeredAt ? Date.parse(a.registeredAt) : Number(a.id) || 0;
+      function buildArchers(archerDocs, contactDocs) {
+        const contacts = {};
+        (contactDocs || []).forEach((d) => (contacts[d.id] = d.data()));
+        return archerDocs
+          .map((d) => ({ ...d.data(), ...(contacts[d.id] || {}), id: d.id }))
+          .sort((a, b) => archerSortKey(a) - archerSortKey(b));
+      }
+      function buildScores(scoreDocs) {
+        const s = {};
+        scoreDocs.forEach((d) => (s[d.id] = d.data()));
+        return s;
+      }
+      function buildElimination(bracketDocs, matchDocs) {
+        const elim = {};
+        bracketDocs.forEach((d) => {
+          const { catKey, roundCounts, ...meta } = d.data();
+          const rounds = {};
+          Object.entries(roundCounts || {}).forEach(
+            ([rk, n]) => (rounds[rk] = new Array(n).fill(undefined)),
+          );
+          elim[catKey] = { ...meta, rounds };
+        });
+        matchDocs.forEach((d) => {
+          const { catKey, roundKey, idx, match } = d.data();
+          const r = elim[catKey]?.rounds[roundKey];
+          if (r && idx < r.length) r[idx] = match;
+        });
+        // A bracket whose matches haven't all arrived yet is left out until they do
+        Object.keys(elim).forEach((ck) => {
+          if (Object.values(elim[ck].rounds).some((r) => r.some((m) => m === undefined)))
+            delete elim[ck];
+        });
+        return elim;
+      }
+      function assembleComp(compSnap, archerDocs, contactDocs, scoreDocs, bracketDocs, matchDocs) {
+        return {
+          ...compSnap.data(),
+          archers: buildArchers(archerDocs, contactDocs),
+          scores: buildScores(scoreDocs),
+          elimination: buildElimination(bracketDocs, matchDocs),
+        };
+      }
+      // One-time read of a whole competition
+      async function loadComp(id, withContacts = false) {
+        const [c, a, ct, s, b, m] = await Promise.all([
+          getDoc(compRef(id)),
+          getDocs(sub(id, 'archers')),
+          withContacts ? getDocs(sub(id, 'contacts')) : Promise.resolve({ docs: [] }),
+          getDocs(sub(id, 'scores')),
+          getDocs(sub(id, 'brackets')),
+          getDocs(sub(id, 'matches')),
+        ]);
+        if (!c.exists()) return null;
+        return assembleComp(c, a.docs, ct.docs, s.docs, b.docs, m.docs);
+      }
+      // Live listener on a whole competition; returns an unsubscribe function
+      function watchComp(id, withContacts, onData) {
+        const parts = {
+          comp: null,
+          archers: null,
+          contacts: withContacts ? null : [],
+          scores: null,
+          brackets: null,
+          matches: null,
+        };
+        const emit = () => {
+          if (Object.values(parts).some((v) => v === null)) return;
+          if (!parts.comp.exists()) return onData(null);
+          onData(
+            assembleComp(
+              parts.comp,
+              parts.archers,
+              parts.contacts,
+              parts.scores,
+              parts.brackets,
+              parts.matches,
+            ),
+          );
+        };
+        const names = ['archers', 'scores', 'brackets', 'matches'];
+        if (withContacts) names.push('contacts');
+        const unsubs = [
+          onSnapshot(compRef(id), (s) => {
+            parts.comp = s;
+            emit();
+          }),
+          ...names.map((name) =>
+            onSnapshot(sub(id, name), (s) => {
+              parts[name] = s.docs;
+              emit();
+            }),
+          ),
+        ];
+        return () => unsubs.forEach((u) => u());
+      }
+      // Run write operations in batches (Firestore max 500 per batch)
+      async function commitOps(ops) {
+        for (let i = 0; i < ops.length; i += 400) {
+          const b = writeBatch(db);
+          ops.slice(i, i + 400).forEach((op) => op(b));
+          await b.commit();
+        }
+      }
+      // Delete a competition and everything under it
+      async function deleteCompDeep(id) {
+        for (const name of ['archers', 'contacts', 'scores', 'brackets', 'matches']) {
+          const snap = await getDocs(sub(id, name));
+          await commitOps(snap.docs.map((d) => (b) => b.delete(d.ref)));
+        }
+        await deleteDoc(compRef(id));
+      }
       let compId = null,
         compData = null,
         selectedArcherId = null,
@@ -1801,9 +1929,8 @@
       async function loadArchers(id) {
         if (!id) return;
         compId = id;
-        const snap = await getDoc(doc(db, 'competitions', id));
-        if (!snap.exists()) return;
-        compData = snap.data();
+        compData = await loadComp(id);
+        if (!compData) return;
         discipline = compData.discipline || 'Outdoor';
         targetConfig = compData.targetConfig || [];
         const archers = compData.archers || [];
@@ -1825,8 +1952,7 @@
           return;
         }
         document.getElementById('error-msg').style.display = 'none';
-        const snap = await getDoc(doc(db, 'competitions', compId));
-        compData = snap.data();
+        compData = await loadComp(compId);
         discipline = compData.discipline || 'Outdoor';
         targetConfig = compData.targetConfig || [];
         const elim = compData.elimination || {};
@@ -2694,7 +2820,7 @@
       async function saveQualScores() {
         if (!compId) return;
         try {
-          const payload = { scores: {} };
+          const payload = { scores: {} }; // archer key -> score doc
           targetArchers.forEach((a) => {
             const key = String(a.id).replace(/\./g, '_');
             const s = scores[a.id];
@@ -2716,7 +2842,13 @@
               ends: endsObj,
             };
           });
-          await setDoc(doc(db, 'competitions', compId), payload, { merge: true });
+          await commitOps(
+            Object.entries(payload.scores).map(
+              ([key, sc]) =>
+                (b) =>
+                  b.set(doc(sub(compId, 'scores'), key), sc, { merge: true }),
+            ),
+          );
         } catch (e) {
           toast(t('save_failed'), 'error');
         }
@@ -3613,9 +3745,12 @@
       async function saveMatchProgress() {
         if (!compId || !matchCatKey || !matchRoundKey || matchIdx === null) return;
         try {
-          const snap = await getDoc(doc(db, 'competitions', compId));
-          const data = snap.data();
-          const match = data.elimination[matchCatKey].rounds[matchRoundKey][matchIdx];
+          const mRef = doc(
+            sub(compId, 'matches'),
+            matchDocId(matchCatKey, matchRoundKey, matchIdx),
+          );
+          const snap = await getDoc(mRef);
+          const match = snap.data().match;
           if (matchFormat === 'sets') {
             match.sets = matchSets.map((s) => ({
               score1: s.score1 || 0,
@@ -3642,12 +3777,7 @@
                 });
             }
           }
-          data.elimination[matchCatKey].rounds[matchRoundKey][matchIdx] = match;
-          await setDoc(
-            doc(db, 'competitions', compId),
-            { elimination: data.elimination },
-            { merge: true },
-          );
+          await setDoc(mRef, { match }, { merge: true });
         } catch (e) {
           console.error('Save error:', e);
         }
@@ -3722,9 +3852,12 @@
         }
         if (winnerId) {
           try {
-            const snap = await getDoc(doc(db, 'competitions', compId));
-            const data = snap.data();
-            const match = data.elimination[matchCatKey].rounds[matchRoundKey][matchIdx];
+            const mRef = doc(
+              sub(compId, 'matches'),
+              matchDocId(matchCatKey, matchRoundKey, matchIdx),
+            );
+            const snap = await getDoc(mRef);
+            const match = snap.data().match;
             match.winnerChoice = winnerId;
             if (matchFormat === 'sets') {
               match.sets = matchSets.map((s) => ({
@@ -3742,12 +3875,7 @@
               match.arrows2 = cumArrows2;
               match.score2 = cumArrows2.reduce((s, v) => s + getVal(v), 0);
             }
-            data.elimination[matchCatKey].rounds[matchRoundKey][matchIdx] = match;
-            await setDoc(
-              doc(db, 'competitions', compId),
-              { elimination: data.elimination },
-              { merge: true },
-            );
+            await setDoc(mRef, { match }, { merge: true });
           } catch (e) {
             console.error('Save error:', e);
           }
@@ -3844,9 +3972,8 @@
       async function autoLoginFromQR(qrCompId, qrTargetNum) {
         try {
           compId = qrCompId;
-          const snap = await getDoc(doc(db, 'competitions', qrCompId));
-          if (!snap.exists()) return;
-          compData = snap.data();
+          compData = await loadComp(qrCompId);
+          if (!compData) return;
           discipline = compData.discipline || 'Outdoor';
           targetConfig = compData.targetConfig || [];
           const allArchers = compData.archers || [];
