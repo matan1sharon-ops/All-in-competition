@@ -980,6 +980,51 @@
   </head>
   <body>
     <div
+      id="scanner"
+      style="
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 9998;
+        background: #000;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <video
+        id="scanner-video"
+        playsinline
+        muted
+        style="width: 100%; max-width: 520px; max-height: 70vh; object-fit: cover"
+      ></video>
+      <div
+        id="scanner-msg"
+        style="
+          color: #fff;
+          font-family: sans-serif;
+          font-size: 15px;
+          text-align: center;
+          padding: 14px 20px;
+        "
+      ></div>
+      <button
+        onclick="closeScanner()"
+        style="
+          background: #333;
+          color: #fff;
+          border: 1px solid #555;
+          border-radius: 10px;
+          padding: 12px 28px;
+          font-size: 16px;
+          font-weight: 700;
+        "
+        data-t="scan_cancel"
+      >
+        CANCEL
+      </button>
+    </div>
+    <div
       id="net-banner"
       style="
         display: none;
@@ -1066,23 +1111,23 @@
         <div id="login-step-1">
           <div class="error-msg" id="error-msg"></div>
           <!-- Scoring is opened only by scanning the QR on the scorecard (no choosing names) -->
-          <div style="text-align: center; padding: 10px 4px 16px">
-            <div style="font-size: 56px; line-height: 1">📷</div>
+          <div style="text-align: center; padding: 10px 4px 6px">
             <div
-              style="
-                font-family: 'Barlow Condensed', sans-serif;
-                font-size: 22px;
-                font-weight: 900;
-                margin-top: 10px;
-              "
+              style="font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900"
               data-t="scan_title"
             >
               SCAN YOUR SCORECARD
             </div>
-            <div style="font-size: 14px; color: var(--muted); margin-top: 8px" data-t="scan_help">
-              Open your phone camera and scan the QR code printed on your scorecard.
+            <div
+              style="font-size: 14px; color: var(--muted); margin: 8px 0 14px"
+              data-t="scan_help"
+            >
+              Tap the button and point the camera at the QR code on your scorecard.
             </div>
           </div>
+          <button class="login-btn" onclick="openScanner()" data-t="scan_btn">
+            📷 SCAN QR CODE
+          </button>
           <button class="login-back" onclick="goToMainMenu()" style="margin-top: 12px">
             ← BACK TO MENU
           </button>
@@ -1698,7 +1743,13 @@
           score_saved: 'Scores saved ✓',
           save_failed: 'Save failed',
           scan_title: 'SCAN YOUR SCORECARD',
-          scan_help: 'Open your phone camera and scan the QR code printed on your scorecard.',
+          scan_help: 'Tap the button and point the camera at the QR code on your scorecard.',
+          scan_btn: '📷 SCAN QR CODE',
+          scan_point: 'Point the camera at the QR code on your scorecard',
+          scan_cancel: 'CANCEL',
+          scan_not_ours: 'This is not an ALL IN scorecard QR',
+          camera_denied:
+            'Camera not available. Allow camera access in the browser settings, or scan with the phone camera app.',
           no_archers_target: 'No archers or match on this target. Ask the organizer.',
           comp_not_found: 'Competition not found. Ask the organizer.',
           updated_other_phone: 'Updated from another phone',
@@ -1751,7 +1802,13 @@
           score_saved: 'ניקוד נשמר ✓',
           save_failed: 'שמירה נכשלה',
           scan_title: 'סרקו את כרטיס הניקוד',
-          scan_help: 'פתחו את מצלמת הטלפון וסרקו את קוד ה-QR שעל כרטיס הניקוד.',
+          scan_help: 'לחצו על הכפתור וכוונו את המצלמה לקוד ה-QR שעל כרטיס הניקוד.',
+          scan_btn: '📷 סריקת QR',
+          scan_point: 'כוונו את המצלמה לקוד ה-QR שעל כרטיס הניקוד',
+          scan_cancel: 'ביטול',
+          scan_not_ours: 'זה לא קוד QR של כרטיס ניקוד ALL IN',
+          camera_denied:
+            'המצלמה לא זמינה. אשרו גישה למצלמה בהגדרות הדפדפן, או סרקו עם אפליקציית המצלמה.',
           no_archers_target: 'אין קשתים או מקצה על מטרה זו. פנו למארגן.',
           comp_not_found: 'התחרות לא נמצאה. פנו למארגן.',
           updated_other_phone: 'עודכן מטלפון אחר',
@@ -4194,6 +4251,87 @@
         }
       };
       /* ── QR AUTO LOGIN ── */
+      /* ── QR SCANNER (camera inside the app) ── */
+      let scanStream = null,
+        scanLoop = null;
+      function loadJsQR() {
+        if (window.jsQR) return Promise.resolve();
+        return new Promise((res, rej) => {
+          const sc = document.createElement('script');
+          sc.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
+          sc.onload = res;
+          sc.onerror = rej;
+          document.head.appendChild(sc);
+        });
+      }
+      window.openScanner = async () => {
+        const overlay = document.getElementById('scanner');
+        const msg = document.getElementById('scanner-msg');
+        overlay.style.display = 'flex';
+        msg.textContent = t('scan_point');
+        try {
+          await loadJsQR();
+          scanStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'environment' },
+            audio: false,
+          });
+        } catch (e) {
+          console.error('camera', e);
+          msg.textContent = t('camera_denied');
+          return;
+        }
+        const video = document.getElementById('scanner-video');
+        video.srcObject = scanStream;
+        await video.play().catch(() => {});
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        let lastBad = 0;
+        const tick = () => {
+          if (!scanStream) return;
+          if (video.readyState >= 2 && video.videoWidth) {
+            const w = Math.min(640, video.videoWidth);
+            const h = Math.round((video.videoHeight / video.videoWidth) * w);
+            canvas.width = w;
+            canvas.height = h;
+            ctx.drawImage(video, 0, 0, w, h);
+            const code = window.jsQR(ctx.getImageData(0, 0, w, h).data, w, h);
+            if (code?.data) {
+              if (handleScannedQR(code.data)) return;
+              if (Date.now() - lastBad > 1500) {
+                msg.textContent = t('scan_not_ours');
+                lastBad = Date.now();
+              }
+            }
+          }
+          scanLoop = requestAnimationFrame(tick);
+        };
+        tick();
+      };
+      window.closeScanner = () => {
+        if (scanLoop) cancelAnimationFrame(scanLoop);
+        scanLoop = null;
+        if (scanStream) scanStream.getTracks().forEach((tr) => tr.stop());
+        scanStream = null;
+        document.getElementById('scanner').style.display = 'none';
+      };
+      // A scorecard QR is a scoring.html address with ?comp=...&target=...
+      function handleScannedQR(text) {
+        let url;
+        try {
+          url = new URL(text, location.href);
+        } catch (e) {
+          return false;
+        }
+        const comp = url.searchParams.get('comp');
+        const target = parseInt(url.searchParams.get('target'));
+        if (!/scoring\.html$/.test(url.pathname) || !comp || !target) return false;
+        closeScanner();
+        history.replaceState(null, '', `?comp=${encodeURIComponent(comp)}&target=${target}`);
+        document.getElementById('error-msg').style.display = 'none';
+        autoLoginFromQR(comp, target);
+        return true;
+      }
+      window._handleScannedQR = handleScannedQR; // used by tests
       function showScanError(msg) {
         document.getElementById('main-menu').style.display = 'none';
         document.getElementById('login-screen').style.display = 'flex';
