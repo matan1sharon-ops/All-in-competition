@@ -178,6 +178,10 @@
         color: var(--text);
         border: 1px solid var(--border);
       }
+      .cbtn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
       .cbtn:active {
         transform: scale(0.97);
       }
@@ -262,7 +266,8 @@
         <button class="cbtn" id="btn-pause" onclick="pauseResume()">⏸ PAUSE</button>
         <button class="cbtn" onclick="restartEnd()">↺ RESTART END</button>
       </div>
-      <div class="c-grid four">
+      <div class="c-label" id="adj-label">Change time (pause first)</div>
+      <div class="c-grid four" id="adj-btns">
         <button class="cbtn" onclick="adjust(-5)">−5 s</button>
         <button class="cbtn" onclick="adjust(-1)">−1 s</button>
         <button class="cbtn" onclick="adjust(1)">+1 s</button>
@@ -546,6 +551,8 @@
               v.c.end < totalEnds() ? `▶ START ${startLabel(v.c.end + 1)}` : '✓ ALL ENDS DONE';
           else if (k === 'running') main.textContent = '⏭ NEXT (END PHASE NOW)';
           else main.textContent = '▶ RESUME';
+          const canAdjust = k === 'paused' || k === 'emergency';
+          document.querySelectorAll('#adj-btns button').forEach((b) => (b.disabled = !canAdjust));
           document.getElementById('btn-pause').textContent =
             k === 'paused' || k === 'emergency' ? '▶ RESUME' : '⏸ PAUSE';
         }
@@ -619,17 +626,8 @@
       };
       window.adjust = (sec) => {
         const c = current();
-        if (c.kind === 'running') {
-          const seg = state.seq[c.segIndex];
-          const remaining = Math.max(0, c.remaining + sec);
-          return write({
-            ...state,
-            segIndex: c.segIndex,
-            segStartedAt: now() - (seg.dur - remaining) * 1000,
-          });
-        }
+        // time can only be changed while the end is paused / emergency-stopped
         if (c.kind === 'paused' || c.kind === 'emergency') {
-          const seg = state.seq[state.segIndex];
           return write({
             ...state,
             remaining: Math.max(0, state.remaining + sec),
