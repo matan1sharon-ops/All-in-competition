@@ -1065,15 +1065,24 @@
         </div>
         <div id="login-step-1">
           <div class="error-msg" id="error-msg"></div>
-          <label class="login-label" data-t="competition">Competition</label>
-          <select id="comp-select" class="login-select">
-            <option value="">\u2014 Select Competition \u2014</option>
-          </select>
-          <label class="login-label" data-t="your_name">Your Name</label>
-          <select id="archer-select" class="login-select">
-            <option value="">\u2014 Select competition first \u2014</option>
-          </select>
-          <button class="login-btn" onclick="checkPhase()" data-t="continue">CONTINUE →</button>
+          <!-- Scoring is opened only by scanning the QR on the scorecard (no choosing names) -->
+          <div style="text-align: center; padding: 10px 4px 16px">
+            <div style="font-size: 56px; line-height: 1">📷</div>
+            <div
+              style="
+                font-family: 'Barlow Condensed', sans-serif;
+                font-size: 22px;
+                font-weight: 900;
+                margin-top: 10px;
+              "
+              data-t="scan_title"
+            >
+              SCAN YOUR SCORECARD
+            </div>
+            <div style="font-size: 14px; color: var(--muted); margin-top: 8px" data-t="scan_help">
+              Open your phone camera and scan the QR code printed on your scorecard.
+            </div>
+          </div>
           <button class="login-back" onclick="goToMainMenu()" style="margin-top: 12px">
             ← BACK TO MENU
           </button>
@@ -1688,6 +1697,10 @@
           station: 'STATION',
           score_saved: 'Scores saved ✓',
           save_failed: 'Save failed',
+          scan_title: 'SCAN YOUR SCORECARD',
+          scan_help: 'Open your phone camera and scan the QR code printed on your scorecard.',
+          no_archers_target: 'No archers or match on this target. Ask the organizer.',
+          comp_not_found: 'Competition not found. Ask the organizer.',
           updated_other_phone: 'Updated from another phone',
           offline_banner: '⚠ Offline — scores are saved on this phone and upload automatically',
           uploading_banner: '⏳ Uploading scores…',
@@ -1737,6 +1750,10 @@
           station: 'תחנה',
           score_saved: 'ניקוד נשמר ✓',
           save_failed: 'שמירה נכשלה',
+          scan_title: 'סרקו את כרטיס הניקוד',
+          scan_help: 'פתחו את מצלמת הטלפון וסרקו את קוד ה-QR שעל כרטיס הניקוד.',
+          no_archers_target: 'אין קשתים או מקצה על מטרה זו. פנו למארגן.',
+          comp_not_found: 'התחרות לא נמצאה. פנו למארגן.',
           updated_other_phone: 'עודכן מטלפון אחר',
           offline_banner: '⚠ אין חיבור — הניקוד נשמר בטלפון ויעלה אוטומטית',
           uploading_banner: '⏳ מעלה ניקוד…',
@@ -1842,7 +1859,6 @@
         document.getElementById('main-menu').style.display = 'none';
         document.getElementById('login-screen').style.display = 'flex';
         showLoginStep('login-step-1');
-        loadCompetitions();
       };
       window.toggleResultsDropdown = async () => {
         const dd = document.getElementById('results-dropdown');
@@ -4178,20 +4194,27 @@
         }
       };
       /* ── QR AUTO LOGIN ── */
+      function showScanError(msg) {
+        document.getElementById('main-menu').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'flex';
+        showLoginStep('login-step-1');
+        const el = document.getElementById('error-msg');
+        el.textContent = msg;
+        el.style.display = 'block';
+      }
       async function autoLoginFromQR(qrCompId, qrTargetNum) {
         try {
           compId = qrCompId;
           compData = await loadComp(qrCompId);
-          if (!compData) return;
+          if (!compData) return showScanError(t('comp_not_found'));
           discipline = compData.discipline || 'Outdoor';
           targetConfig = compData.targetConfig || [];
           const allArchers = compData.archers || [];
           const allTargets = compData.targets || [];
           const target = allTargets.find((t) => Number(t.num) === Number(qrTargetNum));
-          if (!target) return;
           targetNum = qrTargetNum;
           targetArchers = ['A', 'B', 'C', 'D']
-            .filter((s) => target[s])
+            .filter((s) => target && target[s])
             .map((s) => {
               const sd = target[s];
               const fa = allArchers.find(
@@ -4199,7 +4222,6 @@
               );
               return { ...(fa || sd), slot: s, id: fa ? fa.id : sd.id };
             });
-          if (!targetArchers.length) return;
           // Check if any archer on this target has an active elimination match
           const elim = compData.elimination || {};
           const roundOrder = ['R1', 'QF', 'SF', 'F', 'B'];
@@ -4246,6 +4268,7 @@
               }
             }
           }
+          if (!targetArchers.length) return showScanError(t('no_archers_target'));
           document.getElementById('confirm-archers').innerHTML = targetArchers
             .map(
               (a) =>
