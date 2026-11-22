@@ -1017,6 +1017,9 @@
                 >
                   🏟 FIELD OF PLAY
                 </button>
+                <button class="btn btn-secondary" onclick="printTargetQRSigns()">
+                  🔳 TARGET QR SIGNS
+                </button>
               </div>
             </div>
             <div id="target-grid"></div>
@@ -4024,6 +4027,25 @@
         );
         win.document.close();
         setTimeout(() => win.print(), 400);
+      };
+      // Reusable QR sign per target: holds only the target number, so the same printed sign
+      // opens today's competition for that target at every competition
+      window.printTargetQRSigns = () => {
+        const def = Math.max(targets.length, 1);
+        const n = parseInt(prompt('How many targets? (one sign per target)', def));
+        if (!n || n < 1) return;
+        const pages = Array.from({ length: n }, (_, i) => i + 1)
+          .map(
+            (num) =>
+              `<div class="page"><div class="brand">ALL IN</div><div class="tnum">TARGET ${num}</div><div class="qr" data-url="${APP_BASE}/scoring.html?target=${num}"></div><div class="help">📷 Scan to score · סרקו לניקוד</div></div>`,
+          )
+          .join('');
+        const win = window.open('', '_blank');
+        if (!win) return;
+        win.document.write(
+          `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Target QR signs</title><style>body{margin:0;font-family:Arial,sans-serif;color:#000;}.page{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;page-break-after:always;}.page:last-child{page-break-after:auto;}.brand{font-size:28px;font-weight:900;letter-spacing:6px;}.tnum{font-size:96px;font-weight:900;margin:10px 0 24px;}.qr{width:380px;height:380px;}.help{font-size:24px;margin-top:24px;}@media print{@page{size:A4 portrait;margin:10mm;}.page{height:270mm;}}</style><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script></head><body>${pages}<script>window.onload=function(){document.querySelectorAll(".qr").forEach(function(el){new QRCode(el,{text:el.dataset.url,width:380,height:380,correctLevel:QRCode.CorrectLevel.M});});setTimeout(function(){window.print();},500);};<\/script></body></html>`,
+        );
+        win.document.close();
       };
       window.printStartList = () => {
         if (!targets.length) {

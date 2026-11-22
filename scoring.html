@@ -1128,6 +1128,7 @@
           <button class="login-btn" onclick="openScanner()" data-t="scan_btn">
             📷 SCAN QR CODE
           </button>
+          <div id="comp-pick" style="display: none; margin-top: 12px"></div>
           <button class="login-back" onclick="goToMainMenu()" style="margin-top: 12px">
             ← BACK TO MENU
           </button>
@@ -1748,6 +1749,8 @@
           scan_point: 'Point the camera at the QR code on your scorecard',
           scan_cancel: 'CANCEL',
           scan_not_ours: 'This is not an ALL IN scorecard QR',
+          no_comp_today: 'No competition is running today. Ask the organizer.',
+          pick_comp: 'More than one competition today — choose yours:',
           camera_denied:
             'Camera not available. Allow camera access in the browser settings, or scan with the phone camera app.',
           no_archers_target: 'No archers or match on this target. Ask the organizer.',
@@ -1807,6 +1810,8 @@
           scan_point: 'כוונו את המצלמה לקוד ה-QR שעל כרטיס הניקוד',
           scan_cancel: 'ביטול',
           scan_not_ours: 'זה לא קוד QR של כרטיס ניקוד ALL IN',
+          no_comp_today: 'אין תחרות היום. פנו למארגן.',
+          pick_comp: 'יש יותר מתחרות אחת היום — בחרו את שלכם:',
           camera_denied:
             'המצלמה לא זמינה. אשרו גישה למצלמה בהגדרות הדפדפן, או סרקו עם אפליקציית המצלמה.',
           no_archers_target: 'אין קשתים או מקצה על מטרה זו. פנו למארגן.',
@@ -4324,12 +4329,60 @@
         }
         const comp = url.searchParams.get('comp');
         const target = parseInt(url.searchParams.get('target'));
-        if (!/scoring\.html$/.test(url.pathname) || !comp || !target) return false;
+        if (!/scoring\.html$/.test(url.pathname) || !target) return false;
         closeScanner();
-        history.replaceState(null, '', `?comp=${encodeURIComponent(comp)}&target=${target}`);
         document.getElementById('error-msg').style.display = 'none';
-        autoLoginFromQR(comp, target);
+        if (comp) {
+          // scorecard QR: competition + target
+          history.replaceState(null, '', `?comp=${encodeURIComponent(comp)}&target=${target}`);
+          autoLoginFromQR(comp, target);
+        } else openTargetFromQR(target); // reusable target sign: target only
         return true;
+      }
+      // Competitions running today (start date + number of days, not archived)
+      async function activeCompsToday() {
+        const snap = await getDocs(collection(db, 'competitions'));
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const list = [];
+        snap.docs.forEach((d) => {
+          const c = d.data();
+          if (c.archived || !c.date) return;
+          const start = new Date(c.date);
+          start.setHours(0, 0, 0, 0);
+          const end = new Date(start);
+          end.setDate(end.getDate() + (parseInt(c.numDays) || 1) - 1);
+          end.setHours(23, 59, 59, 999);
+          if (today >= start && today <= end) list.push({ id: d.id, name: c.name || '' });
+        });
+        return list;
+      }
+      // Target sign QR: open today's competition for this target (ask if more than one)
+      async function openTargetFromQR(target) {
+        let comps;
+        try {
+          comps = await activeCompsToday();
+        } catch (e) {
+          return showScanError(t('comp_not_found'));
+        }
+        if (!comps.length) return showScanError(t('no_comp_today'));
+        const go = (id) => {
+          document.getElementById('comp-pick').style.display = 'none';
+          document.getElementById('error-msg').style.display = 'none';
+          history.replaceState(null, '', `?comp=${encodeURIComponent(id)}&target=${target}`);
+          autoLoginFromQR(id, target);
+        };
+        if (comps.length === 1) return go(comps[0].id);
+        showScanError(t('pick_comp'));
+        const box = document.getElementById('comp-pick');
+        box.innerHTML = comps
+          .map(
+            (c) =>
+              `<button class="login-btn" style="margin-top:8px;" data-id="${c.id}">${c.name.replace(/[<>&"]/g, '')}</button>`,
+          )
+          .join('');
+        box.querySelectorAll('button').forEach((b) => (b.onclick = () => go(b.dataset.id)));
+        box.style.display = 'block';
       }
       window._handleScannedQR = handleScannedQR; // used by tests
       function showScanError(msg) {
@@ -4466,6 +4519,8 @@
       const qrTarget = parseInt(params.get('target'));
       if (qrComp && qrTarget) {
         autoLoginFromQR(qrComp, qrTarget);
+      } else if (qrTarget) {
+        openTargetFromQR(qrTarget);
       }
     </script>
     <script>
