@@ -602,7 +602,7 @@
       }
       // Delete a competition and everything under it
       async function deleteCompDeep(id) {
-        for (const name of ['archers', 'contacts', 'scores', 'brackets', 'matches']) {
+        for (const name of ['archers', 'contacts', 'scores', 'brackets', 'matches', 'timer']) {
           const snap = await getDocs(sub(id, name));
           await commitOps(snap.docs.map((d) => (b) => b.delete(d.ref)));
         }

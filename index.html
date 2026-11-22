@@ -702,6 +702,9 @@
           <div class="nav-item" onclick="showPanel('elimination')" data-panel="elimination">
             <span class="icon">⚔️</span><span>Elimination</span>
           </div>
+          <div class="nav-item" onclick="showPanel('timer')" data-panel="timer">
+            <span class="icon">⏱</span><span>Timer</span>
+          </div>
           <a
             href="history.html"
             target="_blank"
@@ -1166,6 +1169,79 @@
               </div>
               <div id="results-by-category"></div>
               <div id="final-results-admin" style="display: none"></div>
+            </div>
+          </div>
+          <!-- TIMER -->
+          <div id="panel-timer" class="panel">
+            <div class="card">
+              <div class="card-title">⏱ End Timer — Settings</div>
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                  gap: 10px;
+                "
+              >
+                <div class="form-group">
+                  <label>Shooting time (sec)</label><input type="number" id="tm-shoot" min="10" />
+                </div>
+                <div class="form-group">
+                  <label>Call-up time (sec)</label><input type="number" id="tm-callup" min="0" />
+                </div>
+                <div class="form-group">
+                  <label>Yellow warning (sec)</label><input type="number" id="tm-warn" min="0" />
+                </div>
+                <div class="form-group">
+                  <label>Ends</label><input type="number" id="tm-ends" min="1" />
+                </div>
+                <div class="form-group">
+                  <label>Practice ends</label><input type="number" id="tm-practice" min="0" />
+                </div>
+                <div class="form-group">
+                  <label>Shooting lines</label
+                  ><select id="tm-lines">
+                    <option value="AB">AB only</option>
+                    <option value="AB-CD">AB then CD (every end)</option>
+                    <option value="ALT">Alternate (AB-CD, then CD-AB)</option>
+                  </select>
+                </div>
+              </div>
+              <div style="font-size: 12px; color: var(--muted2); margin: 4px 0 10px">
+                Beeps: 2 = to the line · 1 = start shooting · 3 = collect arrows · 5 = emergency
+                stop
+              </div>
+              <button class="btn btn-primary" onclick="saveTimerSettings()">SAVE SETTINGS</button>
+            </div>
+            <div class="card">
+              <div class="card-title">🖥 Display &amp; phone control</div>
+              <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <button class="btn btn-secondary" onclick="openTimerDisplay()">
+                    🖥 OPEN TIMER DISPLAY
+                  </button>
+                  <button class="btn btn-secondary" onclick="copyTimerControlLink()">
+                    🔗 COPY PHONE CONTROL LINK
+                  </button>
+                  <div style="font-size: 12px; color: var(--muted2); max-width: 260px">
+                    Open the display on the TV / projector and turn sound on there. Scan the QR to
+                    control the timer from your phone.
+                  </div>
+                </div>
+                <div id="timer-qr" style="background: #fff; padding: 8px; border-radius: 8px"></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">🎛 Control</div>
+              <iframe
+                id="timer-control-frame"
+                style="
+                  width: 100%;
+                  max-width: 560px;
+                  height: 640px;
+                  border: 0;
+                  background: transparent;
+                "
+              ></iframe>
             </div>
           </div>
           <!-- SCORECARDS -->
@@ -2010,7 +2086,7 @@
       }
       // Delete a competition and everything under it
       async function deleteCompDeep(id) {
-        for (const name of ['archers', 'contacts', 'scores', 'brackets', 'matches']) {
+        for (const name of ['archers', 'contacts', 'scores', 'brackets', 'matches', 'timer']) {
           const snap = await getDocs(sub(id, name));
           await commitOps(snap.docs.map((d) => (b) => b.delete(d.ref)));
         }
@@ -2047,6 +2123,7 @@
           results: 'Live Results',
           scorecards: 'Scorecards',
           elimination: 'Elimination',
+          timer: 'Timer',
           history: 'History',
           // Buttons
           new_comp: '+ NEW COMPETITION',
@@ -2232,6 +2309,7 @@
           results: 'תוצאות חיות',
           scorecards: 'כרטיסי ניקוד',
           elimination: 'מקצי הדחות',
+          timer: 'טיימר',
           history: 'היסטוריה',
           // Buttons
           new_comp: '+ תחרות חדשה',
@@ -4788,6 +4866,71 @@
           .then(() => toast(t('match_link_copied'), 'success'))
           .catch(() => prompt('Copy this link:', url));
       };
+      /* ── END TIMER (settings here; the timer itself is timer.html) ── */
+      function timerDefaults() {
+        const indoor = currentDiscipline === 'Indoor';
+        return {
+          shootSec: indoor ? 120 : 240,
+          callupSec: 10,
+          warnSec: 30,
+          ends: indoor ? 20 : 12,
+          practiceEnds: 2,
+          lines: 'AB-CD',
+        };
+      }
+      const timerUrl = (extra = '') => `${APP_BASE}/timer.html?comp=${currentCompId}${extra}`;
+      function initTimerPanel() {
+        if (!currentCompId) {
+          toast(t('select_comp_first'), 'error');
+          return;
+        }
+        const ts = { ...timerDefaults(), ...(window._compData?.timerSettings || {}) };
+        document.getElementById('tm-shoot').value = ts.shootSec;
+        document.getElementById('tm-callup').value = ts.callupSec;
+        document.getElementById('tm-warn').value = ts.warnSec;
+        document.getElementById('tm-ends').value = ts.ends;
+        document.getElementById('tm-practice').value = ts.practiceEnds;
+        document.getElementById('tm-lines').value = ts.lines;
+        const frame = document.getElementById('timer-control-frame');
+        const src = timerUrl('&mode=control&embed=1');
+        if (frame.getAttribute('src') !== src) frame.setAttribute('src', src);
+        const qrEl = document.getElementById('timer-qr');
+        const drawQR = () => {
+          qrEl.innerHTML = '';
+          new window.QRCode(qrEl, { text: timerUrl('&mode=control'), width: 140, height: 140 });
+        };
+        if (window.QRCode) drawQR();
+        else {
+          const sc = document.createElement('script');
+          sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+          sc.onload = drawQR;
+          document.head.appendChild(sc);
+        }
+      }
+      window.saveTimerSettings = async () => {
+        if (!currentCompId) return;
+        const num = (id, min) => Math.max(min, parseInt(document.getElementById(id).value) || 0);
+        const timerSettings = {
+          shootSec: num('tm-shoot', 10),
+          callupSec: num('tm-callup', 0),
+          warnSec: num('tm-warn', 0),
+          ends: num('tm-ends', 1),
+          practiceEnds: num('tm-practice', 0),
+          lines: document.getElementById('tm-lines').value,
+        };
+        await setDoc(doc(db, 'competitions', currentCompId), { timerSettings }, { merge: true });
+        if (window._compData) window._compData.timerSettings = timerSettings;
+        toast('Timer settings saved', 'success');
+      };
+      window.openTimerDisplay = () => {
+        if (!currentCompId) return;
+        window.open(timerUrl(), '_blank');
+      };
+      window.copyTimerControlLink = () => {
+        if (!currentCompId) return;
+        navigator.clipboard?.writeText(timerUrl('&mode=control'));
+        toast('Link copied ✓', 'success');
+      };
       window.openDisplayScreen = () => {
         if (!currentCompId) {
           toast(t('select_comp_first'), 'error');
@@ -5008,8 +5151,10 @@
             results: t('results'),
             scorecards: t('scorecards'),
             elimination: t('elimination'),
+            timer: t('timer'),
           }[name] || name;
         if (name === 'scorecards') renderScorecards();
+        if (name === 'timer') initTimerPanel();
         if (name === 'targetsetup') initTargetSetup();
         if (name === 'elimination') {
           document.getElementById('panel-elimination').style.display = 'flex';

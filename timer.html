@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>ALL IN — End Timer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0a0a0a;
+        --surface: #141414;
+        --surface2: #1c1c1c;
+        --border: #2a2a2a;
+        --text: #f0f0f0;
+        --muted: #888;
+        --accent: #ffd700;
+        --green: #2e7d32;
+        --yellow: #f9a825;
+        --red: #c62828;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Barlow', sans-serif;
+        -webkit-tap-highlight-color: transparent;
+      }
+      /* ── DISPLAY ── */
+      #display {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        transition: background 0.2s;
+      }
+      #display.c-red {
+        background: var(--red);
+      }
+      #display.c-green {
+        background: var(--green);
+      }
+      #display.c-yellow {
+        background: var(--yellow);
+        color: #000;
+      }
+      #display.c-idle {
+        background: var(--surface);
+      }
+      .d-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2vh 3vw;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+        font-size: 5vh;
+        letter-spacing: 2px;
+      }
+      .d-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      #d-time {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+        font-size: min(45vh, 38vw);
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+      }
+      #d-phase {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+        font-size: 7vh;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+      }
+      #d-group {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+        font-size: 14vh;
+        letter-spacing: 6px;
+      }
+      .d-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5vh 3vw;
+        font-size: 2.2vh;
+        opacity: 0.8;
+      }
+      .d-bottom button {
+        background: rgba(0, 0, 0, 0.35);
+        color: inherit;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        padding: 8px 14px;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 700;
+        font-size: 2.2vh;
+        cursor: pointer;
+      }
+      /* ── CONTROLLER ── */
+      #control {
+        display: none;
+        max-width: 560px;
+        margin: 0 auto;
+        padding: 14px;
+      }
+      body.embed #control {
+        max-width: none;
+        padding: 0;
+      }
+      .c-status {
+        border-radius: 12px;
+        padding: 14px;
+        text-align: center;
+        margin-bottom: 12px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+      }
+      .c-status.c-red {
+        background: var(--red);
+      }
+      .c-status.c-green {
+        background: var(--green);
+      }
+      .c-status.c-yellow {
+        background: var(--yellow);
+        color: #000;
+      }
+      #c-time {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+        font-size: 72px;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+      }
+      #c-info {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 700;
+        font-size: 18px;
+        letter-spacing: 1px;
+      }
+      .c-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .c-grid.three {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+      .cbtn {
+        border: none;
+        border-radius: 10px;
+        padding: 16px 8px;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+        font-size: 20px;
+        letter-spacing: 1px;
+        cursor: pointer;
+        background: var(--surface2);
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+      .cbtn:active {
+        transform: scale(0.97);
+      }
+      .cbtn.big {
+        grid-column: span 2;
+        font-size: 26px;
+        padding: 22px 8px;
+        background: var(--accent);
+        color: #000;
+        border: none;
+      }
+      .cbtn.stop {
+        grid-column: span 2;
+        background: var(--red);
+        border: none;
+      }
+      .cbtn.small {
+        font-size: 15px;
+        padding: 12px 6px;
+      }
+      .c-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .c-row input {
+        width: 80px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 16px;
+        text-align: center;
+      }
+      .c-label {
+        font-size: 12px;
+        color: var(--muted);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin: 12px 0 6px;
+      }
+      #msg {
+        padding: 40px 20px;
+        text-align: center;
+        color: var(--muted);
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="msg"></div>
+
+    <div id="display" class="c-idle" style="display: none">
+      <div class="d-top">
+        <span id="d-comp"></span>
+        <span id="d-end"></span>
+      </div>
+      <div class="d-main">
+        <div id="d-group"></div>
+        <div id="d-time">--:--</div>
+        <div id="d-phase"></div>
+      </div>
+      <div class="d-bottom">
+        <span id="d-next"></span>
+        <span>
+          <button id="btn-sound" onclick="toggleSound()">🔇 SOUND OFF</button>
+          <button onclick="goFullscreen()">⛶ FULL SCREEN</button>
+        </span>
+      </div>
+    </div>
+
+    <div id="control">
+      <div class="c-status" id="c-status">
+        <div id="c-info">—</div>
+        <div id="c-time">--:--</div>
+        <div id="c-sub" style="font-size: 13px; opacity: 0.8"></div>
+      </div>
+      <div class="c-grid">
+        <button class="cbtn big" id="btn-main" onclick="mainAction()">START</button>
+        <button class="cbtn" id="btn-pause" onclick="pauseResume()">⏸ PAUSE</button>
+        <button class="cbtn" onclick="restartEnd()">↺ RESTART END</button>
+        <button class="cbtn" onclick="adjust(-10)">−10 s</button>
+        <button class="cbtn" onclick="adjust(10)">+10 s</button>
+        <button class="cbtn stop" onclick="emergency()">⛔ EMERGENCY STOP</button>
+      </div>
+      <div class="c-label">Jump to end</div>
+      <div class="c-row">
+        <select id="jump-end" class="cbtn small" style="flex: 1"></select>
+        <button class="cbtn small" onclick="jumpEnd()">GO</button>
+      </div>
+      <div class="c-label">Manual beeps</div>
+      <div class="c-grid three">
+        <button class="cbtn small" onclick="manualBeep(1)">1 BEEP</button>
+        <button class="cbtn small" onclick="manualBeep(2)">2 BEEPS</button>
+        <button class="cbtn small" onclick="manualBeep(3)">3 BEEPS</button>
+      </div>
+      <div class="c-row" style="margin-top: 12px">
+        <button class="cbtn small" id="btn-sound-c" onclick="toggleSound()" style="flex: 1">
+          🔇 SOUND OFF ON THIS DEVICE
+        </button>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+        setDoc,
+        onSnapshot,
+        serverTimestamp,
+      } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+      const liveConfig = {
+        apiKey: 'AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To',
+        authDomain: 'all-in-competition.firebaseapp.com',
+        projectId: 'all-in-competition',
+        storageBucket: 'all-in-competition.firebasestorage.app',
+        messagingSenderId: '620146958631',
+        appId: '1:620146958631:web:1e88019d1436372689c902',
+      };
+      const devConfig = {
+        apiKey: 'AIzaSyDjmlQJbyRUXXFRlEfVMil0M_DFFUP5Fcc',
+        authDomain: 'all-in-dev-f2807.firebaseapp.com',
+        projectId: 'all-in-dev-f2807',
+        storageBucket: 'all-in-dev-f2807.firebasestorage.app',
+        messagingSenderId: '358306227588',
+        appId: '1:358306227588:web:4e3ad05ffc3812415d69d1',
+      };
+      // Live data only on GitHub Pages; anywhere else (your computer) uses all-in-dev
+      const firebaseConfig = location.hostname.endsWith('github.io') ? liveConfig : devConfig;
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      /* ── END TIMER ──
+         competitions/{id}            timerSettings (set in admin)
+           timer/state                current timer state (written by the controller)
+           timer/clock                used once per device to measure its clock against the server
+         Every device works out the current phase from the state + time, so displays stay in sync
+         and keep running if the connection drops for a moment. */
+      const params = new URLSearchParams(location.search);
+      const compId = params.get('comp');
+      const mode = params.get('mode') === 'control' ? 'control' : 'display';
+      if (params.get('embed')) document.body.classList.add('embed');
+      const stateRef = compId && doc(db, 'competitions', compId, 'timer', 'state');
+
+      const DEFAULTS = {
+        shootSec: 240,
+        callupSec: 10,
+        warnSec: 30,
+        ends: 12,
+        practiceEnds: 2,
+        lines: 'AB-CD', // 'AB' | 'AB-CD' | 'ALT'
+      };
+      let settings = { ...DEFAULTS };
+      let compName = '';
+      let state = null; // last state from Firebase
+      let serverOffset = 0; // server time - device time (ms)
+      const now = () => Date.now() + serverOffset;
+
+      // Measure this device's clock against the server (so all screens show the same second)
+      async function syncClock() {
+        try {
+          const ref = doc(db, 'competitions', compId, 'timer', 'clock');
+          const t0 = Date.now();
+          await setDoc(ref, { t: serverTimestamp() });
+          const snap = await getDoc(ref);
+          const t1 = Date.now();
+          const server = snap.data()?.t?.toMillis?.();
+          if (server) serverOffset = server - (t0 + t1) / 2;
+        } catch (e) {
+          console.error('clock sync', e);
+        }
+      }
+
+      /* ── sequence of one end ── */
+      const endLabel = (e) =>
+        e <= settings.practiceEnds ? 'P' + e : String(e - settings.practiceEnds);
+      const totalEnds = () => settings.practiceEnds + settings.ends;
+      function groupsForEnd(e) {
+        if (settings.lines === 'AB') return ['AB'];
+        if (settings.lines === 'ALT') {
+          const n = e <= settings.practiceEnds ? e : e - settings.practiceEnds;
+          return n % 2 === 1 ? ['AB', 'CD'] : ['CD', 'AB'];
+        }
+        return ['AB', 'CD'];
+      }
+      function buildSeq(e) {
+        const seq = [];
+        groupsForEnd(e).forEach((g) => {
+          seq.push({ phase: 'callup', group: g, dur: settings.callupSec, beeps: 2 });
+          seq.push({ phase: 'shoot', group: g, dur: settings.shootSec, beeps: 1 });
+        });
+        return seq;
+      }
+
+      /* ── where are we now? (same answer on every device) ── */
+      function current() {
+        const s = state;
+        if (!s || !s.status || s.status === 'idle') return { kind: 'idle', end: s?.end || 1 };
+        if (s.status === 'ready') return { kind: 'ready', end: s.end };
+        if (s.status === 'collect') return { kind: 'collect', end: s.end };
+        if (s.status === 'paused' || s.status === 'emergency') {
+          const seg = s.seq[s.segIndex];
+          return { kind: s.status, end: s.end, segIndex: s.segIndex, seg, remaining: s.remaining };
+        }
+        // running: walk forward through the segments
+        let i = s.segIndex;
+        let elapsed = (now() - s.segStartedAt) / 1000;
+        while (i < s.seq.length && elapsed >= s.seq[i].dur) {
+          elapsed -= s.seq[i].dur;
+          i++;
+        }
+        if (i >= s.seq.length) return { kind: 'collect', end: s.end, auto: true };
+        return {
+          kind: 'running',
+          end: s.end,
+          segIndex: i,
+          seg: s.seq[i],
+          remaining: s.seq[i].dur - elapsed,
+        };
+      }
+
+      /* ── sound (Web Audio beeps) ── */
+      let soundOn = false,
+        audioCtx = null;
+      window.toggleSound = () => {
+        soundOn = !soundOn;
+        if (soundOn && !audioCtx)
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx?.state === 'suspended') audioCtx.resume();
+        const label = soundOn ? '🔊 SOUND ON' : '🔇 SOUND OFF';
+        const b1 = document.getElementById('btn-sound');
+        const b2 = document.getElementById('btn-sound-c');
+        if (b1) b1.textContent = label;
+        if (b2) b2.textContent = label + ' ON THIS DEVICE';
+        if (soundOn) beep(1);
+      };
+      function beep(n) {
+        if (!soundOn || !audioCtx) return;
+        const t0 = audioCtx.currentTime + 0.02;
+        for (let i = 0; i < n; i++) {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = 'square';
+          o.frequency.value = 880;
+          const st = t0 + i * 0.9;
+          g.gain.setValueAtTime(0.0001, st);
+          g.gain.exponentialRampToValueAtTime(0.6, st + 0.02);
+          g.gain.setValueAtTime(0.6, st + 0.55);
+          g.gain.exponentialRampToValueAtTime(0.0001, st + 0.6);
+          o.connect(g).connect(audioCtx.destination);
+          o.start(st);
+          o.stop(st + 0.62);
+        }
+      }
+
+      /* ── render loop: draw + play beeps when entering a new phase ── */
+      let lastKey = null,
+        lastManualBeep = undefined;
+      const fmt = (sec) => {
+        const s = Math.max(0, Math.ceil(sec));
+        return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+      };
+      function view() {
+        const c = current();
+        let color = 'c-red',
+          time = '--:--',
+          phase = '',
+          group = '';
+        const endTxt = `END ${endLabel(c.end)} / ${settings.ends}${c.end <= settings.practiceEnds ? ' (PRACTICE)' : ''}`;
+        if (c.kind === 'idle') {
+          color = 'c-idle';
+          phase = 'WAITING';
+        } else if (c.kind === 'ready') {
+          phase = 'READY';
+          time = fmt(settings.callupSec);
+        } else if (c.kind === 'collect') {
+          phase = 'COLLECT ARROWS';
+          time = '0:00';
+        } else {
+          group = c.seg.group;
+          time = fmt(c.remaining);
+          if (c.kind === 'emergency') phase = '⛔ STOP';
+          else if (c.kind === 'paused') phase = 'PAUSED';
+          else phase = c.seg.phase === 'callup' ? 'TO THE LINE' : 'SHOOT';
+          if (c.kind === 'running' && c.seg.phase === 'shoot')
+            color = c.remaining <= settings.warnSec ? 'c-yellow' : 'c-green';
+          if (c.kind === 'paused' && c.seg.phase === 'shoot') color = 'c-yellow';
+        }
+        let next = '';
+        if (c.kind === 'running' || c.kind === 'paused') {
+          const s = state.seq[c.segIndex + 1];
+          next = s
+            ? `Next: ${s.group} ${s.phase === 'callup' ? 'to the line' : 'shoot'}`
+            : 'Next: collect';
+        }
+        return { c, color, time, phase, group, endTxt, next };
+      }
+      let stateLoaded = false;
+      function soundEvents(c) {
+        if (!stateLoaded) return;
+        // beeps when the phase changes (not on first load, so a reloaded screen stays quiet)
+        const key =
+          c.kind === 'running'
+            ? `${state.end}-${state.startId}-${c.segIndex}`
+            : `${c.kind}-${state?.end}-${state?.startId}`;
+        if (key !== lastKey) {
+          if (lastKey !== null) {
+            if (c.kind === 'running') beep(c.seg.beeps);
+            else if (c.kind === 'collect') beep(3);
+            else if (c.kind === 'emergency') beep(5);
+          }
+          lastKey = key;
+        }
+        // manual beeps: play when a new one arrives (not the one already there on load)
+        const mbId = state?.manualBeep?.id || null;
+        if (lastManualBeep === undefined) lastManualBeep = mbId;
+        else if (mbId && mbId !== lastManualBeep) {
+          beep(state.manualBeep.n);
+          lastManualBeep = mbId;
+        }
+      }
+      function draw() {
+        const v = view();
+        soundEvents(v.c);
+        if (mode === 'display') {
+          const d = document.getElementById('display');
+          d.className = v.color;
+          document.getElementById('d-time').textContent = v.time;
+          document.getElementById('d-phase').textContent = v.phase;
+          document.getElementById('d-group').textContent = v.group;
+          document.getElementById('d-end').textContent = v.endTxt;
+          document.getElementById('d-comp').textContent = compName;
+          document.getElementById('d-next').textContent = v.next;
+        } else {
+          const st = document.getElementById('c-status');
+          st.className = 'c-status ' + (v.color === 'c-idle' ? '' : v.color);
+          document.getElementById('c-time').textContent = v.time;
+          document.getElementById('c-info').textContent =
+            `${v.endTxt}${v.group ? ' · ' + v.group : ''}`;
+          document.getElementById('c-sub').textContent = [v.phase, v.next]
+            .filter(Boolean)
+            .join(' · ');
+          const k = v.c.kind;
+          const main = document.getElementById('btn-main');
+          if (k === 'idle' || k === 'ready') main.textContent = `▶ START END ${endLabel(v.c.end)}`;
+          else if (k === 'collect')
+            main.textContent =
+              v.c.end < totalEnds() ? `▶ START END ${endLabel(v.c.end + 1)}` : '✓ ALL ENDS DONE';
+          else if (k === 'running') main.textContent = '⏭ NEXT (END PHASE NOW)';
+          else main.textContent = '▶ RESUME';
+          document.getElementById('btn-pause').textContent =
+            k === 'paused' || k === 'emergency' ? '▶ RESUME' : '⏸ PAUSE';
+        }
+      }
+
+      /* ── controller actions (write the new state) ── */
+      const write = (s) => setDoc(stateRef, { ...s, updatedAt: now() });
+      const startId = () => Math.random().toString(36).slice(2, 8);
+      function startEnd(e) {
+        return write({
+          status: 'running',
+          end: e,
+          seq: buildSeq(e),
+          segIndex: 0,
+          segStartedAt: now(),
+          startId: startId(),
+          manualBeep: state?.manualBeep || null,
+        });
+      }
+      window.mainAction = () => {
+        const c = current();
+        if (c.kind === 'idle' || c.kind === 'ready') return startEnd(c.end || 1);
+        if (c.kind === 'collect') {
+          if (c.end < totalEnds()) return startEnd(c.end + 1);
+          return;
+        }
+        if (c.kind === 'running') {
+          // end the current phase now
+          const nextIdx = c.segIndex + 1;
+          if (nextIdx >= state.seq.length) return write({ ...state, status: 'collect' });
+          return write({ ...state, segIndex: nextIdx, segStartedAt: now() });
+        }
+        return pauseResume();
+      };
+      window.pauseResume = () => {
+        const c = current();
+        if (c.kind === 'running')
+          return write({
+            ...state,
+            status: 'paused',
+            segIndex: c.segIndex,
+            remaining: c.remaining,
+          });
+        if (c.kind === 'paused' || c.kind === 'emergency') {
+          const seg = state.seq[state.segIndex];
+          return write({
+            ...state,
+            status: 'running',
+            segStartedAt: now() - (seg.dur - state.remaining) * 1000,
+            remaining: null,
+          });
+        }
+      };
+      window.emergency = () => {
+        const c = current();
+        if (c.kind === 'running' || c.kind === 'paused')
+          return write({
+            ...state,
+            status: 'emergency',
+            segIndex: c.segIndex,
+            remaining: c.remaining,
+          });
+        return write({
+          ...(state || {}),
+          status: 'emergency',
+          end: c.end || 1,
+          seq: state?.seq || buildSeq(c.end || 1),
+          segIndex: 0,
+          remaining: settings.callupSec,
+        });
+      };
+      window.adjust = (sec) => {
+        const c = current();
+        if (c.kind === 'running') {
+          const seg = state.seq[c.segIndex];
+          const remaining = Math.min(seg.dur, Math.max(0, c.remaining + sec));
+          return write({
+            ...state,
+            segIndex: c.segIndex,
+            segStartedAt: now() - (seg.dur - remaining) * 1000,
+          });
+        }
+        if (c.kind === 'paused' || c.kind === 'emergency') {
+          const seg = state.seq[state.segIndex];
+          return write({
+            ...state,
+            remaining: Math.min(seg.dur, Math.max(0, state.remaining + sec)),
+          });
+        }
+      };
+      window.restartEnd = () => {
+        const c = current();
+        return write({ status: 'ready', end: c.end || 1, manualBeep: state?.manualBeep || null });
+      };
+      window.jumpEnd = () => {
+        const e = parseInt(document.getElementById('jump-end').value);
+        if (!e) return;
+        return write({ status: 'ready', end: e, manualBeep: state?.manualBeep || null });
+      };
+      window.manualBeep = (n) =>
+        write({ ...(state || { status: 'idle', end: 1 }), manualBeep: { n, id: startId() } });
+
+      window.goFullscreen = () => document.documentElement.requestFullscreen?.();
+
+      function fillJump() {
+        const sel = document.getElementById('jump-end');
+        if (!sel) return;
+        const cur = sel.value;
+        sel.innerHTML = Array.from({ length: totalEnds() }, (_, i) => i + 1)
+          .map(
+            (e) =>
+              `<option value="${e}">End ${endLabel(e)}${e <= settings.practiceEnds ? ' (practice)' : ''}</option>`,
+          )
+          .join('');
+        if (cur) sel.value = cur;
+      }
+
+      async function init() {
+        if (!compId) {
+          const m = document.getElementById('msg');
+          m.style.display = 'block';
+          m.textContent = 'No competition selected. Open the timer from the admin Timer panel.';
+          return;
+        }
+        document.getElementById(mode).style.display = mode === 'display' ? 'flex' : 'block';
+        onSnapshot(doc(db, 'competitions', compId), (snap) => {
+          const d = snap.data() || {};
+          compName = d.name || '';
+          settings = { ...DEFAULTS, ...(d.timerSettings || {}) };
+          fillJump();
+          draw();
+        });
+        onSnapshot(stateRef, (snap) => {
+          state = snap.data() || null;
+          stateLoaded = true;
+          draw();
+        });
+        await syncClock();
+        setInterval(syncClock, 5 * 60 * 1000);
+        setInterval(draw, 200);
+      }
+      init();
+    </script>
+  </body>
+</html>
