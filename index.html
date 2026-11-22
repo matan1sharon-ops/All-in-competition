@@ -5219,44 +5219,40 @@
         if (archerCount <= 8) return Math.min(maxBracket, 4);
         return Math.min(maxBracket, 8);
       }
+      // World Archery bracket order: seeds placed so 1 and 2 can only meet in the final,
+      // 1 meets 8 (QF) then 4 (SF) etc. e.g. 16 slots: 1v16, 8v9, 4v13, 5v12, 2v15, 7v10, 3v14, 6v11
+      function bracketSeedOrder(totalSlots) {
+        let order = [1, 2];
+        while (order.length < totalSlots) {
+          const size = order.length * 2;
+          order = order.flatMap((sd) => [sd, size + 1 - sd]);
+        }
+        return order;
+      }
       function buildBracketMatches(seeds, bracketSize, firstRound) {
         const totalSlots = bracketSize * 2;
+        const order = bracketSeedOrder(totalSlots);
         const matches = [];
-        const slots = Array.from({ length: totalSlots }, (_, i) => seeds[i] || null);
-        for (let i = 0; i < totalSlots / 2; i++) {
-          const a1 = slots[i];
-          const a2 = slots[totalSlots - 1 - i];
-          const isBye = a1 && !a2;
-          if (isBye) {
-            matches.push({
-              id: `${firstRound}_m${i + 1}`,
-              round: firstRound,
-              position: i + 1,
-              archer1: { id: a1.id, name: a1.name, seed: i + 1, qualScore: a1.qualScore },
-              archer2: null,
-              isBye: true,
-              sets: [],
-              score1: null,
-              score2: null,
-              tiebreak1: null,
-              tiebreak2: null,
-              winnerChoice: a1.id,
-            });
-          } else {
-            matches.push({
-              id: `${firstRound}_m${i + 1}`,
-              round: firstRound,
-              position: i + 1,
-              archer1: { id: a1.id, name: a1.name, seed: i + 1, qualScore: a1.qualScore },
-              archer2: { id: a2.id, name: a2.name, seed: totalSlots - i, qualScore: a2.qualScore },
-              sets: [],
-              score1: null,
-              score2: null,
-              tiebreak1: null,
-              tiebreak2: null,
-              winnerChoice: null,
-            });
-          }
+        for (let i = 0; i < bracketSize; i++) {
+          const s1 = order[2 * i],
+            s2 = order[2 * i + 1];
+          const a1 = seeds[s1 - 1] || null; // higher seed
+          const a2 = seeds[s2 - 1] || null; // missing lower seed = bye
+          const entry = (a, sd) => ({ id: a.id, name: a.name, seed: sd, qualScore: a.qualScore });
+          matches.push({
+            id: `${firstRound}_m${i + 1}`,
+            round: firstRound,
+            position: i + 1,
+            archer1: a1 ? entry(a1, s1) : null,
+            archer2: a2 ? entry(a2, s2) : null,
+            isBye: !!(a1 && !a2),
+            sets: [],
+            score1: null,
+            score2: null,
+            tiebreak1: null,
+            tiebreak2: null,
+            winnerChoice: a1 && !a2 ? a1.id : null,
+          });
         }
         return matches;
       }

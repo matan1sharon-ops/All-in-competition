@@ -979,6 +979,23 @@
     </style>
   </head>
   <body>
+    <div
+      id="net-banner"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 9999;
+        color: #fff;
+        text-align: center;
+        padding: 6px;
+        font-size: 13px;
+        font-weight: 700;
+        font-family: sans-serif;
+      "
+    ></div>
     <!-- MAIN MENU -->
     <div id="main-menu">
       <div class="menu-card">
@@ -1310,6 +1327,9 @@
         getDocs,
         setDoc,
         onSnapshot,
+        initializeFirestore,
+        persistentLocalCache,
+        persistentMultipleTabManager,
         writeBatch,
         deleteDoc,
       } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
@@ -1332,7 +1352,15 @@
       // Live data only on GitHub Pages; anywhere else (your computer) uses all-in-dev
       const firebaseConfig = location.hostname.endsWith('github.io') ? liveConfig : devConfig;
       const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
+      // Scores are kept on the phone (IndexedDB) until uploaded, so nothing is lost offline or on reload
+      let db;
+      try {
+        db = initializeFirestore(app, {
+          localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+        });
+      } catch (e) {
+        db = getFirestore(app);
+      }
       // Links point to the same place this page is running from (live site, test site or your computer)
       const APP_BASE = new URL('.', location.href).href.replace(/\/$/, '');
       /* ── DATA LAYOUT ──
@@ -1660,6 +1688,9 @@
           station: 'STATION',
           score_saved: 'Scores saved ✓',
           save_failed: 'Save failed',
+          updated_other_phone: 'Updated from another phone',
+          offline_banner: '⚠ Offline — scores are saved on this phone and upload automatically',
+          uploading_banner: '⏳ Uploading scores…',
           no_competitions: 'No competitions found',
           select_competition: '— Select Competition —',
           complete: 'Complete',
@@ -1706,6 +1737,9 @@
           station: 'תחנה',
           score_saved: 'ניקוד נשמר ✓',
           save_failed: 'שמירה נכשלה',
+          updated_other_phone: 'עודכן מטלפון אחר',
+          offline_banner: '⚠ אין חיבור — הניקוד נשמר בטלפון ויעלה אוטומטית',
+          uploading_banner: '⏳ מעלה ניקוד…',
           no_competitions: 'לא נמצאו תחרויות',
           select_competition: '— בחר תחרות —',
           complete: 'הושלם',
@@ -1796,6 +1830,8 @@
       }
       /* ── MAIN MENU ── */
       window.goToMainMenu = () => {
+        stopQualSync();
+        stopMatchSync();
         ['login-screen', 'scoring-screen', 'match-screen', 'summary-screen'].forEach((id) => {
           document.getElementById(id).style.display = 'none';
         });
@@ -2104,6 +2140,11 @@
           }
         });
         targetArchers.forEach((a) => recalcStats(a.id));
+        targetArchers.forEach((a) => {
+          const k = scoreKey(a.id);
+          setQualBase(a.id, existing[k] || existing[String(a.id)]);
+        });
+        startQualSync();
         activeArcherIdx = 0;
         scoringArcherIdx = 0;
         editingEnd = null;
@@ -2816,40 +2857,212 @@
           scores[archerId].sixes = sixes;
         }
       }
+      /* ── TWO PHONES ON ONE TARGET / MATCH ──
+         Each phone keeps the last version it saw from Firebase ("base").
+         Something that differs from the base was changed on this phone → it is saved.
+         Something unchanged here that changed in Firebase → taken from the other phone.
+         Qualification saves only the ends that changed, so phones never overwrite each other's ends. */
+      const J = (v) => JSON.stringify(v ?? null);
+      let qualBase = {}; // archerId -> { endIndex: json }
+      let unwatchQual = [];
+      const scoreKey = (id) => String(id).replace(/\./g, '_');
+      function endsFromRaw(raw) {
+        const out = {};
+        if (Array.isArray(raw?.ends)) raw.ends.forEach((e, i) => (out[i] = e || []));
+        else Object.keys(raw?.ends || {}).forEach((i) => (out[parseInt(i)] = raw.ends[i] || []));
+        return out;
+      }
+      function setQualBase(archerId, raw) {
+        qualBase[archerId] = {};
+        const ends = endsFromRaw(raw);
+        Object.keys(ends).forEach((i) => (qualBase[archerId][i] = J(ends[i])));
+      }
+      function stopQualSync() {
+        unwatchQual.forEach((u) => u());
+        unwatchQual = [];
+      }
+      function startQualSync() {
+        stopQualSync();
+        targetArchers.forEach((a) => {
+          unwatchQual.push(
+            onSnapshot(doc(sub(compId, 'scores'), scoreKey(a.id)), (snap) => {
+              if (snap.exists()) applyRemoteScore(a.id, snap.data());
+            }),
+          );
+        });
+      }
+      function applyRemoteScore(archerId, raw) {
+        const s = scores[archerId];
+        if (!s) return;
+        const remote = endsFromRaw(raw);
+        const base = qualBase[archerId] || (qualBase[archerId] = {});
+        let changed = false;
+        Object.keys(remote).forEach((i) => {
+          const rj = J(remote[i]);
+          const lj = J(s.ends[i] || []);
+          const bj = base[i] ?? J([]);
+          if (lj === bj && lj !== rj) {
+            s.ends[i] = remote[i];
+            changed = true;
+          }
+          base[i] = rj;
+        });
+        if (!changed) return;
+        recalcStats(archerId);
+        if (document.getElementById('scoring-screen')?.style.display === 'flex') {
+          renderTabs();
+          renderScoreList();
+          renderPad();
+          updateQualHeader();
+        }
+        toast(t('updated_other_phone'), 'success');
+        // totals in Firebase were worked out by the other phone; keep them matching all ends
+        if (raw.total !== s.total) saveQualScores();
+      }
+
+      /* ── OFFLINE ── saves never wait for the internet; Firebase keeps them on the phone
+         (also across a reload) and uploads them when the connection is back */
+      let pendingWrites = 0;
+      function trackWrite(promise) {
+        pendingWrites++;
+        updateNetBanner();
+        promise
+          .catch((e) => {
+            console.error('Save error:', e);
+            toast(t('save_failed'), 'error');
+          })
+          .finally(() => {
+            pendingWrites--;
+            updateNetBanner();
+          });
+      }
+      function updateNetBanner() {
+        const el = document.getElementById('net-banner');
+        if (!el) return;
+        if (!navigator.onLine) {
+          el.textContent = t('offline_banner');
+          el.style.display = 'block';
+          el.style.background = '#c62828';
+        } else if (pendingWrites > 0) {
+          el.textContent = t('uploading_banner');
+          el.style.display = 'block';
+          el.style.background = '#37474f';
+        } else el.style.display = 'none';
+      }
+      window.addEventListener('online', updateNetBanner);
+      window.addEventListener('offline', updateNetBanner);
+
+      /* ── MATCH (same idea: base = last version seen from Firebase) ── */
+      let matchBase = null,
+        unwatchMatch = null;
+      const matchRef = () =>
+        doc(sub(compId, 'matches'), matchDocId(matchCatKey, matchRoundKey, matchIdx));
+      // every independently-entered part of a match: each archer's arrows per set, cumulative arrows, tiebreaks
+      function matchParts(m, local) {
+        const p = {};
+        if (local) {
+          if (matchFormat === 'sets')
+            matchSets.forEach((s, i) => {
+              if (!s) return;
+              p['s' + i + 'a0'] = s.arrows1 || [];
+              p['s' + i + 'a1'] = s.arrows2 || [];
+            });
+          else {
+            p.c0 = cumArrows1;
+            p.c1 = cumArrows2;
+            p.t0 = cumTB1 !== null ? getVal(cumTB1) : null;
+            p.t1 = cumTB2 !== null ? getVal(cumTB2) : null;
+          }
+          return p;
+        }
+        if (!m) return p;
+        if (matchFormat === 'sets')
+          (m.sets || []).forEach((s, i) => {
+            if (!s) return;
+            p['s' + i + 'a0'] = s.arrows1 || [];
+            p['s' + i + 'a1'] = s.arrows2 || [];
+          });
+        else {
+          p.c0 = m.arrows1 || [];
+          p.c1 = m.arrows2 || [];
+          p.t0 = m.tiebreak1 ?? null;
+          p.t1 = m.tiebreak2 ?? null;
+        }
+        return p;
+      }
+      function setLocalPart(k, v) {
+        if (k[0] === 's') {
+          const si = parseInt(k.slice(1));
+          setMatchArrows(si, k.endsWith('a0') ? 0 : 1, [...(v || [])]);
+        } else if (k === 'c0') cumArrows1 = [...(v || [])];
+        else if (k === 'c1') cumArrows2 = [...(v || [])];
+        else if (k === 't0') cumTB1 = v;
+        else if (k === 't1') cumTB2 = v;
+      }
+      function stopMatchSync() {
+        if (unwatchMatch) unwatchMatch();
+        unwatchMatch = null;
+        matchBase = null;
+      }
+      function startMatchSync() {
+        stopMatchSync();
+        matchBase = matchData ? JSON.parse(JSON.stringify(matchData)) : null;
+        unwatchMatch = onSnapshot(matchRef(), (snap) => {
+          const remote = snap.data()?.match;
+          if (remote) applyRemoteMatch(remote);
+        });
+      }
+      function applyRemoteMatch(remote) {
+        const L = matchParts(null, true),
+          B = matchParts(matchBase),
+          R = matchParts(remote);
+        let changed = false;
+        new Set([...Object.keys(L), ...Object.keys(R)]).forEach((k) => {
+          if (J(L[k]) === J(B[k]) && J(L[k]) !== J(R[k])) {
+            setLocalPart(k, R[k]);
+            changed = true;
+          }
+        });
+        matchBase = JSON.parse(JSON.stringify(remote));
+        if (!changed) return;
+        if (document.getElementById('match-screen')?.style.display === 'flex') {
+          renderMatchTabs();
+          renderMatchSets();
+          renderMatchPad();
+          updateMatchHeader();
+        }
+        toast(t('updated_other_phone'), 'success');
+      }
       async function saveQualScores() {
         if (!compId) return;
-        try {
-          const payload = { scores: {} }; // archer key -> score doc
-          targetArchers.forEach((a) => {
-            const key = String(a.id).replace(/\./g, '_');
-            const s = scores[a.id];
-            const endsObj = {};
-            s.ends.forEach((end, i) => {
-              endsObj[String(i)] = end;
-            });
-            payload.scores[key] = {
-              total: s.total,
-              tens: s.tens,
-              xs: s.xs,
-              g1: s.g1 || 0,
-              g2: s.g2 || 0,
-              h1: s.h1 || 0,
-              h2: s.h2 || 0,
-              kills: s.kills || 0,
-              elevens: s.elevens || 0,
-              sixes: s.sixes || 0,
-              ends: endsObj,
-            };
+        const ops = [];
+        targetArchers.forEach((a) => {
+          const s = scores[a.id];
+          if (!s) return;
+          const base = qualBase[a.id] || (qualBase[a.id] = {});
+          const endsObj = {};
+          s.ends.forEach((end, i) => {
+            if (J(end || []) !== (base[i] ?? J([]))) endsObj[String(i)] = end || [];
           });
-          await commitOps(
-            Object.entries(payload.scores).map(
-              ([key, sc]) =>
-                (b) =>
-                  b.set(doc(sub(compId, 'scores'), key), sc, { merge: true }),
-            ),
-          );
-        } catch (e) {
-          toast(t('save_failed'), 'error');
+          const sc = {
+            total: s.total,
+            tens: s.tens,
+            xs: s.xs,
+            g1: s.g1 || 0,
+            g2: s.g2 || 0,
+            h1: s.h1 || 0,
+            h2: s.h2 || 0,
+            kills: s.kills || 0,
+            elevens: s.elevens || 0,
+            sixes: s.sixes || 0,
+            ends: endsObj, // only the ends changed on this phone
+          };
+          ops.push((b) => b.set(doc(sub(compId, 'scores'), scoreKey(a.id)), sc, { merge: true }));
+        });
+        for (let i = 0; i < ops.length; i += 400) {
+          const b = writeBatch(db);
+          ops.slice(i, i + 400).forEach((op) => op(b));
+          trackWrite(b.commit());
         }
       }
 
@@ -3160,6 +3373,8 @@
         }
       }
       window.goBackToScoring = () => {
+        stopQualSync();
+        stopMatchSync();
         document.getElementById('summary-screen').style.display = 'none';
         if (matchData) {
           document.getElementById('login-screen').style.display = 'flex';
@@ -3288,6 +3503,7 @@
         cumTB1 = null;
         cumTB2 = null;
         window._cumTBWinner = null;
+        startMatchSync();
         renderMatchTabs();
         renderMatchSets();
         renderMatchPad();
@@ -3744,12 +3960,8 @@
       async function saveMatchProgress() {
         if (!compId || !matchCatKey || !matchRoundKey || matchIdx === null) return;
         try {
-          const mRef = doc(
-            sub(compId, 'matches'),
-            matchDocId(matchCatKey, matchRoundKey, matchIdx),
-          );
-          const snap = await getDoc(mRef);
-          const match = snap.data().match;
+          const mRef = matchRef();
+          const match = JSON.parse(JSON.stringify(matchBase || matchData));
           if (matchFormat === 'sets') {
             match.sets = matchSets.map((s) => ({
               score1: s.score1 || 0,
@@ -3776,7 +3988,7 @@
                 });
             }
           }
-          await setDoc(mRef, { match }, { merge: true });
+          trackWrite(setDoc(mRef, { match }, { merge: true }));
         } catch (e) {
           console.error('Save error:', e);
         }
@@ -3851,12 +4063,8 @@
         }
         if (winnerId) {
           try {
-            const mRef = doc(
-              sub(compId, 'matches'),
-              matchDocId(matchCatKey, matchRoundKey, matchIdx),
-            );
-            const snap = await getDoc(mRef);
-            const match = snap.data().match;
+            const mRef = matchRef();
+            const match = JSON.parse(JSON.stringify(matchBase || matchData));
             match.winnerChoice = winnerId;
             if (matchFormat === 'sets') {
               match.sets = matchSets.map((s) => ({
@@ -3874,7 +4082,7 @@
               match.arrows2 = cumArrows2;
               match.score2 = cumArrows2.reduce((s, v) => s + getVal(v), 0);
             }
-            await setDoc(mRef, { match }, { merge: true });
+            trackWrite(setDoc(mRef, { match }, { merge: true }));
           } catch (e) {
             console.error('Save error:', e);
           }
@@ -3947,6 +4155,8 @@
         toast('Match submitted ✓', 'success');
       };
       window.goBackToScoring = () => {
+        stopQualSync();
+        stopMatchSync();
         document.getElementById('summary-screen').style.display = 'none';
         if (matchData) {
           document.getElementById('login-screen').style.display = 'flex';
