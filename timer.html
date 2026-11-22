@@ -159,6 +159,9 @@
         gap: 8px;
         margin-bottom: 8px;
       }
+      .c-grid.four {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+      }
       .c-grid.three {
         grid-template-columns: 1fr 1fr 1fr;
       }
@@ -258,8 +261,14 @@
         <button class="cbtn big" id="btn-main" onclick="mainAction()">START</button>
         <button class="cbtn" id="btn-pause" onclick="pauseResume()">⏸ PAUSE</button>
         <button class="cbtn" onclick="restartEnd()">↺ RESTART END</button>
-        <button class="cbtn" onclick="adjust(-10)">−10 s</button>
-        <button class="cbtn" onclick="adjust(10)">+10 s</button>
+      </div>
+      <div class="c-grid four">
+        <button class="cbtn" onclick="adjust(-5)">−5 s</button>
+        <button class="cbtn" onclick="adjust(-1)">−1 s</button>
+        <button class="cbtn" onclick="adjust(1)">+1 s</button>
+        <button class="cbtn" onclick="adjust(5)">+5 s</button>
+      </div>
+      <div class="c-grid">
         <button class="cbtn stop" onclick="emergency()">⛔ EMERGENCY STOP</button>
       </div>
       <div class="c-label">Jump to end</div>
@@ -612,7 +621,7 @@
         const c = current();
         if (c.kind === 'running') {
           const seg = state.seq[c.segIndex];
-          const remaining = Math.min(seg.dur, Math.max(0, c.remaining + sec));
+          const remaining = Math.max(0, c.remaining + sec);
           return write({
             ...state,
             segIndex: c.segIndex,
@@ -623,7 +632,7 @@
           const seg = state.seq[state.segIndex];
           return write({
             ...state,
-            remaining: Math.min(seg.dur, Math.max(0, state.remaining + sec)),
+            remaining: Math.max(0, state.remaining + sec),
           });
         }
       };
