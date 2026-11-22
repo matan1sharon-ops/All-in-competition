@@ -1120,11 +1120,34 @@
               </div>
               <div style="margin-bottom: 16px; display: flex; gap: 8px; flex-wrap: wrap">
                 <button
+                  id="res-btn-qual"
+                  class="btn btn-primary btn-sm"
+                  onclick="setResultsView('qual')"
+                  data-t="qualification_view"
+                >
+                  🏹 QUALIFICATION
+                </button>
+                <button
+                  id="res-btn-final"
+                  class="btn btn-secondary btn-sm"
+                  onclick="setResultsView('final')"
+                  data-t="final_results"
+                >
+                  🏆 FINAL RESULTS
+                </button>
+                <button
                   class="btn btn-secondary btn-sm"
                   onclick="exportResultsPDF()"
-                  data-t="export_pdf"
+                  data-t="print_qual"
                 >
-                  📄 EXPORT PDF
+                  🖨 PRINT QUALIFICATION
+                </button>
+                <button
+                  class="btn btn-secondary btn-sm"
+                  onclick="printFinalResults()"
+                  data-t="print_final"
+                >
+                  🖨 PRINT FINAL RESULTS
                 </button>
                 <button
                   class="btn btn-secondary btn-sm"
@@ -1142,6 +1165,7 @@
                 </button>
               </div>
               <div id="results-by-category"></div>
+              <div id="final-results-admin" style="display: none"></div>
             </div>
           </div>
           <!-- SCORECARDS -->
@@ -2035,6 +2059,14 @@
           apply_all: 'APPLY TYPE TO ALL',
           add_session: '+ ADD SESSION',
           export_pdf: '📄 EXPORT PDF',
+          qualification_view: '🏹 QUALIFICATION',
+          final_results: '🏆 FINAL RESULTS',
+          final_results_title: 'Final Results',
+          print_qual: '🖨 PRINT QUALIFICATION',
+          print_final: '🖨 PRINT FINAL RESULTS',
+          elim_in_progress: 'Elimination in progress',
+          qual_rank: 'Qual',
+          club: 'Club',
           display_screen: '🖥 DISPLAY SCREEN',
           share_results: '🔗 SHARE RESULTS',
           print_all: '🖨 PRINT ALL',
@@ -2212,6 +2244,14 @@
           apply_all: 'החל סוג על כולם',
           add_session: '+ הוסף סבב',
           export_pdf: '📄 ייצא PDF',
+          qualification_view: '🏹 מוקדמות',
+          final_results: '🏆 תוצאות סופיות',
+          final_results_title: 'תוצאות סופיות',
+          print_qual: '🖨 הדפס מוקדמות',
+          print_final: '🖨 הדפס תוצאות סופיות',
+          elim_in_progress: 'מקצי ההדחות עדיין בתהליך',
+          qual_rank: 'מוקדמות',
+          club: 'מועדון',
           display_screen: '🖥 מסך תצוגה',
           share_results: '🔗 שתף תוצאות',
           print_all: '🖨 הדפס הכל',
@@ -4160,6 +4200,7 @@
         if (!container) return;
         if (!archers.length) {
           container.innerHTML = '<p style="color:var(--muted2)">No archers yet.</p>';
+          renderFinalResultsAdmin();
           return;
         }
         const labels = getGoldLabels();
@@ -4184,6 +4225,7 @@
           });
         if (!scoredArchers.length) {
           container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted2);">${t('no_scores_yet')}<br>${t('results_will_appear')}</div>`;
+          renderFinalResultsAdmin();
           return;
         }
         const catMap = {};
@@ -4234,6 +4276,159 @@
           requestAnimationFrame(() => {
             scrollEl.scrollTop = st;
           });
+        renderFinalResultsAdmin();
+      };
+      /* ── FINAL RESULTS (after elimination) — same ranking as live results page ──
+         1-2 Final winner/loser, 3-4 Bronze winner/loser, then archers out in earlier rounds
+         (deepest round first, each round by qualification rank), then everyone else by qualification. */
+      let resultsView = 'qual';
+      window.setResultsView = (view) => {
+        resultsView = view;
+        ['qual', 'final'].forEach((v) => {
+          const btn = document.getElementById('res-btn-' + v);
+          if (btn) btn.className = 'btn btn-sm ' + (view === v ? 'btn-primary' : 'btn-secondary');
+        });
+        document.getElementById('results-by-category').style.display =
+          view === 'qual' ? 'block' : 'none';
+        document.getElementById('final-results-admin').style.display =
+          view === 'final' ? 'block' : 'none';
+      };
+      function qualCompare() {
+        const isCustomDisc = currentDiscipline === 'Custom';
+        return (a, b) => {
+          const td = b.total - a.total;
+          if (td !== 0) return td;
+          if (isCustomDisc) {
+            const avgA = ((a.kills || 0) + (a.elevens || 0) + (a.sixes || 0)) / 3;
+            const avgB = ((b.kills || 0) + (b.elevens || 0) + (b.sixes || 0)) / 3;
+            return avgB - avgA;
+          }
+          return (b.g1 || 0) - (a.g1 || 0) || (b.g2 || 0) - (a.g2 || 0);
+        };
+      }
+      function buildFinalCats() {
+        const elimData = window._elimData || {};
+        const catMap = {};
+        archers
+          .filter((a) => (getScore(a.id)?.total || 0) > 0)
+          .forEach((a) => {
+            const s = getScore(a.id);
+            const key = `${a.bow}||${a.age}||${a.gender}`;
+            if (!catMap[key])
+              catMap[key] = { key, bow: a.bow, age: a.age, gender: a.gender, archers: [] };
+            catMap[key].archers.push({
+              ...a,
+              total: s.total || 0,
+              g1: s.g1 || 0,
+              g2: s.g2 || 0,
+              kills: s.kills || 0,
+              elevens: s.elevens || 0,
+              sixes: s.sixes || 0,
+            });
+          });
+        const cats = Object.values(catMap).sort((a, b) => {
+          const bi = BOW_ORDER.indexOf(a.bow) - BOW_ORDER.indexOf(b.bow);
+          if (bi !== 0) return bi;
+          const ai = AGE_ORDER.indexOf(a.age) - AGE_ORDER.indexOf(b.age);
+          if (ai !== 0) return ai;
+          return a.gender.localeCompare(b.gender);
+        });
+        return cats.map((cat) => {
+          const elim = elimData[cat.key];
+          const qual = [...cat.archers].sort(qualCompare());
+          const qualRank = new Map(qual.map((a, i) => [String(a.id), i + 1]));
+          const byId = new Map(qual.map((a) => [String(a.id), a]));
+          const rounds = elim?.rounds || {};
+          const done = (rk) =>
+            (rounds[rk] || []).length > 0 && rounds[rk].every((m) => m.winnerChoice);
+          if (elim && !(done('F') && done('B'))) return { cat, inProgress: true, rows: [] };
+          const placed = new Set();
+          const rows = [];
+          const add = (archer) => {
+            const id = String(archer?.id ?? '');
+            if (!archer || placed.has(id)) return;
+            placed.add(id);
+            rows.push({
+              ...(byId.get(id) || archer),
+              rank: rows.length + 1,
+              qualRank: qualRank.get(id) || null,
+            });
+          };
+          const winLose = (m) => {
+            const w = String(m.winnerChoice) === String(m.archer1?.id) ? m.archer1 : m.archer2;
+            return [w, w === m.archer1 ? m.archer2 : m.archer1];
+          };
+          if (elim) {
+            [...winLose(rounds.F[0]), ...winLose(rounds.B[0])].forEach(add);
+            ['SF', 'QF', 'R1'].forEach((rk) =>
+              (rounds[rk] || [])
+                .filter((m) => m.winnerChoice && !m.isBye)
+                .map((m) => winLose(m)[1])
+                .filter(Boolean)
+                .sort(
+                  (a, b) =>
+                    (qualRank.get(String(a.id)) || 9999) - (qualRank.get(String(b.id)) || 9999),
+                )
+                .forEach(add),
+            );
+          }
+          qual.forEach(add);
+          return { cat, inProgress: false, rows };
+        });
+      }
+      function renderFinalResultsAdmin() {
+        const el = document.getElementById('final-results-admin');
+        if (!el) return;
+        const finalCats = buildFinalCats();
+        if (!finalCats.length) {
+          el.innerHTML = `<div style="text-align:center;padding:40px;color:var(--muted2);">${t('no_scores_yet')}</div>`;
+          return;
+        }
+        const medal = (i) => (i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1);
+        const cards = finalCats
+          .map(({ cat, inProgress, rows }) => {
+            const color = BOW_COLORS[cat.bow] || '#555';
+            const gLabel = cat.gender === 'M' ? t('men') : t('women');
+            const body = inProgress
+              ? `<div style="padding:16px;text-align:center;color:var(--muted2);">${t('elim_in_progress')}</div>`
+              : `<div class="table-wrap"><table><thead><tr><th style="width:36px;text-align:center;"></th><th>${t('name')}</th><th style="text-align:center;">${t('qual_rank')}</th><th style="text-align:center;">${t('score')}</th></tr></thead><tbody>${rows
+                  .map(
+                    (a, i) =>
+                      `<tr><td style="text-align:center;font-size:16px;padding:8px 4px;">${medal(i)}</td><td style="color:#111;font-weight:${i < 3 ? '700' : '600'};">${a.name}</td><td style="color:#555;text-align:center;font-size:12px;">${a.qualRank || '—'}</td><td style="color:#111;text-align:center;font-size:12px;">${a.total || 0}</td></tr>`,
+                  )
+                  .join('')}</tbody></table></div>`;
+            return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;break-inside:avoid;margin-bottom:14px;"><div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${color}22;border-bottom:1px solid ${color}44;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:1px;color:${color};">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</span></div>${body}</div>`;
+          })
+          .join('');
+        const n = finalCats.length;
+        const numCols = n <= 1 ? 1 : n === 2 ? 2 : n <= 6 ? 3 : 4;
+        el.innerHTML = `<div style="columns:${numCols};column-gap:14px;">${cards}</div>`;
+      }
+      window.printFinalResults = () => {
+        const ready = buildFinalCats().filter((c) => !c.inProgress);
+        if (!ready.length) {
+          toast(t('elim_in_progress'), 'error');
+          return;
+        }
+        const sections = ready
+          .map(({ cat, rows }) => {
+            const gLabel = cat.gender === 'M' ? t('men') : t('women');
+            return `<h3 style="margin:16px 0 6px;">${cat.bow} · ${cat.age} · ${gLabel}</h3><table style="width:100%;border-collapse:collapse;margin-bottom:8px;"><thead><tr><th style="width:40px;">#</th><th>${t('name')}</th><th>${t('club')}</th><th>${t('qual_rank')}</th><th>${t('score')}</th></tr></thead><tbody>${rows
+              .map(
+                (a) =>
+                  `<tr><td style="text-align:center;font-weight:700;">${a.rank}</td><td style="font-weight:600;">${a.name}</td><td>${a.club || ''}</td><td style="text-align:center;">${a.qualRank || '—'}</td><td style="text-align:center;">${a.total || 0}</td></tr>`,
+              )
+              .join('')}</tbody></table>`;
+          })
+          .join('');
+        const compName = window._compData?.name || '';
+        const win = window.open('', '_blank');
+        if (!win) return;
+        win.document.write(
+          `<!DOCTYPE html><html dir="${currentLang === 'he' ? 'rtl' : 'ltr'}"><head><meta charset="utf-8"><title>${t('final_results_title')}</title><style>body{font-family:Arial,sans-serif;margin:20px;color:#000;}td,th{border:1px solid #000;padding:5px 8px;text-align:start;}table{page-break-inside:avoid;}h3{page-break-after:avoid;}@media print{@page{size:A4 portrait;margin:10mm;}}</style></head><body><h2 style="margin-bottom:4px;">🏆 ${t('final_results_title')} — ${compName}</h2>${sections}</body></html>`,
+        );
+        win.document.close();
+        setTimeout(() => win.print(), 400);
       };
 
       function getArcherEnds(archerId) {
@@ -4600,6 +4795,7 @@
       };
       window.exportResultsPDF = () => {
         const labels = getGoldLabels();
+        const isCustomDisc = currentDiscipline === 'Custom';
         const showHalves = currentDiscipline === 'Outdoor' || currentDiscipline === 'Indoor';
         const scoredArchers = archers
           .filter((a) => (getScore(a.id)?.total || 0) > 0)
