@@ -5425,6 +5425,20 @@
         const losers = (data.rounds[lastRound] || []).map((m) =>
           m.winnerChoice === m.archer1.id ? m.archer2 : m.archer1,
         );
+        // Targets for the new round: same as bracket generation, cycle through this category's targets
+        const [cBow, cAge, cGender] = catKey.split('||');
+        const catTargetNums = [
+          ...new Set(
+            archers
+              .filter((a) => a.bow === cBow && a.age === cAge && a.gender === cGender && a.target)
+              .map((a) => a.target),
+          ),
+        ].sort((a, b) => a - b);
+        const roundTargets = catTargetNums.length
+          ? catTargetNums
+          : targets.map((t) => t.num).sort((a, b) => a - b);
+        const targetFor = (i) =>
+          roundTargets.length ? roundTargets[i % roundTargets.length] : null;
         let newMatches = [];
         if (finalNext || lastRound === 'SF') {
           newMatches = [
@@ -5441,7 +5455,7 @@
               tiebreak1: null,
               tiebreak2: null,
               winnerChoice: null,
-              targetNum: winners[0]?.targetNum || winners[1]?.targetNum || null,
+              targetNum: targetFor(0),
             },
           ];
           const bronzeMatches = [
@@ -5458,7 +5472,7 @@
               tiebreak1: null,
               tiebreak2: null,
               winnerChoice: null,
-              targetNum: losers[0]?.targetNum || losers[1]?.targetNum || null,
+              targetNum: targetFor(1),
             },
           ];
           data.rounds['F'] = newMatches;
@@ -5479,7 +5493,7 @@
               tiebreak1: null,
               tiebreak2: null,
               winnerChoice: null,
-              targetNum: winners[i]?.targetNum || winners[i + 1]?.targetNum || null,
+              targetNum: targetFor(i / 2),
             });
           }
           data.rounds[nextRound] = newMatches;

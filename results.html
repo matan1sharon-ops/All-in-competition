@@ -269,6 +269,23 @@
         >
           ⚔️ ELIMINATION
         </button>
+        <button
+          id="btn-final"
+          onclick="setView('final')"
+          style="
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: 1px solid var(--border2);
+            background: transparent;
+            color: var(--muted2);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+          "
+        >
+          🏆 FINAL RESULTS
+        </button>
       </div>
       <span class="refresh-badge" id="last-update"></span>
     </div>
@@ -276,6 +293,7 @@
     <div class="main" id="main">
       <div id="qual-content"></div>
       <div id="elim-content" style="display: none"></div>
+      <div id="final-content" style="display: none"></div>
       <div class="no-comp">
         <div class="icon">🏆</div>
         <p id="results-no-comp-msg">Select a competition above<br />to show live results.</p>
@@ -476,6 +494,12 @@
           tbd: 'TBD',
           closest_center: 'TIED — WHO IS CLOSEST TO CENTER?',
           closer_center: 'Closer to center?',
+          final_results: '🏆 FINAL RESULTS',
+          final_results_title: 'Final Results',
+          in_progress: 'Elimination in progress',
+          qual_rank: 'QUAL',
+          club: 'Club',
+          print: 'PRINT',
         },
         he: {
           live: 'חי',
@@ -505,6 +529,12 @@
           tbd: 'טרם נקבע',
           closest_center: 'שוויון — מי קרוב יותר למרכז?',
           closer_center: 'קרוב יותר למרכז?',
+          final_results: '🏆 תוצאות סופיות',
+          final_results_title: 'תוצאות סופיות',
+          in_progress: 'מקצי ההדחות עדיין בתהליך',
+          qual_rank: 'מוקדמות',
+          club: 'מועדון',
+          print: 'הדפסה',
         },
       };
       function initResultsLang() {
@@ -531,6 +561,8 @@
         const btnElim = document.getElementById('btn-elim');
         if (btnQual) btnQual.textContent = tr('qualification');
         if (btnElim) btnElim.textContent = tr('elimination');
+        const btnFinal = document.getElementById('btn-final');
+        if (btnFinal) btnFinal.textContent = tr('final_results');
         const noCompP = document.getElementById('results-no-comp-msg');
         if (noCompP) noCompP.innerHTML = tr('select_above') + '<br>' + tr('to_show');
         const liveLabel = document.querySelector('.live-label');
@@ -702,22 +734,16 @@
         lastData = null;
       window.setView = (view) => {
         currentView = view;
-        const btnQual = document.getElementById('btn-qual');
-        const btnElim = document.getElementById('btn-elim');
-        if (btnQual && btnElim) {
-          btnQual.style.background = view === 'qual' ? 'var(--accent)' : 'transparent';
-          btnQual.style.color = view === 'qual' ? '#000' : 'var(--muted2)';
-          btnQual.style.borderColor = view === 'qual' ? 'var(--accent)' : 'var(--border2)';
-          btnElim.style.background = view === 'elim' ? 'var(--accent)' : 'transparent';
-          btnElim.style.color = view === 'elim' ? '#000' : 'var(--muted2)';
-          btnElim.style.borderColor = view === 'elim' ? 'var(--accent)' : 'var(--border2)';
-        }
-        const qualDiv = document.getElementById('qual-content');
-        const elimDiv = document.getElementById('elim-content');
-        if (qualDiv && elimDiv) {
-          qualDiv.style.display = view === 'qual' ? 'block' : 'none';
-          elimDiv.style.display = view === 'elim' ? 'block' : 'none';
-        }
+        ['qual', 'elim', 'final'].forEach((v) => {
+          const btn = document.getElementById('btn-' + v);
+          if (btn) {
+            btn.style.background = view === v ? 'var(--accent)' : 'transparent';
+            btn.style.color = view === v ? '#000' : 'var(--muted2)';
+            btn.style.borderColor = view === v ? 'var(--accent)' : 'var(--border2)';
+          }
+          const div = document.getElementById(v + '-content');
+          if (div) div.style.display = view === v ? 'block' : 'none';
+        });
       };
       window.selectComp = (id) => {
         if (unsubscribe) unsubscribe();
@@ -751,6 +777,114 @@
         const key = String(archerId).replace(/\./g, '_');
         return scores[key] || scores[String(archerId)] || {};
       }
+      /* ── FINAL RESULTS (after elimination) ──
+         1-2 Final winner/loser, 3-4 Bronze winner/loser, then archers out in earlier rounds
+         (deepest round first, each round by qualification rank), then everyone else by qualification. */
+      let lastFinalCats = [];
+      function qualCompare(disc) {
+        return (a, b) => {
+          const td = b.total - a.total;
+          if (td !== 0) return td;
+          if (disc === 'Custom') {
+            const avgA = ((a.kills || 0) + (a.elevens || 0) + (a.sixes || 0)) / 3;
+            const avgB = ((b.kills || 0) + (b.elevens || 0) + (b.sixes || 0)) / 3;
+            return avgB - avgA;
+          }
+          return (b.g1 || 0) - (a.g1 || 0) || (b.g2 || 0) - (a.g2 || 0);
+        };
+      }
+      function buildFinalRanking(cat, elim, disc) {
+        const qual = [...cat.archers].sort(qualCompare(disc));
+        const qualRank = new Map(qual.map((a, i) => [String(a.id), i + 1]));
+        const byId = new Map(qual.map((a) => [String(a.id), a]));
+        const rounds = elim?.rounds || {};
+        const done = (rk) =>
+          (rounds[rk] || []).length > 0 && rounds[rk].every((m) => m.winnerChoice);
+        if (elim && !(done('F') && done('B'))) return { inProgress: true, rows: [] };
+        const placed = new Set();
+        const rows = [];
+        const add = (archer) => {
+          const id = String(archer?.id ?? '');
+          if (!archer || placed.has(id)) return;
+          placed.add(id);
+          const a = byId.get(id) || archer;
+          rows.push({ ...a, rank: rows.length + 1, qualRank: qualRank.get(id) || null });
+        };
+        const winLose = (m) => {
+          const w = String(m.winnerChoice) === String(m.archer1?.id) ? m.archer1 : m.archer2;
+          const l = w === m.archer1 ? m.archer2 : m.archer1;
+          return [w, l];
+        };
+        if (elim) {
+          const [fw, fl] = winLose(rounds.F[0]);
+          const [bw, bl] = winLose(rounds.B[0]);
+          [fw, fl, bw, bl].forEach(add);
+          ['SF', 'QF', 'R1'].forEach((rk) => {
+            const losers = (rounds[rk] || [])
+              .filter((m) => m.winnerChoice && !m.isBye)
+              .map((m) => winLose(m)[1])
+              .filter(Boolean)
+              .sort(
+                (a, b) =>
+                  (qualRank.get(String(a.id)) || 9999) - (qualRank.get(String(b.id)) || 9999),
+              );
+            losers.forEach(add);
+          });
+        }
+        qual.forEach(add);
+        return { inProgress: false, rows };
+      }
+      function renderFinalResults(cats, elimData, disc) {
+        const el = document.getElementById('final-content');
+        if (!el) return;
+        lastFinalCats = cats.map((cat) => ({
+          cat,
+          ...buildFinalRanking(cat, elimData[`${cat.bow}||${cat.age}||${cat.gender}`], disc),
+        }));
+        const cell = "font-family:'Barlow Condensed',sans-serif;padding:6px 8px;";
+        const blocks = lastFinalCats
+          .map(({ cat, inProgress, rows }) => {
+            const color = BOW_COLORS[cat.bow] || '#555';
+            const gLabel = cat.gender === 'M' ? t('men').toUpperCase() : t('women').toUpperCase();
+            const body = inProgress
+              ? `<div style="padding:14px;text-align:center;color:var(--muted2);font-family:'Barlow Condensed',sans-serif;font-weight:700;">${t('in_progress')}</div>`
+              : `<table class="cat-table"><tbody><tr style="border-bottom:1px solid var(--border2);"><td style="width:36px;"></td><td style="font-size:10px;color:var(--muted);padding:3px 10px;font-family:'Barlow Condensed',sans-serif;">${t('name')}</td><td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${t('qual_rank')}</td><td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${t('score')}</td></tr>${rows
+                  .map((a) => {
+                    const i = a.rank - 1;
+                    const rankClass =
+                      i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-n';
+                    const rankLabel = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : a.rank;
+                    return `<tr><td style="${cell}font-size:16px;font-weight:900;text-align:center;width:32px;" class="${rankClass}">${rankLabel}</td><td style="${cell}font-size:14px;font-weight:700;white-space:nowrap;">${a.name}</td><td style="${cell}font-size:13px;font-weight:700;color:var(--muted2);text-align:center;">${a.qualRank || '—'}</td><td style="${cell}font-size:13px;font-weight:700;color:var(--muted2);text-align:center;">${a.total || 0}</td></tr>`;
+                  })
+                  .join('')}</tbody></table>`;
+            return `<div class="cat-block"><div class="cat-header" style="background:${color}33;color:${color};border-bottom:2px solid ${color}44;">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</div>${body}</div>`;
+          })
+          .join('');
+        el.innerHTML = `<div style="display:flex;justify-content:flex-end;margin-bottom:12px;"><button onclick="printFinalResults()" style="padding:6px 14px;border-radius:6px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">🖨 ${t('print')}</button></div><div class="categories-grid">${blocks}</div>`;
+      }
+      window.printFinalResults = () => {
+        const comp = document.getElementById('comp-name')?.textContent || '';
+        const ready = lastFinalCats.filter((c) => !c.inProgress);
+        const tables = ready
+          .map(({ cat, rows }) => {
+            const gLabel = cat.gender === 'M' ? t('men') : t('women');
+            return `<h2>${cat.bow} · ${cat.age} · ${gLabel}</h2><table><tr><th>#</th><th>${t('name')}</th><th>${t('club')}</th><th>${t('qual_rank')}</th><th>${t('score')}</th></tr>${rows
+              .map(
+                (a) =>
+                  `<tr><td>${a.rank}</td><td>${a.name}</td><td>${a.club || ''}</td><td>${a.qualRank || '—'}</td><td>${a.total || 0}</td></tr>`,
+              )
+              .join('')}</table>`;
+          })
+          .join('');
+        const w = window.open('', '_blank');
+        if (!w) return;
+        w.document.write(
+          `<!DOCTYPE html><html dir="${currentLang === 'he' ? 'rtl' : 'ltr'}"><head><meta charset="utf-8"><title>${t('final_results_title')}</title><style>body{font-family:Arial,sans-serif;color:#000;margin:20px;}h1{font-size:20px;margin:0 0 4px;}h2{font-size:15px;margin:18px 0 6px;page-break-after:avoid;}table{border-collapse:collapse;width:100%;page-break-inside:avoid;}th,td{border:1px solid #000;padding:4px 8px;font-size:12px;text-align:start;}th{font-weight:bold;}</style></head><body><h1>${t('final_results_title')}</h1><div>${comp}</div>${tables || `<p>${t('in_progress')}</p>`}</body></html>`,
+        );
+        w.document.close();
+        w.focus();
+        w.print();
+      };
       function renderResults(data) {
         const archers = data.archers || [];
         const scores = data.scores || {};
@@ -836,6 +970,7 @@
             : `<tr style="border-bottom:1px solid var(--border2);"><td style="width:36px;"></td><td style="font-size:10px;color:var(--muted);padding:3px 10px;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px;">${t('name')}</td><td style="font-size:10px;color:var(--muted);padding:3px 10px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${t('score')}</td><td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${g1label}</td><td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">${g2label}</td>${isCustomDisc ? `<td style="font-size:10px;color:var(--muted);padding:3px 6px;text-align:center;font-family:'Barlow Condensed',sans-serif;">6s</td>` : ''}</tr>`;
           return `<div class="cat-block"><div class="cat-header" style="background:${color}33;color:${color};border-bottom:2px solid ${color}44;">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</div><table class="cat-table"><tbody>${colHeaders}${rows}</tbody></table></div>`;
         }
+        renderFinalResults(cats, elimData, disc);
         let html = '<div style="display:flex;flex-direction:column;gap:20px;">';
         BOW_ORDER.forEach((bow) => {
           const group = bowGroups[bow] || [];
