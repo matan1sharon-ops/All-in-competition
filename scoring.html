@@ -1407,6 +1407,22 @@
       // Live data only on GitHub Pages; anywhere else (your computer) uses all-in-dev
       const firebaseConfig = location.hostname.endsWith('github.io') ? liveConfig : devConfig;
       const app = initializeApp(firebaseConfig);
+      /* ── SAFE TEXT ──
+         Everything read from Firebase goes through cleanData(): characters that could break the page
+         or run code (< > " ' & ` \\) are swapped for look-alikes, e.g. O'Brien → O’Brien. */
+      const UNSAFE = { '<': '‹', '>': '›', '"': '”', "'": '’', '&': '＆', '`': 'ʹ', '\\': '∖' };
+      const cleanText = (s) => String(s).replace(/[<>"'&`\\]/g, (ch) => UNSAFE[ch]);
+      function cleanData(v) {
+        if (typeof v === 'string') return cleanText(v);
+        if (Array.isArray(v)) return v.map(cleanData);
+        if (v && typeof v === 'object') {
+          if (typeof v.toMillis === 'function') return v; // Firestore timestamp
+          const o = {};
+          Object.keys(v).forEach((k) => (o[k] = cleanData(v[k])));
+          return o;
+        }
+        return v;
+      }
       // Scores are kept on the phone (IndexedDB) until uploaded, so nothing is lost offline or on reload
       let db;
       try {
@@ -1434,20 +1450,20 @@
         a.registeredAt ? Date.parse(a.registeredAt) : Number(a.id) || 0;
       function buildArchers(archerDocs, contactDocs) {
         const contacts = {};
-        (contactDocs || []).forEach((d) => (contacts[d.id] = d.data()));
+        (contactDocs || []).forEach((d) => (contacts[d.id] = cleanData(d.data())));
         return archerDocs
-          .map((d) => ({ ...d.data(), ...(contacts[d.id] || {}), id: d.id }))
+          .map((d) => ({ ...cleanData(d.data()), ...(contacts[d.id] || {}), id: d.id }))
           .sort((a, b) => archerSortKey(a) - archerSortKey(b));
       }
       function buildScores(scoreDocs) {
         const s = {};
-        scoreDocs.forEach((d) => (s[d.id] = d.data()));
+        scoreDocs.forEach((d) => (s[d.id] = cleanData(d.data())));
         return s;
       }
       function buildElimination(bracketDocs, matchDocs) {
         const elim = {};
         bracketDocs.forEach((d) => {
-          const { catKey, roundCounts, ...meta } = d.data();
+          const { catKey, roundCounts, ...meta } = cleanData(d.data());
           const rounds = {};
           Object.entries(roundCounts || {}).forEach(
             ([rk, n]) => (rounds[rk] = new Array(n).fill(undefined)),
@@ -1455,7 +1471,7 @@
           elim[catKey] = { ...meta, rounds };
         });
         matchDocs.forEach((d) => {
-          const { catKey, roundKey, idx, match } = d.data();
+          const { catKey, roundKey, idx, match } = cleanData(d.data());
           const r = elim[catKey]?.rounds[roundKey];
           if (r && idx < r.length) r[idx] = match;
         });
@@ -1468,7 +1484,7 @@
       }
       function assembleComp(compSnap, archerDocs, contactDocs, scoreDocs, bracketDocs, matchDocs) {
         return {
-          ...compSnap.data(),
+          ...cleanData(compSnap.data()),
           archers: buildArchers(archerDocs, contactDocs),
           scores: buildScores(scoreDocs),
           elimination: buildElimination(bracketDocs, matchDocs),
@@ -1940,7 +1956,7 @@
           today.setHours(0, 0, 0, 0);
           const comps = [];
           snap.docs.forEach((d) => {
-            const c = d.data();
+            const c = cleanData(d.data());
             if (c.archived) return;
             if (!c.date) {
               comps.push({ id: d.id, name: c.name });
@@ -2011,7 +2027,7 @@
           today.setHours(0, 0, 0, 0);
           const active = [];
           snap.docs.forEach((d) => {
-            const c = d.data();
+            const c = cleanData(d.data());
             if (c.archived) return;
             if (!c.date) {
               active.push({ id: d.id, name: c.name, date: '' });
@@ -2964,7 +2980,7 @@
         targetArchers.forEach((a) => {
           unwatchQual.push(
             onSnapshot(doc(sub(compId, 'scores'), scoreKey(a.id)), (snap) => {
-              if (snap.exists()) applyRemoteScore(a.id, snap.data());
+              if (snap.exists()) applyRemoteScore(a.id, cleanData(snap.data()));
             }),
           );
         });
@@ -3086,7 +3102,7 @@
         stopMatchSync();
         matchBase = matchData ? JSON.parse(JSON.stringify(matchData)) : null;
         unwatchMatch = onSnapshot(matchRef(), (snap) => {
-          const remote = snap.data()?.match;
+          const remote = cleanData(snap.data())?.match;
           if (remote) applyRemoteMatch(remote);
         });
       }
@@ -4346,7 +4362,7 @@
         today.setHours(0, 0, 0, 0);
         const list = [];
         snap.docs.forEach((d) => {
-          const c = d.data();
+          const c = cleanData(d.data());
           if (c.archived || !c.date) return;
           const start = new Date(c.date);
           start.setHours(0, 0, 0, 0);

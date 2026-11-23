@@ -332,6 +332,22 @@
       // Live data only on GitHub Pages; anywhere else (your computer) uses all-in-dev
       const firebaseConfig = location.hostname.endsWith('github.io') ? liveConfig : devConfig;
       const app = initializeApp(firebaseConfig);
+      /* ── SAFE TEXT ──
+         Everything read from Firebase goes through cleanData(): characters that could break the page
+         or run code (< > " ' & ` \\) are swapped for look-alikes, e.g. O'Brien → O’Brien. */
+      const UNSAFE = { '<': '‹', '>': '›', '"': '”', "'": '’', '&': '＆', '`': 'ʹ', '\\': '∖' };
+      const cleanText = (s) => String(s).replace(/[<>"'&`\\]/g, (ch) => UNSAFE[ch]);
+      function cleanData(v) {
+        if (typeof v === 'string') return cleanText(v);
+        if (Array.isArray(v)) return v.map(cleanData);
+        if (v && typeof v === 'object') {
+          if (typeof v.toMillis === 'function') return v; // Firestore timestamp
+          const o = {};
+          Object.keys(v).forEach((k) => (o[k] = cleanData(v[k])));
+          return o;
+        }
+        return v;
+      }
       const db = getFirestore(app);
       /* ── DATA LAYOUT ──
          competitions/{id}            settings (name, date, discipline, targets, sessions, targetConfig…)
@@ -349,20 +365,20 @@
         a.registeredAt ? Date.parse(a.registeredAt) : Number(a.id) || 0;
       function buildArchers(archerDocs, contactDocs) {
         const contacts = {};
-        (contactDocs || []).forEach((d) => (contacts[d.id] = d.data()));
+        (contactDocs || []).forEach((d) => (contacts[d.id] = cleanData(d.data())));
         return archerDocs
-          .map((d) => ({ ...d.data(), ...(contacts[d.id] || {}), id: d.id }))
+          .map((d) => ({ ...cleanData(d.data()), ...(contacts[d.id] || {}), id: d.id }))
           .sort((a, b) => archerSortKey(a) - archerSortKey(b));
       }
       function buildScores(scoreDocs) {
         const s = {};
-        scoreDocs.forEach((d) => (s[d.id] = d.data()));
+        scoreDocs.forEach((d) => (s[d.id] = cleanData(d.data())));
         return s;
       }
       function buildElimination(bracketDocs, matchDocs) {
         const elim = {};
         bracketDocs.forEach((d) => {
-          const { catKey, roundCounts, ...meta } = d.data();
+          const { catKey, roundCounts, ...meta } = cleanData(d.data());
           const rounds = {};
           Object.entries(roundCounts || {}).forEach(
             ([rk, n]) => (rounds[rk] = new Array(n).fill(undefined)),
@@ -370,7 +386,7 @@
           elim[catKey] = { ...meta, rounds };
         });
         matchDocs.forEach((d) => {
-          const { catKey, roundKey, idx, match } = d.data();
+          const { catKey, roundKey, idx, match } = cleanData(d.data());
           const r = elim[catKey]?.rounds[roundKey];
           if (r && idx < r.length) r[idx] = match;
         });
@@ -383,7 +399,7 @@
       }
       function assembleComp(compSnap, archerDocs, contactDocs, scoreDocs, bracketDocs, matchDocs) {
         return {
-          ...compSnap.data(),
+          ...cleanData(compSnap.data()),
           archers: buildArchers(archerDocs, contactDocs),
           scores: buildScores(scoreDocs),
           elimination: buildElimination(bracketDocs, matchDocs),
@@ -715,9 +731,9 @@
         const snap = await getDocs(collection(db, 'competitions'));
         const sel = document.getElementById('comp-select');
         snap.docs
-          .filter((d) => !d.data().archived)
+          .filter((d) => !cleanData(d.data()).archived)
           .forEach((d) => {
-            const c = d.data(),
+            const c = cleanData(d.data()),
               o = document.createElement('option');
             o.value = d.id;
             o.textContent = c.name + (c.date ? ` (${c.date})` : '');

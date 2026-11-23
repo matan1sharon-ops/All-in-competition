@@ -510,6 +510,22 @@
       // Live data only on GitHub Pages; anywhere else (your computer) uses all-in-dev
       const firebaseConfig = location.hostname.endsWith('github.io') ? liveConfig : devConfig;
       const app = initializeApp(firebaseConfig);
+      /* ── SAFE TEXT ──
+         Everything read from Firebase goes through cleanData(): characters that could break the page
+         or run code (< > " ' & ` \\) are swapped for look-alikes, e.g. O'Brien → O’Brien. */
+      const UNSAFE = { '<': '‹', '>': '›', '"': '”', "'": '’', '&': '＆', '`': 'ʹ', '\\': '∖' };
+      const cleanText = (s) => String(s).replace(/[<>"'&`\\]/g, (ch) => UNSAFE[ch]);
+      function cleanData(v) {
+        if (typeof v === 'string') return cleanText(v);
+        if (Array.isArray(v)) return v.map(cleanData);
+        if (v && typeof v === 'object') {
+          if (typeof v.toMillis === 'function') return v; // Firestore timestamp
+          const o = {};
+          Object.keys(v).forEach((k) => (o[k] = cleanData(v[k])));
+          return o;
+        }
+        return v;
+      }
       const db = getFirestore(app);
       // Links point to the same place this page is running from (live site, test site or your computer)
       const APP_BASE = new URL('.', location.href).href.replace(/\/$/, '');
@@ -698,7 +714,7 @@
             showError(t('not_found'));
             return;
           }
-          compData = snap.data();
+          compData = cleanData(snap.data());
           document.getElementById('loading').style.display = 'none';
           // Build and show schedule screen first
           const sessions = compData.sessions || [];
@@ -746,9 +762,12 @@
       }
 
       window.submitRegistration = async () => {
-        const fname = document.getElementById('fname').value.trim();
-        const lname = document.getElementById('lname').value.trim();
-        const club = document.getElementById('club').value.trim();
+        // cleaned + length-limited before saving
+        const field = (id, max = 60) =>
+          cleanText(document.getElementById(id).value.trim()).slice(0, max);
+        const fname = field('fname');
+        const lname = field('lname');
+        const club = field('club');
         const bow = document.getElementById('bow').value;
         const gender = document.getElementById('gender').value;
         const age = document.getElementById('age').value;
@@ -762,8 +781,8 @@
           showError(t('enter_lname'));
           return;
         }
-        const phone = document.getElementById('phone').value.trim();
-        const email = document.getElementById('email').value.trim();
+        const phone = field('phone', 30);
+        const email = field('email', 100);
         if (!phone) {
           showError(t('enter_phone'));
           return;
@@ -850,7 +869,8 @@
           const payWrap = document.getElementById('payment-btn-wrap');
           const payBtn = document.getElementById('payment-link-btn');
           if (compData.paymentLink && payWrap && payBtn) {
-            payBtn.href = compData.paymentLink;
+            // only normal web links (blocks javascript: and other tricks)
+            payBtn.href = /^https?:\/\//i.test(compData.paymentLink) ? compData.paymentLink : '#';
             payWrap.style.display = 'block';
           } else if (payWrap) {
             payWrap.style.display = 'none';
