@@ -1325,6 +1325,9 @@
               </div>
               <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px">
                 <button class="btn btn-primary" onclick="sendAltToTimer()">▶ SEND TO TIMER</button>
+                <button class="btn btn-secondary" onclick="openAltScoring()">
+                  ✏️ ENTER ARROWS
+                </button>
                 <button class="btn btn-secondary" onclick="backToNormalTimer()">
                   ↩ BACK TO NORMAL TIMER
                 </button>
@@ -5414,6 +5417,7 @@
               label: `${d.bow} ${d.age} ${d.gender === 'M' ? 'Men' : 'Women'} · ${medal}`,
               names: [m.archer1.name, m.archer2.name],
               done: !!m.winnerChoice,
+              targetNum: m.targetNum || null,
             });
           });
         });
@@ -5486,6 +5490,22 @@
           updatedAt: Date.now(),
         });
         toast('Sent to the timer ✓', 'success');
+      };
+      // open the scoring app on this match (same page the target judge's phone uses; both stay in sync)
+      window.openAltScoring = () => {
+        const m = altMatches().find((x) => x.key === document.getElementById('alt-match').value);
+        if (!m) {
+          toast('No match selected', 'error');
+          return;
+        }
+        if (!m.targetNum) {
+          toast('This match has no target number — set it in Elimination (🎯)', 'error');
+          return;
+        }
+        window.open(
+          `${APP_BASE}/scoring.html?comp=${currentCompId}&target=${m.targetNum}`,
+          '_blank',
+        );
       };
       window.backToNormalTimer = async () => {
         if (!currentCompId) return;

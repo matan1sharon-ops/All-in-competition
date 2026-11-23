@@ -191,7 +191,8 @@ The field manager runs the ends from a phone; one press starts an end and the ti
 1. Admin → **Timer** → **🏆 Finals — alternating**: pick the match, **⇄ SWAP SIDES** so left/right match the field, then **▶ SEND TO TIMER**.
 2. The screen shows both archers side by side, each with a 20 s clock per arrow, the set points (or total) and this end's arrows from the phones, marked provisional until the admin approves.
 3. On the phone: choose who starts (**◀ … STARTS / … STARTS ▶** — the archer behind starts the next end), **▶ START**, then **⏭ ARROW SHOT** after each arrow. If time runs out, the turn passes by itself. **SHOOT-OFF** is in Jump to end.
-4. **↩ BACK TO NORMAL TIMER** in admin returns to the regular end timer.
+4. Arrows: the target judge scans the match QR and enters them on a phone; the admin can enter them too with **✏️ ENTER ARROWS** (opens the same match in the scoring app). Both stay in sync, and either can correct an arrow.
+5. **↩ BACK TO NORMAL TIMER** in admin returns to the regular end timer. The timer never switches by itself.
 
 Turn **sound on** only on the device connected to the speaker (usually the TV computer), so the beeps don't echo.
 
