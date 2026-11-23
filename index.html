@@ -6608,8 +6608,14 @@
         function buildCard(catKey, data, match, roundKey) {
           const fmt = data.format || 'sets';
           const isCum = fmt === 'cumulative';
-          const slots = isCum ? 4 : 5;
-          const slotLabels = isCum ? ['T1', 'T2', 'T3', 'T4'] : ['S1', 'S2', 'S3', 'S4', 'S5'];
+          // same as the scoring app: 3D/Field/Custom = 4 targets, Outdoor/Indoor cumulative = 5 ends
+          const byTarget = ['3D', 'Field', 'Custom'].includes(currentDiscipline);
+          const slots = isCum && byTarget ? 4 : 5;
+          const slotLabels = !isCum
+            ? ['S1', 'S2', 'S3', 'S4', 'S5']
+            : byTarget
+              ? ['T1', 'T2', 'T3', 'T4']
+              : ['E1', 'E2', 'E3', 'E4', 'E5'];
           const gLabel = data.gender === 'M' ? 'Men' : 'Women';
           const roundLabel = roundLabels[roundKey] || roundKey;
           const a1 = match.archer1;
@@ -6618,14 +6624,20 @@
           const a2name = withNames ? a2?.name || 'TBD' : 'Archer B';
           const a1seed = withNames && a1?.seed ? `#${a1.seed} · ${a1.qualScore || 0} pts` : '';
           const a2seed = withNames && a2?.seed ? `#${a2.seed} · ${a2.qualScore || 0} pts` : '';
-          const arrowCols = '<col><col><col>';
-          const arrowHeaders = `<th>A1</th><th>A2</th><th>A3</th>`;
+          // arrows per end/target: 2 in 3D, 3 otherwise (same as the scoring app)
+          const nArr = currentDiscipline === '3D' ? 2 : 3;
+          const arrowHeaders = Array.from({ length: nArr }, (_, i) => `<th>A${i + 1}</th>`).join(
+            '',
+          );
+          const arrowCells = '<td></td>'.repeat(nArr);
+          const arrowW = (63 / (2 * nArr)).toFixed(2);
+          const colgroup = `<colgroup><col style="width:5%">${`<col style="width:${arrowW}%">`.repeat(nArr)}<col style="width:8%"><col style="width:8%">${`<col style="width:${arrowW}%">`.repeat(nArr)}<col style="width:8%"><col style="width:8%"></colgroup>`;
           let rows = '';
           for (let i = 0; i < slots; i++) {
-            rows += `<tr style="height:26px;"><td style="background:#f0f0f0;font-weight:700;font-size:10px;">${slotLabels[i]}</td><td></td><td></td><td></td><td style="background:#e0e0e0;"></td><td style="background:#e0e0e0;"></td><td></td><td></td><td></td><td style="background:#e0e0e0;"></td><td style="background:#e0e0e0;"></td></tr>`;
+            rows += `<tr style="height:26px;"><td style="background:#f0f0f0;font-weight:700;font-size:10px;">${slotLabels[i]}</td>${arrowCells}<td style="background:#e0e0e0;"></td><td style="background:#e0e0e0;"></td>${arrowCells}<td style="background:#e0e0e0;"></td><td style="background:#e0e0e0;"></td></tr>`;
           }
-          const totalColspan = isCum ? 2 : 4;
-          const extraCols = isCum ? '' : `<td colspan="3"></td>`;
+          const totalColspan = 1 + nArr;
+          const extraCols = `<td colspan="${nArr}"></td>`;
           return `<div class="page">
       <div style="background:#37474f;color:#fff;padding:5px 10px;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><div style="font-size:13px;font-weight:700;">${compName}</div><div style="font-size:13px;font-weight:700;">${data.bow} · ${data.age} · ${gLabel} | ${roundLabel} · Match ${match.position}</div><div style="font-size:11px;color:#aaa;">${isCum ? 'Cumulative' : 'Sets System'}</div></div>
       <div style="display:flex;align-items:center;gap:6px;padding:2px 6px;background:#f9f9f9;border-bottom:1px solid #eee;margin-bottom:4px;"><div class="qr-placeholder" data-url="${APP_BASE}/scoring.html?comp=${currentCompId}&target=${match.targetNum || ''}" style="width:64px;height:64px;flex-shrink:0;"></div><div style="font-size:8px;color:#555;">Scan to score<br><strong>${data.bow} · ${data.age} · ${gLabel} | ${roundLabel} · Match ${match.position}</strong>${match.targetNum ? `<br><span style="font-size:13px;font-weight:900;color:#FFD700;">🎯 TARGET ${match.targetNum}</span>` : ''}</div></div>
@@ -6635,8 +6647,8 @@
         <div style="background:#f5f5f5;padding:5px 10px;text-align:right;"><div style="font-size:9px;color:#555;">${a2seed}</div><div style="font-size:14px;font-weight:700;">${a2name}</div></div>
       </div>
     <table style="margin-bottom:4px;width:100%;border-collapse:collapse;table-layout:fixed;">
-    <colgroup><col style="width:5%"><col style="width:11%"><col style="width:11%"><col style="width:11%"><col style="width:8%"><col style="width:8%"><col style="width:11%"><col style="width:11%"><col style="width:11%"><col style="width:8%"><col style="width:8%"></colgroup>
-        <thead><tr style="background:#555;color:#fff;height:18px;"><th>${isCum ? 'Target' : 'Set'}</th>${arrowHeaders}<th style="background:#e0e0e0;color:#111;">Total A</th><th style="background:#e0e0e0;color:#111;">Pts A</th>${arrowHeaders}<th style="background:#e0e0e0;color:#111;">Total B</th><th style="background:#e0e0e0;color:#111;">Pts B</th></tr></thead>
+    ${colgroup}
+        <thead><tr style="background:#555;color:#fff;height:18px;"><th>${isCum ? (byTarget ? 'Target' : 'End') : 'Set'}</th>${arrowHeaders}<th style="background:#e0e0e0;color:#111;">Total A</th><th style="background:#e0e0e0;color:#111;">Pts A</th>${arrowHeaders}<th style="background:#e0e0e0;color:#111;">Total B</th><th style="background:#e0e0e0;color:#111;">Pts B</th></tr></thead>
         <tbody>${rows}<tr style="height:20px;background:#37474f;color:#fff;font-weight:700;font-size:10px;"><td colspan="${totalColspan}" style="text-align:right;padding-right:8px;">${isCum ? 'TOTAL' : 'SET POINTS TOTAL'}</td><td style="background:#e0e0e0;"></td><td style="background:#e0e0e0;"></td>${extraCols}<td style="background:#e0e0e0;"></td><td style="background:#e0e0e0;"></td></tr></tbody>
       </table>
       <div style="display:grid;grid-template-columns:1fr 80px 1fr;border:1px solid #ccc;margin-bottom:4px;">
