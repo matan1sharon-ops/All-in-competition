@@ -1,0 +1,16 @@
+rules_version = '2';
+// ALL IN — Firestore rules for the current setup (no login yet).
+// Paste into Firebase console → Firestore Database → Rules → Publish (dev first, then live).
+// Covers the new layout: competitions/{id} and everything under it
+// (archers, contacts, scores, brackets, matches, timer). No end date.
+// NOTE: still open to anyone (like today) until login is added — contacts are not protected yet.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /competitions/{compId} {
+      allow read, write: if true;
+      match /{sub=**} {
+        allow read, write: if true;
+      }
+    }
+  }
+}
