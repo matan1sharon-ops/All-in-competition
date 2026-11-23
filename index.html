@@ -2160,6 +2160,9 @@
           apply_all: 'APPLY TYPE TO ALL',
           add_session: '+ ADD SESSION',
           export_pdf: '📄 EXPORT PDF',
+          dns_tip: 'Did not start / withdrawn — leave out of targets, scoring and results',
+          dns_restore_tip: 'Restore archer (needs a target again)',
+          dns_restored: 'restored',
           qualification_view: '🏹 QUALIFICATION',
           final_results: '🏆 FINAL RESULTS',
           final_results_title: 'Final Results',
@@ -2346,6 +2349,9 @@
           apply_all: 'החל סוג על כולם',
           add_session: '+ הוסף סבב',
           export_pdf: '📄 ייצא PDF',
+          dns_tip: 'לא הגיע / פרש — לא ישובץ במטרה, בניקוד ובתוצאות',
+          dns_restore_tip: 'החזרת הקשת (צריך לשבץ שוב במטרה)',
+          dns_restored: 'הוחזר',
           qualification_view: '🏹 מוקדמות',
           final_results: '🏆 תוצאות סופיות',
           final_results_title: 'תוצאות סופיות',
@@ -2698,6 +2704,28 @@
               : x;
         return JSON.stringify(sortKeys(v === undefined ? null : v));
       }
+      /* ── DNS (did not start / withdrawn) ── marked archers stay in the entry list but are
+         left out of targets, scoring, elimination, scorecards and results */
+      const activeArchers = () => archers.filter((a) => !a.dns);
+      window.toggleDNS = async (id) => {
+        const a = archers.find((x) => String(x.id) === String(id));
+        if (!a) return;
+        a.dns = !a.dns;
+        if (a.dns && a.target) {
+          // free the archer's target place
+          targets.forEach((tg) =>
+            ['A', 'B', 'C', 'D'].forEach((sl) => {
+              if (tg[sl] && String(tg[sl].id) === String(a.id)) tg[sl] = null;
+            }),
+          );
+          a.target = null;
+          a.slot = null;
+          await saveTargets();
+        }
+        await saveArchers();
+        renderAll();
+        toast(`${a.fname} ${a.lname}: ${a.dns ? 'DNS' : t('dns_restored')}`, 'success');
+      };
       async function saveArchers() {
         if (!currentCompId) return;
         const id = currentCompId;
@@ -3044,7 +3072,7 @@
       }
       function renderDashboard() {
         if (!currentCompId) return;
-        document.getElementById('d-total').textContent = archers.length;
+        document.getElementById('d-total').textContent = activeArchers().length;
         document.getElementById('d-assigned').textContent = archers.filter((a) => a.target).length;
         document.getElementById('d-targets').textContent = targets.length;
         document.getElementById('d-scored').textContent = archers.filter(
@@ -3170,14 +3198,15 @@
               (a.club || '').toLowerCase().includes(search)) &&
             (!bowF || a.bow === bowF),
         );
+        const dnsCount = archers.filter((a) => a.dns).length;
         document.getElementById('entry-count').textContent =
-          archers.length + ' ' + t('archers_count');
-        document.getElementById('entry-badge').textContent = archers.length;
+          archers.length + ' ' + t('archers_count') + (dnsCount ? ` (${dnsCount} DNS)` : '');
+        document.getElementById('entry-badge').textContent = archers.length - dnsCount;
         document.getElementById('entries-table').innerHTML =
           filtered
             .map(
               (a) =>
-                `<tr><td style="color:#999;">${archers.indexOf(a) + 1}</td><td style="color:#111;font-weight:600;">${a.fname} ${a.lname}</td><td style="color:#555;">${a.club || '—'}</td><td><span class="tag tag-${a.bow.toLowerCase()}">${a.bow}</span></td><td style="color:#111;">${a.age}</td><td><span class="tag tag-${a.gender.toLowerCase()}">${a.gender}</span></td><td style="color:#1565c0;font-weight:700;">${a.target ? `T${a.target}${a.slot}` : '<span style="color:#999">—</span>'}</td><td style="color:#555;font-size:12px;">${a.phone || '—'}</td><td style="color:#555;font-size:12px;">${a.email || '—'}</td><td style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="openEditArcher('${a.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteArcher('${a.id}')">✕</button></td></tr>`,
+                `<tr style="${a.dns ? 'opacity:0.45;' : ''}"><td style="color:#999;">${archers.indexOf(a) + 1}</td><td style="color:#111;font-weight:600;">${a.fname} ${a.lname}${a.dns ? ' <span style="background:#c62828;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:4px;">DNS</span>' : ''}</td><td style="color:#555;">${a.club || '—'}</td><td><span class="tag tag-${a.bow.toLowerCase()}">${a.bow}</span></td><td style="color:#111;">${a.age}</td><td><span class="tag tag-${a.gender.toLowerCase()}">${a.gender}</span></td><td style="color:#1565c0;font-weight:700;">${a.target ? `T${a.target}${a.slot}` : '<span style="color:#999">—</span>'}</td><td style="color:#555;font-size:12px;">${a.phone || '—'}</td><td style="color:#555;font-size:12px;">${a.email || '—'}</td><td style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="toggleDNS('${a.id}')" title="${a.dns ? t('dns_restore_tip') : t('dns_tip')}">${a.dns ? '↩' : 'DNS'}</button><button class="btn btn-secondary btn-sm" onclick="openEditArcher('${a.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteArcher('${a.id}')">✕</button></td></tr>`,
             )
             .join('') ||
           `<tr><td colspan="10" style="text-align:center;color:#999;padding:24px">${t('no_archers_yet')}</td></tr>`;
@@ -3320,6 +3349,7 @@
         else toast('No archers imported — check format', 'error');
       };
       window.generateTargets = async () => {
+        const archers = activeArchers(); // DNS archers are left out
         if (!currentCompId) {
           toast(t('select_comp_first'), 'error');
           return;
@@ -3428,6 +3458,7 @@
         toast(`${targets.length} ${t('targets_generated')}`, 'success');
       };
       window.generateOddTargets = async () => {
+        const archers = activeArchers(); // DNS archers are left out
         if (!currentCompId) {
           toast(t('select_comp_first'), 'error');
           return;
@@ -3882,6 +3913,7 @@
         dragState = null;
       };
       window.openAssignModal = (ti, slot) => {
+        const archers = activeArchers(); // DNS archers are left out
         assignPending = { ti, slot };
         const t = targets[ti];
         document.getElementById('assign-modal-title').textContent =
@@ -3957,6 +3989,7 @@
         toast(t('removed_ok'), 'success');
       };
       window.printFieldOfPlay = () => {
+        const archers = activeArchers(); // DNS archers are left out
         if (!targets.length) {
           toast(t('no_targets_yet'), 'error');
           return;
@@ -4070,6 +4103,7 @@
         win.document.close();
       };
       window.printStartList = () => {
+        const archers = activeArchers(); // DNS archers are left out
         if (!targets.length) {
           toast(t('no_targets_yet'), 'error');
           return;
@@ -4323,6 +4357,7 @@
         }
       };
       window.renderResults = () => {
+        const archers = activeArchers(); // DNS archers are left out
         const container = document.getElementById('results-by-category');
         if (!container) return;
         if (!archers.length) {
@@ -4434,6 +4469,7 @@
         };
       }
       function buildFinalCats() {
+        const archers = activeArchers(); // DNS archers are left out
         const elimData = window._elimData || {};
         const catMap = {};
         archers
@@ -4729,6 +4765,7 @@
         return '—';
       }
       function renderScorecards() {
+        const archers = activeArchers(); // DNS archers are left out
         const list = document.getElementById('scorecards-list');
         if (!list) return;
         if (!currentCompId) {
@@ -4816,6 +4853,7 @@
         setTimeout(() => win.print(), 400);
       };
       window.printAllScorecards = () => {
+        const archers = activeArchers(); // DNS archers are left out
         if (!archers.length) {
           toast(t('no_archers'), 'error');
           return;
@@ -4983,6 +5021,7 @@
         window.open(`${APP_BASE}/results.html?comp=${currentCompId}`, '_blank');
       };
       window.exportResultsPDF = () => {
+        const archers = activeArchers(); // DNS archers are left out
         const labels = getGoldLabels();
         const isCustomDisc = currentDiscipline === 'Custom';
         const showHalves = currentDiscipline === 'Outdoor' || currentDiscipline === 'Indoor';
@@ -5301,6 +5340,7 @@
         return matches;
       }
       async function generateBracketForCategory(catKey, maxBracket) {
+        const archers = activeArchers(); // DNS archers are left out
         const [bow, age, gender] = catKey.split('||');
         const format = getElimFormat(bow);
         const catArchers = archers
@@ -5345,6 +5385,7 @@
         };
       }
       window.generateElimination = async () => {
+        const archers = activeArchers(); // DNS archers are left out
         const maxBracket = parseInt(document.getElementById('elim-bracket').value);
         const elimData = await generateBracketForCategory(catKey, maxBracket);
         if (!elimData) {
@@ -5365,6 +5406,7 @@
         renderElimContent();
       };
       window.generateAllElimination = async () => {
+        const archers = activeArchers(); // DNS archers are left out
         const maxBracket = parseInt(document.getElementById('elim-bracket').value);
         if (!currentCompId) {
           toast(t('select_comp_first'), 'error');

@@ -518,6 +518,7 @@
         (contactDocs || []).forEach((d) => (contacts[d.id] = cleanData(d.data())));
         return archerDocs
           .map((d) => ({ ...cleanData(d.data()), ...(contacts[d.id] || {}), id: d.id }))
+          .filter((a) => !a.dns) // DNS archers are not shown on this page
           .sort((a, b) => archerSortKey(a) - archerSortKey(b));
       }
       function buildScores(scoreDocs) {
