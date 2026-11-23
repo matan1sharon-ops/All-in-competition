@@ -792,6 +792,16 @@
               >
                 + CREATE COMPETITION
               </button>
+              <br /><br /><button class="btn btn-secondary btn-sm" onclick="pickRestoreFile()">
+                ♻️ RESTORE FROM BACKUP
+              </button>
+              <input
+                type="file"
+                id="restore-file"
+                accept=".json,application/json"
+                style="display: none"
+                onchange="restoreComp(this)"
+              />
             </div>
             <div id="dash-content" style="display: none">
               <div class="stats-row">
@@ -819,6 +829,28 @@
               <div class="card">
                 <div class="card-title" id="reg-card-title">📝 Registration</div>
                 <div id="reg-settings"></div>
+              </div>
+              <div class="card">
+                <div class="card-title">💾 Export &amp; Backup</div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap">
+                  <button class="btn btn-secondary btn-sm" onclick="exportCSV('entries')">
+                    📥 ENTRY LIST (CSV)
+                  </button>
+                  <button class="btn btn-secondary btn-sm" onclick="exportCSV('qual')">
+                    📥 QUALIFICATION (CSV)
+                  </button>
+                  <button class="btn btn-secondary btn-sm" onclick="exportCSV('final')">
+                    📥 FINAL RESULTS (CSV)
+                  </button>
+                  <button class="btn btn-primary btn-sm" onclick="backupComp()">💾 BACKUP</button>
+                  <button class="btn btn-secondary btn-sm" onclick="pickRestoreFile()">
+                    ♻️ RESTORE
+                  </button>
+                </div>
+                <div style="font-size: 12px; color: var(--muted2); margin-top: 8px">
+                  CSV opens in Excel. BACKUP saves the whole competition in one file; RESTORE loads
+                  a backup file as a new competition.
+                </div>
               </div>
               <div class="card">
                 <div class="card-title" id="cat-breakdown-title">Categories Breakdown</div>
@@ -3180,6 +3212,189 @@
           'success',
         );
         renderDashboard();
+      };
+      /* ── Export (CSV for Excel) and backup / restore ── */
+      async function currentCompDoc() {
+        const snap = await getDoc(doc(db, 'competitions', currentCompId));
+        return cleanData(snap.data() || {});
+      }
+      const fileSafe = (x) =>
+        String(x || 'competition')
+          .replace(/[\\/:*?"<>|]+/g, '-')
+          .trim();
+      function downloadFile(name, text, type) {
+        const blob = new Blob([text], { type });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      }
+      const csvCell = (v) => {
+        const x = v === null || v === undefined ? '' : String(v);
+        return /[",\n\r]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x;
+      };
+      const toCSV = (rows) => '\uFEFF' + rows.map((r) => r.map(csvCell).join(',')).join('\r\n');
+      const catName = (c) => `${c.bow} ${c.age} ${c.gender === 'M' ? 'Men' : 'Women'}`;
+      function qualCats() {
+        const catMap = {};
+        activeArchers()
+          .filter((a) => (getScore(a.id)?.total || 0) > 0)
+          .forEach((a) => {
+            const s = getScore(a.id);
+            const key = `${a.bow}||${a.age}||${a.gender}`;
+            if (!catMap[key])
+              catMap[key] = { bow: a.bow, age: a.age, gender: a.gender, archers: [] };
+            catMap[key].archers.push({ ...s, ...a, total: s.total || 0 });
+          });
+        return Object.values(catMap).sort(
+          (a, b) =>
+            BOW_ORDER.indexOf(a.bow) - BOW_ORDER.indexOf(b.bow) ||
+            AGE_ORDER.indexOf(a.age) - AGE_ORDER.indexOf(b.age) ||
+            a.gender.localeCompare(b.gender),
+        );
+      }
+      window.exportCSV = async (kind) => {
+        if (!currentCompId) return;
+        const comp = await currentCompDoc();
+        const base = `${fileSafe(comp.name)} ${comp.date || ''}`.trim();
+        const L = getGoldLabels();
+        let rows;
+        if (kind === 'entries') {
+          rows = [
+            [
+              '#',
+              'First name',
+              'Last name',
+              'Club',
+              'Bow',
+              'Age',
+              'Gender',
+              'Target',
+              'Phone',
+              'Email',
+              'Paid',
+              'DNS',
+            ],
+          ];
+          archers.forEach((a, i) =>
+            rows.push([
+              i + 1,
+              a.fname,
+              a.lname,
+              a.club,
+              a.bow,
+              a.age,
+              a.gender,
+              a.target ? `${a.target}${a.slot || ''}` : '',
+              a.phone,
+              a.email,
+              a.paid ? 'yes' : '',
+              a.dns ? 'DNS' : '',
+            ]),
+          );
+        } else if (kind === 'qual') {
+          rows = [['Category', 'Place', 'Name', 'Club', 'Score', L.g1, L.g2]];
+          qualCats().forEach((c) => {
+            const ranked = [...c.archers].sort(qualCompare());
+            const places = qualPlaces(ranked, currentDiscipline);
+            ranked.forEach((a, i) =>
+              rows.push([
+                catName(c),
+                places[i].place + (places[i].tied ? ' (tie)' : ''),
+                a.name,
+                a.club,
+                a.total,
+                a.g1 || 0,
+                a.g2 || 0,
+              ]),
+            );
+          });
+        } else {
+          rows = [
+            ['Category', 'Place', 'Name', 'Club', 'Qualification rank', 'Qualification score'],
+          ];
+          buildFinalCats().forEach(({ cat, inProgress, rows: rr }) => {
+            if (inProgress) rows.push([catName(cat), '', 'Elimination in progress', '', '', '']);
+            else
+              rr.forEach((a) =>
+                rows.push([catName(cat), a.rank, a.name, a.club, a.qualRank || '', a.total || 0]),
+              );
+          });
+        }
+        if (rows.length < 2) {
+          toast(t('no_scores_yet'), 'error');
+          return;
+        }
+        const label = { entries: 'Entry list', qual: 'Qualification', final: 'Final results' }[
+          kind
+        ];
+        downloadFile(`${base} - ${label}.csv`, toCSV(rows), 'text/csv;charset=utf-8');
+      };
+      const BACKUP_SUBS = ['archers', 'contacts', 'scores', 'brackets', 'matches', 'timer'];
+      window.backupComp = async () => {
+        if (!currentCompId) return;
+        try {
+          const comp = await currentCompDoc();
+          const subs = {};
+          for (const name of BACKUP_SUBS) {
+            const snap = await getDocs(sub(currentCompId, name));
+            subs[name] = {};
+            snap.docs.forEach((d) => (subs[name][d.id] = cleanData(d.data())));
+          }
+          const data = { app: 'ALL IN', version: 1, savedAt: new Date().toISOString(), comp, subs };
+          downloadFile(
+            `${fileSafe(comp.name)} ${comp.date || ''} - backup.json`.replace('  ', ' '),
+            JSON.stringify(data),
+            'application/json',
+          );
+          toast('Backup saved ✓', 'success');
+        } catch (e) {
+          toast('Backup failed', 'error');
+        }
+      };
+      window.pickRestoreFile = () => {
+        const inp = document.getElementById('restore-file');
+        inp.value = '';
+        inp.click();
+      };
+      window.restoreComp = async (input) => {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        let data;
+        try {
+          data = JSON.parse(await file.text());
+        } catch (e) {
+          data = null;
+        }
+        if (!data || data.app !== 'ALL IN' || !data.comp || !data.subs) {
+          toast('This is not an ALL IN backup file', 'error');
+          return;
+        }
+        if (!confirm(`Restore "${data.comp.name || 'competition'}" as a new competition?`)) return;
+        try {
+          const comp = {
+            ...data.comp,
+            name: `${data.comp.name || 'Competition'} (restored)`,
+            archived: false,
+          };
+          const ref = await addDoc(collection(db, 'competitions'), comp);
+          const ops = [];
+          BACKUP_SUBS.forEach((name) =>
+            Object.entries(data.subs[name] || {}).forEach(([id, v]) =>
+              ops.push((b) => b.set(doc(sub(ref.id, name), id), v)),
+            ),
+          );
+          await commitOps(ops);
+          toast('Competition restored ✓', 'success');
+          await loadCompetitions();
+          document.getElementById('comp-select').value = ref.id;
+          selectCompetition(ref.id);
+        } catch (e) {
+          toast('Restore failed', 'error');
+        }
       };
       function renderDashboard() {
         if (!currentCompId) return;

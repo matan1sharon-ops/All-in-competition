@@ -125,6 +125,8 @@ Final results build themselves from the approved matches; print them, then archi
 - **Live Results → 🏆 FINAL RESULTS** shows each category's final ranking: 1st–2nd from the Final, 3rd–4th from the Bronze match, then archers out in earlier rounds by qualification rank, then everyone else by qualification. A category whose Final or Bronze isn't approved yet shows "Elimination in progress".
 - **🖨 PRINT QUALIFICATION** and **🖨 PRINT FINAL RESULTS** print plain black-and-white tables.
 - The public results page has the same three views (Qualification, Elimination, Final Results) and its own print button for final results.
+- **Dashboard → 💾 Export & Backup:** CSV files for Excel (entry list, qualification, final results). **💾 BACKUP** saves the whole competition in one file; **♻️ RESTORE** loads a backup file as a new competition (also on the start screen). Keep a backup after each competition.
+- To save results as PDF, press a **🖨 PRINT** button and choose **Save as PDF** instead of a printer.
 - **🗄 ARCHIVE** (top right) moves the competition to **History**, where everyone can still see its results. Competitions are also archived automatically 7 days after their date.
 - **🗑 DELETE** removes the competition and everything in it (archers, scores, brackets). It can't be undone.
 
