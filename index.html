@@ -5669,6 +5669,36 @@
             : `<div class="bk-tools">${resultBtns}<span style="font-size:10px;color:var(--muted2);">🎯</span><input type="number" value="${match.targetNum || ''}" min="1" style="width:48px;background:var(--surface3);border:1px solid var(--border2);color:var(--text);padding:2px 4px;border-radius:4px;font-size:12px;text-align:center;" onchange="setMatchTarget('${catKey}','${rk}',${idx},this.value)"></div>`;
         return `<div class="bk-box${match.winnerChoice ? ' bk-done' : pending ? ' bk-pending' : ''}">${meta}${row(match.archer1, 1)}${row(match.archer2, 2)}${tools}</div>`;
       }
+      // Brackets made before auto-advance only have the rounds generated so far. Create the missing
+      // later rounds (TBD, with targets) and move every winner already decided into them.
+      function upgradeOldBracket(catKey, data) {
+        if (data.rounds?.F) return;
+        const order = ['R1', 'QF', 'SF'];
+        let prev = order.filter((rk) => data.rounds?.[rk]?.length).pop();
+        if (!prev) return;
+        let n = data.rounds[prev].length;
+        let rk = prev;
+        while (rk !== 'SF') {
+          rk = order[order.indexOf(rk) + 1];
+          n = Math.ceil(n / 2);
+          if (!data.rounds[rk]) {
+            data.rounds[rk] = Array.from({ length: n }, (_, i) => emptyMatch(rk, i));
+            const tn = elimRoundTargets(catKey, n);
+            data.rounds[rk].forEach((m, i) => (m.targetNum = tn[i]));
+          }
+        }
+        data.rounds.F = [emptyMatch('F', 0)];
+        data.rounds.B = [emptyMatch('B', 0)];
+        const tfb = elimRoundTargets(catKey, 2);
+        data.rounds.F[0].targetNum = tfb[0];
+        data.rounds.B[0].targetNum = tfb[1];
+        data.autoAdvance = true;
+        ['R1', 'QF', 'SF'].forEach((r) =>
+          (data.rounds[r] || []).forEach((m, i) => {
+            if (m.winnerChoice) applyAdvance(data, r, i);
+          }),
+        );
+      }
       // Admin approves the winner a phone sent (after checking the paper scorecard)
       window.approveMatch = async (catKey, rk, idx) => {
         const data = JSON.parse(JSON.stringify(window._elimData?.[catKey] || {}));
@@ -5676,6 +5706,7 @@
         if (!m || !m.pendingWinner) return;
         m.winnerChoice = m.pendingWinner;
         m.pendingWinner = null;
+        upgradeOldBracket(catKey, data);
         const blocked = applyAdvance(data, rk, idx);
         await saveBrackets({ [catKey]: data });
         if (blocked.length)
@@ -6031,6 +6062,7 @@
         };
         const updatedData = JSON.parse(JSON.stringify(data));
         updatedData.rounds[roundKey][matchIdx] = updatedMatch;
+        upgradeOldBracket(catKey, updatedData);
         const blocked = applyAdvance(updatedData, roundKey, matchIdx);
         await saveBrackets({ [catKey]: updatedData });
         closeModal('modal-match');
