@@ -119,6 +119,11 @@
         border-color: #66bb6a;
         color: #fff;
       }
+      body.auto .header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
       .main {
         flex: 1;
         padding: 20px;
@@ -287,6 +292,23 @@
           🏆 FINAL RESULTS
         </button>
       </div>
+      <button
+        id="btn-auto"
+        onclick="toggleAuto()"
+        style="
+          padding: 6px 14px;
+          border-radius: 6px;
+          border: 1px solid var(--border2);
+          background: transparent;
+          color: var(--muted2);
+          font-family: 'Barlow Condensed', sans-serif;
+          font-weight: 700;
+          font-size: 12px;
+          cursor: pointer;
+        "
+      >
+        ▶ AUTO-SCROLL
+      </button>
       <span class="refresh-badge" id="last-update"></span>
     </div>
 
@@ -771,6 +793,93 @@
           if (div) div.style.display = view === v ? 'block' : 'none';
         });
       };
+      /* ── AUTO-SCROLL (for a TV): scrolls the page down slowly, waits at the bottom, back to the top,
+         again and again. The view follows the competition: qualification → brackets once
+         elimination starts → final results once every Final and Bronze match is approved.
+         Any scroll / touch / click / key stops it. ?auto=1 starts it. */
+      let autoOn = false,
+        autoPhase = 'top',
+        autoT = 0,
+        autoLast = 0,
+        autoPos = 0,
+        autoRaf = null;
+      function stageOf(d) {
+        const elim = d.elimination || {};
+        const cats = Object.values(elim);
+        if (!cats.length) return 'qual';
+        const done = (e, rk) =>
+          (e.rounds?.[rk] || []).length > 0 && e.rounds[rk].every((m) => m.winnerChoice);
+        return cats.every((e) => done(e, 'F') && done(e, 'B')) ? 'final' : 'elim';
+      }
+      function autoStage(d) {
+        const st = stageOf(d);
+        if (st !== currentView) {
+          setView(st);
+          autoRestart();
+        }
+      }
+      function autoRestart() {
+        autoPhase = 'top';
+        autoT = 0;
+        autoPos = 0;
+        window.scrollTo(0, 0);
+      }
+      function autoStep(ts) {
+        if (!autoOn) return;
+        const dt = autoLast ? Math.min(0.1, (ts - autoLast) / 1000) : 0;
+        autoLast = ts;
+        const el = document.scrollingElement || document.documentElement;
+        const max = el.scrollHeight - window.innerHeight;
+        autoT += dt;
+        if (max <= 2) {
+          autoPhase = 'top'; // everything fits: nothing to scroll
+        } else if (autoPhase === 'top') {
+          if (autoT > 4) {
+            autoPhase = 'down';
+            autoT = 0;
+            autoPos = el.scrollTop;
+          }
+        } else if (autoPhase === 'down') {
+          autoPos += dt * Math.max(30, window.innerHeight * 0.05); // about 5% of the screen a second
+          if (autoPos >= max) {
+            autoPos = max;
+            autoPhase = 'bottom';
+            autoT = 0;
+          }
+          window.scrollTo(0, autoPos);
+        } else if (autoPhase === 'bottom' && autoT > 5) {
+          autoRestart();
+        }
+        autoRaf = requestAnimationFrame(autoStep);
+      }
+      function setAuto(on) {
+        autoOn = on;
+        document.body.classList.toggle('auto', on);
+        const b = document.getElementById('btn-auto');
+        b.textContent = on ? '⏸ AUTO-SCROLL ON' : '▶ AUTO-SCROLL';
+        b.style.background = on ? 'var(--accent)' : 'transparent';
+        b.style.color = on ? '#000' : 'var(--muted2)';
+        b.style.borderColor = on ? 'var(--accent)' : 'var(--border2)';
+        if (autoRaf) cancelAnimationFrame(autoRaf);
+        autoRaf = null;
+        if (on) {
+          if (lastData) autoStage(lastData);
+          autoRestart();
+          autoLast = 0;
+          autoRaf = requestAnimationFrame(autoStep);
+        }
+      }
+      window.toggleAuto = () => setAuto(!autoOn);
+      const stopAuto = (e) => {
+        if (!autoOn) return;
+        if (e.target && e.target.closest && e.target.closest('#btn-auto')) return;
+        setAuto(false);
+      };
+      ['wheel', 'touchstart', 'mousedown', 'keydown'].forEach((ev) =>
+        window.addEventListener(ev, stopAuto, { passive: true }),
+      );
+      if (new URLSearchParams(location.search).get('auto') === '1')
+        setTimeout(() => setAuto(true), 0);
       window.selectComp = (id) => {
         if (unsubscribe) unsubscribe();
         if (!id) return;
@@ -790,6 +899,7 @@
               second: '2-digit',
             });
           const hasElim = Object.keys(d.elimination || {}).length > 0;
+          if (autoOn) autoStage(d);
           const toggle = document.getElementById('view-toggle');
           if (toggle) toggle.style.display = hasElim ? 'flex' : 'none';
           if (_renderTimer) clearTimeout(_renderTimer);

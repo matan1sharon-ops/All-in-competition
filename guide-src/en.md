@@ -77,7 +77,7 @@ On the day the admin runs the timer, watches scores come in and fixes mistakes; 
 
 - **Dashboard** shows how many archers are entered, assigned and scored.
 - **Live Results** shows the qualification ranking per category as arrows come in.
-- **🖥 DISPLAY SCREEN** opens the public live results for a TV. **🔗 SHARE RESULTS** copies the results link for archers and families.
+- **🖥 DISPLAY SCREEN** opens the public live results for a TV, with **auto-scroll** on: the page scrolls slowly by itself, waits at the bottom, and starts again from the top. It shows qualification, then the brackets once elimination starts, then the final results once every Final and Bronze match is approved. Touching or scrolling stops it; **▶ AUTO-SCROLL** starts it again. **🔗 SHARE RESULTS** copies the results link for archers and families.
 
 ### Fixing a qualification score
 
