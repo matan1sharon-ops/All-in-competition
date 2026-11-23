@@ -705,6 +705,17 @@
           <div class="nav-item" onclick="showPanel('timer')" data-panel="timer">
             <span class="icon">⏱</span><span>Timer</span>
           </div>
+          <div
+            class="nav-item"
+            onclick="
+              window.open(
+                'guide.html?lang=' + (localStorage.getItem('adminLang') === 'he' ? 'he' : 'en'),
+                '_blank',
+              )
+            "
+          >
+            <span class="icon">📖</span><span>Guide</span>
+          </div>
           <a
             href="history.html"
             target="_blank"

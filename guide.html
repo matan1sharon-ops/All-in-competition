@@ -1,0 +1,1244 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ALL IN — Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;900&family=Barlow:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0a0a0a;
+        --surface: #141414;
+        --surface2: #1c1c1c;
+        --border: #2a2a2a;
+        --text: #f0f0f0;
+        --muted: #9a9a9a;
+        --accent: #ffd700;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Barlow', sans-serif;
+        font-size: 16px;
+        line-height: 1.55;
+      }
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 18px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+      }
+      .logo {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+        font-size: 24px;
+        letter-spacing: 4px;
+        color: var(--accent);
+      }
+      .logo small {
+        display: block;
+        font-size: 11px;
+        letter-spacing: 3px;
+        color: var(--muted);
+      }
+      .switch button {
+        background: transparent;
+        color: var(--muted);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .switch button.on {
+        background: var(--accent);
+        color: #000;
+        border-color: var(--accent);
+      }
+      main {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 18px 18px 60px;
+      }
+      .toc {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 6px 0 18px;
+      }
+      .toc a {
+        color: var(--text);
+        text-decoration: none;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 4px 12px;
+        font-size: 13px;
+      }
+      h2 {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+        font-size: 26px;
+        letter-spacing: 1px;
+        color: var(--accent);
+        margin: 34px 0 8px;
+        padding-top: 8px;
+        border-top: 1px solid var(--border);
+      }
+      h3 {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 700;
+        font-size: 19px;
+        margin: 22px 0 6px;
+      }
+      a {
+        color: var(--accent);
+      }
+      strong {
+        color: #fff;
+      }
+      code {
+        background: var(--surface2);
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
+      ul,
+      ol {
+        padding-inline-start: 22px;
+      }
+      li {
+        margin: 4px 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 10px 0 14px;
+        font-size: 14px;
+        display: block;
+        overflow-x: auto;
+      }
+      th,
+      td {
+        border: 1px solid var(--border);
+        padding: 7px 10px;
+        text-align: start;
+        vertical-align: top;
+      }
+      th {
+        background: var(--surface2);
+        font-family: 'Barlow Condensed', sans-serif;
+        letter-spacing: 1px;
+      }
+      .lang {
+        display: none;
+      }
+      .lang.show {
+        display: block;
+      }
+      body.archers [data-part='admin'],
+      body.archers .toc {
+        display: none;
+      }
+      .back {
+        display: inline-block;
+        margin-top: 28px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">ALL IN<small>GUIDE</small></div>
+      <div class="switch">
+        <button id="btn-en" onclick="setLang('en')">ENG</button>
+        <button id="btn-he" onclick="setLang('he')">עברית</button>
+      </div>
+    </header>
+    <main>
+      <div class="lang" id="lang-en" dir="ltr" lang="en">
+        <nav class="toc">
+          <a href="#en-overview">Overview</a
+          ><a href="#en-admin-before-the-competition">Admin: before the competition</a
+          ><a href="#en-admin-competition-day">Admin: competition day</a
+          ><a href="#en-admin-elimination">Admin: elimination</a
+          ><a href="#en-admin-results-and-after">Admin: results and after</a
+          ><a href="#en-archers">Archers</a
+          ><a href="#en-field-manager-running-the-timer">Field manager: running the timer</a
+          ><a href="#en-troubleshooting">Troubleshooting</a>
+        </nav>
+        <section id="en-intro" data-part="intro">
+          <p>
+            ALL IN runs an archery competition from registration to final results: archers register
+            and score on their phones, the admin manages everything from one screen, and results
+            update live.
+          </p>
+        </section>
+        <section id="en-overview" data-part="admin">
+          <h2>Overview</h2>
+          <p>
+            <strong>Live address:</strong> https://matan1sharon-ops.github.io/All-in-competition/
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Page</th>
+                <th>Who uses it</th>
+                <th>What it does</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Admin</td>
+                <td>Organizer, judge</td>
+                <td>
+                  Create the competition, entries, targets, printing, elimination, approving
+                  results, timer settings
+                </td>
+              </tr>
+              <tr>
+                <td>Registration</td>
+                <td>Archers</td>
+                <td>Sign up with the registration link</td>
+              </tr>
+              <tr>
+                <td>Scoring</td>
+                <td>Archers</td>
+                <td>Enter arrows after scanning a QR code</td>
+              </tr>
+              <tr>
+                <td>Live results</td>
+                <td>Everyone</td>
+                <td>Qualification, elimination brackets and final results, live</td>
+              </tr>
+              <tr>
+                <td>Timer</td>
+                <td>Field manager, TV screen</td>
+                <td>End timer display with beeps, and phone control</td>
+              </tr>
+              <tr>
+                <td>History</td>
+                <td>Everyone</td>
+                <td>Results of archived competitions</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>A competition day in order:</p>
+          <ol>
+            <li>Create the competition and share the registration link.</li>
+            <li>Archers register; mark no-shows as DNS on the day.</li>
+            <li>Assign targets and print the scorecards (or use the target QR signs).</li>
+            <li>Qualification: archers scan the QR and score; the timer runs the ends.</li>
+            <li>
+              Elimination: generate brackets, archers score matches, the admin approves each result.
+            </li>
+            <li>Final results: show and print; archive the competition.</li>
+          </ol>
+        </section>
+        <section id="en-admin-before-the-competition" data-part="admin">
+          <h2>Admin: before the competition</h2>
+          <p>
+            Set up takes four steps: create the competition, collect entries, assign targets, print.
+          </p>
+          <h3>1. Create the competition</h3>
+          <ol>
+            <li>Press <strong>+ NEW COMPETITION</strong> (top left).</li>
+            <li>
+              Fill in name, date, number of days, location, organizer and
+              <strong>discipline</strong>: Outdoor, Indoor, 3D, Field or Custom.
+            </li>
+            <li>
+              Optional: a <strong>payment link</strong> (archers see a yellow pay button after
+              registering). For Custom: allowed bow types and ages. For 3D: 24 targets or 2×12.
+            </li>
+            <li>
+              Save. Pick the competition in <strong>Select Competition</strong> whenever you come
+              back.
+            </li>
+          </ol>
+          <h3>2. Registration and entries</h3>
+          <ul>
+            <li>
+              <strong>Registration link:</strong> Dashboard → <strong>🔗 REGISTRATION LINK</strong>,
+              then send it (WhatsApp, email). Archers fill in name, club, bow, age, gender, phone
+              and email. The same name can't register twice.
+            </li>
+            <li>
+              <strong>Schedule</strong> (optional): add sessions (name, place, date, time). Archers
+              see them before the registration form. Nothing else uses them.
+            </li>
+            <li>
+              <strong>Entry List:</strong> every archer with club, bow, age, gender, target, phone
+              and email.
+              <ul>
+                <li>Add an archer by hand at the top of the panel.</li>
+                <li>
+                  <strong>📥 IMPORT CSV</strong> for many archers at once (<strong
+                    >📋 GET TEMPLATE</strong
+                  >
+                  gives the file layout).
+                </li>
+                <li>✏️ edits an archer, ✕ deletes one.</li>
+                <li>
+                  <strong>DNS</strong> marks an archer who did not start or withdrew: the row greys
+                  out, the archer leaves their target and is left out of scoring, elimination and
+                  results. <strong>↩</strong> brings them back (they need a target again).
+                </li>
+              </ul>
+            </li>
+          </ul>
+          <h3>3. Targets</h3>
+          <ul>
+            <li>
+              <strong>Target Assignment → ⚡ AUTO GENERATE FROM ENTRIES</strong> places archers on
+              targets by bow and age group, up to 4 per target (A, B, C, D).
+            </li>
+            <li>
+              Click an empty place to put an archer there by hand; edit a target's number to
+              renumber it. In 3D, Field and Custom you can add or delete targets.
+            </li>
+            <li>
+              Mark DNS archers <strong>before</strong> generating, so they don't take a place.
+            </li>
+            <li>
+              <strong>🖨 PRINT START LIST</strong> and <strong>🏟 FIELD OF PLAY</strong> print who is
+              where.
+            </li>
+          </ul>
+          <h3>4. Print</h3>
+          <ul>
+            <li>
+              <strong>Scorecards → 🖨 PRINT BLANK:</strong> qualification scorecards with a
+              <strong>QR code per target</strong>. Archers scan it to score.
+            </li>
+            <li>
+              <strong>🖨 PRINT ALL:</strong> scorecards with the scores filled in (after the round).
+            </li>
+            <li>
+              <strong>Target Assignment → 🔳 TARGET QR SIGNS:</strong> one A4 sign per target
+              (TARGET 1, TARGET 2…). The QR holds only the target number, so the same laminated
+              signs work at every competition. Print them from the live site.
+            </li>
+            <li>
+              Custom discipline only: set up each target in <strong>Target Setup</strong> first
+              (type, arrows, scoring).
+            </li>
+          </ul>
+        </section>
+        <section id="en-admin-competition-day" data-part="admin">
+          <h2>Admin: competition day</h2>
+          <p>
+            On the day the admin runs the timer, watches scores come in and fixes mistakes; archers
+            do the scoring themselves.
+          </p>
+          <h3>Check-in</h3>
+          <ul>
+            <li>
+              Mark archers who didn't come as <strong>DNS</strong> (Entry List). Their target place
+              is freed; you can put a late entry there by hand.
+            </li>
+          </ul>
+          <h3>Timer</h3>
+          <ol>
+            <li>
+              <strong>Timer</strong> panel → settings: shooting time, call-up time (10 s), yellow
+              warning (30 s), number of ends, practice ends, shooting lines (AB only, AB then CD, or
+              alternating). <strong>SAVE SETTINGS.</strong>
+            </li>
+            <li>
+              <strong>🖥 OPEN TIMER DISPLAY</strong> on the computer connected to the TV or
+              projector. Press <strong>SOUND ON</strong> there (on that one device only).
+            </li>
+            <li>
+              Run the ends from the controller in the panel, or from a phone: scan the QR in the
+              panel or use <strong>🔗 COPY PHONE CONTROL LINK</strong>. See
+              <em>Field manager</em> below.
+            </li>
+          </ol>
+          <h3>Watching scores</h3>
+          <ul>
+            <li>
+              <strong>Dashboard</strong> shows how many archers are entered, assigned and scored.
+            </li>
+            <li>
+              <strong>Live Results</strong> shows the qualification ranking per category as arrows
+              come in.
+            </li>
+            <li>
+              <strong>🖥 DISPLAY SCREEN</strong> opens the public live results for a TV.
+              <strong>🔗 SHARE RESULTS</strong> copies the results link for archers and families.
+            </li>
+          </ul>
+          <h3>Fixing a qualification score</h3>
+          <ul>
+            <li>
+              <strong>Live Results</strong> → click an archer's score (✏️) → change it → save. Use
+              the paper scorecard as the reference.
+            </li>
+          </ul>
+        </section>
+        <section id="en-admin-elimination" data-part="admin">
+          <h2>Admin: elimination</h2>
+          <p>
+            After qualification the admin generates the brackets once; from then on every match
+            result is approved by the admin, and the winner moves to the next round by himself.
+          </p>
+          <h3>Generate the brackets</h3>
+          <ol>
+            <li>
+              <strong>Elimination</strong> panel → choose the bracket size (e.g.
+              <strong>1/8 — Top 16</strong>). Categories with fewer archers get a smaller bracket.
+            </li>
+            <li>
+              <strong>⚡ GENERATE ALL</strong> builds a bracket per category in World Archery seed
+              order (1 and 2 can only meet in the final). DNS archers and archers without a score
+              are left out.
+            </li>
+            <li>
+              Every round is created at once: later rounds show <strong>TBD</strong>, Final and
+              Bronze included, each with its target. Archers with a bye are already in the next
+              round.
+            </li>
+          </ol>
+          <p>
+            Format in Outdoor and Indoor: Recurve, Barebow, Traditional and Longbow shoot
+            <strong>sets</strong> (S1–S5, 2 points a set won, 6 wins); Compound shoots
+            <strong>cumulative</strong> (5 ends of 3 arrows). In 3D and Field every bow shoots
+            cumulative over 4 targets (2 arrows per target in 3D).
+          </p>
+          <h3>Print and score</h3>
+          <ul>
+            <li>
+              <strong>🖨 PRINT SCORECARDS</strong> prints one card per match that is ready (both
+              archers known, not finished), with a QR for its target. Press it again after each
+              round: it prints only the new matches.
+            </li>
+            <li><strong>👤 WITH NAMES / NO NAMES</strong> switches names on the printed cards.</li>
+            <li>
+              Archers scan the card's QR (or the target sign) and score the match on one or two
+              phones.
+            </li>
+          </ul>
+          <h3>Approve each result</h3>
+          <p>
+            A match finished on a phone is only a <strong>provisional</strong> winner until the
+            admin approves it:
+          </p>
+          <ol>
+            <li>
+              The match box turns orange: <strong>⏳ APPROVE?</strong>, with the end scores of both
+              archers in the box.
+            </li>
+            <li>Compare with the paper scorecard.</li>
+            <li>
+              Same result → <strong>✓ APPROVE</strong>. The winner moves to his place in the next
+              round; a semifinal loser goes to the Bronze match.
+            </li>
+            <li>
+              Different result → <strong>✏️</strong>, type the scores from the paper and save.
+              Saving counts as the approval, and the right archer moves on.
+            </li>
+          </ol>
+          <p>
+            A result you enter yourself with <strong>Enter Result</strong> needs no extra approval.
+            If you change a winner after the next match has started, the archer there is not changed
+            and you get a warning: fix that match by hand.
+          </p>
+          <h3>Other tools</h3>
+          <ul>
+            <li>The 🎯 box on each match changes its target number.</li>
+            <li>
+              <strong>🖨 PRINT BRACKETS</strong> prints the brackets as on screen, one category per
+              A4 landscape page.
+            </li>
+            <li>
+              <strong>✕ DELETE</strong> on a category removes its bracket (to generate it again).
+            </li>
+          </ul>
+        </section>
+        <section id="en-admin-results-and-after" data-part="admin">
+          <h2>Admin: results and after</h2>
+          <p>
+            Final results build themselves from the approved matches; print them, then archive the
+            competition.
+          </p>
+          <ul>
+            <li>
+              <strong>Live Results → 🏆 FINAL RESULTS</strong> shows each category's final ranking:
+              1st–2nd from the Final, 3rd–4th from the Bronze match, then archers out in earlier
+              rounds by qualification rank, then everyone else by qualification. A category whose
+              Final or Bronze isn't approved yet shows "Elimination in progress".
+            </li>
+            <li>
+              <strong>🖨 PRINT QUALIFICATION</strong> and
+              <strong>🖨 PRINT FINAL RESULTS</strong> print plain black-and-white tables.
+            </li>
+            <li>
+              The public results page has the same three views (Qualification, Elimination, Final
+              Results) and its own print button for final results.
+            </li>
+            <li>
+              <strong>🗄 ARCHIVE</strong> (top right) moves the competition to
+              <strong>History</strong>, where everyone can still see its results. Competitions are
+              also archived automatically 7 days after their date.
+            </li>
+            <li>
+              <strong>🗑 DELETE</strong> removes the competition and everything in it (archers,
+              scores, brackets). It can't be undone.
+            </li>
+          </ul>
+        </section>
+        <section id="en-archers" data-part="archers">
+          <h2>Archers</h2>
+          <p>
+            Archers need only their phone: register with the link, then scan the QR on the target to
+            score.
+          </p>
+          <h3>Register</h3>
+          <ol>
+            <li>Open the registration link from the organizer.</li>
+            <li>
+              Fill in first and last name, club, bow, age category, gender and phone (email is
+              optional).
+            </li>
+            <li>Press register. If there is a pay button, pay there.</li>
+          </ol>
+          <h3>Score qualification</h3>
+          <ol>
+            <li>
+              Scan the QR on your <strong>scorecard</strong> or on the <strong>target sign</strong>,
+              with the phone camera or the app's <strong>📷 SCAN QR CODE</strong> button (allow the
+              camera the first time).
+            </li>
+            <li>Check the archers on your target and press <strong>START SCORING</strong>.</li>
+            <li>
+              Enter each arrow (X, 10–1, M). Use BACKSPACE ← to fix the last arrow. After an end the
+              app moves to the next archer by itself.
+            </li>
+            <li>Keep the paper scorecard too: it's the reference if something is wrong.</li>
+          </ol>
+          <p>
+            Two phones can score the same target at the same time; each sees the other's arrows. If
+            your phone dies, another archer scans the same QR and continues; nothing saved is lost.
+          </p>
+          <h3>Score an elimination match</h3>
+          <ol>
+            <li>
+              Scan the QR on the match scorecard (or the target sign). The app opens your match.
+            </li>
+            <li>
+              Enter the arrows for both archers, set by set (or target by target in 3D/Field).
+            </li>
+            <li>
+              At the end press <strong>SUBMIT MATCH</strong>. The result goes to the admin for
+              approval.
+            </li>
+          </ol>
+          <h3>Messages you may see</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Message</th>
+                <th>What it means</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>⚠ Offline — scores are saved on this phone</td>
+                <td>
+                  No internet. Keep scoring; scores upload by themselves when the connection is back
+                </td>
+              </tr>
+              <tr>
+                <td>⏳ Uploading scores…</td>
+                <td>Back online, sending what was saved</td>
+              </tr>
+              <tr>
+                <td>Updated from another phone</td>
+                <td>Someone else on your target entered arrows</td>
+              </tr>
+              <tr>
+                <td>Your next match is waiting for the opponent</td>
+                <td>The other match feeding yours isn't finished. Scan again later</td>
+              </tr>
+              <tr>
+                <td>Match finished — waiting for the admin to approve</td>
+                <td>Your match is done; the admin checks it against the paper</td>
+              </tr>
+              <tr>
+                <td>No archers or match on this target</td>
+                <td>Wrong target, or not assigned yet. Ask the organizer</td>
+              </tr>
+              <tr>
+                <td>No competition is running today</td>
+                <td>The target sign found no competition today. Ask the organizer</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+        <section id="en-field-manager-running-the-timer" data-part="admin">
+          <h2>Field manager: running the timer</h2>
+          <p>
+            The field manager runs the ends from a phone; one press starts an end and the timer does
+            the rest.
+          </p>
+          <p>
+            <strong>Get the controller:</strong> scan the QR in the admin
+            <strong>Timer</strong> panel, or open the phone control link the admin sends. The phone
+            shows the same clock as the big screen.
+          </p>
+          <p>
+            <strong>One end runs by itself:</strong> call-up for AB (red, 2 beeps) → AB shoots
+            (green, 1 beep; yellow for the last 30 s) → call-up for CD → CD shoots → collect arrows
+            (red, 3 beeps). Practice ends show as <strong>PRACTICE ROUND</strong> and don't count as
+            ends. Time is shown in seconds.
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Button</th>
+                <th>What it does</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>▶ START</td>
+                <td>Starts the next end (or practice round)</td>
+              </tr>
+              <tr>
+                <td>⏭ NEXT</td>
+                <td>Ends the current phase early, when everyone on the line has shot</td>
+              </tr>
+              <tr>
+                <td>⏸ PAUSE / ▶ RESUME</td>
+                <td>
+                  Stops the clock; resume continues from the same second with the phase's signal
+                </td>
+              </tr>
+              <tr>
+                <td>⛔ EMERGENCY STOP</td>
+                <td>5 beeps, red screen; resume continues where it stopped</td>
+              </tr>
+              <tr>
+                <td>−5 / −1 / +1 / +5 s</td>
+                <td>Change the time left — only while paused or stopped</td>
+              </tr>
+              <tr>
+                <td>↺ RESTART END</td>
+                <td>Cancels the current end and gets it ready again</td>
+              </tr>
+              <tr>
+                <td>Jump to end → GO</td>
+                <td>Picks any end or practice round, ready to start</td>
+              </tr>
+              <tr>
+                <td>1 / 2 / 3 BEEPS</td>
+                <td>A manual signal at any time</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            Turn <strong>sound on</strong> only on the device connected to the speaker (usually the
+            TV computer), so the beeps don't echo.
+          </p>
+        </section>
+        <section id="en-troubleshooting" data-part="admin">
+          <h2>Troubleshooting</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Problem</th>
+                <th>What to do</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>A page shows an old version</td>
+                <td>
+                  Reload with Ctrl+Shift+R (computer). On a phone, open the page once with internet
+                </td>
+              </tr>
+              <tr>
+                <td>An archer's phone died</td>
+                <td>Another archer scans the same QR and continues; saved scores are kept</td>
+              </tr>
+              <tr>
+                <td>Arrows entered offline are missing</td>
+                <td>
+                  They upload when that phone is back online. Until then re-enter the end, or fix it
+                  in admin from the paper
+                </td>
+              </tr>
+              <tr>
+                <td>Phone score differs from the paper</td>
+                <td>
+                  Qualification: Live Results → click the score ✏️. Elimination: ✏️ on the match,
+                  type the paper scores
+                </td>
+              </tr>
+              <tr>
+                <td>An archer didn't come</td>
+                <td>Entry List → DNS (before generating targets or brackets)</td>
+              </tr>
+              <tr>
+                <td>A match won't open ("waiting for the opponent")</td>
+                <td>The feeding match isn't approved yet; approve it in Elimination</td>
+              </tr>
+              <tr>
+                <td>Camera doesn't open in the app</td>
+                <td>
+                  Allow the camera in the browser settings, or scan with the phone's camera app
+                </td>
+              </tr>
+              <tr>
+                <td>QR from a computer printout doesn't open on phones</td>
+                <td>Print QR codes and signs from the live site, not from files on a computer</td>
+              </tr>
+              <tr>
+                <td>Timer has no sound</td>
+                <td>Press SOUND ON on that screen; phones and tablets need one tap first</td>
+              </tr>
+              <tr>
+                <td>Two competitions on the same day</td>
+                <td>Scanning a target sign shows a list; the archer picks the right one</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+      <div class="lang" id="lang-he" dir="rtl" lang="he">
+        <nav class="toc">
+          <a href="#he-s">סקירה</a><a href="#he-s">מנהל: לפני התחרות</a
+          ><a href="#he-s">מנהל: יום התחרות</a><a href="#he-s">מנהל: מקצי הדחות</a
+          ><a href="#he-s">מנהל: תוצאות ואחרי התחרות</a><a href="#he-archers">קשתים</a
+          ><a href="#he-s">מנהל שדה: הפעלת הטיימר</a><a href="#he-s">פתרון בעיות</a>
+        </nav>
+        <section id="he-intro" data-part="intro">
+          <p>
+            ALL IN מנהלת תחרות קשתות מההרשמה ועד התוצאות הסופיות: הקשתים נרשמים ומנקדים בטלפון,
+            המנהל מנהל הכול ממסך אחד, והתוצאות מתעדכנות בזמן אמת.
+          </p>
+          <p>
+            שמות הכפתורים כתובים כאן כפי שהם מופיעים באנגלית. כשהאפליקציה בעברית, חלק מהם מתורגמים.
+          </p>
+        </section>
+        <section id="he-s" data-part="admin">
+          <h2>סקירה</h2>
+          <p><strong>כתובת האתר:</strong> https://matan1sharon-ops.github.io/All-in-competition/</p>
+          <table>
+            <thead>
+              <tr>
+                <th>דף</th>
+                <th>מי משתמש</th>
+                <th>מה הוא עושה</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ניהול</td>
+                <td>מארגן, שופט</td>
+                <td>
+                  יצירת תחרות, רשימת משתתפים, מטרות, הדפסות, מקצי הדחות, אישור תוצאות, הגדרות טיימר
+                </td>
+              </tr>
+              <tr>
+                <td>הרשמה</td>
+                <td>קשתים</td>
+                <td>הרשמה דרך קישור ההרשמה</td>
+              </tr>
+              <tr>
+                <td>ניקוד</td>
+                <td>קשתים</td>
+                <td>הזנת חיצים אחרי סריקת QR</td>
+              </tr>
+              <tr>
+                <td>תוצאות חיות</td>
+                <td>כולם</td>
+                <td>מוקדמות, עצי הדחות ותוצאות סופיות, בזמן אמת</td>
+              </tr>
+              <tr>
+                <td>טיימר</td>
+                <td>מנהל שדה, מסך טלוויזיה</td>
+                <td>תצוגת זמן לסבב עם צפצופים, ושליטה מהטלפון</td>
+              </tr>
+              <tr>
+                <td>היסטוריה</td>
+                <td>כולם</td>
+                <td>תוצאות של תחרויות שהועברו לארכיון</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>יום תחרות לפי הסדר:</p>
+          <ol>
+            <li>יוצרים תחרות ושולחים את קישור ההרשמה.</li>
+            <li>הקשתים נרשמים; ביום התחרות מסמנים מי שלא הגיע כ-DNS.</li>
+            <li>משבצים למטרות ומדפיסים כרטיסי ניקוד (או משתמשים בשלטי ה-QR של המטרות).</li>
+            <li>מוקדמות: הקשתים סורקים QR ומנקדים; הטיימר מנהל את הסבבים.</li>
+            <li>מקצי הדחות: יוצרים עצים, הקשתים מנקדים, המנהל מאשר כל תוצאה.</li>
+            <li>תוצאות סופיות: מציגים ומדפיסים; מעבירים את התחרות לארכיון.</li>
+          </ol>
+        </section>
+        <section id="he-s" data-part="admin">
+          <h2>מנהל: לפני התחרות</h2>
+          <p>ההכנה בארבעה שלבים: יצירת תחרות, איסוף משתתפים, שיבוץ למטרות, הדפסה.</p>
+          <h3>1. יצירת תחרות</h3>
+          <ol>
+            <li>לוחצים <strong>+ NEW COMPETITION</strong> (למעלה משמאל).</li>
+            <li>
+              ממלאים שם, תאריך, מספר ימים, מיקום, מארגן ו<strong>מקצוע</strong>: Outdoor, Indoor,
+              3D, Field או Custom.
+            </li>
+            <li>
+              לא חובה: <strong>קישור לתשלום</strong> (הקשת רואה כפתור צהוב לתשלום אחרי ההרשמה).
+              ב-Custom: סוגי קשת וגילאים מותרים. ב-3D: פורמט 24 מטרות או 2×12.
+            </li>
+            <li>שומרים. כשחוזרים, בוחרים את התחרות ב-<strong>Select Competition</strong>.</li>
+          </ol>
+          <h3>2. הרשמה ורשימת משתתפים</h3>
+          <ul>
+            <li>
+              <strong>קישור הרשמה:</strong> Dashboard ← <strong>🔗 REGISTRATION LINK</strong>,
+              ושולחים (ווטסאפ, מייל). הקשתים ממלאים שם, מועדון, קשת, גיל, מין, טלפון ומייל. אותו שם
+              לא יכול להירשם פעמיים.
+            </li>
+            <li>
+              <strong>Schedule</strong> (לא חובה): מוסיפים מקצים (שם, מקום, תאריך, שעה). הקשתים
+              רואים אותם לפני טופס ההרשמה. שום דבר אחר לא משתמש בהם.
+            </li>
+            <li>
+              <strong>Entry List:</strong> כל הקשתים עם מועדון, קשת, גיל, מין, מטרה, טלפון ומייל.
+              <ul>
+                <li>הוספת קשת ידנית בראש המסך.</li>
+                <li>
+                  <strong>📥 IMPORT CSV</strong> להוספת קשתים רבים בבת אחת (<strong
+                    >📋 GET TEMPLATE</strong
+                  >
+                  נותן את מבנה הקובץ).
+                </li>
+                <li>✏️ עריכת קשת, ✕ מחיקה.</li>
+                <li>
+                  <strong>DNS</strong> מסמן קשת שלא הגיע או פרש: השורה מאפירה, הקשת יוצא מהמטרה ולא
+                  מופיע בניקוד, במקצי ההדחות ובתוצאות. <strong>↩</strong> מחזיר אותו (צריך לשבץ שוב
+                  למטרה).
+                </li>
+              </ul>
+            </li>
+          </ul>
+          <h3>3. מטרות</h3>
+          <ul>
+            <li>
+              <strong>Target Assignment ← ⚡ AUTO GENERATE FROM ENTRIES</strong> משבץ קשתים למטרות
+              לפי סוג קשת וגיל, עד 4 למטרה (A, B, C, D).
+            </li>
+            <li>
+              לוחצים על מקום ריק כדי לשבץ קשת ידנית; משנים מספר מטרה כדי למספר מחדש. ב-3D, Field
+              ו-Custom אפשר להוסיף ולמחוק מטרות.
+            </li>
+            <li>מסמנים DNS <strong>לפני</strong> השיבוץ, כדי שלא יתפסו מקום.</li>
+            <li>
+              <strong>🖨 PRINT START LIST</strong> ו-<strong>🏟 FIELD OF PLAY</strong> מדפיסים מי עומד
+              איפה.
+            </li>
+          </ul>
+          <h3>4. הדפסה</h3>
+          <ul>
+            <li>
+              <strong>Scorecards ← 🖨 PRINT BLANK:</strong> כרטיסי ניקוד למוקדמות עם
+              <strong>קוד QR לכל מטרה</strong>. הקשתים סורקים אותו כדי לנקד.
+            </li>
+            <li><strong>🖨 PRINT ALL:</strong> כרטיסים עם הניקוד ממולא (אחרי הסבב).</li>
+            <li>
+              <strong>Target Assignment ← 🔳 TARGET QR SIGNS:</strong> שלט A4 לכל מטרה (TARGET 1,
+              TARGET 2…). ה-QR מכיל רק את מספר המטרה, כך שאותם שלטים מנוילנים עובדים בכל תחרות.
+              מדפיסים מהאתר החי.
+            </li>
+            <li>
+              רק ב-Custom: מגדירים קודם כל מטרה ב-<strong>Target Setup</strong> (סוג, חיצים, ניקוד).
+            </li>
+          </ul>
+        </section>
+        <section id="he-s" data-part="admin">
+          <h2>מנהל: יום התחרות</h2>
+          <p>
+            ביום התחרות המנהל מפעיל את הטיימר, עוקב אחרי הניקוד ומתקן טעויות; הקשתים מנקדים בעצמם.
+          </p>
+          <h3>אישור הגעה</h3>
+          <ul>
+            <li>
+              מסמנים קשתים שלא הגיעו כ-<strong>DNS</strong> (Entry List). המקום שלהם במטרה מתפנה,
+              ואפשר לשבץ שם נרשם מאוחר ידנית.
+            </li>
+          </ul>
+          <h3>טיימר</h3>
+          <ol>
+            <li>
+              לשונית <strong>Timer</strong> ← הגדרות: זמן ירי, זמן עלייה לקו (10 שניות), אזהרה צהובה
+              (30 שניות), מספר סבבים, סבבי אימון, קווי ירי (AB בלבד, AB ואז CD, או מתחלף).
+              <strong>SAVE SETTINGS.</strong>
+            </li>
+            <li>
+              <strong>🖥 OPEN TIMER DISPLAY</strong> במחשב המחובר לטלוויזיה או למקרן. לוחצים שם
+              <strong>SOUND ON</strong> (רק במכשיר הזה).
+            </li>
+            <li>
+              מפעילים את הסבבים מהשליטה שבלשונית, או מהטלפון: סורקים את ה-QR שבלשונית או שולחים
+              <strong>🔗 COPY PHONE CONTROL LINK</strong>. ראו <em>מנהל שדה</em> למטה.
+            </li>
+          </ol>
+          <h3>מעקב ניקוד</h3>
+          <ul>
+            <li><strong>Dashboard</strong> מראה כמה קשתים רשומים, משובצים ומנוקדים.</li>
+            <li>
+              <strong>Live Results</strong> מראה את דירוג המוקדמות לפי קטגוריה, תוך כדי ניקוד.
+            </li>
+            <li>
+              <strong>🖥 DISPLAY SCREEN</strong> פותח את התוצאות החיות למסך טלוויזיה.
+              <strong>🔗 SHARE RESULTS</strong> מעתיק את קישור התוצאות לקשתים ולמשפחות.
+            </li>
+          </ul>
+          <h3>תיקון ניקוד מוקדמות</h3>
+          <ul>
+            <li>
+              <strong>Live Results</strong> ← לוחצים על הניקוד של הקשת (✏️) ← משנים ← שומרים. הכרטיס
+              המודפס הוא הקובע.
+            </li>
+          </ul>
+        </section>
+        <section id="he-s" data-part="admin">
+          <h2>מנהל: מקצי הדחות</h2>
+          <p>
+            אחרי המוקדמות המנהל יוצר את העצים פעם אחת; משם והלאה כל תוצאה מאושרת על ידי המנהל,
+            והמנצח עולה לשלב הבא לבד.
+          </p>
+          <h3>יצירת העצים</h3>
+          <ol>
+            <li>
+              לשונית <strong>Elimination</strong> ← בוחרים גודל עץ (למשל
+              <strong>1/8 — Top 16</strong>). קטגוריה עם פחות קשתים מקבלת עץ קטן יותר.
+            </li>
+            <li>
+              <strong>⚡ GENERATE ALL</strong> יוצר עץ לכל קטגוריה לפי סדר הדירוג של World Archery
+              (מדורגים 1 ו-2 נפגשים רק בגמר). קשתי DNS וקשתים בלי ניקוד לא נכללים.
+            </li>
+            <li>
+              כל השלבים נוצרים מיד: שלבים מאוחרים מסומנים <strong>TBD</strong>, כולל גמר וארד, כל
+              אחד עם מטרה. קשת שקיבל עולה ישירות (bye) כבר נמצא בשלב הבא.
+            </li>
+          </ol>
+          <p>
+            פורמט ב-Outdoor ו-Indoor: ריקרב, ברבו, טרדישיונל ולונגבו יורים
+            <strong>סטים</strong> (S1–S5, 2 נקודות לסט, ניצחון ב-6); קומפאונד יורה
+            <strong>צבור</strong> (5 סבבים של 3 חיצים). ב-3D ו-Field כל הקשתות יורות צבור על 4 מטרות
+            (ב-3D שני חיצים למטרה).
+          </p>
+          <h3>הדפסה וניקוד</h3>
+          <ul>
+            <li>
+              <strong>🖨 PRINT SCORECARDS</strong> מדפיס כרטיס לכל מקצה מוכן (שני הקשתים ידועים
+              והמקצה לא הסתיים), עם QR למטרה. לוחצים שוב אחרי כל שלב: רק המקצים החדשים מודפסים.
+            </li>
+            <li><strong>👤 WITH NAMES / NO NAMES</strong> קובע אם השמות מודפסים על הכרטיסים.</li>
+            <li>הקשתים סורקים את ה-QR של הכרטיס (או שלט המטרה) ומנקדים בטלפון אחד או שניים.</li>
+          </ul>
+          <h3>אישור כל תוצאה</h3>
+          <p>מקצה שהסתיים בטלפון הוא מנצח <strong>זמני</strong> עד שהמנהל מאשר:</p>
+          <ol>
+            <li>
+              תיבת המקצה הופכת לכתומה: <strong>⏳ APPROVE?</strong>, עם ניקוד הסבבים של שני הקשתים.
+            </li>
+            <li>משווים לכרטיס הנייר.</li>
+            <li>
+              אותה תוצאה ← <strong>✓ APPROVE</strong>. המנצח עולה למקומו בשלב הבא; מפסיד חצי גמר
+              עובר למקצה הארד.
+            </li>
+            <li>
+              תוצאה שונה ← <strong>✏️</strong>, מקלידים את הניקוד מהנייר ושומרים. השמירה נחשבת
+              כאישור, והקשת הנכון עולה.
+            </li>
+          </ol>
+          <p>
+            תוצאה שהמנהל מזין בעצמו ב-<strong>Enter Result</strong> לא צריכה אישור נוסף. אם משנים
+            מנצח אחרי שהמקצה הבא כבר התחיל, הקשת שם לא מתחלף ומופיעה אזהרה: מתקנים את המקצה ידנית.
+          </p>
+          <h3>כלים נוספים</h3>
+          <ul>
+            <li>תיבת ה-🎯 בכל מקצה משנה את מספר המטרה.</li>
+            <li>
+              <strong>🖨 PRINT BRACKETS</strong> מדפיס את העצים כמו במסך, קטגוריה אחת בעמוד A4 לרוחב.
+            </li>
+            <li><strong>✕ DELETE</strong> על קטגוריה מוחק את העץ שלה (כדי ליצור מחדש).</li>
+          </ul>
+        </section>
+        <section id="he-s" data-part="admin">
+          <h2>מנהל: תוצאות ואחרי התחרות</h2>
+          <p>התוצאות הסופיות נבנות לבד מהמקצים שאושרו; מדפיסים אותן ומעבירים את התחרות לארכיון.</p>
+          <ul>
+            <li>
+              <strong>Live Results ← 🏆 FINAL RESULTS</strong> מראה את הדירוג הסופי של כל קטגוריה:
+              מקומות 1–2 מהגמר, 3–4 ממקצה הארד, אחר כך מי שהודח בשלבים מוקדמים לפי דירוג המוקדמות,
+              ואחר כך כל השאר לפי המוקדמות. קטגוריה שהגמר או הארד שלה עוד לא אושרו מסומנת
+              "Elimination in progress".
+            </li>
+            <li>
+              <strong>🖨 PRINT QUALIFICATION</strong> ו-<strong>🖨 PRINT FINAL RESULTS</strong>
+              מדפיסים טבלאות שחור-לבן.
+            </li>
+            <li>
+              בדף התוצאות הציבורי יש אותן שלוש תצוגות (מוקדמות, הדחות, תוצאות סופיות) וכפתור הדפסה
+              לתוצאות הסופיות.
+            </li>
+            <li>
+              <strong>🗄 ARCHIVE</strong> (למעלה מימין) מעביר את התחרות ל-<strong>History</strong>,
+              שם כולם עדיין רואים את התוצאות. תחרות עוברת לארכיון גם לבד, 7 ימים אחרי התאריך שלה.
+            </li>
+            <li>
+              <strong>🗑 DELETE</strong> מוחק את התחרות וכל מה שבה (קשתים, ניקוד, עצים). אי אפשר
+              לבטל.
+            </li>
+          </ul>
+        </section>
+        <section id="he-archers" data-part="archers">
+          <h2>קשתים</h2>
+          <p>לקשת מספיק הטלפון: נרשמים דרך הקישור, וסורקים את ה-QR של המטרה כדי לנקד.</p>
+          <h3>הרשמה</h3>
+          <ol>
+            <li>פותחים את קישור ההרשמה מהמארגן.</li>
+            <li>
+              ממלאים שם פרטי ושם משפחה, מועדון, סוג קשת, קטגוריית גיל, מין וטלפון (מייל לא חובה).
+            </li>
+            <li>נרשמים. אם יש כפתור תשלום, משלמים דרכו.</li>
+          </ol>
+          <h3>ניקוד מוקדמות</h3>
+          <ol>
+            <li>
+              סורקים את ה-QR של <strong>כרטיס הניקוד</strong> או של <strong>שלט המטרה</strong>,
+              במצלמת הטלפון או בכפתור <strong>📷 SCAN QR CODE</strong> שבאפליקציה (בפעם הראשונה צריך
+              לאשר מצלמה).
+            </li>
+            <li>בודקים את הקשתים על המטרה ולוחצים <strong>START SCORING</strong>.</li>
+            <li>
+              מזינים כל חץ (X, 10–1, M). <strong>BACKSPACE ←</strong> מתקן את החץ האחרון. בסוף סבב
+              האפליקציה עוברת לקשת הבא לבד.
+            </li>
+            <li>ממלאים גם את כרטיס הנייר: הוא הקובע אם משהו לא תקין.</li>
+          </ol>
+          <p>
+            שני טלפונים יכולים לנקד את אותה מטרה באותו זמן; כל אחד רואה את החיצים של השני. אם הטלפון
+            נכבה, קשת אחר סורק את אותו QR וממשיך; מה שנשמר לא אובד.
+          </p>
+          <h3>ניקוד מקצה הדחה</h3>
+          <ol>
+            <li>סורקים את ה-QR של כרטיס המקצה (או שלט המטרה). המקצה נפתח.</li>
+            <li>מזינים את החיצים של שני הקשתים, סט אחר סט (או מטרה אחר מטרה ב-3D/Field).</li>
+            <li>בסוף לוחצים <strong>SUBMIT MATCH</strong>. התוצאה נשלחת לאישור המנהל.</li>
+          </ol>
+          <h3>הודעות שאפשר לראות</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>הודעה</th>
+                <th>מה זה אומר</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>⚠ אין חיבור — הניקוד נשמר בטלפון</td>
+                <td>אין אינטרנט. ממשיכים לנקד; הניקוד עולה לבד כשהחיבור חוזר</td>
+              </tr>
+              <tr>
+                <td>⏳ מעלה ניקוד…</td>
+                <td>החיבור חזר, שולח את מה שנשמר</td>
+              </tr>
+              <tr>
+                <td>עודכן מטלפון אחר</td>
+                <td>מישהו אחר במטרה הזין חיצים</td>
+              </tr>
+              <tr>
+                <td>המקצה הבא ממתין ליריב</td>
+                <td>המקצה שמזין את שלך עוד לא הסתיים. סורקים שוב מאוחר יותר</td>
+              </tr>
+              <tr>
+                <td>המקצה הסתיים — ממתין לאישור המנהל</td>
+                <td>המקצה שלך נגמר; המנהל בודק מול הנייר</td>
+              </tr>
+              <tr>
+                <td>אין קשתים או מקצה על מטרה זו</td>
+                <td>מטרה לא נכונה, או עוד לא שובצתם. פונים למארגן</td>
+              </tr>
+              <tr>
+                <td>אין תחרות היום</td>
+                <td>שלט המטרה לא מצא תחרות של היום. פונים למארגן</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+        <section id="he-s" data-part="admin">
+          <h2>מנהל שדה: הפעלת הטיימר</h2>
+          <p>מנהל השדה מפעיל את הסבבים מהטלפון; לחיצה אחת מתחילה סבב והטיימר עושה את השאר.</p>
+          <p>
+            <strong>פתיחת השליטה:</strong> סורקים את ה-QR בלשונית <strong>Timer</strong> בממשק
+            הניהול, או פותחים את קישור השליטה שהמנהל שלח. הטלפון מראה את אותו שעון כמו המסך הגדול.
+          </p>
+          <p>
+            <strong>סבב רץ לבד:</strong> עלייה לקו של AB (אדום, 2 צפצופים) ← AB יורים (ירוק, צפצוף
+            אחד; צהוב ב-30 השניות האחרונות) ← עלייה לקו של CD ← CD יורים ← איסוף חיצים (אדום, 3
+            צפצופים). סבבי אימון מופיעים כ-<strong>PRACTICE ROUND</strong> ולא נספרים כסבבים. הזמן
+            מוצג בשניות.
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>כפתור</th>
+                <th>מה הוא עושה</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>▶ START</td>
+                <td>מתחיל את הסבב הבא (או סבב אימון)</td>
+              </tr>
+              <tr>
+                <td>⏭ NEXT</td>
+                <td>מסיים את השלב הנוכחי מוקדם, כשכולם על הקו סיימו</td>
+              </tr>
+              <tr>
+                <td>⏸ PAUSE / ▶ RESUME</td>
+                <td>עוצר את השעון; המשך מאותה שנייה עם הסימן של השלב</td>
+              </tr>
+              <tr>
+                <td>⛔ EMERGENCY STOP</td>
+                <td>5 צפצופים, מסך אדום; המשך מאותה נקודה</td>
+              </tr>
+              <tr>
+                <td>−5 / −1 / +1 / +5 s</td>
+                <td>משנה את הזמן שנשאר — רק כשהסבב עצור</td>
+              </tr>
+              <tr>
+                <td>↺ RESTART END</td>
+                <td>מבטל את הסבב הנוכחי ומכין אותו מחדש</td>
+              </tr>
+              <tr>
+                <td>Jump to end ← GO</td>
+                <td>בוחר כל סבב או סבב אימון, מוכן להתחלה</td>
+              </tr>
+              <tr>
+                <td>1 / 2 / 3 BEEPS</td>
+                <td>סימן ידני בכל זמן</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            מפעילים <strong>צליל</strong> רק במכשיר המחובר לרמקול (בדרך כלל מחשב הטלוויזיה), כדי
+            שהצפצופים לא יהדהדו.
+          </p>
+        </section>
+        <section id="he-s" data-part="admin">
+          <h2>פתרון בעיות</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>בעיה</th>
+                <th>מה עושים</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>דף מראה גרסה ישנה</td>
+                <td>טעינה מחדש עם Ctrl+Shift+R (מחשב). בטלפון, פותחים את הדף פעם אחת עם אינטרנט</td>
+              </tr>
+              <tr>
+                <td>הטלפון של קשת נכבה</td>
+                <td>קשת אחר סורק את אותו QR וממשיך; הניקוד שנשמר נשאר</td>
+              </tr>
+              <tr>
+                <td>חסרים חיצים שהוזנו בלי חיבור</td>
+                <td>
+                  הם יעלו כשהטלפון ההוא יחזור לאינטרנט. עד אז מזינים את הסבב שוב, או מתקנים בניהול
+                  לפי הנייר
+                </td>
+              </tr>
+              <tr>
+                <td>ניקוד בטלפון שונה מהנייר</td>
+                <td>
+                  מוקדמות: Live Results ← לוחצים על הניקוד ✏️. הדחות: ✏️ במקצה, מקלידים את ניקוד
+                  הנייר
+                </td>
+              </tr>
+              <tr>
+                <td>קשת לא הגיע</td>
+                <td>Entry List ← DNS (לפני שיבוץ למטרות או יצירת עצים)</td>
+              </tr>
+              <tr>
+                <td>מקצה לא נפתח ("ממתין ליריב")</td>
+                <td>המקצה שמזין אותו עוד לא אושר; מאשרים אותו ב-Elimination</td>
+              </tr>
+              <tr>
+                <td>המצלמה לא נפתחת באפליקציה</td>
+                <td>מאשרים מצלמה בהגדרות הדפדפן, או סורקים באפליקציית המצלמה של הטלפון</td>
+              </tr>
+              <tr>
+                <td>QR שהודפס ממחשב לא נפתח בטלפון</td>
+                <td>מדפיסים קודי QR ושלטים מהאתר החי, לא מקבצים שנמצאים על המחשב</td>
+              </tr>
+              <tr>
+                <td>אין צליל בטיימר</td>
+                <td>לוחצים SOUND ON במסך הזה; בטלפונים ובטאבלטים צריך קודם נגיעה אחת במסך</td>
+              </tr>
+              <tr>
+                <td>שתי תחרויות באותו יום</td>
+                <td>סריקת שלט מטרה מראה רשימה; הקשת בוחר את התחרות שלו</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+      <a class="back" href="javascript:history.back()">← Back</a>
+    </main>
+    <script>
+      // ?lang=he|en (else the language the app last used), ?for=archers shows only the archers part
+      const q = new URLSearchParams(location.search);
+      if (q.get('for') === 'archers') document.body.classList.add('archers');
+      function setLang(l) {
+        document
+          .querySelectorAll('.lang')
+          .forEach((e) => e.classList.toggle('show', e.id === 'lang-' + l));
+        document.getElementById('btn-en').classList.toggle('on', l === 'en');
+        document.getElementById('btn-he').classList.toggle('on', l === 'he');
+        document.documentElement.lang = l;
+        try {
+          localStorage.setItem('guideLang', l);
+        } catch (e) {}
+      }
+      let saved = null;
+      try {
+        saved =
+          localStorage.getItem('guideLang') ||
+          localStorage.getItem('scoringLang') ||
+          localStorage.getItem('adminLang');
+      } catch (e) {}
+      setLang(
+        q.get('lang') === 'he' || q.get('lang') === 'en'
+          ? q.get('lang')
+          : saved === 'he'
+            ? 'he'
+            : 'en',
+      );
+    </script>
+  </body>
+</html>

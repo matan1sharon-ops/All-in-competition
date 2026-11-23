@@ -1077,6 +1077,16 @@
             <span class="menu-btn-sub" id="menu-sub-history">Past competition results</span>
           </span>
         </button>
+        <button
+          class="menu-btn menu-btn-history"
+          onclick="location.href = 'guide.html?for=archers&lang=' + currentLang"
+        >
+          <span class="menu-btn-icon">📖</span>
+          <span class="menu-btn-text">
+            <span class="menu-btn-label" id="menu-lbl-guide">GUIDE</span>
+            <span class="menu-btn-sub" id="menu-sub-guide">How to register and score</span>
+          </span>
+        </button>
       </div>
     </div>
 
@@ -1892,6 +1902,8 @@
             results_sub: "View today's competition results",
             history: 'HISTORY',
             history_sub: 'Past competition results',
+            guide: 'GUIDE',
+            guide_sub: 'How to register and score',
           },
           he: {
             score: 'ניקוד הסבב',
@@ -1900,6 +1912,8 @@
             results_sub: 'צפה בתוצאות התחרות',
             history: 'היסטוריה',
             history_sub: 'תוצאות תחרויות קודמות',
+            guide: 'מדריך',
+            guide_sub: 'איך נרשמים ומנקדים',
           },
         };
         const L = menuLabels[lang] || menuLabels.en;
@@ -1910,6 +1924,8 @@
           results_sub: 'menu-sub-results',
           history: 'menu-lbl-history',
           history_sub: 'menu-sub-history',
+          guide: 'menu-lbl-guide',
+          guide_sub: 'menu-sub-guide',
         };
         Object.entries(ids).forEach(([k, id]) => {
           const el = document.getElementById(id);
