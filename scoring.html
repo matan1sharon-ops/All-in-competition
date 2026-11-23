@@ -1077,10 +1077,7 @@
             <span class="menu-btn-sub" id="menu-sub-history">Past competition results</span>
           </span>
         </button>
-        <button
-          class="menu-btn menu-btn-history"
-          onclick="location.href = 'guide.html?for=archers&lang=' + currentLang"
-        >
+        <button class="menu-btn menu-btn-history" onclick="openGuide()">
           <span class="menu-btn-icon">📖</span>
           <span class="menu-btn-text">
             <span class="menu-btn-label" id="menu-lbl-guide">GUIDE</span>
@@ -2009,6 +2006,9 @@
         const id = document.getElementById('results-comp-select').value;
         if (!id) return;
         window.open(APP_BASE + '/results.html?comp=' + id, '_blank');
+      };
+      window.openGuide = () => {
+        location.href = 'guide.html?for=archers&lang=' + (currentLang === 'he' ? 'he' : 'en');
       };
       window.openHistory = () => {
         window.open(APP_BASE + '/history.html', '_blank');
