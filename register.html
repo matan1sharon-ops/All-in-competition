@@ -563,6 +563,8 @@
           enter_fname: 'Please enter your first name.',
           enter_lname: 'Please enter your last name.',
           already_registered: 'is already registered for this competition.',
+          reg_closed: 'Registration is closed.',
+          reg_full: 'Registration is full.',
           reg_failed: 'Registration failed. Please try again.',
           registered: 'REGISTERED!',
           success_sub: 'You have been successfully registered for the competition.',
@@ -605,6 +607,8 @@
           enter_fname: 'אנא הזן את שמך הפרטי.',
           enter_lname: 'אנא הזן את שם משפחתך.',
           already_registered: 'כבר רשום לתחרות זו.',
+          reg_closed: 'ההרשמה סגורה.',
+          reg_full: 'ההרשמה מלאה.',
           reg_failed: 'ההרשמה נכשלה. אנא נסה שוב.',
           registered: 'נרשמת!',
           success_sub: 'נרשמת בהצלחה לתחרות.',
@@ -701,6 +705,16 @@
         document.getElementById('schedule-section').style.display = 'none';
         document.getElementById('form-section').style.display = 'block';
       };
+      // null when registration is open, otherwise the message to show
+      async function regClosedMsg(d) {
+        if (d.regClosed) return t('reg_closed');
+        if (d.regDeadline && Date.now() > new Date(d.regDeadline).getTime()) return t('reg_closed');
+        if (d.maxEntries) {
+          const all = await getDocs(collection(db, 'competitions', compId, 'archers'));
+          if (all.docs.filter((x) => !x.data().dns).length >= d.maxEntries) return t('reg_full');
+        }
+        return null;
+      }
       async function loadCompetition() {
         document.getElementById('loading').style.display = 'block';
         applyLang();
@@ -716,6 +730,11 @@
           }
           compData = cleanData(snap.data());
           document.getElementById('loading').style.display = 'none';
+          const closedMsg = await regClosedMsg(compData);
+          if (closedMsg) {
+            showError(`🏆 ${compData.name} — ${closedMsg}`);
+            return;
+          }
           // Build and show schedule screen first
           const sessions = compData.sessions || [];
           document.getElementById('schedule-comp-name').textContent = '🏆 ' + compData.name;
@@ -793,6 +812,15 @@
         btn.textContent = t('registering');
 
         try {
+          // check again: it may have closed or filled up while the form was open
+          const fresh = await getDoc(doc(db, 'competitions', compId));
+          const closedMsg = await regClosedMsg(cleanData(fresh.data() || {}));
+          if (closedMsg) {
+            showError(closedMsg);
+            btn.disabled = false;
+            btn.textContent = t('register_btn');
+            return;
+          }
           const archersCol = collection(db, 'competitions', compId, 'archers');
           const nameKey = `${fname} ${lname}`.toLowerCase();
           const dup = await getDocs(query(archersCol, where('nameKey', '==', nameKey)));

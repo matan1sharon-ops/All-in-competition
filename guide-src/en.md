@@ -35,12 +35,14 @@ Set up takes four steps: create the competition, collect entries, assign targets
 
 ### 2. Registration and entries
 
-- **Registration link:** Dashboard → **🔗 REGISTRATION LINK**, then send it (WhatsApp, email). Archers fill in name, club, bow, age, gender, phone and email. The same name can't register twice.
+- **Registration link:** Entry List → **🔗 REGISTRATION LINK**, then send it (WhatsApp, email). Archers fill in name, club, bow, age, gender, phone and email. The same name can't register twice.
+- **Registration limits** (Dashboard → Registration, optional): a closing date and time, and a maximum number of entries. Empty means no deadline and no limit. **🔒 CLOSE REGISTRATION** closes it at any time; **🔓 OPEN REGISTRATION** opens it again. When closed or full, the link shows a message instead of the form; you can still add archers by hand.
 - **Schedule** (optional): add sessions (name, place, date, time). Archers see them before the registration form. Nothing else uses them.
 - **Entry List:** every archer with club, bow, age, gender, target, phone and email.
     - Add an archer by hand at the top of the panel.
     - **📥 IMPORT CSV** for many archers at once (**📋 GET TEMPLATE** gives the file layout).
     - ✏️ edits an archer, ✕ deletes one.
+    - **💰 Paid**: tick archers who paid. The top of the list shows how many paid. Only the admin sees it.
     - **DNS** marks an archer who did not start or withdrew: the row greys out, the archer leaves their target and is left out of scoring, elimination and results. **↩** brings them back (they need a target again).
 
 ### 3. Targets

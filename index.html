@@ -817,6 +817,10 @@
                 <div class="form-grid" id="comp-info-grid"></div>
               </div>
               <div class="card">
+                <div class="card-title" id="reg-card-title">📝 Registration</div>
+                <div id="reg-settings"></div>
+              </div>
+              <div class="card">
                 <div class="card-title" id="cat-breakdown-title">Categories Breakdown</div>
                 <div class="table-wrap">
                   <table>
@@ -978,6 +982,7 @@
                       <th id="th-target">Target</th>
                       <th>Phone</th>
                       <th>Email</th>
+                      <th>💰 Paid</th>
                       <th></th>
                     </tr>
                   </thead>
@@ -2726,6 +2731,13 @@
       /* ── DNS (did not start / withdrawn) ── marked archers stay in the entry list but are
          left out of targets, scoring, elimination, scorecards and results */
       const activeArchers = () => archers.filter((a) => !a.dns);
+      window.togglePaid = async (id) => {
+        const a = archers.find((x) => String(x.id) === String(id));
+        if (!a) return;
+        a.paid = !a.paid;
+        await saveArchers();
+        renderEntries();
+      };
       window.toggleDNS = async (id) => {
         const a = archers.find((x) => String(x.id) === String(id));
         if (!a) return;
@@ -2759,11 +2771,15 @@
           ids.add(aid);
           const json = canon(a);
           if (savedArcherJson[aid] === json) return;
-          const { id: _id, phone, email, ...pub } = a;
+          const { id: _id, phone, email, paid, ...pub } = a;
           pub.nameKey = `${a.fname || ''} ${a.lname || ''}`.trim().toLowerCase();
           ops.push((b) => b.set(doc(sub(id, 'archers'), aid), pub));
           ops.push((b) =>
-            b.set(doc(sub(id, 'contacts'), aid), { phone: phone || '', email: email || '' }),
+            b.set(doc(sub(id, 'contacts'), aid), {
+              phone: phone || '',
+              email: email || '',
+              paid: !!paid,
+            }),
           );
           savedArcherJson[aid] = json;
         });
@@ -3089,6 +3105,72 @@
         renderResults();
         renderScorecards();
       }
+      // Registration: optional deadline + optional maximum (empty = none), and a manual open/close
+      function regStatus(d) {
+        const n = activeArchers().length;
+        if (d.regClosed) return { open: false, why: 'manual', n };
+        if (d.regDeadline && Date.now() > new Date(d.regDeadline).getTime())
+          return { open: false, why: 'deadline', n };
+        if (d.maxEntries && n >= d.maxEntries) return { open: false, why: 'full', n };
+        return { open: true, n };
+      }
+      function renderRegSettings(d) {
+        const el = document.getElementById('reg-settings');
+        if (!el) return;
+        const he = currentLang === 'he';
+        const titleEl = document.getElementById('reg-card-title');
+        if (titleEl) titleEl.textContent = he ? '📝 הרשמה' : '📝 Registration';
+        const st = regStatus(d);
+        const why = {
+          manual: he ? 'נסגרה ידנית' : 'closed by admin',
+          deadline: he ? 'עבר מועד הסגירה' : 'deadline passed',
+          full: he ? 'מלאה' : 'full',
+        }[st.why];
+        const status = st.open
+          ? `<span style="color:#43a047;font-weight:900;">● ${he ? 'פתוחה' : 'OPEN'}</span>`
+          : `<span style="color:#e53935;font-weight:900;">● ${he ? 'סגורה' : 'CLOSED'}</span> <span style="color:var(--muted2);">(${why})</span>`;
+        el.innerHTML = `<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px;font-family:'Barlow Condensed',sans-serif;font-size:16px;">${status}<span style="color:var(--muted2);">${st.n}${d.maxEntries ? ' / ' + d.maxEntries : ''} ${he ? 'רשומים' : 'registered'}</span></div>
+          <div class="form-grid">
+            <div class="form-group"><label>${he ? 'מועד סגירת הרשמה (לא חובה)' : 'Registration deadline (optional)'}</label><input type="datetime-local" id="reg-deadline" value="${d.regDeadline || ''}"></div>
+            <div class="form-group"><label>${he ? 'מספר משתתפים מקסימלי (לא חובה)' : 'Maximum entries (optional)'}</label><input type="number" min="1" id="reg-max" value="${d.maxEntries || ''}" placeholder="${he ? 'ללא הגבלה' : 'No limit'}"></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+            <button class="btn btn-primary btn-sm" onclick="saveRegSettings()">${he ? 'שמור' : 'SAVE'}</button>
+            <button class="btn ${d.regClosed ? 'btn-primary' : 'btn-danger'} btn-sm" onclick="toggleRegClosed(${d.regClosed ? 'false' : 'true'})">${d.regClosed ? (he ? '🔓 פתח הרשמה' : '🔓 OPEN REGISTRATION') : he ? '🔒 סגור הרשמה' : '🔒 CLOSE REGISTRATION'}</button>
+          </div>`;
+      }
+      window.saveRegSettings = async () => {
+        if (!currentCompId) return;
+        const regDeadline = document.getElementById('reg-deadline').value || null;
+        const max = parseInt(document.getElementById('reg-max').value);
+        const maxEntries = max > 0 ? max : null;
+        await setDoc(
+          doc(db, 'competitions', currentCompId),
+          { regDeadline, maxEntries },
+          { merge: true },
+        );
+        toast(currentLang === 'he' ? 'נשמר ✓' : 'Saved ✓', 'success');
+        renderDashboard();
+      };
+      window.toggleRegClosed = async (closed) => {
+        if (!currentCompId) return;
+        await setDoc(
+          doc(db, 'competitions', currentCompId),
+          { regClosed: closed },
+          { merge: true },
+        );
+        toast(
+          closed
+            ? currentLang === 'he'
+              ? 'ההרשמה נסגרה'
+              : 'Registration closed'
+            : currentLang === 'he'
+              ? 'ההרשמה נפתחה'
+              : 'Registration open',
+          'success',
+        );
+        renderDashboard();
+      };
       function renderDashboard() {
         if (!currentCompId) return;
         document.getElementById('d-total').textContent = activeArchers().length;
@@ -3102,6 +3184,7 @@
           archers.length + ' ' + t('archers_count');
         getDoc(doc(db, 'competitions', currentCompId)).then((s) => {
           const d = cleanData(s.data());
+          renderRegSettings(d);
           document.getElementById('comp-info-grid').innerHTML =
             `<div class="form-group"><label>${t('name')}</label><input value="${d.name || ''}" readonly style="opacity:0.7;"></div><div class="form-group"><label>${t('date')}</label><input value="${d.date || ''}" readonly style="opacity:0.7;"></div><div class="form-group"><label>${t('location')}</label><input value="${d.location || ''}" readonly style="opacity:0.7;"></div><div class="form-group"><label>${t('discipline')}</label><input value="${d.discipline || ''}" readonly style="opacity:0.7;"></div><div class="form-group"><label>${t('organizer')}</label><input value="${d.organizer || ''}" readonly style="opacity:0.7;"></div>`;
         });
@@ -3218,17 +3301,25 @@
             (!bowF || a.bow === bowF),
         );
         const dnsCount = archers.filter((a) => a.dns).length;
+        const active = archers.filter((a) => !a.dns);
+        const paidCount = active.filter((a) => a.paid).length;
         document.getElementById('entry-count').textContent =
-          archers.length + ' ' + t('archers_count') + (dnsCount ? ` (${dnsCount} DNS)` : '');
+          archers.length +
+          ' ' +
+          t('archers_count') +
+          (dnsCount ? ` (${dnsCount} DNS)` : '') +
+          (active.length
+            ? ` · 💰 ${paidCount}/${active.length} ${currentLang === 'he' ? 'שילמו' : 'paid'}`
+            : '');
         document.getElementById('entry-badge').textContent = archers.length - dnsCount;
         document.getElementById('entries-table').innerHTML =
           filtered
             .map(
               (a) =>
-                `<tr style="${a.dns ? 'opacity:0.45;' : ''}"><td style="color:#999;">${archers.indexOf(a) + 1}</td><td style="color:#111;font-weight:600;">${a.fname} ${a.lname}${a.dns ? ' <span style="background:#c62828;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:4px;">DNS</span>' : ''}</td><td style="color:#555;">${a.club || '—'}</td><td><span class="tag tag-${a.bow.toLowerCase()}">${a.bow}</span></td><td style="color:#111;">${a.age}</td><td><span class="tag tag-${a.gender.toLowerCase()}">${a.gender}</span></td><td style="color:#1565c0;font-weight:700;">${a.target ? `T${a.target}${a.slot}` : '<span style="color:#999">—</span>'}</td><td style="color:#555;font-size:12px;">${a.phone || '—'}</td><td style="color:#555;font-size:12px;">${a.email || '—'}</td><td style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="toggleDNS('${a.id}')" title="${a.dns ? t('dns_restore_tip') : t('dns_tip')}">${a.dns ? '↩' : 'DNS'}</button><button class="btn btn-secondary btn-sm" onclick="openEditArcher('${a.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteArcher('${a.id}')">✕</button></td></tr>`,
+                `<tr style="${a.dns ? 'opacity:0.45;' : ''}"><td style="color:#999;">${archers.indexOf(a) + 1}</td><td style="color:#111;font-weight:600;">${a.fname} ${a.lname}${a.dns ? ' <span style="background:#c62828;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:4px;">DNS</span>' : ''}</td><td style="color:#555;">${a.club || '—'}</td><td><span class="tag tag-${a.bow.toLowerCase()}">${a.bow}</span></td><td style="color:#111;">${a.age}</td><td><span class="tag tag-${a.gender.toLowerCase()}">${a.gender}</span></td><td style="color:#1565c0;font-weight:700;">${a.target ? `T${a.target}${a.slot}` : '<span style="color:#999">—</span>'}</td><td style="color:#555;font-size:12px;">${a.phone || '—'}</td><td style="color:#555;font-size:12px;">${a.email || '—'}</td><td style="text-align:center;"><input type="checkbox" ${a.paid ? 'checked' : ''} onchange="togglePaid('${a.id}')" style="width:18px;height:18px;cursor:pointer;" title="Paid"></td><td style="display:flex;gap:4px;"><button class="btn btn-secondary btn-sm" onclick="toggleDNS('${a.id}')" title="${a.dns ? t('dns_restore_tip') : t('dns_tip')}">${a.dns ? '↩' : 'DNS'}</button><button class="btn btn-secondary btn-sm" onclick="openEditArcher('${a.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteArcher('${a.id}')">✕</button></td></tr>`,
             )
             .join('') ||
-          `<tr><td colspan="10" style="text-align:center;color:#999;padding:24px">${t('no_archers_yet')}</td></tr>`;
+          `<tr><td colspan="11" style="text-align:center;color:#999;padding:24px">${t('no_archers_yet')}</td></tr>`;
       };
       window.openImportModal = () => {
         const isHe = currentLang === 'he';
