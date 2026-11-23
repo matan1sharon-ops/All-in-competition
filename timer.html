@@ -173,6 +173,10 @@
         font-size: min(30vh, 20vw);
         line-height: 1;
         font-variant-numeric: tabular-nums;
+        height: min(32vh, 22vw);
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
       .a-clock.wait {
         font-size: 9vh;
@@ -213,10 +217,20 @@
         text-align: center;
         font-size: 5.5vh;
       }
+      .a-arrows span {
+        height: 8vh;
+        line-height: 6.8vh;
+      }
       .a-arrows b {
+        min-width: 10vh;
+        height: 8vh;
+        line-height: 6.8vh;
+        padding: 0.6vh 1vh;
+        margin-left: 1vw;
+        border-radius: 1vh;
+        border: 2px solid var(--accent);
+        text-align: center;
         font-size: 5.5vh;
-        margin-left: 1.5vw;
-        opacity: 0.85;
       }
       .a-bottom {
         display: flex;
@@ -892,8 +906,10 @@
           const sc = score && score[a.idx[si]];
           el.querySelector('.a-pts').innerHTML = sc ? `${sc.big}<small>${sc.label}</small>` : '';
           el.querySelector('.a-arrows').innerHTML = sc
-            ? sc.arrows.map((x) => `<span>${x}</span>`).join('') +
-              (sc.arrows.length ? `<b>= ${sum(sc.arrows)}</b>` : '')
+            ? Array.from(
+                { length: c.end > a.ends ? 1 : a.arrows },
+                (_, i) => `<span>${sc.arrows[i] ?? ''}</span>`,
+              ).join('') + `<b>${sc.arrows.length ? sum(sc.arrows) : ''}</b>`
             : '';
         });
         const m = matchWatch.m;
