@@ -807,17 +807,46 @@
          1-2 Final winner/loser, 3-4 Bronze winner/loser, then archers out in earlier rounds
          (deepest round first, each round by qualification rank), then everyone else by qualification. */
       let lastFinalCats = [];
+      /* Qualification ranking (World Archery): total, then the discipline's tie-break counts.
+         Outdoor: 10s counting X (g1 = X, g2 = 10 without X), then X. Indoor: 10, then 9.
+         3D: 11, then 10. Field: 6, then 5. Custom: average of kills/11s/6s.
+         Archers equal on everything share the place, shown with "=". */
+      function tieKeys(s, disc) {
+        s = s || {};
+        if (disc === 'Outdoor') return [s.total || 0, (s.g1 || 0) + (s.g2 || 0), s.g1 || 0];
+        if (disc === 'Custom')
+          return [s.total || 0, ((s.kills || 0) + (s.elevens || 0) + (s.sixes || 0)) / 3];
+        return [s.total || 0, s.g1 || 0, s.g2 || 0];
+      }
+      function cmpQual(a, b, disc) {
+        const ka = tieKeys(a, disc),
+          kb = tieKeys(b, disc);
+        for (let i = 0; i < ka.length; i++) if (kb[i] !== ka[i]) return kb[i] - ka[i];
+        return 0;
+      }
+      // places for a ranked list: [{ place: 3, tied: true }, …]
+      function qualPlaces(ranked, disc) {
+        const out = [];
+        ranked.forEach((a, i) => {
+          const same = (j) => j >= 0 && j < ranked.length && cmpQual(ranked[j], a, disc) === 0;
+          out.push({
+            place: same(i - 1) ? out[i - 1].place : i + 1,
+            tied: same(i - 1) || same(i + 1),
+          });
+        });
+        return out;
+      }
+      const placeText = (p) => (p.tied ? '=' : '') + p.place;
+      const medalText = (p, plain) =>
+        !p.tied && p.place === 1
+          ? '🥇'
+          : !p.tied && p.place === 2
+            ? '🥈'
+            : !p.tied && p.place === 3
+              ? '🥉'
+              : plain;
       function qualCompare(disc) {
-        return (a, b) => {
-          const td = b.total - a.total;
-          if (td !== 0) return td;
-          if (disc === 'Custom') {
-            const avgA = ((a.kills || 0) + (a.elevens || 0) + (a.sixes || 0)) / 3;
-            const avgB = ((b.kills || 0) + (b.elevens || 0) + (b.sixes || 0)) / 3;
-            return avgB - avgA;
-          }
-          return (b.g1 || 0) - (a.g1 || 0) || (b.g2 || 0) - (a.g2 || 0);
-        };
+        return (a, b) => cmpQual(a, b, disc);
       }
       function buildFinalRanking(cat, elim, disc) {
         const qual = [...cat.archers].sort(qualCompare(disc));
@@ -964,16 +993,8 @@
         });
         function buildCatBlock(cat) {
           const isCustomDisc = disc === 'Custom';
-          const ranked = [...cat.archers].sort((a, b) => {
-            const td = b.total - a.total;
-            if (td !== 0) return td;
-            if (isCustomDisc) {
-              const avgA = ((a.kills || 0) + (a.elevens || 0) + (a.sixes || 0)) / 3;
-              const avgB = ((b.kills || 0) + (b.elevens || 0) + (b.sixes || 0)) / 3;
-              return avgB - avgA;
-            }
-            return (b.g1 || 0) - (a.g1 || 0) || (b.g2 || 0) - (a.g2 || 0);
-          });
+          const ranked = [...cat.archers].sort(qualCompare(disc));
+          const places = qualPlaces(ranked, disc);
           const color = BOW_COLORS[cat.bow] || '#555';
           const gLabel = cat.gender === 'M' ? t('men').toUpperCase() : t('women').toUpperCase();
           const g1label =
@@ -982,9 +1003,9 @@
             disc === '3D' ? '10' : disc === 'Field' ? '5' : isCustomDisc ? '11s' : '10';
           const rows = ranked
             .map((a, i) => {
-              const rankClass =
-                i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-n';
-              const rankLabel = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1;
+              const p = places[i];
+              const rankClass = p.tied ? 'rank-n' : p.place <= 3 ? 'rank-' + p.place : 'rank-n';
+              const rankLabel = medalText(p, placeText(p));
               const h1h2 = showHalves
                 ? `<td style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted2);text-align:center;padding:6px 4px;min-width:32px;">${a.h1 || 0}</td><td style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--muted2);text-align:center;padding:6px 4px;min-width:32px;">${a.h2 || 0}</td>`
                 : '';

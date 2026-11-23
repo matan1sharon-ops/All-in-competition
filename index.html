@@ -4422,30 +4422,19 @@
           if (ai !== 0) return ai;
           return a.gender.localeCompare(b.gender);
         });
-        const medal = (i) =>
-          i === 0
-            ? '🥇'
-            : i === 1
-              ? '🥈'
-              : i === 2
-                ? '🥉'
-                : `<span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--muted2);">${i + 1}</span>`;
+        const medal = (p) =>
+          medalText(
+            p,
+            `<span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:var(--muted2);">${placeText(p)}</span>`,
+          );
         let catCards = '';
         sortedCats.forEach((cat) => {
           const isCustomDisc = currentDiscipline === 'Custom';
-          const ranked = [...cat.archers].sort((a, b) => {
-            const td = b.total - a.total;
-            if (td !== 0) return td;
-            if (isCustomDisc) {
-              const avgA = ((a.kills || 0) + (a.elevens || 0) + (a.sixes || 0)) / 3;
-              const avgB = ((b.kills || 0) + (b.elevens || 0) + (b.sixes || 0)) / 3;
-              return avgB - avgA;
-            }
-            return (b.g1 || 0) - (a.g1 || 0) || (b.g2 || 0) - (a.g2 || 0);
-          });
+          const ranked = [...cat.archers].sort(qualCompare());
+          const places = qualPlaces(ranked, currentDiscipline);
           const color = BOW_COLORS[cat.bow] || '#555';
           const gLabel = cat.gender === 'M' ? t('men') : t('women');
-          catCards += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;break-inside:avoid;margin-bottom:14px;"><div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${color}22;border-bottom:1px solid ${color}44;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:1px;color:${color};">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</span><span style="font-size:11px;color:var(--muted2);margin-left:auto;">${ranked.length} ${t('archers_count')}</span></div><div class="table-wrap"><table><thead><tr><th style="width:36px;text-align:center;"></th><th>${t('name')}</th><th style="text-align:center;">${t('score')}</th>${showHalves ? '<th style="text-align:center;">H1</th><th style="text-align:center;">H2</th>' : ''}<th style="text-align:center;">${isCustomDisc ? 'Kills' : labels.g1}</th><th style="text-align:center;">${isCustomDisc ? '11s' : labels.g2}</th>${isCustomDisc ? '<th style="text-align:center;">6s</th>' : ''}</tr></thead><tbody>${ranked.map((a, i) => `<tr style="${i === 0 ? 'background:#fffde7;' : i === 1 ? 'background:#f9f9f9;' : i === 2 ? 'background:#fff8f0;' : ''}"><td style="text-align:center;font-size:16px;padding:8px 4px;">${medal(i)}</td><td style="color:#111;font-weight:${i < 3 ? '700' : '600'};font-size:${i === 0 ? '14px' : '13px'};">${a.name}</td><td style="font-weight:900;font-size:${i === 0 ? '16px' : '14px'};color:${i === 0 ? '#c62828' : i === 1 ? '#37474f' : i === 2 ? '#bf360c' : '#111'};text-align:center;cursor:pointer;" onclick="openScoreEdit('${a.id}')" title="Edit score">${a.total} <span style='font-size:9px;opacity:0.4;'>✏️</span></td>${showHalves ? `<td style="color:#555;text-align:center;font-size:12px;">${a.h1 || '—'}</td><td style="color:#555;text-align:center;font-size:12px;">${a.h2 || '—'}</td>` : ''}<td style="color:#111;text-align:center;font-size:12px;">${isCustomDisc ? a.kills || 0 : a.g1 || '—'}</td><td style="color:#111;text-align:center;font-size:12px;">${isCustomDisc ? a.elevens || 0 : a.g2 || '—'}</td>${isCustomDisc ? `<td style="color:#111;text-align:center;font-size:12px;">${a.sixes || 0}</td>` : ''}</tr>`).join('')}</tbody></table></div></div>`;
+          catCards += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;break-inside:avoid;margin-bottom:14px;"><div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${color}22;border-bottom:1px solid ${color}44;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:1px;color:${color};">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</span><span style="font-size:11px;color:var(--muted2);margin-left:auto;">${ranked.length} ${t('archers_count')}</span></div><div class="table-wrap"><table><thead><tr><th style="width:36px;text-align:center;"></th><th>${t('name')}</th><th style="text-align:center;">${t('score')}</th>${showHalves ? '<th style="text-align:center;">H1</th><th style="text-align:center;">H2</th>' : ''}<th style="text-align:center;">${isCustomDisc ? 'Kills' : labels.g1}</th><th style="text-align:center;">${isCustomDisc ? '11s' : labels.g2}</th>${isCustomDisc ? '<th style="text-align:center;">6s</th>' : ''}</tr></thead><tbody>${ranked.map((a, i) => `<tr style="${i === 0 ? 'background:#fffde7;' : i === 1 ? 'background:#f9f9f9;' : i === 2 ? 'background:#fff8f0;' : ''}"><td style="text-align:center;font-size:16px;padding:8px 4px;">${medal(places[i])}</td><td style="color:#111;font-weight:${i < 3 ? '700' : '600'};font-size:${i === 0 ? '14px' : '13px'};">${a.name}</td><td style="font-weight:900;font-size:${i === 0 ? '16px' : '14px'};color:${i === 0 ? '#c62828' : i === 1 ? '#37474f' : i === 2 ? '#bf360c' : '#111'};text-align:center;cursor:pointer;" onclick="openScoreEdit('${a.id}')" title="Edit score">${a.total} <span style='font-size:9px;opacity:0.4;'>✏️</span></td>${showHalves ? `<td style="color:#555;text-align:center;font-size:12px;">${a.h1 || '—'}</td><td style="color:#555;text-align:center;font-size:12px;">${a.h2 || '—'}</td>` : ''}<td style="color:#111;text-align:center;font-size:12px;">${isCustomDisc ? a.kills || 0 : a.g1 || '—'}</td><td style="color:#111;text-align:center;font-size:12px;">${isCustomDisc ? a.elevens || 0 : a.g2 || '—'}</td>${isCustomDisc ? `<td style="color:#111;text-align:center;font-size:12px;">${a.sixes || 0}</td>` : ''}</tr>`).join('')}</tbody></table></div></div>`;
         });
         const n = sortedCats.length;
         const numCols = n <= 1 ? 1 : n === 2 ? 2 : n <= 6 ? 3 : 4;
@@ -4474,18 +4463,46 @@
         document.getElementById('final-results-admin').style.display =
           view === 'final' ? 'block' : 'none';
       };
+      /* Qualification ranking (World Archery): total, then the discipline's tie-break counts.
+         Outdoor: 10s counting X (g1 = X, g2 = 10 without X), then X. Indoor: 10, then 9.
+         3D: 11, then 10. Field: 6, then 5. Custom: average of kills/11s/6s.
+         Archers equal on everything share the place, shown with "=". */
+      function tieKeys(s, disc) {
+        s = s || {};
+        if (disc === 'Outdoor') return [s.total || 0, (s.g1 || 0) + (s.g2 || 0), s.g1 || 0];
+        if (disc === 'Custom')
+          return [s.total || 0, ((s.kills || 0) + (s.elevens || 0) + (s.sixes || 0)) / 3];
+        return [s.total || 0, s.g1 || 0, s.g2 || 0];
+      }
+      function cmpQual(a, b, disc) {
+        const ka = tieKeys(a, disc),
+          kb = tieKeys(b, disc);
+        for (let i = 0; i < ka.length; i++) if (kb[i] !== ka[i]) return kb[i] - ka[i];
+        return 0;
+      }
+      // places for a ranked list: [{ place: 3, tied: true }, …]
+      function qualPlaces(ranked, disc) {
+        const out = [];
+        ranked.forEach((a, i) => {
+          const same = (j) => j >= 0 && j < ranked.length && cmpQual(ranked[j], a, disc) === 0;
+          out.push({
+            place: same(i - 1) ? out[i - 1].place : i + 1,
+            tied: same(i - 1) || same(i + 1),
+          });
+        });
+        return out;
+      }
+      const placeText = (p) => (p.tied ? '=' : '') + p.place;
+      const medalText = (p, plain) =>
+        !p.tied && p.place === 1
+          ? '🥇'
+          : !p.tied && p.place === 2
+            ? '🥈'
+            : !p.tied && p.place === 3
+              ? '🥉'
+              : plain;
       function qualCompare() {
-        const isCustomDisc = currentDiscipline === 'Custom';
-        return (a, b) => {
-          const td = b.total - a.total;
-          if (td !== 0) return td;
-          if (isCustomDisc) {
-            const avgA = ((a.kills || 0) + (a.elevens || 0) + (a.sixes || 0)) / 3;
-            const avgB = ((b.kills || 0) + (b.elevens || 0) + (b.sixes || 0)) / 3;
-            return avgB - avgA;
-          }
-          return (b.g1 || 0) - (a.g1 || 0) || (b.g2 || 0) - (a.g2 || 0);
-        };
+        return (a, b) => cmpQual(a, b, currentDiscipline);
       }
       function buildFinalCats() {
         const archers = activeArchers(); // DNS archers are left out
@@ -4888,7 +4905,7 @@
         const sorted = [...filtered].sort((a, b) => {
           const bi = BOW_ORDER.indexOf(a.bow) - BOW_ORDER.indexOf(b.bow);
           if (bi !== 0) return bi;
-          return (getScore(b.id)?.total || 0) - (getScore(a.id)?.total || 0);
+          return cmpQual(getScore(a.id), getScore(b.id), currentDiscipline);
         });
         const sections = sorted
           .map((archer, i) => {
@@ -5081,21 +5098,13 @@
         });
         let sections = '';
         sortedCats.forEach((cat) => {
-          const ranked = [...cat.archers].sort((a, b) => {
-            const td = b.total - a.total;
-            if (td !== 0) return td;
-            if (isCustomDisc) {
-              const avgA = ((a.kills || 0) + (a.elevens || 0) + (a.sixes || 0)) / 3;
-              const avgB = ((b.kills || 0) + (b.elevens || 0) + (b.sixes || 0)) / 3;
-              return avgB - avgA;
-            }
-            return (b.g1 || 0) - (a.g1 || 0) || (b.g2 || 0) - (a.g2 || 0);
-          });
+          const ranked = [...cat.archers].sort(qualCompare());
+          const places = qualPlaces(ranked, currentDiscipline);
           const gLabel = cat.gender === 'M' ? t('men') : t('women');
           const rows = ranked
             .map(
               (a, i) =>
-                `<tr><td style="text-align:center;font-weight:700;">${i + 1}</td><td style="font-weight:600;">${a.name}</td><td style="font-weight:700;font-size:14px;">${a.total}</td>${showHalves ? `<td>${a.h1 || '—'}</td><td>${a.h2 || '—'}</td>` : ''}<td>${a.g1 || '—'}</td><td>${a.g2 || '—'}</td></tr>`,
+                `<tr><td style="text-align:center;font-weight:700;">${placeText(places[i])}</td><td style="font-weight:600;">${a.name}</td><td style="font-weight:700;font-size:14px;">${a.total}</td>${showHalves ? `<td>${a.h1 || '—'}</td><td>${a.h2 || '—'}</td>` : ''}<td>${a.g1 || '—'}</td><td>${a.g2 || '—'}</td></tr>`,
             )
             .join('');
           sections += `<h3 style="margin:16px 0 6px;color:#37474f;">${cat.bow} · ${cat.age} · ${gLabel}</h3><table style="width:100%;border-collapse:collapse;margin-bottom:8px;"><thead style="background:#37474f;color:#fff;"><tr><th style="padding:6px 8px;width:40px;">Rank</th><th style="padding:6px 8px;">Name</th><th style="padding:6px 8px;">Score</th>${showHalves ? '<th style="padding:6px 8px;">H1</th><th style="padding:6px 8px;">H2</th>' : ''}<th style="padding:6px 8px;">${labels.g1}</th><th style="padding:6px 8px;">${labels.g2 || ''}</th></tr></thead><tbody>${rows}</tbody></table>`;
@@ -5422,6 +5431,45 @@
         });
         return blocked;
       }
+      // Shoot-off picker: resolves with the chosen archers, or null if the admin skips the category
+      function pickShootOffWinners(catLabel, tied, places) {
+        return new Promise((resolve) => {
+          const ov = document.createElement('div');
+          ov.style.cssText =
+            'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
+          ov.innerHTML = `<div style="background:var(--surface);border:2px solid #ff9800;border-radius:12px;max-width:440px;width:100%;padding:18px;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:#ff9800;">⚠ TIE FOR THE LAST PLACE — SHOOT-OFF NEEDED</div>
+            <div style="margin:6px 0 12px;color:var(--muted2);font-size:13px;">${catLabel}: these archers are equal on score and tie-break counts. Shoot the shoot-off, then tick the <b>${places}</b> ${places > 1 ? 'archers who go' : 'archer who goes'} into the bracket.</div>
+            ${tied
+              .map(
+                (a, i) =>
+                  `<label style="display:flex;gap:10px;align-items:center;padding:8px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer;"><input type="checkbox" data-i="${i}" style="width:18px;height:18px;"><span style="font-weight:700;">${a.name}</span><span style="margin-left:auto;color:var(--muted2);">${a.total ?? getScore(a.id)?.total ?? ''}</span></label>`,
+              )
+              .join('')}
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+              <button class="btn btn-secondary btn-sm" data-act="skip">SKIP THIS CATEGORY</button>
+              <button class="btn btn-primary btn-sm" data-act="ok" disabled>CONFIRM</button>
+            </div></div>`;
+          const boxes = [...ov.querySelectorAll('input[type=checkbox]')];
+          const ok = ov.querySelector('[data-act=ok]');
+          ok.style.opacity = '0.4';
+          boxes.forEach((b) =>
+            b.addEventListener('change', () => {
+              ok.disabled = boxes.filter((x) => x.checked).length !== places;
+              ok.style.opacity = ok.disabled ? '0.4' : '1';
+            }),
+          );
+          ov.querySelector('[data-act=skip]').onclick = () => {
+            ov.remove();
+            resolve(null);
+          };
+          ok.onclick = () => {
+            ov.remove();
+            resolve(boxes.filter((x) => x.checked).map((x) => tied[+x.dataset.i]));
+          };
+          document.body.appendChild(ov);
+        });
+      }
       async function generateBracketForCategory(catKey, maxBracket) {
         const archers = activeArchers(); // DNS archers are left out
         const [bow, age, gender] = catKey.split('||');
@@ -5437,22 +5485,40 @@
           .map((a) => ({
             ...a,
             qualScore: getScore(a.id)?.total || 0,
+            total: getScore(a.id)?.total || 0,
             g1: getScore(a.id)?.g1 || 0,
             g2: getScore(a.id)?.g2 || 0,
-            xs: getScore(a.id)?.xs || 0,
-            tens: getScore(a.id)?.tens || 0,
+            kills: getScore(a.id)?.kills || 0,
+            elevens: getScore(a.id)?.elevens || 0,
+            sixes: getScore(a.id)?.sixes || 0,
           }))
-          .sort(
-            (a, b) =>
-              b.qualScore - a.qualScore ||
-              (b.xs || 0) - (a.xs || 0) ||
-              (b.tens || 0) - (a.tens || 0),
-          );
+          .sort(qualCompare());
         if (catArchers.length < 3) return null;
         const bracketSize = getActualBracketSize(catArchers.length, maxBracket);
         if (!bracketSize) return null;
         const firstRound = bracketSize === 8 ? 'R1' : bracketSize === 4 ? 'QF' : 'SF';
         const totalSlots = bracketSize * 2;
+        // a full tie for the last place in the bracket: shoot-off, the admin picks who goes in
+        if (
+          catArchers.length > totalSlots &&
+          cmpQual(catArchers[totalSlots - 1], catArchers[totalSlots], currentDiscipline) === 0
+        ) {
+          const last = catArchers[totalSlots - 1];
+          const tied = catArchers.filter((a) => cmpQual(a, last, currentDiscipline) === 0);
+          const firstIdx = catArchers.indexOf(tied[0]);
+          const chosen = await pickShootOffWinners(
+            `${bow} · ${age} · ${gender === 'M' ? t('men') : t('women')}`,
+            tied,
+            totalSlots - firstIdx,
+          );
+          if (!chosen) return 'cancelled';
+          catArchers.splice(
+            firstIdx,
+            tied.length,
+            ...chosen,
+            ...tied.filter((a) => !chosen.includes(a)),
+          );
+        }
         const seeds = catArchers.slice(0, totalSlots);
         const matches = buildBracketMatches(seeds, bracketSize, firstRound);
         // all later rounds now, as TBD; Final + Bronze
@@ -5488,6 +5554,7 @@
         const archers = activeArchers(); // DNS archers are left out
         const maxBracket = parseInt(document.getElementById('elim-bracket').value);
         const elimData = await generateBracketForCategory(catKey, maxBracket);
+        if (elimData === 'cancelled') return;
         if (!elimData) {
           toast(t('not_enough'), 'error');
           return;
@@ -5534,7 +5601,7 @@
             continue;
           }
           const data = await generateBracketForCategory(catKey, maxBracket);
-          if (!data) continue; // Auto-assign targets to matches
+          if (!data || data === 'cancelled') continue; // Auto-assign targets to matches
           [['R1'], ['QF'], ['SF'], ['F', 'B']].forEach((rks) => {
             const ms = rks.flatMap((rk) => data.rounds[rk] || []).filter((m) => !m.isBye);
             const tn = elimRoundTargets(catKey, ms.length);

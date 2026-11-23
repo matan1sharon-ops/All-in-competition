@@ -487,6 +487,44 @@
          or run code (< > " ' & ` \\) are swapped for look-alikes, e.g. O'Brien → O’Brien. */
       const UNSAFE = { '<': '‹', '>': '›', '"': '”', "'": '’', '&': '＆', '`': 'ʹ', '\\': '∖' };
       const cleanText = (s) => String(s).replace(/[<>"'&`\\]/g, (ch) => UNSAFE[ch]);
+      /* Qualification ranking (World Archery): total, then the discipline's tie-break counts.
+         Outdoor: 10s counting X (g1 = X, g2 = 10 without X), then X. Indoor: 10, then 9.
+         3D: 11, then 10. Field: 6, then 5. Custom: average of kills/11s/6s.
+         Archers equal on everything share the place, shown with "=". */
+      function tieKeys(s, disc) {
+        s = s || {};
+        if (disc === 'Outdoor') return [s.total || 0, (s.g1 || 0) + (s.g2 || 0), s.g1 || 0];
+        if (disc === 'Custom')
+          return [s.total || 0, ((s.kills || 0) + (s.elevens || 0) + (s.sixes || 0)) / 3];
+        return [s.total || 0, s.g1 || 0, s.g2 || 0];
+      }
+      function cmpQual(a, b, disc) {
+        const ka = tieKeys(a, disc),
+          kb = tieKeys(b, disc);
+        for (let i = 0; i < ka.length; i++) if (kb[i] !== ka[i]) return kb[i] - ka[i];
+        return 0;
+      }
+      // places for a ranked list: [{ place: 3, tied: true }, …]
+      function qualPlaces(ranked, disc) {
+        const out = [];
+        ranked.forEach((a, i) => {
+          const same = (j) => j >= 0 && j < ranked.length && cmpQual(ranked[j], a, disc) === 0;
+          out.push({
+            place: same(i - 1) ? out[i - 1].place : i + 1,
+            tied: same(i - 1) || same(i + 1),
+          });
+        });
+        return out;
+      }
+      const placeText = (p) => (p.tied ? '=' : '') + p.place;
+      const medalText = (p, plain) =>
+        !p.tied && p.place === 1
+          ? '🥇'
+          : !p.tied && p.place === 2
+            ? '🥈'
+            : !p.tied && p.place === 3
+              ? '🥉'
+              : plain;
       function cleanData(v) {
         if (typeof v === 'string') return cleanText(v);
         if (Array.isArray(v)) return v.map(cleanData);
@@ -828,16 +866,16 @@
           .join('')}</div>${cats
           .map((cat, i) => {
             const isCustom = d.discipline === 'Custom';
-            const ranked = [...cat.archers].sort(
-              (a, b) =>
-                b.total - a.total || (b.xs || 0) - (a.xs || 0) || (b.tens || 0) - (a.tens || 0),
-            );
+            const ranked = [...cat.archers].sort((a, b) => cmpQual(a, b, d.discipline));
+            const places = qualPlaces(ranked, d.discipline);
             const gLabel = cat.gender === 'M' ? t('men') : t('women');
             const color = BOW_COLORS[cat.bow] || '#555';
             const rows = ranked
               .map((a, ri) => {
-                const medal = ri === 0 ? '🥇' : ri === 1 ? '🥈' : ri === 2 ? '🥉' : '';
-                const rankDisplay = medal || `<span class="rank-num">${ri + 1}</span>`;
+                const rankDisplay = medalText(
+                  places[ri],
+                  `<span class="rank-num">${placeText(places[ri])}</span>`,
+                );
                 const halves = showHalves
                   ? `<td style="color:var(--muted2);text-align:center;">${a.h1 || 0}</td><td style="color:var(--muted2);text-align:center;">${a.h2 || 0}</td>`
                   : '';
