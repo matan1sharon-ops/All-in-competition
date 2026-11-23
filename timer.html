@@ -111,6 +111,135 @@
         font-size: 2.2vh;
         cursor: pointer;
       }
+      /* ── FINALS: ALTERNATING DISPLAY ── */
+      #alt {
+        height: 100%;
+        display: none;
+        flex-direction: column;
+        background: var(--surface);
+      }
+      #alt.c-red {
+        background: var(--red);
+      }
+      .a-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5vh 3vw;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+        font-size: 4.5vh;
+        letter-spacing: 2px;
+      }
+      .a-sides {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1vw;
+        padding: 0 1vw;
+      }
+      .a-side {
+        border-radius: 2vh;
+        background: #000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        padding: 2vh 1vw;
+        transition: background 0.2s;
+        overflow: hidden;
+      }
+      .a-side.c-green {
+        background: var(--green);
+      }
+      .a-side.c-yellow {
+        background: var(--yellow);
+        color: #000;
+      }
+      .a-side.c-red {
+        background: rgba(0, 0, 0, 0.35);
+      }
+      .a-name {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+        font-size: 8vh;
+        line-height: 1.05;
+        text-align: center;
+        text-transform: uppercase;
+      }
+      .a-clock {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+        font-size: min(30vh, 20vw);
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+      }
+      .a-clock.wait {
+        font-size: 9vh;
+        opacity: 0.45;
+        letter-spacing: 4px;
+      }
+      .a-pts {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+        font-size: 11vh;
+        line-height: 1;
+        color: var(--accent);
+        text-align: center;
+      }
+      .a-side.c-yellow .a-pts {
+        color: #000;
+      }
+      .a-pts small {
+        display: block;
+        font-size: 2.4vh;
+        letter-spacing: 2px;
+        opacity: 0.8;
+        text-align: center;
+      }
+      .a-arrows {
+        display: flex;
+        gap: 1vw;
+        align-items: center;
+        min-height: 8vh;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 900;
+      }
+      .a-arrows span {
+        min-width: 7vh;
+        padding: 0.6vh 1vh;
+        border-radius: 1vh;
+        background: rgba(255, 255, 255, 0.15);
+        text-align: center;
+        font-size: 5.5vh;
+      }
+      .a-arrows b {
+        font-size: 5.5vh;
+        margin-left: 1.5vw;
+        opacity: 0.85;
+      }
+      .a-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.2vh 3vw;
+        font-size: 2.4vh;
+      }
+      .a-bottom button {
+        background: rgba(0, 0, 0, 0.35);
+        color: inherit;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        padding: 8px 14px;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 700;
+        font-size: 2.2vh;
+        cursor: pointer;
+      }
+      .cbtn.on {
+        background: var(--green);
+        border-color: var(--green);
+      }
       /* ── CONTROLLER ── */
       #control {
         display: none;
@@ -255,11 +384,43 @@
       </div>
     </div>
 
+    <div id="alt">
+      <div class="a-top">
+        <span id="a-label"></span>
+        <span id="a-end"></span>
+      </div>
+      <div class="a-sides">
+        <div class="a-side" id="a-L">
+          <div class="a-name"></div>
+          <div class="a-clock"></div>
+          <div class="a-pts"></div>
+          <div class="a-arrows"></div>
+        </div>
+        <div class="a-side" id="a-R">
+          <div class="a-name"></div>
+          <div class="a-clock"></div>
+          <div class="a-pts"></div>
+          <div class="a-arrows"></div>
+        </div>
+      </div>
+      <div class="a-bottom">
+        <span id="a-note"></span>
+        <span>
+          <button id="btn-sound-a" onclick="toggleSound()">🔇 SOUND OFF</button>
+          <button onclick="goFullscreen()">⛶ FULL SCREEN</button>
+        </span>
+      </div>
+    </div>
+
     <div id="control">
       <div class="c-status" id="c-status">
         <div id="c-info">—</div>
         <div id="c-time">--</div>
         <div id="c-sub" style="font-size: 13px; opacity: 0.8"></div>
+      </div>
+      <div class="c-grid" id="starter-row" style="display: none">
+        <button class="cbtn small" id="btn-start-L" onclick="setStarter('L')"></button>
+        <button class="cbtn small" id="btn-start-R" onclick="setStarter('R')"></button>
       </div>
       <div class="c-grid">
         <button class="cbtn big" id="btn-main" onclick="mainAction()">START</button>
@@ -382,18 +543,30 @@
         }
       }
 
+      /* ── FINALS (alternating): state.mode = 'alt', state.alt = { label, catKey, roundKey, format,
+         names: [left, right], idx: [archer index on the left, on the right], starter 'L'|'R',
+         sec, arrows, ends, callup } — set from the admin Timer panel. End ends+1 = shoot-off. */
+      const isAlt = () => state?.mode === 'alt' && !!state.alt;
+      const AL = () => state.alt;
+      const altKeep = () => (isAlt() ? { mode: 'alt', alt: state.alt } : {});
+      const sideName = (g) => (g === 'L' ? AL().names[0] : AL().names[1]) || g;
+
       /* ── sequence of one end ── */
       // Practice ends are not counted as ends: "PRACTICE ROUND" (numbered if there is more than one)
-      const isPractice = (e) => e <= settings.practiceEnds;
+      const isPractice = (e) => !isAlt() && e <= settings.practiceEnds;
       const endLabel = (e) => {
+        if (isAlt()) return e > AL().ends ? 'SHOOT-OFF' : `END ${e} / ${AL().ends}`;
         if (isPractice(e))
           return settings.practiceEnds > 1
             ? `PRACTICE ROUND ${e}/${settings.practiceEnds}`
             : 'PRACTICE ROUND';
         return `END ${e - settings.practiceEnds} / ${settings.ends}`;
       };
-      const startLabel = (e) => (isPractice(e) ? endLabel(e) : `END ${e - settings.practiceEnds}`);
-      const totalEnds = () => settings.practiceEnds + settings.ends;
+      const startLabel = (e) => {
+        if (isAlt()) return e > AL().ends ? 'SHOOT-OFF' : `END ${e}`;
+        return isPractice(e) ? endLabel(e) : `END ${e - settings.practiceEnds}`;
+      };
+      const totalEnds = () => (isAlt() ? AL().ends + 1 : settings.practiceEnds + settings.ends);
       function groupsForEnd(e) {
         if (settings.lines === 'AB') return ['AB'];
         if (settings.lines === 'ALT') {
@@ -404,6 +577,19 @@
       }
       function buildSeq(e) {
         const seq = [];
+        if (isAlt()) {
+          // call-up, then one arrow each in turn, starting with the chosen archer
+          const a = AL();
+          const first = a.starter === 'R' ? 'R' : 'L';
+          const other = first === 'L' ? 'R' : 'L';
+          const n = e > a.ends ? 1 : a.arrows;
+          if (a.callup > 0) seq.push({ phase: 'callup', group: first, dur: a.callup, beeps: 2 });
+          for (let i = 0; i < n; i++) {
+            seq.push({ phase: 'shoot', group: first, dur: a.sec, beeps: 1 });
+            seq.push({ phase: 'shoot', group: other, dur: a.sec, beeps: 1 });
+          }
+          return seq;
+        }
         groupsForEnd(e).forEach((g) => {
           seq.push({ phase: 'callup', group: g, dur: settings.callupSec, beeps: 2 });
           seq.push({ phase: 'shoot', group: g, dur: settings.shootSec, beeps: 1 });
@@ -449,6 +635,8 @@
         const label = soundOn ? '🔊 SOUND ON' : '🔇 SOUND OFF';
         const b1 = document.getElementById('btn-sound');
         const b2 = document.getElementById('btn-sound-c');
+        const b3 = document.getElementById('btn-sound-a');
+        if (b3) b3.textContent = label;
         if (b1) b1.textContent = label;
         if (b2) b2.textContent = label + ' ON THIS DEVICE';
         if (soundOn) beep(1);
@@ -499,15 +687,19 @@
           if (c.kind === 'emergency') phase = '⛔ STOP';
           else if (c.kind === 'paused') phase = 'PAUSED';
           else phase = c.seg.phase === 'callup' ? 'TO THE LINE' : 'SHOOT';
+          const warn = isAlt() ? 5 : settings.warnSec;
           if (c.kind === 'running' && c.seg.phase === 'shoot')
-            color = c.remaining <= settings.warnSec ? 'c-yellow' : 'c-green';
+            color = c.remaining <= warn ? 'c-yellow' : 'c-green';
+          if (isAlt()) group = sideName(c.seg.group);
           if (c.kind === 'paused' && c.seg.phase === 'shoot') color = 'c-yellow';
         }
         let next = '';
         if (c.kind === 'running' || c.kind === 'paused') {
           const s = state.seq[c.segIndex + 1];
           next = s
-            ? `Next: ${s.group} ${s.phase === 'callup' ? 'to the line' : 'shoot'}`
+            ? isAlt()
+              ? `Next: ${sideName(s.group)}`
+              : `Next: ${s.group} ${s.phase === 'callup' ? 'to the line' : 'shoot'}`
             : 'Next: collect';
         }
         return { c, color, time, phase, group, endTxt, next };
@@ -539,7 +731,13 @@
       function draw() {
         const v = view();
         soundEvents(v.c);
-        if (mode === 'display') {
+        if (mode === 'display' && isAlt()) {
+          document.getElementById('display').style.display = 'none';
+          document.getElementById('alt').style.display = 'flex';
+          drawAlt(v);
+        } else if (mode === 'display') {
+          document.getElementById('display').style.display = 'flex';
+          document.getElementById('alt').style.display = 'none';
           const d = document.getElementById('display');
           d.className = v.color;
           document.getElementById('d-time').textContent = v.time;
@@ -563,13 +761,149 @@
           else if (k === 'collect')
             main.textContent =
               v.c.end < totalEnds() ? `▶ START ${startLabel(v.c.end + 1)}` : '✓ ALL ENDS DONE';
-          else if (k === 'running') main.textContent = '⏭ NEXT (END PHASE NOW)';
+          else if (k === 'running' && isAlt()) {
+            const nx = state.seq[v.c.segIndex + 1];
+            main.textContent =
+              v.c.seg.phase === 'callup'
+                ? `⏭ START ${sideName(v.c.seg.group)} NOW`
+                : nx
+                  ? `⏭ ARROW SHOT → ${sideName(nx.group)}`
+                  : '⏭ ARROW SHOT → END';
+          } else if (k === 'running') main.textContent = '⏭ NEXT (END PHASE NOW)';
           else main.textContent = '▶ RESUME';
           const canAdjust = k === 'paused' || k === 'emergency';
           document.querySelectorAll('#adj-btns button').forEach((b) => (b.disabled = !canAdjust));
           document.getElementById('btn-pause').textContent =
             k === 'paused' || k === 'emergency' ? '▶ RESUME' : '⏸ PAUSE';
+          // finals: who starts the next end (by the rules: the archer behind starts)
+          const sr = document.getElementById('starter-row');
+          const canPick = isAlt() && (k === 'idle' || k === 'ready' || k === 'collect');
+          sr.style.display = canPick ? 'grid' : 'none';
+          if (canPick) {
+            ['L', 'R'].forEach((g) => {
+              const b = document.getElementById('btn-start-' + g);
+              b.textContent = `${g === 'L' ? '◀ ' : ''}${sideName(g)} STARTS${g === 'R' ? ' ▶' : ''}`;
+              b.classList.toggle('on', (AL().starter || 'L') === g);
+            });
+          }
+          if (isAlt())
+            document.getElementById('c-info').textContent =
+              `${AL().label} · ${v.endTxt}${v.group ? ' · ' + v.group : ''}`;
         }
+      }
+
+      /* ── finals display: two sides, live score from the match being scored on the phones ── */
+      let matchWatch = { key: null, unsub: null, m: null };
+      function watchAltMatch() {
+        const key = isAlt() ? `${AL().catKey}~${AL().roundKey}` : null;
+        if (key === matchWatch.key) return;
+        if (matchWatch.unsub) matchWatch.unsub();
+        matchWatch = { key, unsub: null, m: null };
+        if (!key) return;
+        const id = encodeURIComponent(AL().catKey) + '~' + AL().roundKey + '~0';
+        matchWatch.unsub = onSnapshot(doc(db, 'competitions', compId, 'matches', id), (snap) => {
+          const d = cleanData(snap.data()) || {};
+          matchWatch.m = d.match || d;
+          draw();
+        });
+      }
+      const arrowVal = (v) => (v === 'X' ? 10 : parseInt(v) || 0);
+      const sum = (arr) => (arr || []).reduce((t, v) => t + arrowVal(v), 0);
+      // per archer index (0 = archer1, 1 = archer2): big number (set points or total) + this end's arrows
+      function altScore(end) {
+        const m = matchWatch.m;
+        if (!m) return null;
+        const a = AL();
+        const per = a.arrows;
+        const shootOff = end > a.ends;
+        if (a.format === 'sets') {
+          const sets = m.sets || [];
+          const any = sets.some((x) => x && ((x.arrows1 || []).length || (x.arrows2 || []).length));
+          if (!any) return null;
+          const pts = [0, 0];
+          sets.slice(0, a.ends).forEach((x) => {
+            if (!x) return;
+            const a1 = x.arrows1 || [],
+              a2 = x.arrows2 || [];
+            if (a1.length < per || a2.length < per) return;
+            const s1 = sum(a1),
+              s2 = sum(a2);
+            if (s1 > s2) pts[0] += 2;
+            else if (s2 > s1) pts[1] += 2;
+            else {
+              pts[0] += 1;
+              pts[1] += 1;
+            }
+          });
+          const cur = sets[shootOff ? a.ends : end - 1] || {};
+          return [0, 1].map((i) => ({
+            big: pts[i],
+            label: 'SET POINTS',
+            arrows: (i === 0 ? cur.arrows1 : cur.arrows2) || [],
+          }));
+        }
+        const arr = [m.arrows1 || [], m.arrows2 || []];
+        const tb = [m.tiebreak1, m.tiebreak2];
+        if (!arr[0].length && !arr[1].length) return null;
+        return [0, 1].map((i) => ({
+          big: sum(arr[i]),
+          label: 'TOTAL',
+          arrows: shootOff
+            ? tb[i] !== null && tb[i] !== undefined
+              ? [tb[i]]
+              : []
+            : arr[i].slice((end - 1) * per, end * per),
+        }));
+      }
+      function drawAlt(v) {
+        watchAltMatch();
+        const a = AL();
+        const c = v.c;
+        const wrap = document.getElementById('alt');
+        const red =
+          c.kind === 'collect' || c.kind === 'emergency' || (c.seg && c.seg.phase === 'callup');
+        wrap.className = red ? 'c-red' : '';
+        document.getElementById('a-label').textContent = a.label;
+        document.getElementById('a-end').textContent = v.endTxt;
+        const score = altScore(c.end);
+        ['L', 'R'].forEach((g, si) => {
+          const el = document.getElementById('a-' + g);
+          const active =
+            c.seg &&
+            c.seg.group === g &&
+            (c.kind === 'running' || c.kind === 'paused' || c.kind === 'emergency');
+          let cls = '';
+          let clock = 'WAIT';
+          if (active && c.seg.phase === 'shoot') {
+            cls = c.kind === 'emergency' ? 'c-red' : v.color;
+            clock = v.time;
+          } else if (active && c.seg.phase === 'callup') {
+            clock = v.time;
+          }
+          if (c.kind === 'emergency') clock = active ? '⛔ ' + v.time : '⛔';
+          if (c.kind === 'collect') clock = '';
+          if ((c.kind === 'ready' || c.kind === 'idle') && (a.starter || 'L') === g)
+            clock = 'STARTS';
+          el.className = 'a-side ' + cls;
+          el.querySelector('.a-name').textContent = a.names[si] || '';
+          const ck = el.querySelector('.a-clock');
+          ck.textContent = clock;
+          ck.className = 'a-clock' + (/^\d+$/.test(clock) ? '' : ' wait');
+          const sc = score && score[a.idx[si]];
+          el.querySelector('.a-pts').innerHTML = sc ? `${sc.big}<small>${sc.label}</small>` : '';
+          el.querySelector('.a-arrows').innerHTML = sc
+            ? sc.arrows.map((x) => `<span>${x}</span>`).join('') +
+              (sc.arrows.length ? `<b>= ${sum(sc.arrows)}</b>` : '')
+            : '';
+        });
+        const m = matchWatch.m;
+        document.getElementById('a-note').textContent = score
+          ? m && m.winnerChoice
+            ? '✓ RESULT APPROVED'
+            : 'PROVISIONAL SCORE — official result after the judge approves'
+          : v.phase === 'COLLECT ARROWS'
+            ? 'COLLECT ARROWS'
+            : '';
       }
 
       /* ── controller actions (write the new state) ── */
@@ -577,6 +911,7 @@
       const startId = () => Math.random().toString(36).slice(2, 8);
       function startEnd(e) {
         return write({
+          ...altKeep(),
           status: 'running',
           end: e,
           seq: buildSeq(e),
@@ -631,6 +966,7 @@
           });
         return write({
           ...(state || {}),
+          ...altKeep(),
           status: 'emergency',
           end: c.end || 1,
           seq: state?.seq || buildSeq(c.end || 1),
@@ -650,12 +986,28 @@
       };
       window.restartEnd = () => {
         const c = current();
-        return write({ status: 'ready', end: c.end || 1, manualBeep: state?.manualBeep || null });
+        return write({
+          ...altKeep(),
+          status: 'ready',
+          end: c.end || 1,
+          manualBeep: state?.manualBeep || null,
+        });
       };
       window.jumpEnd = () => {
         const e = parseInt(document.getElementById('jump-end').value);
         if (!e) return;
-        return write({ status: 'ready', end: e, manualBeep: state?.manualBeep || null });
+        return write({
+          ...altKeep(),
+          status: 'ready',
+          end: e,
+          manualBeep: state?.manualBeep || null,
+        });
+      };
+      window.setStarter = (g) => {
+        if (!isAlt()) return;
+        const k = current().kind;
+        if (k === 'running' || k === 'paused' || k === 'emergency') return;
+        return write({ ...state, alt: { ...state.alt, starter: g } });
       };
       window.manualBeep = (n) =>
         write({ ...(state || { status: 'idle', end: 1 }), manualBeep: { n, id: startId() } });
@@ -690,6 +1042,7 @@
         onSnapshot(stateRef, (snap) => {
           state = cleanData(snap.data()) || null;
           stateLoaded = true;
+          fillJump();
           draw();
         });
         await syncClock();

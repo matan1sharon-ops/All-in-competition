@@ -186,6 +186,13 @@ The field manager runs the ends from a phone; one press starts an end and the ti
 | Jump to end → GO | Picks any end or practice round, ready to start |
 | 1 / 2 / 3 BEEPS | A manual signal at any time |
 
+### Gold and Bronze matches: alternating
+
+1. Admin → **Timer** → **🏆 Finals — alternating**: pick the match, **⇄ SWAP SIDES** so left/right match the field, then **▶ SEND TO TIMER**.
+2. The screen shows both archers side by side, each with a 20 s clock per arrow, the set points (or total) and this end's arrows from the phones, marked provisional until the admin approves.
+3. On the phone: choose who starts (**◀ … STARTS / … STARTS ▶** — the archer behind starts the next end), **▶ START**, then **⏭ ARROW SHOT** after each arrow. If time runs out, the turn passes by itself. **SHOOT-OFF** is in Jump to end.
+4. **↩ BACK TO NORMAL TIMER** in admin returns to the regular end timer.
+
 Turn **sound on** only on the device connected to the speaker (usually the TV computer), so the beeps don't echo.
 
 ## Troubleshooting

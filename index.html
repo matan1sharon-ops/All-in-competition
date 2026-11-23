@@ -1282,6 +1282,59 @@
               </div>
             </div>
             <div class="card">
+              <div class="card-title">🏆 Finals — alternating (Gold / Bronze)</div>
+              <div class="form-group" style="margin-bottom: 10px">
+                <label>Match</label
+                ><select id="alt-match" onchange="altMatchChanged()"></select>
+              </div>
+              <div
+                id="alt-sides"
+                style="
+                  display: flex;
+                  gap: 10px;
+                  align-items: center;
+                  flex-wrap: wrap;
+                  margin-bottom: 10px;
+                  font-family: 'Barlow Condensed', sans-serif;
+                  font-size: 18px;
+                  font-weight: 700;
+                "
+              ></div>
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                  gap: 10px;
+                "
+              >
+                <div class="form-group">
+                  <label>Seconds per arrow</label
+                  ><input type="number" id="alt-sec" min="5" value="20" />
+                </div>
+                <div class="form-group">
+                  <label>Arrows each per end</label
+                  ><input type="number" id="alt-arrows" min="1" value="3" />
+                </div>
+                <div class="form-group">
+                  <label>Ends (max)</label><input type="number" id="alt-ends" min="1" value="5" />
+                </div>
+                <div class="form-group">
+                  <label>Call-up (sec)</label
+                  ><input type="number" id="alt-callup" min="0" value="10" />
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px">
+                <button class="btn btn-primary" onclick="sendAltToTimer()">▶ SEND TO TIMER</button>
+                <button class="btn btn-secondary" onclick="backToNormalTimer()">
+                  ↩ BACK TO NORMAL TIMER
+                </button>
+              </div>
+              <div style="font-size: 12px; color: var(--muted2); margin-top: 8px">
+                The timer screen shows the two archers side by side, 20 s per arrow in turns, with
+                the live score from the phones (provisional until you approve the match).
+              </div>
+            </div>
+            <div class="card">
               <div class="card-title">🎛 Control</div>
               <iframe
                 id="timer-control-frame"
@@ -5325,6 +5378,7 @@
         document.getElementById('tm-ends').value = ts.ends;
         document.getElementById('tm-practice').value = ts.practiceEnds;
         document.getElementById('tm-lines').value = ts.lines;
+        fillAltMatches();
         const frame = document.getElementById('timer-control-frame');
         const src = timerUrl('&mode=control&embed=1');
         if (frame.getAttribute('src') !== src) frame.setAttribute('src', src);
@@ -5341,6 +5395,108 @@
           document.head.appendChild(sc);
         }
       }
+      /* ── Finals: alternating timer for one Gold / Bronze match ── */
+      let altSwap = false;
+      function altMatches() {
+        const out = [];
+        Object.entries(window._elimData || {}).forEach(([ck, d]) => {
+          [
+            ['F', 'GOLD'],
+            ['B', 'BRONZE'],
+          ].forEach(([rk, medal]) => {
+            const m = d.rounds?.[rk]?.[0];
+            if (!m || !m.archer1 || !m.archer2 || m.isBye) return;
+            out.push({
+              key: ck + '|' + rk,
+              catKey: ck,
+              roundKey: rk,
+              format: d.format,
+              label: `${d.bow} ${d.age} ${d.gender === 'M' ? 'Men' : 'Women'} · ${medal}`,
+              names: [m.archer1.name, m.archer2.name],
+              done: !!m.winnerChoice,
+            });
+          });
+        });
+        return out.sort((a, b) => a.label.localeCompare(b.label));
+      }
+      function fillAltMatches() {
+        const sel = document.getElementById('alt-match');
+        if (!sel) return;
+        const cur = sel.value;
+        const list = altMatches();
+        sel.innerHTML = list.length
+          ? list
+              .map(
+                (m) =>
+                  `<option value="${m.key}">${m.label} · ${m.names[0]} – ${m.names[1]}${m.done ? ' ✓' : ''}</option>`,
+              )
+              .join('')
+          : '<option value="">No Gold / Bronze match ready yet</option>';
+        if (cur && list.some((m) => m.key === cur)) sel.value = cur;
+        altMatchChanged(true);
+      }
+      window.altMatchChanged = (keepSides) => {
+        if (!keepSides) altSwap = false;
+        const m = altMatches().find((x) => x.key === document.getElementById('alt-match').value);
+        const box = document.getElementById('alt-sides');
+        if (!m) {
+          box.innerHTML = '';
+          return;
+        }
+        if (!keepSides) {
+          const tgtSport = currentDiscipline === '3D';
+          document.getElementById('alt-arrows').value = tgtSport ? 2 : 3;
+          document.getElementById('alt-ends').value =
+            currentDiscipline === '3D' || currentDiscipline === 'Field' ? 4 : 5;
+        }
+        const [l, rr] = altSwap ? [m.names[1], m.names[0]] : m.names;
+        box.innerHTML = `<span>◀ LEFT: <span style="color:var(--accent)">${l}</span></span><button class="btn btn-secondary btn-sm" onclick="altSwapSides()">⇄ SWAP SIDES</button><span>RIGHT: <span style="color:var(--accent)">${rr}</span> ▶</span>`;
+      };
+      window.altSwapSides = () => {
+        altSwap = !altSwap;
+        altMatchChanged(true);
+      };
+      window.sendAltToTimer = async () => {
+        if (!currentCompId) return;
+        const m = altMatches().find((x) => x.key === document.getElementById('alt-match').value);
+        if (!m) {
+          toast('No match selected', 'error');
+          return;
+        }
+        const num = (id, min) => Math.max(min, parseInt(document.getElementById(id).value) || 0);
+        const idx = altSwap ? [1, 0] : [0, 1];
+        const alt = {
+          label: m.label,
+          catKey: m.catKey,
+          roundKey: m.roundKey,
+          format: m.format,
+          names: idx.map((i) => m.names[i]),
+          idx,
+          starter: 'L',
+          sec: num('alt-sec', 5),
+          arrows: num('alt-arrows', 1),
+          ends: num('alt-ends', 1),
+          callup: num('alt-callup', 0),
+        };
+        await setDoc(doc(db, 'competitions', currentCompId, 'timer', 'state'), {
+          status: 'ready',
+          mode: 'alt',
+          alt,
+          end: 1,
+          updatedAt: Date.now(),
+        });
+        toast('Sent to the timer ✓', 'success');
+      };
+      window.backToNormalTimer = async () => {
+        if (!currentCompId) return;
+        if (!confirm('Go back to the normal end timer?')) return;
+        await setDoc(doc(db, 'competitions', currentCompId, 'timer', 'state'), {
+          status: 'idle',
+          end: 1,
+          updatedAt: Date.now(),
+        });
+        toast('Normal timer ✓', 'success');
+      };
       window.saveTimerSettings = async () => {
         if (!currentCompId) return;
         const num = (id, min) => Math.max(min, parseInt(document.getElementById(id).value) || 0);
