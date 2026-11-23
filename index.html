@@ -2160,6 +2160,10 @@
           apply_all: 'APPLY TYPE TO ALL',
           add_session: '+ ADD SESSION',
           export_pdf: '📄 EXPORT PDF',
+          awaiting_approval: 'APPROVE?',
+          approve: 'APPROVE',
+          edit_result: 'Edit result (from paper)',
+          result_approved: 'Result approved ✓ — winner moved on',
           dns_tip: 'Did not start / withdrawn — leave out of targets, scoring and results',
           dns_restore_tip: 'Restore archer (needs a target again)',
           dns_restored: 'restored',
@@ -2349,6 +2353,10 @@
           apply_all: 'החל סוג על כולם',
           add_session: '+ הוסף סבב',
           export_pdf: '📄 ייצא PDF',
+          awaiting_approval: 'לאישור',
+          approve: 'אישור',
+          edit_result: 'עריכת תוצאה (לפי הנייר)',
+          result_approved: 'התוצאה אושרה ✓ — המנצח עלה שלב',
           dns_tip: 'לא הגיע / פרש — לא ישובץ במטרה, בניקוד ובתוצאות',
           dns_restore_tip: 'החזרת הקשת (צריך לשבץ שוב במטרה)',
           dns_restored: 'הוחזר',
@@ -5542,7 +5550,7 @@
       const BRACKET_CSS = `
         .bk-wrap{overflow-x:auto;padding-bottom:6px;}
         .bk-row{display:flex;align-items:stretch;}
-        .bk-col{display:flex;flex-direction:column;width:250px;flex-shrink:0;}
+        .bk-col{display:flex;flex-direction:column;width:330px;flex-shrink:0;}
         .bk-col-h{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:var(--muted2);text-transform:uppercase;text-align:center;padding:0 18px 6px;}
         .bk-slots{display:flex;flex-direction:column;flex:1;}
         .bk-slot{position:relative;flex:1;display:flex;align-items:center;padding:6px 18px;}
@@ -5561,7 +5569,15 @@
         .bk-ar.bk-won .bk-name{color:var(--green);}
         .bk-score{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--accent);min-width:22px;text-align:right;}
         .bk-ar.bk-won .bk-score{color:var(--green);}
-        .bk-tools{display:flex;align-items:center;gap:6px;margin-top:6px;}`;
+        .bk-tools{display:flex;align-items:center;gap:6px;margin-top:6px;}
+        .bk-ends{display:flex;gap:1px;flex-shrink:0;}
+        .bk-end{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;width:19px;text-align:center;color:var(--muted2);}
+        .bk-end-w{color:var(--green);}
+        .bk-end-l{color:var(--muted);}
+        .bk-end-so{color:var(--accent);border-left:1px solid var(--border2);}
+        .bk-box.bk-pending{border-color:#ff9800;}
+        .bk-ar.bk-prov{background:rgba(255,152,0,0.12);border:1px dashed #ff9800;}
+        .bk-ar.bk-prov .bk-name,.bk-ar.bk-prov .bk-score{color:#ff9800;}`;
       function bracketRounds(data) {
         const first = data.bracketSize === 8 ? 'R1' : data.bracketSize === 4 ? 'QF' : 'SF';
         const all = ['R1', 'QF', 'SF'];
@@ -5590,25 +5606,85 @@
       function bracketBox(catKey, rk, idx, match, fmt, forPrint) {
         if (!match)
           return `<div class="bk-box bk-empty"><div class="bk-ar"><span class="bk-name">TBD</span></div><div class="bk-ar"><span class="bk-name">TBD</span></div></div>`;
+        const pending = !match.winnerChoice && match.pendingWinner;
+        // end / set scores of one archer (like live results): S1..S5 (+ shoot-off), or T1..T4 for 3D/Field
+        const ends = (num) => {
+          const nSlots = currentDiscipline === '3D' || currentDiscipline === 'Field' ? 4 : 5;
+          const sets = match.sets || [];
+          let cells = '';
+          for (let i = 0; i < nSlots; i++) {
+            const st = sets[i];
+            const v = st ? (num === 1 ? st.score1 : st.score2) : null;
+            const o = st ? (num === 1 ? st.score2 : st.score1) : null;
+            const has =
+              st && ((st.arrows1 || []).length || (st.arrows2 || []).length || v > 0 || o > 0);
+            const cls = !has
+              ? 'bk-end'
+              : v > o
+                ? 'bk-end bk-end-w'
+                : v < o
+                  ? 'bk-end bk-end-l'
+                  : 'bk-end';
+            cells += `<span class="${cls}">${has ? v : '·'}</span>`;
+          }
+          const so =
+            fmt === 'cumulative'
+              ? match.tiebreak1 !== null && match.tiebreak1 !== undefined
+                ? num === 1
+                  ? match.tiebreak1
+                  : match.tiebreak2
+                : null
+              : sets[nSlots] && (sets[nSlots].score1 > 0 || sets[nSlots].score2 > 0)
+                ? num === 1
+                  ? sets[nSlots].score1
+                  : sets[nSlots].score2
+                : null;
+          if (so !== null) cells += `<span class="bk-end bk-end-so" title="Shoot-off">${so}</span>`;
+          return `<span class="bk-ends">${cells}</span>`;
+        };
         const row = (archer, num) => {
           if (!archer)
             return `<div class="bk-ar"><span class="bk-seed"></span><span class="bk-name" style="color:var(--muted2);">${match.isBye ? 'BYE' : 'TBD'}</span></div>`;
           const won = match.winnerChoice && String(match.winnerChoice) === String(archer.id);
+          const prov = pending && String(match.pendingWinner) === String(archer.id);
           const sc = bracketScore(match, num, fmt);
-          return `<div class="bk-ar${won ? ' bk-won' : ''}"><span class="bk-seed">#${archer.seed || '?'}</span><span class="bk-name">${archer.name}</span><span class="bk-score">${sc ?? ''}</span></div>`;
+          return `<div class="bk-ar${won ? ' bk-won' : prov ? ' bk-prov' : ''}"><span class="bk-seed">#${archer.seed || '?'}</span><span class="bk-name">${archer.name}</span>${match.isBye ? '' : ends(num)}<span class="bk-score">${sc ?? ''}</span></div>`;
         };
         const status = match.winnerChoice
           ? `<span style="color:var(--green);font-weight:700;">${t('complete')}</span>`
-          : match.isBye
-            ? ''
-            : `<span style="color:var(--accent);">${t('pending')}</span>`;
+          : pending
+            ? `<span style="color:#ff9800;font-weight:700;">⏳ ${t('awaiting_approval')}</span>`
+            : match.isBye
+              ? ''
+              : `<span style="color:var(--accent);">${t('pending')}</span>`;
         const meta = `<div class="bk-meta"><span>${t('match')} ${idx + 1}${match.targetNum ? ` · <b style="color:var(--accent);font-size:12px;">🎯 T${match.targetNum}</b>` : ''}</span>${status}</div>`;
+        const resultBtns = match.winnerChoice
+          ? '<span style="flex:1;"></span>'
+          : pending
+            ? `<button class="btn btn-success btn-sm" style="flex:1;padding:3px 6px;" onclick="approveMatch('${catKey}','${rk}',${idx})">✓ ${t('approve')}</button><button class="btn btn-secondary btn-sm" style="padding:3px 8px;" onclick="openMatchModal('${catKey}','${rk}',${idx})" title="${t('edit_result')}">✏️</button>`
+            : `<button class="btn btn-primary btn-sm" style="flex:1;padding:3px 6px;" onclick="openMatchModal('${catKey}','${rk}',${idx})">${t('enter_result')}</button>`;
         const tools =
           forPrint || match.isBye || !match.archer1 || !match.archer2
             ? ''
-            : `<div class="bk-tools">${!match.winnerChoice ? `<button class="btn btn-primary btn-sm" style="flex:1;padding:3px 6px;" onclick="openMatchModal('${catKey}','${rk}',${idx})">${t('enter_result')}</button>` : '<span style="flex:1;"></span>'}<span style="font-size:10px;color:var(--muted2);">🎯</span><input type="number" value="${match.targetNum || ''}" min="1" style="width:48px;background:var(--surface3);border:1px solid var(--border2);color:var(--text);padding:2px 4px;border-radius:4px;font-size:12px;text-align:center;" onchange="setMatchTarget('${catKey}','${rk}',${idx},this.value)"></div>`;
-        return `<div class="bk-box${match.winnerChoice ? ' bk-done' : ''}">${meta}${row(match.archer1, 1)}${row(match.archer2, 2)}${tools}</div>`;
+            : `<div class="bk-tools">${resultBtns}<span style="font-size:10px;color:var(--muted2);">🎯</span><input type="number" value="${match.targetNum || ''}" min="1" style="width:48px;background:var(--surface3);border:1px solid var(--border2);color:var(--text);padding:2px 4px;border-radius:4px;font-size:12px;text-align:center;" onchange="setMatchTarget('${catKey}','${rk}',${idx},this.value)"></div>`;
+        return `<div class="bk-box${match.winnerChoice ? ' bk-done' : pending ? ' bk-pending' : ''}">${meta}${row(match.archer1, 1)}${row(match.archer2, 2)}${tools}</div>`;
       }
+      // Admin approves the winner a phone sent (after checking the paper scorecard)
+      window.approveMatch = async (catKey, rk, idx) => {
+        const data = JSON.parse(JSON.stringify(window._elimData?.[catKey] || {}));
+        const m = data.rounds?.[rk]?.[idx];
+        if (!m || !m.pendingWinner) return;
+        m.winnerChoice = m.pendingWinner;
+        m.pendingWinner = null;
+        const blocked = applyAdvance(data, rk, idx);
+        await saveBrackets({ [catKey]: data });
+        if (blocked.length)
+          toast(
+            'Approved — but the next match already started, so the archer there was not changed. Fix it by hand.',
+            'error',
+          );
+        else toast(t('result_approved'), 'success');
+      };
       function buildBracketHTML(catKey, data, forPrint) {
         const fmt = data.format || 'sets';
         const rks = bracketRounds(data);
@@ -5696,7 +5772,7 @@
         const win = window.open('', '_blank');
         if (!win) return;
         win.document.write(
-          `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Brackets</title><style>${printVars}body{font-family:Arial,sans-serif;color:#000;margin:0;}h2{font-size:15px;margin:0 0 10px;}.page{page-break-after:always;padding:8mm;}.page:last-child{page-break-after:auto;}${BRACKET_CSS}.bk-wrap{overflow:visible;}.bk-col{width:215px;}.bk-ar.bk-won{background:#e8e8e8;border:1px solid #000;}.bk-ar.bk-won .bk-name,.bk-ar.bk-won .bk-score{color:#000;}.bk-name{font-family:Arial,sans-serif;font-size:12px;}.bk-score{font-family:Arial,sans-serif;font-size:13px;}@media print{@page{size:A4 landscape;margin:0;}}</style></head><body>${pages}</body></html>`,
+          `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Brackets</title><style>${printVars}body{font-family:Arial,sans-serif;color:#000;margin:0;}h2{font-size:15px;margin:0 0 10px;}.page{page-break-after:always;padding:8mm;}.page:last-child{page-break-after:auto;}${BRACKET_CSS}.bk-wrap{overflow:visible;}.bk-col{width:290px;}.bk-end{font-family:Arial,sans-serif;font-size:10px;width:16px;color:#000;}.bk-end-l{color:#777;}.bk-end-w{font-weight:900;}.bk-box.bk-pending{border:1px dashed #000;}.bk-ar.bk-prov{background:#fff;border:1px dashed #000;}.bk-ar.bk-prov .bk-name,.bk-ar.bk-prov .bk-score{color:#000;}.bk-ar.bk-won{background:#e8e8e8;border:1px solid #000;}.bk-ar.bk-won .bk-name,.bk-ar.bk-won .bk-score{color:#000;}.bk-name{font-family:Arial,sans-serif;font-size:12px;}.bk-score{font-family:Arial,sans-serif;font-size:13px;}@media print{@page{size:A4 landscape;margin:0;}}</style></head><body>${pages}</body></html>`,
         );
         win.document.close();
         setTimeout(() => win.print(), 400);
@@ -5945,6 +6021,7 @@
         const tb2 = document.getElementById('tb2')?.value;
         const updatedMatch = {
           ...match,
+          pendingWinner: null, // admin's result is the approved one
           sets,
           score1,
           score2,
@@ -6585,7 +6662,14 @@
           roundOrder.forEach((rk) => {
             const matches = data.rounds?.[rk] || [];
             matches.forEach((match) => {
-              if (!match.archer1 || !match.archer2 || match.isBye || match.winnerChoice) return;
+              if (
+                !match.archer1 ||
+                !match.archer2 ||
+                match.isBye ||
+                match.winnerChoice ||
+                match.pendingWinner
+              )
+                return;
               pages += buildCard(catKey, data, match, rk);
             });
           });

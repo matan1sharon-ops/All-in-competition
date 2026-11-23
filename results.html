@@ -512,6 +512,7 @@
           closest_center: 'TIED — WHO IS CLOSEST TO CENTER?',
           closer_center: 'Closer to center?',
           final_results: '🏆 FINAL RESULTS',
+          provisional: 'PROVISIONAL WINNER',
           final_results_title: 'Final Results',
           in_progress: 'Elimination in progress',
           qual_rank: 'QUAL',
@@ -547,6 +548,7 @@
           closest_center: 'שוויון — מי קרוב יותר למרכז?',
           closer_center: 'קרוב יותר למרכז?',
           final_results: '🏆 תוצאות סופיות',
+          provisional: 'מנצח זמני',
           final_results_title: 'תוצאות סופיות',
           in_progress: 'מקצי ההדחות עדיין בתהליך',
           qual_rank: 'מוקדמות',
@@ -656,7 +658,7 @@
                   score1 = hasCumData ? liveTot1 : (match.score1 ?? '');
                   score2 = hasCumData ? liveTot2 : (match.score2 ?? '');
                 }
-                html += `<div style="background:var(--surface);border:1px solid ${done ? 'var(--green)' : 'var(--border2)'};border-radius:8px;padding:6px;overflow:hidden;${rk === 'F' ? 'border-width:2px;' : ''}">${renderMatchRowDisplay(match.archer1, w1, score1, match.sets, 1, data.format, slots, match)}<div style="height:3px;"></div>${renderMatchRowDisplay(match.archer2, w2, score2, match.sets, 2, data.format, slots, match)}</div>`;
+                html += `<div style="background:var(--surface);border:1px solid ${done ? 'var(--green)' : 'var(--border2)'};border-radius:8px;padding:6px;overflow:hidden;${rk === 'F' ? 'border-width:2px;' : ''}">${renderMatchRowDisplay(match.archer1, w1, score1, match.sets, 1, data.format, slots, match)}<div style="height:3px;"></div>${renderMatchRowDisplay(match.archer2, w2, score2, match.sets, 2, data.format, slots, match)}${provisionalLine(match)}</div>`;
               });
               html += '</div></div>';
             });
@@ -670,6 +672,13 @@
         requestAnimationFrame(() => {
           main.scrollTop = scrollTop;
         });
+      }
+      // Winner sent from a phone but not yet approved by the admin
+      function provisionalLine(match) {
+        if (match.winnerChoice || !match.pendingWinner) return '';
+        const a =
+          String(match.pendingWinner) === String(match.archer1?.id) ? match.archer1 : match.archer2;
+        return `<div style="margin-top:4px;padding:3px 6px;border:1px dashed #ff9800;border-radius:5px;color:#ff9800;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;">⏳ ${t('provisional')}: ${a?.name || ''}</div>`;
       }
       function renderMatchRowDisplay(archer, won, score, sets, archerNum, fmt, slots, match) {
         if (!archer)
