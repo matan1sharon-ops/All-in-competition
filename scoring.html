@@ -3622,6 +3622,8 @@
         cumTB2 = null;
         window._cumTBWinner = null;
         startMatchSync();
+        altWatchTimer();
+        altApplyStarter();
         renderMatchTabs();
         renderMatchSets();
         renderMatchPad();
@@ -3987,6 +3989,81 @@
         pad.style.gridTemplateColumns = 'repeat(4,1fr)';
         pad.innerHTML = btns;
       }
+      /* ── Alternating entry (opened from admin ✏️ ENTER ARROWS with &alt=1): after each arrow the
+         pad moves to the other archer, like the shooting; each end starts with the archer the
+         timer says starts. A phone opened from a QR keeps the normal order. */
+      const altEntry = new URLSearchParams(location.search).get('alt') === '1';
+      let altTimer = null,
+        altTimerUnsub = null;
+      function altStarterIdx() {
+        const st = altTimer;
+        if (!st || st.mode !== 'alt' || !st.alt) return 0;
+        if (st.alt.catKey !== matchCatKey || st.alt.roundKey !== matchRoundKey) return 0;
+        const idx = st.alt.idx || [0, 1];
+        return st.alt.starter === 'R' ? idx[1] : idx[0];
+      }
+      // true when neither archer has an arrow in the end being shot now
+      function altEndEmpty() {
+        if (matchFormat === 'sets') {
+          const maxSets = isTiebreakNeeded() ? MAX_SETS + 1 : MAX_SETS;
+          for (let i = 0; i < maxSets; i++) {
+            const a = getMatchArrows(i, 0).length,
+              b = getMatchArrows(i, 1).length;
+            if (a < getTBArrows(i) || b < getTBArrows(i)) return a === 0 && b === 0;
+          }
+          return false;
+        }
+        const per = getArrowsPerSet();
+        return cumArrows1.length === cumArrows2.length && cumArrows1.length % per === 0;
+      }
+      function altApplyStarter() {
+        if (!altEntry || !altEndEmpty()) return;
+        const want = altStarterIdx();
+        if (matchActiveArcher !== want) {
+          matchActiveArcher = want;
+          renderMatchTabs();
+          renderMatchSets();
+          renderMatchPad();
+          updateMatchHeader();
+        }
+      }
+      function altWatchTimer() {
+        if (!altEntry || altTimerUnsub) return;
+        altTimerUnsub = onSnapshot(doc(db, 'competitions', compId, 'timer', 'state'), (snap) => {
+          altTimer = cleanData(snap.data()) || null;
+          altApplyStarter();
+        });
+      }
+      // who enters next after an arrow by archer `me`
+      function altNextArcher(me) {
+        const other = 1 - me;
+        if (matchFormat === 'sets') {
+          const si = (() => {
+            const maxSets = isTiebreakNeeded() ? MAX_SETS + 1 : MAX_SETS;
+            for (let i = 0; i < maxSets; i++)
+              if (
+                getMatchArrows(i, 0).length < getTBArrows(i) ||
+                getMatchArrows(i, 1).length < getTBArrows(i)
+              )
+                return i;
+            return -1;
+          })();
+          if (si === -1) return me;
+          const need = getTBArrows(si);
+          const mine = getMatchArrows(si, me).length,
+            theirs = getMatchArrows(si, other).length;
+          if (mine === 0 && theirs === 0) return altStarterIdx(); // a new end starts
+          if (theirs < need) return other;
+          return me;
+        }
+        const per = getArrowsPerSet();
+        const mine = (me === 0 ? cumArrows1 : cumArrows2).length;
+        const theirs = (me === 0 ? cumArrows2 : cumArrows1).length;
+        if (mine === theirs && mine % per === 0) return altStarterIdx(); // end complete
+        const endFull = Math.ceil(mine / per) * per;
+        if (theirs < endFull) return other;
+        return me;
+      }
       window.handleMatchScore = async (val) => {
         if (matchFormat === 'sets') {
           if (isMatchWon()) return;
@@ -3997,7 +4074,10 @@
           arrows.push(val);
           setMatchArrows(si, matchActiveArcher, arrows);
           saveMatchProgress();
-          if (arrows.length === getTBArrows(si)) {
+          if (altEntry) {
+            matchActiveArcher = altNextArcher(matchActiveArcher);
+            renderMatchTabs();
+          } else if (arrows.length === getTBArrows(si)) {
             const otherArr = getMatchArrows(si, 1 - matchActiveArcher);
             if (otherArr.length < getTBArrows(si)) {
               matchActiveArcher = 1 - matchActiveArcher;
@@ -4033,7 +4113,10 @@
             if (myCum.length >= getCumEnds() * aPerT) return;
             myCum.push(val);
             saveMatchProgress();
-            if (myCum.length % aPerT === 0) {
+            if (altEntry) {
+              matchActiveArcher = altNextArcher(matchActiveArcher);
+              renderMatchTabs();
+            } else if (myCum.length % aPerT === 0) {
               const targetDone = myCum.length / aPerT;
               const otherCum = matchActiveArcher === 0 ? cumArrows2 : cumArrows1;
               const otherTargetDone = Math.floor(otherCum.length / aPerT);
