@@ -1767,6 +1767,8 @@
           scan_cancel: 'CANCEL',
           scan_not_ours: 'This is not an ALL IN scorecard QR',
           no_comp_today: 'No competition is running today. Ask the organizer.',
+          waiting_opponent:
+            'Your next match is waiting for the opponent. Scan again when their match is finished.',
           pick_comp: 'More than one competition today — choose yours:',
           camera_denied:
             'Camera not available. Allow camera access in the browser settings, or scan with the phone camera app.',
@@ -1828,6 +1830,7 @@
           scan_cancel: 'ביטול',
           scan_not_ours: 'זה לא קוד QR של כרטיס ניקוד ALL IN',
           no_comp_today: 'אין תחרות היום. פנו למארגן.',
+          waiting_opponent: 'המקצה הבא ממתין ליריב. סרקו שוב כשהמקצה שלו יסתיים.',
           pick_comp: 'יש יותר מתחרות אחת היום — בחרו את שלכם:',
           camera_denied:
             'המצלמה לא זמינה. אשרו גישה למצלמה בהגדרות הדפדפן, או סרקו עם אפליקציית המצלמה.',
@@ -4100,6 +4103,49 @@
         renderMatchSets();
         renderMatchPad();
       };
+      /* ── AUTO-ADVANCE (same rule as admin) ── match i feeds match floor(i/2) of the next round,
+         even i → archer1, odd i → archer2; a semifinal loser goes to the Bronze match */
+      async function advanceWinner(match) {
+        const next = { R1: 'QF', QF: 'SF', SF: 'F' }[matchRoundKey];
+        if (!next || !match.winnerChoice) return;
+        const w =
+          String(match.winnerChoice) === String(match.archer1?.id) ? match.archer1 : match.archer2;
+        const l = w === match.archer1 ? match.archer2 : match.archer1;
+        const entry = (a) =>
+          a
+            ? { id: a.id, name: a.name, seed: a.seed ?? null, qualScore: a.qualScore ?? null }
+            : null;
+        const side = matchIdx % 2 === 0 ? 'archer1' : 'archer2';
+        const places = [[next, Math.floor(matchIdx / 2), entry(w)]];
+        if (matchRoundKey === 'SF') places.push(['B', 0, entry(l)]);
+        for (const [rk, idx, archer] of places) {
+          const ref = doc(sub(compId, 'matches'), matchDocId(matchCatKey, rk, idx));
+          let nm;
+          try {
+            nm = (await getDoc(ref)).data()?.match;
+          } catch (e) {
+            nm = compData.elimination?.[matchCatKey]?.rounds?.[rk]?.[idx];
+          }
+          if (!nm) continue; // older bracket: admin creates the next round
+          const started =
+            nm.winnerChoice ||
+            (nm.sets || []).some(
+              (st) => (st?.arrows1 || []).length || (st?.arrows2 || []).length,
+            ) ||
+            (nm.arrows1 || []).length ||
+            (nm.arrows2 || []).length;
+          if (started) continue;
+          const upd = { [side]: archer };
+          // Bronze with only one possible archer (other semifinal was a bye): 3rd place straight away
+          const otherSF =
+            compData.elimination?.[matchCatKey]?.rounds?.SF?.[side === 'archer1' ? 1 : 0];
+          if (rk === 'B' && otherSF?.isBye && archer) {
+            upd.isBye = true;
+            upd.winnerChoice = archer.id;
+          }
+          trackWrite(setDoc(ref, { match: upd }, { merge: true }));
+        }
+      }
       window.submitMatch = async () => {
         let winnerId = null,
           winnerName = '';
@@ -4178,6 +4224,7 @@
               match.score2 = cumArrows2.reduce((s, v) => s + getVal(v), 0);
             }
             trackWrite(setDoc(mRef, { match }, { merge: true }));
+            advanceWinner(match);
           } catch (e) {
             console.error('Save error:', e);
           }
@@ -4433,6 +4480,7 @@
           // Check if any archer on this target has an active elimination match
           const elim = compData.elimination || {};
           const roundOrder = ['R1', 'QF', 'SF', 'F', 'B'];
+          let waitingMatch = false;
           for (const [ck, edata] of Object.entries(elim)) {
             for (const rk of roundOrder) {
               const matches = edata.rounds?.[rk] || [];
@@ -4440,6 +4488,10 @@
                 const m = matches[mi];
                 if (m.isBye || m.winnerChoice) continue;
                 const onTarget = Number(m.targetNum) === Number(qrTargetNum);
+                if (onTarget && (!m.archer1 || !m.archer2)) {
+                  waitingMatch = true; // next-round match, opponent not known yet
+                  continue;
+                }
                 if (onTarget) {
                   matchCatKey = ck;
                   matchRoundKey = rk;
@@ -4476,6 +4528,7 @@
               }
             }
           }
+          if (waitingMatch) return showScanError(t('waiting_opponent'));
           if (!targetArchers.length) return showScanError(t('no_archers_target'));
           document.getElementById('confirm-archers').innerHTML = targetArchers
             .map(
