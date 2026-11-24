@@ -113,7 +113,7 @@
     'Yellow warning (sec)': 'אזהרה צהובה (שניות)',
     Ends: 'סבבים',
     'Practice ends': 'סבבי אימון',
-    'Shooting lines': 'קווי ירי',
+    'Shooting order': 'סדר ירי',
     'Beeps: 2 = to the line · 1 = start shooting · 3 = collect arrows · 5 = emergency stop':
       'צפצופים: 2 = עלייה לקו · 1 = התחלת ירי · 3 = איסוף חיצים · 5 = עצירת חירום',
     'SAVE SETTINGS': 'שמור הגדרות',

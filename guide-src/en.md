@@ -69,7 +69,7 @@ On the day the admin runs the timer, watches scores come in and fixes mistakes; 
 
 ### Timer
 
-1. **Timer** panel → settings: shooting time, call-up time (10 s), yellow warning (30 s), number of ends, practice ends, shooting lines (AB only, AB then CD, or alternating). **SAVE SETTINGS.**
+1. **Timer** panel → settings: shooting time, call-up time (10 s), yellow warning (30 s), number of ends, practice ends, shooting order (AB only, AB then CD, or alternating). **SAVE SETTINGS.**
 2. **🖥 OPEN TIMER DISPLAY** on the computer connected to the TV or projector. Press **SOUND ON** there (on that one device only).
 3. Run the ends from the controller in the panel, or from a phone: scan the QR in the panel or use **🔗 COPY PHONE CONTROL LINK**. See *Field manager* below.
 
