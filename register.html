@@ -478,6 +478,7 @@
       </div>
     </div>
 
+    <script src="he-text.js"></script>
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
       import {
@@ -534,6 +535,7 @@
       const compId = params.get('comp');
       let compData = null;
       let currentLang = localStorage.getItem('registerLang') || 'en';
+      if (window.HeText) HeText.setLang(currentLang);
 
       const T = {
         en: {
@@ -583,9 +585,9 @@
         he: {
           sub_title: 'הרשמה לתחרות',
           loading: '⏳ טוען...',
-          no_comp: 'לא צוינה תחרות. אנא השתמש בקישור שסיפק המארגן.',
-          not_found: 'התחרות לא נמצאה. אנא בדוק את קישור ההרשמה.',
-          conn_error: 'שגיאת חיבור. אנא נסה שוב.',
+          no_comp: 'לא צוינה תחרות. השתמשו בקישור שקיבלתם מהמארגן.',
+          not_found: 'התחרות לא נמצאה. בדקו את קישור ההרשמה.',
+          conn_error: 'שגיאת חיבור. נסו שוב.',
           first_name: 'שם פרטי',
           first_name_ph: 'שם פרטי',
           last_name: 'שם משפחה',
@@ -596,28 +598,28 @@
           phone_ph: '050...',
           email: 'אימייל',
           email_ph: 'לא חובה',
-          enter_phone: 'אנא הזן מספר טלפון.',
+          enter_phone: 'הזינו מספר טלפון.',
           bow_type: 'סוג קשת',
           gender: 'מין',
           male: 'זכר',
           female: 'נקבה',
           age_category: 'קטגוריית גיל',
-          register_btn: 'הרשמה →',
-          registering: '...נרשם',
-          enter_fname: 'אנא הזן את שמך הפרטי.',
-          enter_lname: 'אנא הזן את שם משפחתך.',
+          register_btn: 'הרשמה ←',
+          registering: 'נרשם...',
+          enter_fname: 'הזינו שם פרטי.',
+          enter_lname: 'הזינו שם משפחה.',
           already_registered: 'כבר רשום לתחרות זו.',
           reg_closed: 'ההרשמה סגורה.',
           reg_full: 'ההרשמה מלאה.',
-          reg_failed: 'ההרשמה נכשלה. אנא נסה שוב.',
+          reg_failed: 'ההרשמה נכשלה. נסו שוב.',
           registered: 'נרשמת!',
           success_sub: 'נרשמת בהצלחה לתחרות.',
-          register_another: '+ הרשם קשת נוסף',
+          register_another: '+ רישום קשת נוסף',
           your_details: 'הפרטים שלך',
           competition_lbl: 'תחרות',
-          screenshot_hint: '📸 צלם מסך לשמירת פרטי ההרשמה',
-          score_your_round: '📱 ניקוד הסיבוב שלך',
-          click_to_pay: '💳 לחץ כאן לתשלום',
+          screenshot_hint: '📸 צלמו את המסך כדי לשמור את פרטי ההרשמה',
+          score_your_round: '📱 ניקוד הסבב שלך',
+          click_to_pay: '💳 לחצו כאן לתשלום',
           live_results: '🏆 תוצאות חיות',
           bow_lbl: 'קשת',
           age_lbl: 'גיל',
@@ -675,6 +677,7 @@
 
       window.setLang = function (lang) {
         currentLang = lang;
+        if (window.HeText) HeText.setLang(currentLang);
         localStorage.setItem('registerLang', lang);
         applyLang();
         // Re-apply category filtering after language change

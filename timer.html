@@ -469,6 +469,7 @@
       </div>
     </div>
 
+    <script src="he-text.js" data-rtl="no"></script>
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
       import {
@@ -556,6 +557,17 @@
           console.error('clock sync', e);
         }
       }
+
+      const timerLang = (() => {
+        const q = new URLSearchParams(location.search).get('lang');
+        if (q === 'he' || q === 'en') return q;
+        try {
+          return localStorage.getItem('adminLang') || localStorage.getItem('scoringLang') || 'en';
+        } catch (e) {
+          return 'en';
+        }
+      })();
+      if (window.HeText) HeText.setLang(timerLang);
 
       /* ── FINALS (alternating): state.mode = 'alt', state.alt = { label, catKey, roundKey, format,
          names: [left, right], idx: [archer index on the left, on the right], starter 'L'|'R',

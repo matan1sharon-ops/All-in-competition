@@ -449,6 +449,7 @@
       </div>
     </div>
 
+    <script src="he-text.js" data-keep-ltr=".bracket-rounds"></script>
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
       import {
@@ -698,24 +699,24 @@
         },
         he: {
           history_title: 'היסטוריית תחרויות',
-          back_btn: '← כל התחרויות',
+          back_btn: '→ כל התחרויות',
           loading: 'טוען תחרויות...',
           no_archived:
             'אין תחרויות בארכיון עדיין.<br>תחרויות מועברות לארכיון אוטומטית 7 ימים לאחר תאריכן.',
           archers: 'קשתים',
           delete: '🗑 מחק',
           qual_results: '🏹 תוצאות מוקדמות',
-          elim_brackets: '⚔️ מקצי הדחות',
+          elim_brackets: '⚔️ עצי הדחות',
           final_ranking: '🏆 דירוג סופי',
           men: 'גברים',
           women: 'נשים',
           name: 'שם',
           score: 'ניקוד',
-          round_of: 'סיבוב של',
+          round_of: 'סיבוב',
           quarter_finals: 'רבע גמר',
           semi_finals: 'חצי גמר',
           final: 'גמר',
-          bronze: 'גמר קטן',
+          bronze: 'מקצה ארד',
           pending: 'ממתין',
           no_results: 'אין תוצאות עדיין.',
           confirm_delete: 'מחק לצמיתות',
@@ -726,6 +727,7 @@
         const saved =
           localStorage.getItem('adminLang') || localStorage.getItem('scoringLang') || 'en';
         currentLang = saved;
+        if (window.HeText) HeText.setLang(currentLang);
         applyHistoryTranslations();
       }
       function applyHistoryTranslations() {
@@ -781,6 +783,7 @@
         }
         currentLang =
           localStorage.getItem('adminLang') || localStorage.getItem('scoringLang') || 'en';
+        if (window.HeText) HeText.setLang(currentLang);
         listEl.innerHTML = archived
           .map((c) => {
             const archers = c.archerCount || 0;

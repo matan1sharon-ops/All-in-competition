@@ -1379,6 +1379,10 @@
 
     <div id="toast"></div>
 
+    <script
+      src="he-text.js"
+      data-keep-ltr="#scoring-screen, #match-screen, #summary-screen"
+    ></script>
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
       import {
@@ -1804,34 +1808,34 @@
           competition: 'תחרות',
           your_name: 'שמך',
           loading: 'טוען...',
-          select_comp_first: '— בחר תחרות תחילה —',
-          select_name: '— בחר את שמך —',
-          continue: 'המשך →',
-          back: '← חזרה',
-          no_target: '⚠️ אין לך מטרה מוקצית.\nבקש מהמנהל להקצות לך מטרה.',
-          active_match: 'נמצאה מקצה פעילה',
-          start_match: 'התחל מקצה →',
-          confirm_archers: 'אשר קשתים במטרה זו',
-          start_scoring: 'התחל ניקוד →',
+          select_comp_first: '— קודם בחרו תחרות —',
+          select_name: '— בחרו את שמכם —',
+          continue: 'המשך ←',
+          back: '→ חזרה',
+          no_target: '⚠️ עדיין לא שובצתם למטרה.\nבקשו מהמנהל לשבץ אתכם.',
+          active_match: 'נמצא מקצה פעיל',
+          start_match: 'התחל מקצה ←',
+          confirm_archers: 'אשרו את הקשתים במטרה',
+          start_scoring: 'התחל ניקוד ←',
           target: 'מטרה',
           end: 'סבב',
           editing: 'עריכה',
           active: 'פעיל',
           half_total: 'סה״כ מחצית',
           total: 'סה״כ',
-          backspace: 'מחק ←',
+          backspace: 'מחק →',
           done_editing: 'סיום עריכה ✓',
-          view_summary: 'צפה בסיכום 🏆',
+          view_summary: 'לסיכום 🏆',
           set: 'סט',
           submit_match: 'שלח תוצאת מקצה ✓',
           match_complete: 'המקצה הסתיים',
           match_result: 'תוצאת המקצה',
           winner: 'מנצח',
-          set_system: 'שיטת סטים · ראשון ל-6 נקודות',
+          set_system: 'שיטת סטים · הראשון ל-6 נקודות מנצח',
           cumulative: 'צבירה · 15 חצים',
           station: 'תחנה',
-          score_saved: 'ניקוד נשמר ✓',
-          save_failed: 'שמירה נכשלה',
+          score_saved: 'הניקוד נשמר ✓',
+          save_failed: 'השמירה נכשלה',
           scan_title: 'סרקו את כרטיס הניקוד',
           scan_help: 'לחצו על הכפתור וכוונו את המצלמה לקוד ה-QR שעל כרטיס הניקוד.',
           scan_btn: '📷 סריקת QR',
@@ -1851,14 +1855,14 @@
           offline_banner: '⚠ אין חיבור — הניקוד נשמר בטלפון ויעלה אוטומטית',
           uploading_banner: '⏳ מעלה ניקוד…',
           no_competitions: 'לא נמצאו תחרויות',
-          select_competition: '— בחר תחרות —',
+          select_competition: '— בחרו תחרות —',
           complete: 'הושלם',
-          kills: 'קטלניות',
+          kills: 'פגיעות קטילה',
           elevens: '11',
           sixes: '6',
           closest_center: 'שוויון — מי קרוב יותר למרכז?',
           closer_center: 'קרוב יותר למרכז?',
-          select_closest: 'בחר קרוב למרכז ↑',
+          select_closest: 'בחרו את הקרוב למרכז ↑',
           field_lbl: '🌄 שדה',
           threed_lbl: '🦌 3D',
           kill_lbl: '🎯 קטילה',
@@ -1868,6 +1872,8 @@
       window.setLang = function (lang) {
         currentLang = lang;
         localStorage.setItem('scoringLang', lang);
+        if (window.HeText) HeText.setLang(currentLang);
+
         ['menu-lang-en', 'lang-en'].forEach((id) => {
           const el = document.getElementById(id);
           if (el) el.classList.toggle('active', lang === 'en');
@@ -1904,9 +1910,9 @@
           },
           he: {
             score: 'ניקוד הסבב',
-            score_sub: 'הזן ניקוד למטרה שלך',
+            score_sub: 'הזינו ניקוד למטרה שלכם',
             results: 'תוצאות חיות',
-            results_sub: 'צפה בתוצאות התחרות',
+            results_sub: 'צפו בתוצאות התחרות',
             history: 'היסטוריה',
             history_sub: 'תוצאות תחרויות קודמות',
             guide: 'מדריך',
@@ -3753,7 +3759,13 @@
                 : matchWon
                   ? 'rgba(0,0,0,0.2)'
                   : 'transparent';
-            const setLabel = isTB ? 'TB' : t('set').charAt(0) + (i + 1);
+            const setLabel = isTB
+              ? currentLang === 'he'
+                ? 'הכרעה'
+                : 'TB'
+              : currentLang === 'he'
+                ? 'סט ' + (i + 1)
+                : 'S' + (i + 1);
             html +=
               '<div style="display:grid;grid-template-columns:1fr auto auto auto 1fr;gap:4px;align-items:center;padding:6px 8px;margin-bottom:4px;background:' +
               setBg +

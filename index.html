@@ -2036,6 +2036,7 @@
         </div>
       </div>
     </div>
+    <script src="he-text.js" data-keep-ltr=".bk-wrap"></script>
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
       import {
@@ -2446,19 +2447,19 @@
           new_comp: '+ תחרות חדשה',
           add_archer: '+ הוסף קשת',
           import_csv: '📥 ייבוא CSV',
-          get_template: '📋 קבל תבנית',
+          get_template: '📋 הורד תבנית',
           template: '📋 תבנית',
           reg_link: '🔗 קישור הרשמה',
-          auto_generate: '⚡ יצירת קבוצות אוטומטית',
+          auto_generate: '⚡ שיבוץ אוטומטי מרשימת המשתתפים',
           assign_odd: '🔢 שיבוץ מספרים אי-זוגיים',
           clear_all: 'נקה הכל',
-          print_start: '🖨 הדפס רשימת פתיחה',
-          field_of_play: '🏟 מגרש תחרות',
+          print_start: '🖨 הדפס רשימת שיבוץ',
+          field_of_play: '🏟 מפת המגרש',
           save_config: '💾 שמור הגדרות',
           apply_all: 'החל סוג על כולם',
-          add_session: '+ הוסף סבב',
+          add_session: '+ הוסף מפגש',
           export_pdf: '📄 ייצא PDF',
-          awaiting_approval: 'לאישור',
+          awaiting_approval: 'לאשר?',
           approve: 'אישור',
           edit_result: 'עריכת תוצאה (לפי הנייר)',
           result_approved: 'התוצאה אושרה ✓ — המנצח עלה שלב',
@@ -2477,7 +2478,7 @@
           share_results: '🔗 שתף תוצאות',
           print_all: '🖨 הדפס הכל',
           print_blank: '🖨 הדפס ריק',
-          generate_bracket: '⚡ צור סולם',
+          generate_bracket: '⚡ צור עץ הדחות',
           generate_all: '⚡ צור הכל',
           share_match: '🔗 קישור ניקוד מקצה',
           delete_comp: '🗑 מחק',
@@ -2494,16 +2495,16 @@
           bow_type: 'סוג קשת',
           age_category: 'קטגוריית גיל',
           gender: 'מין',
-          session_name: 'שם הסבב',
+          session_name: 'שם המפגש',
           start_time: 'שעת התחלה',
           distance: 'מרחק',
           ends: 'סבבים',
           arrows_end: 'חצים לסבב',
-          add_session_title: 'הוספת סבב',
-          session_name_ph: 'לדוגמה: סבב כשירות 1',
+          add_session_title: 'הוספת מפגש',
+          session_name_ph: 'לדוגמה: מוקדמות 1',
           num_targets: 'מספר מטרות',
           // Table headers
-          name: 'שם תחרות',
+          name: 'שם',
           score: 'ניקוד',
           target: 'מטרה',
           bow: 'קשת',
@@ -2533,17 +2534,17 @@
           move_archer: 'העבר קשת',
           match_result: 'תוצאת מקצה',
           enter_result: 'הזן תוצאה',
-          save_result: 'שמור תוצאה →',
+          save_result: 'שמור תוצאה ←',
           // Actions
           cancel: 'ביטול',
-          create: 'צור →',
-          import_btn: 'ייבא →',
-          assign: 'שבץ →',
-          save: 'שמור →',
+          create: 'צור ←',
+          import_btn: 'ייבא ←',
+          assign: 'שבץ ←',
+          save: 'שמור ←',
           remove: 'הסר',
           advance_qf: '⚡ המשך לרבע גמר',
           advance_sf: '⚡ המשך לחצי גמר',
-          generate_final: '⚡ צור גמר + גמר קטן',
+          generate_final: '⚡ צור גמר + מקצה ארד',
           // Status
           not_connected: '🔴 לא מחובר',
           connecting: '🟡 מתחבר...',
@@ -2551,16 +2552,16 @@
           firebase_ready: '🟢 Firebase מוכן',
           // Empty states
           no_comp_selected: 'לא נבחרה תחרות.',
-          create_or_select: 'צור תחרות חדשה או בחר קיימת.',
+          create_or_select: 'צרו תחרות חדשה או בחרו תחרות קיימת.',
           create_competition: '+ צור תחרות',
           no_archers_yet: 'אין קשתים עדיין.',
           no_scores_yet: 'אין ניקוד עדיין.',
           no_targets_yet: 'אין מטרות עדיין.',
-          no_sessions_yet: 'אין סבבים עדיין.',
-          no_brackets: 'אין סולמות חתימה עדיין.',
+          no_sessions_yet: 'אין מפגשים עדיין.',
+          no_brackets: 'אין עדיין עצי הדחות.',
           // Toast
-          select_comp_first: 'בחר תחרות תחילה',
-          enter_name: 'הזן שם תחרות',
+          select_comp_first: 'קודם בחרו תחרות',
+          enter_name: 'הזינו שם תחרות',
           comp_created: 'התחרות נוצרה! ✓',
           archer_added: 'נוסף ✓',
           archer_removed: 'הקשת הוסר',
@@ -2569,56 +2570,56 @@
           removed_ok: 'הוסר ✓',
           moved_ok: 'הועבר ל',
           targets_generated: 'מטרות נוצרו ✓',
-          session_added: 'סבב נוסף ✓',
+          session_added: 'מפגש נוסף ✓',
           archived_ok: 'התחרות הועברה לארכיון ✓',
           deleted_ok: 'התחרות נמחקה',
           saved_ok: 'מטרות נשמרו ✓',
           link_copied: 'קישור הרשמה הועתק! ✓',
           results_link_copied: 'קישור תוצאות הועתק! ✓',
           match_link_copied: 'קישור ניקוד הועתק! ✓',
-          template_downloaded: 'תבנית הורדה ✓',
+          template_downloaded: 'התבנית הורדה ✓',
           imported_ok: 'קשתים יובאו ✓',
           no_data: 'אין נתונים לייבוא',
           result_saved: 'התוצאה נשמרה ✓',
-          bracket_generated: 'הסולם נוצר!',
+          bracket_generated: 'עץ ההדחות נוצר!',
           next_round: 'הסיבוב הבא נוצר ✓',
-          bracket_deleted: 'הסולם נמחק',
+          bracket_deleted: 'עץ ההדחות נמחק',
           category: 'קטגוריה',
-          bracket: 'בחירת שלבי הדחות',
+          bracket: 'גודל עץ ההדחות',
           semi_finals: 'חצי גמר',
           quarter_finals: 'רבע גמר',
-          round_of: 'סיבוב של',
+          round_of: 'סיבוב',
           final: 'גמר',
-          bronze: 'גמר קטן',
+          bronze: 'מקצה ארד',
           match: 'מקצה',
           cumulative_lbl: 'צבירה',
           sets_lbl: 'שיטת סטים',
           // Misc
-          enter_fname_lname: 'הזן שם פרטי ושם משפחה',
-          add_archers_first: 'הוסף קשתים תחילה',
+          enter_fname_lname: 'הזינו שם פרטי ושם משפחה',
+          add_archers_first: 'קודם הוסיפו קשתים',
           no_archers: 'אין קשתים',
-          select_category: 'בחר קטגוריה',
-          not_enough: 'אין מספיק קשתים (מינימום 3)',
+          select_category: 'בחרו קטגוריה',
+          not_enough: 'אין מספיק קשתים (לפחות 3)',
           all_bows: 'כל הקשתות',
           men: 'גברים',
           women: 'נשים',
           half_total: 'סה״כ מחצית',
           running: 'מצטבר',
-          tiebreak: 'חץ שיווי (במידת הצורך)',
+          tiebreak: 'חץ הכרעה (אם צריך)',
           winner: 'מנצח ✓ (חובה)',
           delete_bracket: '✕ מחק',
           complete: '✓ הושלם',
           pending: 'ממתין',
           set_points: 'נקודות סט',
-          first_to_6: '(ראשון ל-6 מנצח)',
+          first_to_6: '(הראשון ל-6 מנצח)',
           total: 'סה״כ',
           search: '🔍 חיפוש...',
-          sign_below: 'חתום לאחר אימות הניקוד',
-          scorer_sig: 'חתימת מנקד',
+          sign_below: 'חתמו לאחר בדיקת הניקוד',
+          scorer_sig: 'חתימת רושם הניקוד',
           witness_sig: 'חתימת עד',
           archer_sig: 'חתימת קשת',
           scan_to_score: 'סרוק לניקוד',
-          comp_name_ph: 'לדוגמה: אליפות ישראל 2025',
+          comp_name_ph: 'לדוגמה: אליפות ישראל 2026',
           venue_city: 'מקום / עיר',
           club_fed: 'מועדון / התאחדות',
           club_name: 'שם מועדון',
@@ -2629,6 +2630,8 @@
       window.setAdminLang = function (lang) {
         currentLang = lang;
         localStorage.setItem('adminLang', lang);
+        if (window.HeText) HeText.setLang(currentLang);
+
         document.querySelectorAll('.lang-btn').forEach((b) => {
           b.classList.toggle(
             'active',
@@ -2636,8 +2639,18 @@
               (lang === 'he' && b.textContent.trim() === 'עב'),
           );
         });
-        // Re-render current panel
+        // Re-render the screens in the new language
         applyTranslations();
+        const cs = document.getElementById('conn-status');
+        if (cs)
+          ['connected', 'connecting', 'not_connected'].forEach((k) => {
+            if (cs.textContent === T.en[k] || cs.textContent === T.he[k]) cs.textContent = t(k);
+          });
+        if (currentCompId) {
+          renderAll();
+          const active = document.querySelector('.nav-item.active[data-panel]');
+          if (active) showPanel(active.getAttribute('data-panel'));
+        }
       };
 
       function applyTranslations() {
@@ -2770,6 +2783,8 @@
       function initAdminLang() {
         const saved = localStorage.getItem('adminLang') || 'en';
         currentLang = saved;
+        if (window.HeText) HeText.setLang(currentLang);
+
         document.querySelectorAll('.lang-btn').forEach((b) => {
           b.classList.toggle(
             'active',
@@ -5368,7 +5383,8 @@
           lines: 'AB-CD',
         };
       }
-      const timerUrl = (extra = '') => `${APP_BASE}/timer.html?comp=${currentCompId}${extra}`;
+      const timerUrl = (extra = '') =>
+        `${APP_BASE}/timer.html?comp=${currentCompId}${extra}&lang=${currentLang}`;
       function initTimerPanel() {
         if (!currentCompId) {
           toast(t('select_comp_first'), 'error');
@@ -7301,6 +7317,7 @@
       };
       /* ── INIT ── */
       loadCompetitions();
+      initAdminLang();
       document.getElementById('conn-status').textContent = t('connecting');
       setTimeout(() => {
         if (!currentCompId)

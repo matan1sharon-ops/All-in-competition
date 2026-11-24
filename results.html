@@ -322,6 +322,7 @@
       </div>
     </div>
 
+    <script src="he-text.js" data-keep-ltr="#elim-content"></script>
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
       import {
@@ -543,8 +544,8 @@
         },
         he: {
           live: 'חי',
-          select_comp: 'בחר תחרות למטה',
-          select_above: 'בחר תחרות למעלה',
+          select_comp: 'בחרו תחרות למטה',
+          select_above: 'בחרו תחרות למעלה',
           to_show: 'להצגת תוצאות חיות.',
           competition: 'תחרות:',
           qualification: '🏹 מוקדמות',
@@ -556,15 +557,15 @@
           score: 'ניקוד',
           men: 'גברים',
           women: 'נשים',
-          round_of: 'סיבוב של',
+          round_of: 'סיבוב',
           quarter_finals: 'רבע גמר',
           semi_finals: 'חצי גמר',
           final: 'גמר',
-          bronze: 'גמר קטן',
+          bronze: 'מקצה ארד',
           set_system: 'שיטת סטים',
           cumulative: 'צבירה',
           pending: 'ממתין',
-          select: '— בחר —',
+          select: '— בחרו —',
           archers: 'קשתים',
           tbd: 'טרם נקבע',
           closest_center: 'שוויון — מי קרוב יותר למרכז?',
@@ -582,6 +583,7 @@
         const saved =
           localStorage.getItem('adminLang') || localStorage.getItem('scoringLang') || 'en';
         currentLang = saved;
+        if (window.HeText) HeText.setLang(currentLang);
         applyResultsTranslations();
       }
       function applyResultsTranslations() {
@@ -882,6 +884,8 @@
         setTimeout(() => setAuto(true), 0);
       window.selectComp = (id) => {
         if (unsubscribe) unsubscribe();
+        const noComp = document.querySelector('#main > .no-comp');
+        if (noComp) noComp.style.display = id ? 'none' : '';
         if (!id) return;
         let _renderTimer = null;
         // Live results never read contacts (phone/email)
