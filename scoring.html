@@ -2853,6 +2853,7 @@
           }, 700);
           return;
         }
+        if (!editingEnd) saveArrowSoon();
         renderScoreList();
         renderPad();
         updateQualHeader();
@@ -2873,6 +2874,7 @@
           end.pop();
           scores[archer.id].ends[endIdx] = end;
           recalcStats(archer.id);
+          if (!editingEnd) saveArrowSoon();
           renderScoreList();
           renderPad();
           updateQualHeader();
@@ -3183,8 +3185,15 @@
         }
         toast(t('updated_other_phone'), 'success');
       }
-      async function saveQualScores() {
+      // send each arrow soon after it is entered, so a second phone on the target sees it quickly
+      let arrowSaveTimer = null;
+      function saveArrowSoon() {
+        clearTimeout(arrowSaveTimer);
+        arrowSaveTimer = setTimeout(() => saveQualScores(true), 400);
+      }
+      async function saveQualScores(onlyChanged) {
         if (!compId) return;
+        if (!onlyChanged) clearTimeout(arrowSaveTimer);
         const ops = [];
         targetArchers.forEach((a) => {
           const s = scores[a.id];
@@ -3194,6 +3203,7 @@
           s.ends.forEach((end, i) => {
             if (J(end || []) !== (base[i] ?? J([]))) endsObj[String(i)] = end || [];
           });
+          if (onlyChanged && !Object.keys(endsObj).length) return;
           const sc = {
             total: s.total,
             tens: s.tens,
