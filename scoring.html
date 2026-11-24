@@ -3215,8 +3215,10 @@
             kills: s.kills || 0,
             elevens: s.elevens || 0,
             sixes: s.sixes || 0,
-            ends: endsObj, // only the ends changed on this phone
           };
+          // only the ends changed on this phone. Never send an empty map: Firebase would treat it
+          // as "replace all ends with nothing" and wipe the arrows (totals stayed, arrows vanished)
+          if (Object.keys(endsObj).length) sc.ends = endsObj;
           ops.push((b) => b.set(doc(sub(compId, 'scores'), scoreKey(a.id)), sc, { merge: true }));
         });
         for (let i = 0; i < ops.length; i += 400) {
