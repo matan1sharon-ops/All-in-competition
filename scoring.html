@@ -3053,10 +3053,10 @@
                 break;
               }
             }
-            if (nextIdx !== -1) {
-              activeArcherIdx = nextIdx;
-              scoringArcherIdx = nextIdx;
-            }
+            // everyone has finished this end: start the next end with the first archer, like the other phone
+            if (nextIdx === -1) nextIdx = 0;
+            activeArcherIdx = nextIdx;
+            scoringArcherIdx = nextIdx;
           }
         }
         if (document.getElementById('scoring-screen')?.style.display === 'flex') {
