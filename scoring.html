@@ -3033,6 +3033,32 @@
         });
         if (!changed) return;
         recalcStats(archerId);
+        // the other phone finished the end of the archer selected here: move on, like after typing it here
+        if (
+          editingEnd === null &&
+          pendingAdvanceEnd === null &&
+          targetArchers[activeArcherIdx] &&
+          String(targetArchers[activeArcherIdx].id) === String(archerId) &&
+          !targetArchers.every((a) => isArcherDone(a.id))
+        ) {
+          const cur = targetArchers[activeArcherIdx];
+          const curEnd = scores[cur.id].ends[getNextIncompleteEnd()] || [];
+          const myDone = countDoneEnds(cur.id);
+          if (curEnd.length === 0) {
+            let nextIdx = -1;
+            for (let k = 1; k < targetArchers.length; k++) {
+              const i = (activeArcherIdx + k) % targetArchers.length;
+              if (countDoneEnds(targetArchers[i].id) < myDone) {
+                nextIdx = i;
+                break;
+              }
+            }
+            if (nextIdx !== -1) {
+              activeArcherIdx = nextIdx;
+              scoringArcherIdx = nextIdx;
+            }
+          }
+        }
         if (document.getElementById('scoring-screen')?.style.display === 'flex') {
           renderTabs();
           renderScoreList();
