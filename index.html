@@ -716,8 +716,18 @@
           >
             <span class="icon">📖</span><span>Guide</span>
           </div>
+          <div
+            class="nav-item"
+            id="nav-clubs"
+            style="display: none"
+            onclick="showPanel('clubs')"
+            data-panel="clubs"
+          >
+            <span class="icon">🏛</span><span>Clubs</span>
+          </div>
           <a
             href="history.html"
+            id="history-link"
             target="_blank"
             style="
               display: flex;
@@ -746,6 +756,7 @@
           >
         </nav>
         <div class="sidebar-footer">
+          <div id="auth-user" style="margin-bottom: 10px; font-size: 12px"></div>
           <div class="lang-toggle">
             <button class="lang-btn active" onclick="setAdminLang('en')">EN</button
             ><button class="lang-btn" onclick="setAdminLang('he')">עב</button>
@@ -776,6 +787,12 @@
         </div>
         <div class="content">
           <!-- DASHBOARD -->
+          <div id="panel-clubs" class="panel">
+            <div class="card">
+              <div class="card-title">🏛 Clubs</div>
+              <div id="clubs-body"></div>
+            </div>
+          </div>
           <div id="panel-dashboard" class="panel active">
             <div id="no-comp-msg" class="empty-state">
               <div class="empty-icon">🏆</div>
@@ -2036,6 +2053,21 @@
         </div>
       </div>
     </div>
+    <div
+      id="auth-screen"
+      style="
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        background: var(--bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      "
+    >
+      <div style="color: var(--muted2)">…</div>
+    </div>
     <script src="he-text.js" data-keep-ltr=".bk-wrap"></script>
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
@@ -2053,6 +2085,15 @@
         query,
         where,
       } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+      import {
+        getAuth,
+        onAuthStateChanged,
+        signInWithEmailAndPassword,
+        createUserWithEmailAndPassword,
+        sendPasswordResetEmail,
+        sendEmailVerification,
+        signOut,
+      } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
       const liveConfig = {
         apiKey: 'AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To',
         authDomain: 'all-in-competition.firebaseapp.com',
@@ -2089,6 +2130,313 @@
         return v;
       }
       const db = getFirestore(app);
+      /* ── LOGIN: email + password. Each admin belongs to one club and sees only its competitions.
+         The owner (OWNER_EMAIL, email verified) manages the clubs and sees everything.
+         The login is remembered on the device until SIGN OUT. ── */
+      const OWNER_EMAIL = 'matan1sharon@gmail.com';
+      const auth = getAuth(app);
+      let me = null; // { uid, email, owner, clubId, clubName }
+      let clubsById = {};
+      const compClubs = {}; // competition id → club id
+      const isOwnerUser = (u) => !!u && (u.email || '').toLowerCase() === OWNER_EMAIL;
+      const authErr = (e) =>
+        ({
+          'auth/invalid-credential': 'Wrong email or password',
+          'auth/wrong-password': 'Wrong email or password',
+          'auth/user-not-found': 'Wrong email or password',
+          'auth/invalid-email': 'Email address is not valid',
+          'auth/email-already-in-use': 'This email already has an account — log in',
+          'auth/weak-password': 'Password must be at least 6 characters',
+          'auth/too-many-requests': 'Too many tries — wait a minute and try again',
+          'auth/network-request-failed': 'No internet connection',
+        })[e && e.code] || 'Something went wrong — try again';
+      const authInput = (id, type, ph) =>
+        `<input id="${id}" type="${type}" placeholder="${ph}" autocomplete="${type === 'password' ? 'current-password' : 'on'}" style="width:100%;margin-bottom:10px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:12px;border-radius:8px;font-size:15px;outline:none;">`;
+      const authLink = (txt, fn) =>
+        `<button onclick="${fn}" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:13px;padding:6px;">${txt}</button>`;
+      function authScreen(mode, msg, ok) {
+        const el = document.getElementById('auth-screen');
+        el.style.display = 'flex';
+        const box = (inner) =>
+          `<div style="width:100%;max-width:360px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px;"><div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:34px;letter-spacing:5px;color:var(--accent);">ALL IN</div><div style="font-size:11px;letter-spacing:3px;color:var(--muted2);margin-bottom:20px;">COMPETITION ADMIN</div>${msg ? `<div style="margin-bottom:12px;padding:10px;border-radius:8px;font-size:13px;background:${ok ? 'rgba(67,160,71,0.15)' : 'rgba(229,57,53,0.15)'};color:${ok ? 'var(--green)' : '#ff6b6b'};">${msg}</div>` : ''}${inner}</div>`;
+        const btn = (txt, fn) =>
+          `<button class="btn btn-primary" style="width:100%;padding:12px;margin-bottom:8px;" onclick="${fn}">${txt}</button>`;
+        let inner = '';
+        if (mode === 'login')
+          inner =
+            authInput('au-email', 'email', 'Email') +
+            authInput('au-pass', 'password', 'Password') +
+            btn('LOG IN', 'authLogin()') +
+            `<div style="display:flex;justify-content:space-between;flex-wrap:wrap;">${authLink('Forgot password?', 'authForgot()')}${authLink('Sign up with invite code', "authScreenMode('signup')")}</div>`;
+        else if (mode === 'signup')
+          inner =
+            authInput('au-email', 'email', 'Email') +
+            authInput('au-pass', 'password', 'Password (at least 6 characters)') +
+            authInput('au-code', 'text', 'Club invite code') +
+            btn('SIGN UP', 'authSignup()') +
+            authLink('← Back to log in', "authScreenMode('login')");
+        else if (mode === 'link')
+          inner =
+            `<div style="font-size:14px;margin-bottom:12px;">${auth.currentUser?.email || ''}<br><span style="color:var(--muted2);">This account is not linked to a club yet. Enter your club's invite code.</span></div>` +
+            authInput('au-code', 'text', 'Club invite code') +
+            btn('LINK TO CLUB', 'authLink()') +
+            authLink('Sign out', 'authSignOut()');
+        else if (mode === 'verify')
+          inner =
+            `<div style="font-size:14px;margin-bottom:12px;">${auth.currentUser?.email || ''}<br><span style="color:var(--muted2);">We sent you an email with a link. Open it to confirm your address, then press the button below.</span></div>` +
+            btn("I'VE CONFIRMED MY EMAIL", 'authVerified()') +
+            `<div style="display:flex;justify-content:space-between;">${authLink('Send the email again', 'authResend()')}${authLink('Sign out', 'authSignOut()')}</div>`;
+        else inner = `<div style="color:var(--muted2);">…</div>`;
+        // keep what was typed (email, invite code) when the screen changes, e.g. after a wrong password
+        const keep = {};
+        el.querySelectorAll('input').forEach((i) => {
+          if (i.type !== 'password') keep[i.id] = i.value;
+        });
+        el.innerHTML = box(inner);
+        Object.entries(keep).forEach(([id, v]) => {
+          const i = document.getElementById(id);
+          if (i && v) i.value = v;
+        });
+        el.querySelectorAll('input').forEach((i) =>
+          i.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') el.querySelector('.btn-primary')?.click();
+          }),
+        );
+      }
+      window.authScreenMode = (m) => authScreen(m);
+      const authVal = (id) => (document.getElementById(id)?.value || '').trim();
+      window.authLogin = async () => {
+        try {
+          await signInWithEmailAndPassword(auth, authVal('au-email'), authVal('au-pass'));
+        } catch (e) {
+          authScreen('login', authErr(e));
+        }
+      };
+      window.authForgot = async () => {
+        const email = authVal('au-email');
+        if (!email)
+          return authScreen('login', 'Write your email above, then press "Forgot password?"');
+        try {
+          await sendPasswordResetEmail(auth, email);
+          authScreen('login', 'We sent you an email to choose a new password.', true);
+        } catch (e) {
+          authScreen('login', authErr(e));
+        }
+      };
+      async function linkInvite(code) {
+        code = String(code || '')
+          .trim()
+          .toUpperCase();
+        const inv = code ? await getDoc(doc(db, 'invites', code)) : null;
+        if (!inv || !inv.exists()) return false;
+        await setDoc(doc(db, 'users', auth.currentUser.uid), {
+          email: auth.currentUser.email,
+          clubId: inv.data().clubId,
+          inviteCode: code,
+          createdAt: Date.now(),
+        });
+        return true;
+      }
+      window.authSignup = async () => {
+        const email = authVal('au-email'),
+          pass = authVal('au-pass'),
+          code = authVal('au-code');
+        const owner = email.toLowerCase() === OWNER_EMAIL;
+        if (!owner && !code)
+          return authScreen('signup', 'Enter the invite code you got from the organizer');
+        signingUp = true;
+        try {
+          const cred = await createUserWithEmailAndPassword(auth, email, pass);
+          try {
+            await sendEmailVerification(cred.user);
+          } catch (e) {}
+          if (!owner && !(await linkInvite(code))) {
+            signingUp = false;
+            return authScreen('link', 'Invite code not found — check it and try again');
+          }
+        } catch (e) {
+          signingUp = false;
+          return authScreen('signup', authErr(e));
+        }
+        signingUp = false;
+        refreshMe();
+      };
+      window.authLink = async () => {
+        try {
+          if (await linkInvite(authVal('au-code'))) return refreshMe();
+          authScreen('link', 'Invite code not found — check it and try again');
+        } catch (e) {
+          authScreen('link', 'Could not link — try again');
+        }
+      };
+      window.authResend = async () => {
+        try {
+          await sendEmailVerification(auth.currentUser);
+          authScreen('verify', 'Email sent again.', true);
+        } catch (e) {
+          authScreen('verify', authErr(e));
+        }
+      };
+      window.authVerified = async () => {
+        await auth.currentUser.reload();
+        await auth.currentUser.getIdToken(true); // the database sees the confirmed address
+        refreshMe();
+      };
+      window.authSignOut = async () => {
+        await signOut(auth);
+        location.reload();
+      };
+      let signingUp = false;
+      async function loadClubs() {
+        clubsById = {};
+        try {
+          (await getDocs(collection(db, 'clubs'))).docs.forEach(
+            (d) => (clubsById[d.id] = { id: d.id, ...d.data() }),
+          );
+        } catch (e) {}
+      }
+      async function refreshMe() {
+        const u = auth.currentUser;
+        if (!u) {
+          me = null;
+          return authScreen('login');
+        }
+        if (signingUp) return;
+        const owner = isOwnerUser(u);
+        if (owner && !u.emailVerified) return authScreen('verify');
+        let prof = null;
+        try {
+          const snap = await getDoc(doc(db, 'users', u.uid));
+          prof = snap.exists() ? snap.data() : null;
+        } catch (e) {}
+        if (!owner && !(prof && prof.clubId)) return authScreen('link');
+        me = { uid: u.uid, email: u.email, owner, clubId: (prof && prof.clubId) || null };
+        await loadClubs();
+        me.clubName = (clubsById[me.clubId] && clubsById[me.clubId].name) || '';
+        document.getElementById('auth-screen').style.display = 'none';
+        renderAuthUser();
+        loadCompetitions();
+      }
+      function renderAuthUser() {
+        const el = document.getElementById('auth-user');
+        if (el)
+          el.innerHTML = `<div style="font-weight:700;color:var(--text);">🏛 ${me.clubName || (me.owner ? '—' : '')}${me.owner ? ' <span style="color:var(--accent);font-size:10px;">OWNER</span>' : ''}</div><div style="color:var(--muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${me.email}</div><button class="btn btn-secondary btn-sm" style="margin-top:6px;width:100%;" onclick="authSignOut()">Sign out</button>`;
+        document.getElementById('nav-clubs').style.display = me.owner ? '' : 'none';
+        const h = document.getElementById('history-link');
+        if (h)
+          h.href =
+            'history.html' +
+            (me.clubId && !me.owner ? '?club=' + encodeURIComponent(me.clubId) : '');
+      }
+
+      /* ── CLUBS (owner): create clubs, invite codes, admins, move old competitions into a club ── */
+      const newCode = () => {
+        const abc = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let c = '';
+        for (let i = 0; i < 6; i++) c += abc[Math.floor(Math.random() * abc.length)];
+        return c;
+      };
+      async function renderClubs() {
+        const body = document.getElementById('clubs-body');
+        if (!body || !me || !me.owner) return;
+        body.innerHTML = '…';
+        try {
+          await loadClubs();
+          const [inv, us, cs] = await Promise.all([
+            getDocs(collection(db, 'invites')),
+            getDocs(collection(db, 'users')),
+            getDocs(collection(db, 'competitions')),
+          ]);
+          const codes = {},
+            admins = {};
+          inv.docs.forEach((d) => (codes[d.data().clubId] = d.id));
+          us.docs.forEach((d) =>
+            (admins[d.data().clubId] = admins[d.data().clubId] || []).push({
+              uid: d.id,
+              email: d.data().email,
+            }),
+          );
+          const noClub = cs.docs.filter((d) => !d.data().clubId).length;
+          const clubs = Object.values(clubsById).sort((a, b) =>
+            (a.name || '').localeCompare(b.name || ''),
+          );
+          body.innerHTML =
+            `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;"><input id="club-new-name" placeholder="Club name" style="flex:1;min-width:180px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:10px;border-radius:8px;"><button class="btn btn-primary" onclick="createClub()">+ CREATE CLUB</button></div>` +
+            (clubs.length
+              ? `<table><thead><tr><th>Club</th><th>Invite code</th><th>Admins</th><th></th></tr></thead><tbody>${clubs
+                  .map(
+                    (c) =>
+                      `<tr><td style="font-weight:700;">${c.name}${c.id === me.clubId ? ' <span style="color:#b26a00;font-size:11px;">(MY CLUB)</span>' : ''}</td><td style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;letter-spacing:3px;color:#b26a00;">${codes[c.id] || '—'}</td><td style="font-size:12px;">${(admins[c.id] || []).map((a) => `${a.email}${a.uid === me.uid ? '' : ` <button class="btn btn-danger btn-sm" style="padding:1px 6px;" onclick="removeAdmin('${a.uid}','${a.email}')">✕</button>`}`).join('<br>') || '—'}</td><td style="white-space:nowrap;"><button class="btn btn-secondary btn-sm" onclick="newInvite('${c.id}')">🔑 NEW CODE</button> ${c.id === me.clubId ? '' : `<button class="btn btn-secondary btn-sm" onclick="useAsMyClub('${c.id}')">USE AS MY CLUB</button>`}</td></tr>`,
+                  )
+                  .join('')}</tbody></table>`
+              : '<div style="color:var(--muted2);">No clubs yet.</div>') +
+            `<div style="font-size:12px;color:var(--muted2);margin-top:10px;">Give a club's manager its invite code. They open the admin, choose "Sign up with invite code", and see only their club's competitions. NEW CODE replaces the old one (accounts already linked keep working).</div>` +
+            (noClub
+              ? `<div style="margin-top:16px;padding:12px;border:1px solid var(--accent);border-radius:8px;"><b>${noClub}</b> competition(s) have no club yet (made before logins). Move them into: <select id="club-move">${clubs.map((c) => `<option value="${c.id}">${c.name}</option>`).join('')}</select> <button class="btn btn-primary btn-sm" onclick="moveNoClub()">MOVE</button></div>`
+              : '');
+        } catch (e) {
+          body.innerHTML = '<div style="color:#ff6b6b;">Could not load clubs.</div>';
+        }
+      }
+      window.createClub = async () => {
+        const name = (document.getElementById('club-new-name')?.value || '').trim();
+        if (!name) return toast('Write the club name', 'error');
+        const ref = await addDoc(collection(db, 'clubs'), { name, createdAt: Date.now() });
+        clubsById[ref.id] = { id: ref.id, name };
+        await setDoc(doc(db, 'invites', newCode()), {
+          clubId: ref.id,
+          clubName: name,
+          createdAt: Date.now(),
+        });
+        if (!me.clubId) await useAsMyClub(ref.id, true);
+        toast('Club created ✓', 'success');
+        renderClubs();
+      };
+      window.newInvite = async (clubId) => {
+        const inv = await getDocs(collection(db, 'invites'));
+        await Promise.all(
+          inv.docs.filter((d) => d.data().clubId === clubId).map((d) => deleteDoc(d.ref)),
+        );
+        await setDoc(doc(db, 'invites', newCode()), {
+          clubId,
+          clubName: clubsById[clubId]?.name || '',
+          createdAt: Date.now(),
+        });
+        renderClubs();
+      };
+      window.useAsMyClub = async (clubId, quiet) => {
+        await setDoc(
+          doc(db, 'users', me.uid),
+          { email: me.email, clubId, createdAt: Date.now() },
+          { merge: true },
+        );
+        me.clubId = clubId;
+        me.clubName = clubsById[clubId]?.name || '';
+        renderAuthUser();
+        if (!quiet) {
+          toast('Your club: ' + me.clubName, 'success');
+          renderClubs();
+        }
+      };
+      window.removeAdmin = async (uid, email) => {
+        if (!confirm(`Remove ${email} from the club? They will no longer see its competitions.`))
+          return;
+        await deleteDoc(doc(db, 'users', uid));
+        renderClubs();
+      };
+      window.moveNoClub = async () => {
+        const clubId = document.getElementById('club-move')?.value;
+        if (!clubId) return;
+        const cs = await getDocs(collection(db, 'competitions'));
+        await Promise.all(
+          cs.docs
+            .filter((d) => !d.data().clubId)
+            .map((d) => setDoc(d.ref, { clubId }, { merge: true })),
+        );
+        toast('Competitions moved ✓', 'success');
+        renderClubs();
+        loadCompetitions();
+      };
       // Links point to the same place this page is running from (live site, test site or your computer)
       const APP_BASE = new URL('.', location.href).href.replace(/\/$/, '');
       /* ── DATA LAYOUT ──
@@ -2248,6 +2596,7 @@
           scorecards: 'Scorecards',
           elimination: 'Elimination',
           timer: 'Timer',
+          clubs: 'Clubs',
           history: 'History',
           // Buttons
           new_comp: '+ NEW COMPETITION',
@@ -2442,6 +2791,7 @@
           scorecards: 'כרטיסי ניקוד',
           elimination: 'מקצי הדחות',
           timer: 'טיימר',
+          clubs: 'מועדונים',
           history: 'היסטוריה',
           // Buttons
           new_comp: '+ תחרות חדשה',
@@ -2999,6 +3349,8 @@
         const sevenDays = 7 * 24 * 60 * 60 * 1000;
         for (const d of snap.docs) {
           const c = cleanData(d.data());
+          if (!me || !(me.owner || c.clubId === me.clubId)) continue; // another club's competition
+          compClubs[d.id] = c.clubId || null;
           // Auto-archive if competition date was 7+ days ago
           if (!c.archived && c.date) {
             const compDate = new Date(c.date).getTime();
@@ -3010,7 +3362,14 @@
           if (c.archived) continue; // skip archived
           const o = document.createElement('option');
           o.value = d.id;
-          o.textContent = c.name + (c.date ? ` (${c.date})` : '');
+          o.textContent =
+            (me.owner && clubsById[c.clubId]
+              ? `[${clubsById[c.clubId].name}] `
+              : me.owner && !c.clubId
+                ? '[—] '
+                : '') +
+            c.name +
+            (c.date ? ` (${c.date})` : '');
           sel.appendChild(o);
         }
       }
@@ -3084,7 +3443,17 @@
           discipline === '3D'
             ? document.querySelector('input[name="format3d"]:checked')?.value || '24'
             : null;
+        if (!me || !me.clubId) {
+          toast(
+            me && me.owner
+              ? 'Choose your club first: Clubs → USE AS MY CLUB'
+              : 'Not linked to a club',
+            'error',
+          );
+          return;
+        }
         const ref = await addDoc(collection(db, 'competitions'), {
+          clubId: me.clubId,
           name,
           date,
           numDays,
@@ -3446,8 +3815,18 @@
         }
         if (!confirm(`Restore "${data.comp.name || 'competition'}" as a new competition?`)) return;
         try {
+          if (!me || !me.clubId) {
+            toast(
+              me && me.owner
+                ? 'Choose your club first: Clubs → USE AS MY CLUB'
+                : 'Not linked to a club',
+              'error',
+            );
+            return;
+          }
           const comp = {
             ...data.comp,
+            clubId: me.clubId,
             name: `${data.comp.name || 'Competition'} (restored)`,
             archived: false,
           };
@@ -4498,7 +4877,7 @@
         const pages = Array.from({ length: n }, (_, i) => i + 1)
           .map(
             (num) =>
-              `<div class="page"><div class="brand">ALL IN</div><div class="tnum">TARGET ${num}</div><div class="qr" data-url="${APP_BASE}/scoring.html?target=${num}"></div><div class="help">📷 Scan to score · סרקו לניקוד</div></div>`,
+              `<div class="page"><div class="brand">ALL IN</div><div class="tnum">TARGET ${num}</div><div class="qr" data-url="${APP_BASE}/scoring.html?target=${num}${compClubs[currentCompId] ? '&club=' + compClubs[currentCompId] : ''}"></div><div class="help">📷 Scan to score · סרקו לניקוד</div></div>`,
           )
           .join('');
         const win = window.open('', '_blank');
@@ -5771,7 +6150,9 @@
             scorecards: t('scorecards'),
             elimination: t('elimination'),
             timer: t('timer'),
+            clubs: t('clubs'),
           }[name] || name;
+        if (name === 'clubs') renderClubs();
         if (name === 'scorecards') renderScorecards();
         if (name === 'timer') initTimerPanel();
         if (name === 'targetsetup') initTargetSetup();
@@ -7384,8 +7765,8 @@
         setTimeout(() => win.print(), 400);
       };
       /* ── INIT ── */
-      loadCompetitions();
       initAdminLang();
+      onAuthStateChanged(auth, () => refreshMe());
       document.getElementById('conn-status').textContent = t('connecting');
       setTimeout(() => {
         if (!currentCompId)

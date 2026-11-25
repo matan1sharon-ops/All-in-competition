@@ -1,15 +1,109 @@
 rules_version = '2';
-// ALL IN — Firestore rules for the current setup (no login yet).
-// Paste into Firebase console → Firestore Database → Rules → Publish (dev first, then live).
-// Covers the new layout: competitions/{id} and everything under it
-// (archers, contacts, scores, brackets, matches, timer). No end date.
-// NOTE: still open to anyone (like today) until login is added — contacts are not protected yet.
+// ALL IN — Firestore rules with club logins.
+// Paste into Firebase console → Firestore Database → Rules → Publish (test database first, then live).
+//
+// Who can do what:
+//   Owner (matan1sharon@gmail.com, email confirmed): everything, all clubs.
+//   Club admin (logged in, linked to a club with an invite code): only their club's competitions.
+//   Everyone (no login): read results, register to an open competition, score on a competition that
+//   is not archived (phones from the QR), run the timer of a competition that is not archived.
+//   Phones cannot change a match result that the admin already approved.
+//   Phone numbers / emails (contacts) are readable by the club's admins only.
+// Older version without login: firestore-open.rules (to go back if needed).
 service cloud.firestore {
   match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+    function isOwner() {
+      return signedIn()
+        && request.auth.token.email == 'matan1sharon@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+    function userDoc() {
+      return /databases/$(database)/documents/users/$(request.auth.uid);
+    }
+    function myClub() {
+      return get(userDoc()).data.clubId;
+    }
+    function isClubAdmin(clubId) {
+      return isOwner() || (signedIn() && clubId != null && exists(userDoc()) && myClub() == clubId);
+    }
+    function comp(compId) {
+      return get(/databases/$(database)/documents/competitions/$(compId)).data;
+    }
+    function compAdmin(compId) {
+      return isClubAdmin(comp(compId).get('clubId', null));
+    }
+    function compOpen(compId) {
+      return exists(/databases/$(database)/documents/competitions/$(compId))
+        && comp(compId).get('archived', false) != true;
+    }
+
+    // Club names are public; only the owner creates / renames them
+    match /clubs/{clubId} {
+      allow read: if true;
+      allow write: if isOwner();
+    }
+    // Invite codes: a logged-in person may look up one code (to join); the owner manages them
+    match /invites/{code} {
+      allow get: if signedIn();
+      allow list, write: if isOwner();
+    }
+    // Admin accounts: each person reads their own; joining needs a valid invite code
+    match /users/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isOwner());
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['email', 'clubId', 'inviteCode', 'createdAt'])
+        && exists(/databases/$(database)/documents/invites/$(request.resource.data.inviteCode))
+        && get(/databases/$(database)/documents/invites/$(request.resource.data.inviteCode)).data.clubId
+           == request.resource.data.clubId;
+      allow write: if isOwner();
+    }
+
     match /competitions/{compId} {
-      allow read, write: if true;
-      match /{sub=**} {
-        allow read, write: if true;
+      allow read: if true;
+      allow create: if isOwner()
+        || (signedIn() && exists(userDoc()) && request.resource.data.get('clubId', null) == myClub());
+      allow update: if isClubAdmin(resource.data.get('clubId', null))
+        && (isOwner() || request.resource.data.get('clubId', null) == resource.data.get('clubId', null));
+      allow delete: if isClubAdmin(resource.data.get('clubId', null));
+
+      // Entry list: registration form adds archers while the competition is open
+      match /archers/{id} {
+        allow read: if true;
+        allow create: if compAdmin(compId) || compOpen(compId);
+        allow update, delete: if compAdmin(compId);
+      }
+      // Phone / email: private to the club's admins
+      match /contacts/{id} {
+        allow read: if compAdmin(compId);
+        allow create: if compAdmin(compId) || compOpen(compId);
+        allow update, delete: if compAdmin(compId);
+      }
+      // Qualification scores: phones score while the competition is open
+      match /scores/{id} {
+        allow read: if true;
+        allow create, update: if compAdmin(compId) || compOpen(compId);
+        allow delete: if compAdmin(compId);
+      }
+      // Elimination matches: phones score them, but cannot change an approved result
+      match /matches/{id} {
+        allow read: if true;
+        allow create, delete: if compAdmin(compId);
+        allow update: if compAdmin(compId)
+          || (compOpen(compId)
+              && resource.data.get('match', {}).get('winnerChoice', null) == null
+              && request.resource.data.get('match', {}).get('winnerChoice', null) == null);
+      }
+      match /brackets/{id} {
+        allow read: if true;
+        allow write: if compAdmin(compId);
+      }
+      // End timer: the field manager's phone control link runs it while the competition is open
+      match /timer/{id} {
+        allow read: if true;
+        allow write: if compAdmin(compId) || compOpen(compId);
       }
     }
   }

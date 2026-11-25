@@ -464,6 +464,10 @@
         setDoc,
         getCountFromServer,
       } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+      import {
+        getAuth,
+        onAuthStateChanged,
+      } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
       const liveConfig = {
         apiKey: 'AIzaSyBVDdelVGWJOgQZwN_Um6rppelcNYVN2To',
         authDomain: 'all-in-competition.firebaseapp.com',
@@ -538,6 +542,21 @@
         return v;
       }
       const db = getFirestore(app);
+      /* Each club sees only its own History: ?club=… (from the admin or the scoring app), or the club
+         of the admin logged in on this device. Only that club's admins (and the owner) can delete. */
+      const OWNER_EMAIL = 'matan1sharon@gmail.com';
+      const auth = getAuth(app);
+      const clubParam = new URLSearchParams(location.search).get('club');
+      let viewer = { owner: false, clubId: null };
+      async function whoIsHere(u) {
+        viewer = { owner: false, clubId: null };
+        if (!u) return;
+        viewer.owner = (u.email || '').toLowerCase() === OWNER_EMAIL && u.emailVerified;
+        try {
+          const snap = await getDoc(doc(db, 'users', u.uid));
+          if (snap.exists()) viewer.clubId = snap.data().clubId || null;
+        } catch (e) {}
+      }
       /* ── DATA LAYOUT ──
          competitions/{id}            settings (name, date, discipline, targets, sessions, targetConfig…)
            archers/{archerId}         public archer info
@@ -676,6 +695,8 @@
           history_title: 'Competition History',
           back_btn: '← ALL COMPETITIONS',
           loading: 'Loading competitions...',
+          open_from_club:
+            "Open History from your club's admin, or from the scoring app after scanning a QR.",
           no_archived:
             'No archived competitions yet.<br>Competitions are archived automatically 7 days after their date.',
           archers: 'archers',
@@ -701,6 +722,8 @@
           history_title: 'היסטוריית תחרויות',
           back_btn: '→ כל התחרויות',
           loading: 'טוען תחרויות...',
+          open_from_club:
+            'פתחו את ההיסטוריה מממשק הניהול של המועדון, או מאפליקציית הניקוד אחרי סריקת QR.',
           no_archived:
             'אין תחרויות בארכיון עדיין.<br>תחרויות מועברות לארכיון אוטומטית 7 ימים לאחר תאריכן.',
           archers: 'קשתים',
@@ -764,9 +787,16 @@
         return scores[key] || scores[String(archerId)] || {};
       }
       async function loadArchived() {
+        const club = clubParam || viewer.clubId;
+        const listEl0 = document.getElementById('comp-list');
+        if (!club && !viewer.owner) {
+          listEl0.innerHTML = `<div class="empty-state"><div class="icon">🏛</div><p>${t('open_from_club')}</p></div>`;
+          return;
+        }
         const snap = await getDocs(collection(db, 'competitions'));
         const archived = snap.docs
           .filter((d) => cleanData(d.data()).archived === true)
+          .filter((d) => (club ? cleanData(d.data()).clubId === club : true))
           .map((d) => ({ id: d.id, ...cleanData(d.data()) }))
           .sort((a, b) => new Date(b.date) - new Date(a.date));
         // Archer counts come from each competition's archers collection
@@ -794,7 +824,7 @@
                   year: 'numeric',
                 })
               : '—';
-            return `<div class="comp-card" onclick="openComp('${c.id}')"><div class="comp-card-name">${c.name || 'Unnamed'}</div><div class="comp-card-meta"><span>📅 ${date}</span>${c.location ? `<span>📍 ${c.location}</span>` : ''} ${c.organizer ? `<span>🏛 ${c.organizer}</span>` : ''}</div><div class="comp-card-footer"><div class="comp-card-archers">${archers} ${t('archers')}</div><div style="display:flex;align-items:center;gap:8px;"><div class="comp-card-disc">${c.discipline || 'Outdoor'}</div><button onclick="event.stopPropagation();deleteComp('${c.id}','${c.name || ''}')" style="background:#e5393522;border:1px solid #e5393544;color:#e53935;padding:4px 10px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">${t('delete')}</button></div></div></div>`;
+            return `<div class="comp-card" onclick="openComp('${c.id}')"><div class="comp-card-name">${c.name || 'Unnamed'}</div><div class="comp-card-meta"><span>📅 ${date}</span>${c.location ? `<span>📍 ${c.location}</span>` : ''} ${c.organizer ? `<span>🏛 ${c.organizer}</span>` : ''}</div><div class="comp-card-footer"><div class="comp-card-archers">${archers} ${t('archers')}</div><div style="display:flex;align-items:center;gap:8px;"><div class="comp-card-disc">${c.discipline || 'Outdoor'}</div><button onclick="event.stopPropagation();deleteComp('${c.id}','${c.name || ''}')" ${viewer.owner || (viewer.clubId && viewer.clubId === c.clubId) ? '' : 'hidden'} style="background:#e5393522;border:1px solid #e5393544;color:#e53935;padding:4px 10px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;cursor:pointer;">${t('delete')}</button></div></div></div>`;
           })
           .join('');
       }
@@ -1044,8 +1074,11 @@
         await deleteCompDeep(id);
         await loadArchived();
       };
-      loadArchived();
       initHistoryLang();
+      onAuthStateChanged(auth, async (u) => {
+        await whoIsHere(u);
+        loadArchived();
+      });
     </script>
   </body>
 </html>
