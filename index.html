@@ -661,6 +661,20 @@
         <div class="sidebar-logo">
           <div class="brand">ALL IN</div>
           <div class="sub">Competition Admin</div>
+          <div
+            id="logo-club"
+            style="
+              margin-top: 8px;
+              font-family: 'Barlow Condensed', sans-serif;
+              font-weight: 900;
+              font-size: 18px;
+              letter-spacing: 1px;
+              color: var(--text);
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            "
+          ></div>
         </div>
         <div class="comp-selector">
           <select id="comp-select" onchange="selectCompetition(this.value)">
@@ -2329,6 +2343,8 @@
         loadCompetitions();
       }
       function renderAuthUser() {
+        const lc = document.getElementById('logo-club');
+        if (lc) lc.textContent = me.clubName || '';
         const el = document.getElementById('auth-user');
         if (el)
           el.innerHTML = `<div style="font-weight:700;color:var(--text);">🏛 ${me.clubName || (me.owner ? '—' : '')}${me.owner ? ' <span style="color:var(--accent);font-size:10px;">OWNER</span>' : ''}</div><div style="color:var(--muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${me.email}</div><button class="btn btn-secondary btn-sm" style="margin-top:6px;width:100%;" onclick="authSignOut()">Sign out</button>`;
