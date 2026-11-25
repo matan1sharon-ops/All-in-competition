@@ -296,6 +296,7 @@
     'Invite code': 'קוד הזמנה',
     Admins: 'מנהלים',
     '🔑 NEW CODE': '🔑 קוד חדש',
+    '🔗 COPY INVITE LINK': '🔗 העתק קישור הזמנה',
     'USE AS MY CLUB': 'הגדר כמועדון שלי',
     '(MY CLUB)': '(המועדון שלי)',
     'No clubs yet.': 'אין מועדונים עדיין.',
@@ -323,6 +324,7 @@
     [/^1\/(\d+) — Top (\d+)$/, '1/$1 — $2 הראשונים'],
     [/^Match (\d+)( ·)?$/, 'מקצה $1$2'],
     [/^Your club: (.+)$/, 'המועדון שלך: $1'],
+    [/^Invite link for (.+) copied ✓$/, 'קישור ההזמנה של $1 הועתק ✓'],
     [
       /^Remove (.+) from the club\? They will no longer see its competitions\.$/,
       'להסיר את $1 מהמועדון? הוא לא יראה יותר את התחרויות שלו.',

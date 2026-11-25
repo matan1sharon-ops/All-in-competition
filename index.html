@@ -2204,6 +2204,13 @@
         );
       }
       window.authScreenMode = (m) => authScreen(m);
+      const inviteFromLink = (
+        new URLSearchParams(location.search).get('invite') || ''
+      ).toUpperCase();
+      function fillInvite() {
+        const i = document.getElementById('au-code');
+        if (i && inviteFromLink && !i.value) i.value = inviteFromLink;
+      }
       const authVal = (id) => (document.getElementById(id)?.value || '').trim();
       window.authLogin = async () => {
         try {
@@ -2299,7 +2306,8 @@
         const u = auth.currentUser;
         if (!u) {
           me = null;
-          return authScreen('login');
+          authScreen(inviteFromLink ? 'signup' : 'login');
+          return fillInvite();
         }
         if (signingUp) return;
         const owner = isOwnerUser(u);
@@ -2309,7 +2317,10 @@
           const snap = await getDoc(doc(db, 'users', u.uid));
           prof = snap.exists() ? snap.data() : null;
         } catch (e) {}
-        if (!owner && !(prof && prof.clubId)) return authScreen('link');
+        if (!owner && !(prof && prof.clubId)) {
+          authScreen('link');
+          return fillInvite();
+        }
         me = { uid: u.uid, email: u.email, owner, clubId: (prof && prof.clubId) || null };
         await loadClubs();
         me.clubName = (clubsById[me.clubId] && clubsById[me.clubId].name) || '';
@@ -2366,7 +2377,7 @@
               ? `<table><thead><tr><th>Club</th><th>Invite code</th><th>Admins</th><th></th></tr></thead><tbody>${clubs
                   .map(
                     (c) =>
-                      `<tr><td style="font-weight:700;">${c.name}${c.id === me.clubId ? ' <span style="color:#b26a00;font-size:11px;">(MY CLUB)</span>' : ''}</td><td style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;letter-spacing:3px;color:#b26a00;">${codes[c.id] || '—'}</td><td style="font-size:12px;">${(admins[c.id] || []).map((a) => `${a.email}${a.uid === me.uid ? '' : ` <button class="btn btn-danger btn-sm" style="padding:1px 6px;" onclick="removeAdmin('${a.uid}','${a.email}')">✕</button>`}`).join('<br>') || '—'}</td><td style="white-space:nowrap;"><button class="btn btn-secondary btn-sm" onclick="newInvite('${c.id}')">🔑 NEW CODE</button> ${c.id === me.clubId ? '' : `<button class="btn btn-secondary btn-sm" onclick="useAsMyClub('${c.id}')">USE AS MY CLUB</button>`}</td></tr>`,
+                      `<tr><td style="font-weight:700;">${c.name}${c.id === me.clubId ? ' <span style="color:#b26a00;font-size:11px;">(MY CLUB)</span>' : ''}</td><td style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;letter-spacing:3px;color:#b26a00;">${codes[c.id] || '—'}</td><td style="font-size:12px;">${(admins[c.id] || []).map((a) => `${a.email}${a.uid === me.uid ? '' : ` <button class="btn btn-danger btn-sm" style="padding:1px 6px;" onclick="removeAdmin('${a.uid}','${a.email}')">✕</button>`}`).join('<br>') || '—'}</td><td style="white-space:nowrap;">${codes[c.id] ? `<button class="btn btn-primary btn-sm" onclick="copyInviteLink('${codes[c.id]}','${(c.name || '').replace(/'/g, '')}')">🔗 COPY INVITE LINK</button> ` : ''}<button class="btn btn-secondary btn-sm" onclick="newInvite('${c.id}')">🔑 NEW CODE</button> ${c.id === me.clubId ? '' : `<button class="btn btn-secondary btn-sm" onclick="useAsMyClub('${c.id}')">USE AS MY CLUB</button>`}</td></tr>`,
                   )
                   .join('')}</tbody></table>`
               : '<div style="color:var(--muted2);">No clubs yet.</div>') +
@@ -2403,6 +2414,15 @@
           createdAt: Date.now(),
         });
         renderClubs();
+      };
+      // admin link with the invite code inside: opens straight on "Sign up" with the code filled in
+      window.copyInviteLink = (code, name) => {
+        const url = `${APP_BASE}/index.html?invite=${code}`;
+        if (!navigator.clipboard) return prompt('Copy this invite link:', url);
+        navigator.clipboard
+          .writeText(url)
+          .then(() => toast(`Invite link for ${name} copied ✓`, 'success'))
+          .catch(() => prompt('Copy this invite link:', url));
       };
       window.useAsMyClub = async (clubId, quiet) => {
         await setDoc(
@@ -5720,6 +5740,7 @@
       // the scoring app (archers open it and scan the QR of their target)
       window.copyScoringLink = () => {
         const url = `${APP_BASE}/scoring.html`;
+        if (!navigator.clipboard) return prompt('Copy this scoring link:', url);
         navigator.clipboard
           .writeText(url)
           .then(() => toast(t('link_copied'), 'success'))
