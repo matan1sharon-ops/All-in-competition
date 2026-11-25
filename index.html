@@ -6177,10 +6177,17 @@
         return '🥉 ' + t('bronze');
       }
       function bracketScore(match, num, fmt) {
-        if (fmt === 'cumulative') return num === 1 ? match.score1 : match.score2;
+        if (fmt === 'cumulative') {
+          if (match.winnerChoice) return num === 1 ? match.score1 : match.score2;
+          const done = (match.sets || []).filter(Boolean);
+          if (!done.length)
+            return match.sets && match.sets.length ? null : num === 1 ? match.score1 : match.score2;
+          return done.reduce((t, st) => t + ((num === 1 ? st.score1 : st.score2) || 0), 0);
+        }
         const sets = match.sets || [];
-        if (!sets.length) return null;
+        if (!sets.some(Boolean)) return null;
         return sets.reduce((pts, s) => {
+          if (!s) return pts;
           const v = num === 1 ? s.score1 : s.score2;
           const o = num === 1 ? s.score2 : s.score1;
           const hasData =
@@ -6189,14 +6196,47 @@
           return pts + (v > o ? 2 : v === o ? 1 : 0);
         }, 0);
       }
+      // A set / end counts in the bracket only when both archers have shot all its arrows
+      // (or it was typed in by the admin, or the match is approved). Half-shot ends stay hidden.
+      function doneSets(match, disc) {
+        const sets = match.sets || [];
+        if (match.winnerChoice) return sets;
+        const per = disc === '3D' ? 2 : 3;
+        const nSlots = disc === '3D' || disc === 'Field' ? 4 : 5;
+        const f1 = match.arrows1,
+          f2 = match.arrows2;
+        const phoneCum = Array.isArray(f1) && Array.isArray(f2) && (f1.length || f2.length);
+        return sets.map((st, i) => {
+          if (!st) return st;
+          const need = i >= nSlots ? 1 : per;
+          if (Array.isArray(st.arrows1) || Array.isArray(st.arrows2))
+            return (st.arrows1 || []).length >= need && (st.arrows2 || []).length >= need
+              ? st
+              : null;
+          if (phoneCum) return f1.length >= (i + 1) * per && f2.length >= (i + 1) * per ? st : null;
+          return st;
+        });
+      }
+      // the cumulative shoot-off arrow shows once both archers have shot it
+      const tbDone = (m) =>
+        m.winnerChoice ||
+        (m.tiebreak1 !== null &&
+          m.tiebreak1 !== undefined &&
+          m.tiebreak2 !== null &&
+          m.tiebreak2 !== undefined);
       function bracketBox(catKey, rk, idx, match, fmt, forPrint) {
         if (!match)
           return `<div class="bk-box bk-empty"><div class="bk-ar"><span class="bk-name">TBD</span></div><div class="bk-ar"><span class="bk-name">TBD</span></div></div>`;
         const pending = !match.winnerChoice && match.pendingWinner;
+        const shown = { ...match, sets: doneSets(match, currentDiscipline) };
+        if (!tbDone(match)) {
+          shown.tiebreak1 = null;
+          shown.tiebreak2 = null;
+        }
         // end / set scores of one archer (like live results): S1..S5 (+ shoot-off), or T1..T4 for 3D/Field
         const ends = (num) => {
           const nSlots = currentDiscipline === '3D' || currentDiscipline === 'Field' ? 4 : 5;
-          const sets = match.sets || [];
+          const sets = shown.sets || [];
           let cells = '';
           for (let i = 0; i < nSlots; i++) {
             const st = sets[i];
@@ -6215,10 +6255,10 @@
           }
           const so =
             fmt === 'cumulative'
-              ? match.tiebreak1 !== null && match.tiebreak1 !== undefined
+              ? shown.tiebreak1 !== null && shown.tiebreak1 !== undefined
                 ? num === 1
-                  ? match.tiebreak1
-                  : match.tiebreak2
+                  ? shown.tiebreak1
+                  : shown.tiebreak2
                 : null
               : sets[nSlots] && (sets[nSlots].score1 > 0 || sets[nSlots].score2 > 0)
                 ? num === 1
@@ -6233,7 +6273,7 @@
             return `<div class="bk-ar"><span class="bk-seed"></span><span class="bk-name" style="color:var(--muted2);">${match.isBye ? 'BYE' : 'TBD'}</span></div>`;
           const won = match.winnerChoice && String(match.winnerChoice) === String(archer.id);
           const prov = pending && String(match.pendingWinner) === String(archer.id);
-          const sc = bracketScore(match, num, fmt);
+          const sc = bracketScore(shown, num, fmt);
           return `<div class="bk-ar${won ? ' bk-won' : prov ? ' bk-prov' : ''}"><span class="bk-seed">#${archer.seed || '?'}</span><span class="bk-name">${archer.name}</span>${match.isBye ? '' : ends(num)}<span class="bk-score">${sc ?? ''}</span></div>`;
         };
         const status = match.winnerChoice
