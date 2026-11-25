@@ -22,6 +22,36 @@ A competition day in order:
 5. Elimination: generate brackets, archers score matches, the admin approves each result.
 6. Final results: show and print; archive the competition.
 
+## Logins and clubs
+
+Every club logs in to the admin with its own email and password and sees only its own competitions. Archers never log in: they score with the QR as before.
+
+### Joining as a club admin
+
+1. Open the **invite link** you got from the organizer (or the admin link, then **Sign up with invite code** and type the code).
+2. Enter your **email** and a **password** you choose (at least 6 characters), then **SIGN UP**.
+3. You are in: the club name shows under the ALL IN logo, and you see only your club's competitions.
+
+A field manager or a second admin joins the same way, each with their own email. Everyone in a club has the same rights.
+
+### Every day
+
+- **The login is remembered** on each computer and phone. To leave a shared computer, press **Sign out** (bottom of the menu).
+- **Forgot password?** on the login screen sends an email to choose a new one. Write your email first.
+- **History** shows only your club's archived competitions.
+- Phone numbers and emails of archers are visible only to the club's admins.
+
+### Owner: managing clubs
+
+Only the owner sees the **Clubs** page.
+
+- **+ CREATE CLUB**: type the name; an invite code is made.
+- **🔗 COPY INVITE LINK**: copies the admin link with the code inside. Send it privately to the club's manager.
+- **🔑 NEW CODE**: replaces the code; old links stop working for new sign-ups. People already in stay in.
+- **✕** next to an email removes that person from the club.
+- **USE AS MY CLUB**: the club your own new competitions belong to.
+- **MOVE**: competitions made before logins go into the club you choose.
+
 ## Admin: before the competition
 
 Set up takes four steps: create the competition, collect entries, assign targets, print.
