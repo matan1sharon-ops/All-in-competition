@@ -5717,6 +5717,14 @@
         URL.revokeObjectURL(url);
         toast(t('template_downloaded'), 'success');
       };
+      // the scoring app (archers open it and scan the QR of their target)
+      window.copyScoringLink = () => {
+        const url = `${APP_BASE}/scoring.html`;
+        navigator.clipboard
+          .writeText(url)
+          .then(() => toast(t('link_copied'), 'success'))
+          .catch(() => prompt('Copy this scoring link:', url));
+      };
       window.copyRegLink = () => {
         if (!currentCompId) {
           toast(t('select_comp_first'), 'error');
