@@ -668,7 +668,7 @@
                 let sp1 = 0,
                   sp2 = 0;
                 (match.sets || []).forEach((s) => {
-                  if (!s) return;
+                  if (!s || s.partial) return;
                   if (s.score1 > s.score2) sp1 += 2;
                   else if (s.score2 > s.score1) sp2 += 2;
                   else {
@@ -682,13 +682,19 @@
                   score2 = done || sp2 > 0 ? sp2 : '';
                 } else {
                   const cumSets = match.sets || [];
-                  const liveTot1 = cumSets.reduce((t, s) => t + ((s && s.score1) || 0), 0);
-                  const liveTot2 = cumSets.reduce((t, s) => t + ((s && s.score2) || 0), 0);
-                  const hasCumData = cumSets.some(Boolean);
+                  const liveTot1 = cumSets.reduce(
+                    (t, s) => t + ((s && !s.partial && s.score1) || 0),
+                    0,
+                  );
+                  const liveTot2 = cumSets.reduce(
+                    (t, s) => t + ((s && !s.partial && s.score2) || 0),
+                    0,
+                  );
+                  const hasCumData = cumSets.some((s) => s && !s.partial);
                   score1 = hasCumData ? liveTot1 : (match.score1 ?? '');
                   score2 = hasCumData ? liveTot2 : (match.score2 ?? '');
                 }
-                html += `<div style="background:var(--surface);border:1px solid ${done ? 'var(--green)' : 'var(--border2)'};border-radius:8px;padding:6px;overflow:hidden;${rk === 'F' ? 'border-width:2px;' : ''}">${renderMatchRowDisplay(match.archer1, w1, score1, match.sets, 1, data.format, slots, match)}<div style="height:3px;"></div>${renderMatchRowDisplay(match.archer2, w2, score2, match.sets, 2, data.format, slots, match)}${liveEndLine(rawMatch, data.format, discipline)}${provisionalLine(match)}</div>`;
+                html += `<div style="background:var(--surface);border:1px solid ${done ? 'var(--green)' : 'var(--border2)'};border-radius:8px;padding:6px;overflow:hidden;${rk === 'F' ? 'border-width:2px;' : ''}">${renderMatchRowDisplay(match.archer1, w1, score1, match.sets, 1, data.format, slots, match)}<div style="height:3px;"></div>${renderMatchRowDisplay(match.archer2, w2, score2, match.sets, 2, data.format, slots, match)}${provisionalLine(match)}</div>`;
               });
               html += '</div></div>';
             });
@@ -713,15 +719,22 @@
         const f1 = match.arrows1,
           f2 = match.arrows2;
         const phoneCum = Array.isArray(f1) && Array.isArray(f2) && (f1.length || f2.length);
+        // an end still being shot stays visible as each archer's running sum (partial: true),
+        // but it is not counted in the set points / total until both archers finish it
         return sets.map((st, i) => {
           if (!st) return st;
           const need = i >= nSlots ? 1 : per;
-          if (Array.isArray(st.arrows1) || Array.isArray(st.arrows2))
-            return (st.arrows1 || []).length >= need && (st.arrows2 || []).length >= need
-              ? st
-              : null;
-          if (phoneCum) return f1.length >= (i + 1) * per && f2.length >= (i + 1) * per ? st : null;
-          return st;
+          let n1, n2;
+          if (Array.isArray(st.arrows1) || Array.isArray(st.arrows2)) {
+            n1 = (st.arrows1 || []).length;
+            n2 = (st.arrows2 || []).length;
+          } else if (phoneCum) {
+            n1 = Math.max(0, Math.min(per, f1.length - i * per));
+            n2 = Math.max(0, Math.min(per, f2.length - i * per));
+          } else return st;
+          if (n1 >= need && n2 >= need) return st;
+          if (!n1 && !n2) return null;
+          return { ...st, partial: true, has1: n1 > 0, has2: n2 > 0 };
         });
       }
       // the cumulative shoot-off arrow shows once both archers have shot it
@@ -731,58 +744,6 @@
           m.tiebreak1 !== undefined &&
           m.tiebreak2 !== null &&
           m.tiebreak2 !== undefined);
-      // The end being shot now, arrow by arrow (cleared once both archers finish it and its score
-      // moves into the end boxes above)
-      function liveEndLine(m, fmt, disc) {
-        if (m.winnerChoice || !m.archer1 || !m.archer2) return '';
-        const per = disc === '3D' ? 2 : 3;
-        const nSlots = disc === '3D' || disc === 'Field' ? 4 : 5;
-        let a1 = [],
-          a2 = [],
-          label = '',
-          need = per;
-        if (fmt === 'sets') {
-          const sets = m.sets || [];
-          for (let i = 0; i < sets.length; i++) {
-            const st = sets[i];
-            if (!st || (!Array.isArray(st.arrows1) && !Array.isArray(st.arrows2))) continue;
-            const n = i >= nSlots ? 1 : per;
-            const x1 = st.arrows1 || [],
-              x2 = st.arrows2 || [];
-            if (x1.length >= n && x2.length >= n) continue;
-            a1 = x1;
-            a2 = x2;
-            need = n;
-            label = i >= nSlots ? 'SHOOT-OFF' : `SET ${i + 1}`;
-            break;
-          }
-        } else {
-          const f1 = m.arrows1 || [],
-            f2 = m.arrows2 || [];
-          const e = Math.floor(Math.min(f1.length, f2.length) / per);
-          a1 = f1.slice(e * per, (e + 1) * per);
-          a2 = f2.slice(e * per, (e + 1) * per);
-          label = `END ${e + 1}`;
-          if (!a1.length && !a2.length) {
-            const so1 = m.tiebreak1,
-              so2 = m.tiebreak2;
-            const has1 = so1 !== null && so1 !== undefined,
-              has2 = so2 !== null && so2 !== undefined;
-            if (has1 !== has2) {
-              a1 = has1 ? [so1] : [];
-              a2 = has2 ? [so2] : [];
-              need = 1;
-              label = 'SHOOT-OFF';
-            }
-          }
-        }
-        if (!a1.length && !a2.length) return '';
-        const box = (v) =>
-          `<span style="display:inline-block;min-width:20px;padding:1px 3px;margin-left:2px;border-radius:4px;background:${v === undefined ? 'transparent' : 'var(--surface3)'};border:1px solid var(--border2);text-align:center;color:${v === undefined ? 'var(--muted)' : 'var(--text)'};">${v === undefined ? '·' : v}</span>`;
-        const row = (name, arr) =>
-          `<div style="display:flex;justify-content:space-between;align-items:center;gap:6px;"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</span><span style="white-space:nowrap;">${Array.from({ length: need }, (_, i) => box(arr[i])).join('')}</span></div>`;
-        return `<div style="margin-top:4px;padding:4px 6px;border:1px solid var(--accent);border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;"><div style="font-size:10px;letter-spacing:1px;color:var(--accent);margin-bottom:2px;">● <span>${label}</span></div>${row(m.archer1.name, a1)}${row(m.archer2.name, a2)}</div>`;
-      }
       // Winner sent from a phone but not yet approved by the admin
       function provisionalLine(match) {
         if (match.winnerChoice || !match.pendingWinner) return '';
@@ -819,7 +780,12 @@
                 rawVal > 0 ||
                 rawOther > 0);
             let displayVal, color;
-            if (!hasArrows) {
+            if (set && set.partial) {
+              // end still being shot: this archer's running sum, no win / lose colour yet
+              const mine = archerNum === 1 ? set.has1 : set.has2;
+              displayVal = mine ? rawVal : null;
+              color = mine ? 'var(--text)' : 'var(--muted)';
+            } else if (!hasArrows) {
               displayVal = null;
               color = 'var(--muted)';
             } else {
