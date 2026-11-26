@@ -5780,16 +5780,53 @@
             '<tr style="background:#555;color:#fff;font-size:10px;font-weight:700;"><th colspan="4" style="text-align:left;padding:3px 6px;">ARROWS</th><th>END</th><th>RUNNING</th><th>10</th><th>9</th></tr>';
           tableHtml = `<div style="background:#37474f;color:#fff;padding:2px 6px;font-size:10px;font-weight:700;">1st HALF (Ends 1–10)</div><table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:12px;">${cols}<tbody>${thead}${buildHalfIn(0, 10)}</tbody></table><div style="background:#37474f;color:#fff;padding:2px 6px;font-size:10px;font-weight:700;margin-top:4px;">2nd HALF (Ends 11–20)</div><table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:12px;">${cols}<tbody>${thead}${buildHalfIn(10, 20)}</tbody></table>`;
         } else {
-          let rows = '',
-            running = 0;
-          const label = currentDiscipline === '3D' ? 'Station' : 'Target';
-          ends.forEach((ea, i) => {
-            const tot = ea.reduce((x, v) => x + getVal(v), 0);
-            if (ea.length > 0) running += tot;
-            const cells = ea.map((v) => `<td>${v === 0 ? 'M' : v}</td>`).join('');
-            rows += `<tr style="border-bottom:1px solid #ccc;"><td style="background:#f0f0f0;font-size:10px;font-weight:700;width:52px;">${label} ${i + 1}</td>${cells}<td style="font-weight:700;">${ea.length > 0 ? tot : ''}</td><td style="font-weight:700;">${ea.length > 0 ? running : ''}</td></tr>`;
-          });
-          tableHtml = `<table style="width:100%;border-collapse:collapse;border:1.5px solid #999;font-size:12px;"><tbody>${rows}</tbody></table>`;
+          // Field / 3D: rows in target order like the paper card (ends are stored in
+          // shooting order), units of 12, 6s/5s (Field) or 11s/10s (3D)
+          const is3d = currentDiscipline === '3D',
+            n = is3d ? 2 : 3,
+            hi = is3d ? 11 : 6,
+            lo = is3d ? 10 : 5,
+            N = ends.length,
+            rowLbl = is3d ? 'S' : 'T',
+            unitLbl = is3d ? 'Stations' : 'Targets';
+          const tNum = archer.target || parseInt((getTarget(archer).match(/\d+/) || ['1'])[0]) || 1;
+          const start = (((tNum - 1) % N) + N) % N;
+          const gold = (v) =>
+            v === hi || v === lo ? 'background:#fff9c4;color:#5d4037;font-weight:700;' : '';
+          const cols = `<colgroup><col style="width:42px">${'<col>'.repeat(n)}<col style="width:36px"><col style="width:42px"><col style="width:26px"><col style="width:26px"></colgroup>`;
+          const thead = `<tr style="background:#555;color:#fff;font-size:10px;font-weight:700;"><th colspan="${n + 1}" style="text-align:left;padding:3px 6px;">ARROWS</th><th>TOTAL</th><th>RUNNING</th><th>${hi}s</th><th>${lo}s</th></tr>`;
+          let gTot = 0,
+            gHi = 0,
+            gLo = 0;
+          tableHtml = '';
+          for (let from = 0; from < N; from += 12) {
+            const to = Math.min(N, from + 12);
+            let rows = '',
+              running = 0,
+              uHi = 0,
+              uLo = 0;
+            for (let st = from; st < to; st++) {
+              const ea = ends[(st - start + N) % N] || [];
+              const et = ea.length >= n ? ea.slice(0, n).reduce((x, v) => x + getVal(v), 0) : '';
+              if (et !== '') running += et;
+              const cHi = ea.filter((v) => v === hi).length,
+                cLo = ea.filter((v) => v === lo).length;
+              uHi += cHi;
+              uLo += cLo;
+              const cells = Array.from(
+                { length: n },
+                (_, k) => `<td style="${gold(ea[k])}">${d(ea, k)}</td>`,
+              ).join('');
+              rows += `<tr style="border-bottom:1px solid #ccc;"><td style="background:#f0f0f0;font-weight:700;font-size:10px;border-right:2px solid #999;width:42px;">${rowLbl}${st + 1}</td>${cells}<td style="font-weight:700;border-left:2px solid #999;width:36px;">${et}</td><td style="font-weight:700;border-left:2px solid #999;border-right:2px solid #999;width:42px;">${et !== '' ? running : ''}</td><td style="font-size:11px;color:#555;width:26px;">${ea.length > 0 ? cHi : ''}</td><td style="font-size:11px;color:#555;width:26px;">${ea.length > 0 ? cLo : ''}</td></tr>`;
+            }
+            rows += `<tr style="background:#37474f;color:#fff;font-weight:700;"><td colspan="${n + 1}">UNIT TOTAL</td><td>${running}</td><td></td><td>${uHi}</td><td>${uLo}</td></tr>`;
+            gTot += running;
+            gHi += uHi;
+            gLo += uLo;
+            if (to === N)
+              rows += `<tr style="background:#000;color:#fff;font-weight:700;"><td colspan="${n + 1}">TOTAL</td><td>${gTot}</td><td></td><td>${gHi}</td><td>${gLo}</td></tr>`;
+            tableHtml += `<div style="background:#37474f;color:#fff;padding:2px 6px;font-size:10px;font-weight:700;${from > 0 ? 'margin-top:4px;' : ''}">UNIT ${from / 12 + 1} (${unitLbl} ${from + 1}–${to})</div><table style="width:100%;border-collapse:collapse;table-layout:fixed;border:1.5px solid #999;font-size:12px;">${cols}<tbody>${thead}${rows}</tbody></table>`;
+          }
         }
         const tgt = getTarget(archer);
         return `<div style="background:#37474f;color:#fff;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><div><div style="font-size:10px;color:#aaa;">${currentDiscipline} · ${tgt} · ${archer.bow} · ${archer.age} · ${archer.gender}</div><div style="font-size:16px;font-weight:700;">${archer.name}</div></div><div style="text-align:right;"><div style="font-size:28px;font-weight:900;color:#FFD700;">${s.total}</div></div></div>${tableHtml}`;

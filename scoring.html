@@ -2333,7 +2333,11 @@
       };
       function scCellHtml(val, isActive, isEditing, endIdx) {
         const classes = [];
-        if (val === 'X' || val === 10 || val === 9 || val === 11) classes.push('sc-gold');
+        const gold =
+          discipline === 'Field'
+            ? val === 6 || val === 5
+            : val === 'X' || val === 10 || val === 9 || val === 11;
+        if (gold) classes.push('sc-gold');
         if (isEditing) classes.push('sc-editing');
         else if (isActive) classes.push('sc-active');
         let display;
@@ -2350,6 +2354,119 @@
           display +
           '</td>'
         );
+      }
+      // Field / 3D scorecard: rows in target order (T1, T2 …), units of 12,
+      // 6s/5s (Field) or 11s/10s (3D). ends[] is in shooting order, so each row
+      // looks up the end shot on that target.
+      function scUnitsHtml(ends, curEnd, readOnly) {
+        const cfg = getConfig(),
+          n = cfg.arrows,
+          N = cfg.ends,
+          is3d = discipline === '3D';
+        const hi = is3d ? 11 : 6,
+          lo = is3d ? 10 : 5,
+          rowLbl = is3d ? 'S' : 'T',
+          start = ((((parseInt(targetNum) || 1) - 1) % N) + N) % N;
+        const cols =
+          '<colgroup><col style="width:42px">' +
+          '<col>'.repeat(n) +
+          '<col style="width:36px"><col style="width:42px"><col style="width:28px"><col style="width:28px"></colgroup>';
+        let out = '',
+          gTot = 0,
+          gHi = 0,
+          gLo = 0;
+        for (let from = 0; from < N; from += 12) {
+          const to = Math.min(N, from + 12);
+          let rows = '',
+            running = 0,
+            uHi = 0,
+            uLo = 0;
+          for (let st = from; st < to; st++) {
+            const e = (st - start + N) % N;
+            const ea = ends[e] || [];
+            const isActive = !readOnly && e === curEnd && editingEnd === null;
+            const isEditing = !readOnly && editingEnd !== null && editingEnd.endIdx === e;
+            const et = ea.length >= n ? ea.slice(0, n).reduce((x, v) => x + getVal(v), 0) : '';
+            if (et !== '') running += et;
+            const cHi = ea.filter((v) => v === hi).length,
+              cLo = ea.filter((v) => v === lo).length;
+            uHi += cHi;
+            uLo += cLo;
+            let cells = '';
+            for (let k = 0; k < n; k++) {
+              const c = scCellHtml(
+                ea[k],
+                isActive && ea.length === k,
+                isEditing && ea.length === k,
+                e,
+              );
+              cells += readOnly ? c.replace(/ onclick="[^"]*"/, '') : c;
+            }
+            rows +=
+              '<tr class="sc-end-sep"><td class="sc-end-label"' +
+              (readOnly ? '' : ' onclick="editEnd(' + e + ')"') +
+              '>' +
+              rowLbl +
+              (st + 1) +
+              (isActive ? ' ▶' : isEditing ? ' ✏' : '') +
+              '</td>' +
+              cells +
+              '<td class="sc-end-total">' +
+              et +
+              '</td><td class="sc-running">' +
+              (et !== '' ? running : '') +
+              '</td><td class="sc-stat">' +
+              (ea.length > 0 ? cHi : '') +
+              '</td><td class="sc-stat">' +
+              (ea.length > 0 ? cLo : '') +
+              '</td></tr>';
+          }
+          rows +=
+            '<tr class="sc-half-total"><td colspan="' +
+            (n + 1) +
+            '">UNIT TOTAL</td><td>' +
+            running +
+            '</td><td></td><td>' +
+            uHi +
+            '</td><td>' +
+            uLo +
+            '</td></tr>';
+          gTot += running;
+          gHi += uHi;
+          gLo += uLo;
+          if (to === N)
+            rows +=
+              '<tr class="sc-half-total" style="background:#000 !important;"><td colspan="' +
+              (n + 1) +
+              '">TOTAL</td><td>' +
+              gTot +
+              '</td><td></td><td>' +
+              gHi +
+              '</td><td>' +
+              gLo +
+              '</td></tr>';
+          out +=
+            '<div class="sc-half-header"' +
+            (from > 0 ? ' style="margin-top:6px;"' : '') +
+            '><div class="sc-half-title">UNIT ' +
+            (from / 12 + 1) +
+            ' (' +
+            cfg.label +
+            's ' +
+            (from + 1) +
+            '–' +
+            to +
+            ')</div><div>' +
+            hi +
+            's</div><div>' +
+            lo +
+            's</div></div><table class="sc-table">' +
+            cols +
+            '<tbody>' +
+            rows +
+            '</tbody></table>';
+        }
+        return out + '<div style="height:10px;"></div>';
       }
       function getNextIncompleteEnd() {
         const cfg = getConfig();
@@ -2448,55 +2565,9 @@
           return;
         }
         if (discipline === '3D' || discipline === 'Field') {
-          let html = '',
-            running = 0;
-          for (let i = 0; i < cfg.ends; i++) {
-            const ea = ends[i] || [];
-            const isActive = i === curEnd && editingEnd === null;
-            const isEditing = editingEnd !== null && editingEnd.endIdx === i;
-            const tot = ea.reduce((s, v) => s + getVal(v), 0);
-            if (ea.length === cfg.arrows) running += tot;
-            const cls = isEditing
-              ? 'end-card editing'
-              : isActive
-                ? 'end-card active-end'
-                : 'end-card';
-            const chips = Array.from({ length: cfg.arrows }, (_, ai) => {
-              const v = ea[ai];
-              return v !== undefined
-                ? '<span class="arrow-chip ' +
-                    chipClass(v, i) +
-                    '">' +
-                    (v === 0 ? 'M' : v) +
-                    '</span>'
-                : '<span class="arrow-chip chip-empty">·</span>';
-            }).join('');
-            const stationDisplay = ((targetNum - 1 + i) % cfg.ends) + 1;
-            html +=
-              '<div class="' +
-              cls +
-              '" onclick="editEnd(' +
-              i +
-              ')"><div class="end-header"><div class="end-num" style="font-size:15px;font-weight:700;color:var(--accent);">' +
-              cfg.label +
-              ' ' +
-              stationDisplay +
-              (isEditing ? ' (EDITING)' : isActive ? ' (ACTIVE)' : '') +
-              '</div><div style="display:flex;align-items:center;gap:8px;"><div class="end-total">' +
-              (ea.length === cfg.arrows ? tot : ea.length ? tot : '—') +
-              '</div>' +
-              (ea.length > 0
-                ? '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:30px;font-weight:900;color:var(--accent);">' +
-                  running +
-                  '</div>'
-                : '') +
-              '</div></div><div class="end-arrows">' +
-              chips +
-              '</div></div>';
-          }
-          list.innerHTML = '<div style="padding:10px;">' + html + '</div>';
+          list.innerHTML = scUnitsHtml(ends, curEnd, false);
           setTimeout(() => {
-            const a = list.querySelector('.active-end,.editing');
+            const a = list.querySelector('.sc-active,.sc-editing');
             if (a) a.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }, 50);
           return;
@@ -3357,33 +3428,6 @@
           return;
         }
         if (discipline === '3D' || discipline === 'Field') {
-          const cfg = getConfig();
-          const endRows = s.ends
-            .map((end, i) => {
-              const tot = end.reduce((x, v) => x + getVal(v), 0);
-              const chips = end
-                .map(
-                  (v) =>
-                    '<span class="arrow-chip ' +
-                    chipClass(v, i) +
-                    '" style="font-size:12px;padding:2px 7px;">' +
-                    (v === 0 ? 'M' : v) +
-                    '</span>',
-                )
-                .join('');
-              return (
-                '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid #eee;"><div style="font-size:11px;color:#888;width:70px;">' +
-                cfg.label +
-                ' ' +
-                (i + 1) +
-                '</div><div style="display:flex;gap:3px;flex:1;">' +
-                chips +
-                '</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-weight:900;color:#1565c0;">' +
-                tot +
-                '</div></div>'
-              );
-            })
-            .join('');
           list.innerHTML =
             '<div style="background:#37474f;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:11px;color:#aaa;">' +
             a.slot +
@@ -3395,9 +3439,8 @@
             a.name +
             '</div></div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:36px;font-weight:900;color:var(--accent);">' +
             s.total +
-            '</div></div><div>' +
-            endRows +
-            '</div>';
+            '</div></div>' +
+            scUnitsHtml(s.ends, -1, true);
           return;
         }
         function sumCell(val) {
