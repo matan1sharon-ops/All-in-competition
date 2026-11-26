@@ -7806,6 +7806,7 @@
 
         function build3DFieldBlock(archer, stations, arrows, disc, stationRange) {
           const scoring = disc === '3D' ? '11/10/8/5/0' : '6/5/4/3/2/1/0';
+          const [hi, lo] = disc === '3D' ? [11, 10] : [6, 5];
           // Build station order starting from archer's target, wrapping around
           const startNum = archer.targetNum || 1;
           // If stationRange provided (2x12), use it directly; otherwise wrap around
@@ -7823,7 +7824,7 @@
               { length: arrows },
               () => `<td class="arr-cell" style="${bg}"></td>`,
             ).join('');
-            rows += `<tr style="${borderBot}"><td class="stn-lbl">${stn}</td>${arrowCells}<td class="stn-end"></td><td class="stn-run"></td></tr>`;
+            rows += `<tr style="${borderBot}"><td class="stn-lbl">${stn}</td>${arrowCells}<td class="stn-end"></td><td class="stn-run"></td><td></td><td></td></tr>`;
           });
           const arrHeaders = Array.from({ length: arrows }, (_, i) => `<th>A${i + 1}</th>`).join(
             '',
@@ -7835,9 +7836,9 @@
         <span class="cat">${window._printWithNames ? (archer.bow || '') + ' · ' + (archer.age || '') + ' · ' + scoring : ''}</span>
       </div>
       <table style="flex:1;table-layout:fixed;">
-        <thead><tr><th>Stn</th>${arrHeaders}<th>End</th><th>Run.</th></tr></thead>
+        <thead><tr><th>Stn</th>${arrHeaders}<th>End</th><th>Run.</th><th>${hi}s</th><th>${lo}s</th></tr></thead>
         <tbody>${rows}
-        <tr class="half-total"><td colspan="${arrows + 1}">TOTAL</td><td></td><td></td></tr>
+        <tr class="half-total"><td colspan="${arrows + 1}">TOTAL</td><td></td><td></td><td></td><td></td></tr>
         </tbody>
       </table>
 
