@@ -297,6 +297,12 @@
     Admins: 'מנהלים',
     '🔑 NEW CODE': '🔑 קוד חדש',
     '🔗 COPY INVITE LINK': '🔗 העתק קישור הזמנה',
+    '✏️ EDIT': '✏️ עריכה',
+    ARROWS: 'חצים',
+    END: 'סבב',
+    RUNNING: 'מצטבר',
+    'Tap an arrow box to change it (or the next empty box to add one).':
+      'לחצו על תיבת חץ כדי לשנות אותה (או על התיבה הריקה הבאה כדי להוסיף חץ).',
     'USE AS MY CLUB': 'הגדר כמועדון שלי',
     '(MY CLUB)': '(המועדון שלי)',
     'No clubs yet.': 'אין מועדונים עדיין.',
@@ -324,6 +330,8 @@
     [/^1\/(\d+) — Top (\d+)$/, '1/$1 — $2 הראשונים'],
     [/^Match (\d+)( ·)?$/, 'מקצה $1$2'],
     [/^Your club: (.+)$/, 'המועדון שלך: $1'],
+    [/^TOTAL (\d+)$/, 'סה״כ $1'],
+    [/^Target (\d+)$/, 'מטרה $1'],
     [/^Invite link for (.+) copied ✓$/, 'קישור ההזמנה של $1 הועתק ✓'],
     [
       /^Remove (.+) from the club\? They will no longer see its competitions\.$/,
