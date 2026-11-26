@@ -220,13 +220,17 @@
       .section-title {
         padding: 14px 20px;
         font-family: 'Barlow Condensed', sans-serif;
-        font-size: 14px;
+        font-size: 17px;
         font-weight: 700;
         letter-spacing: 1.5px;
         text-transform: uppercase;
-        color: var(--muted2);
+        color: var(--text);
+        border-inline-start: 4px solid var(--accent);
         border-bottom: 1px solid var(--border);
         background: var(--surface2);
+      }
+      html[dir='rtl'] .section-title {
+        letter-spacing: 0.3px;
       }
       .section-body {
         padding: 16px 20px;

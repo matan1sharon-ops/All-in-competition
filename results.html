@@ -651,7 +651,7 @@
               const matches = data.rounds?.[rk];
               if (!matches || !matches.length) return;
               const label = getRLabel(rk, data.bracketSize);
-              html += `<div style="flex:1;min-width:240px;max-width:380px;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:var(--muted2);text-transform:uppercase;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border2);">${label}</div><div style="display:flex;flex-direction:column;gap:8px;">`;
+              html += `<div style="flex:1;min-width:240px;max-width:380px;"><div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;color:var(--text);text-transform:uppercase;margin-bottom:8px;padding:2px 0;padding-inline-start:8px;border-inline-start:3px solid var(--accent);">${label}</div><div style="display:flex;flex-direction:column;gap:8px;">`;
               matches.forEach((rawMatch) => {
                 const match = { ...rawMatch, sets: doneSets(rawMatch, discipline) };
                 if (!tbDone(rawMatch)) {

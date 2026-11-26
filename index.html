@@ -228,21 +228,21 @@
       }
       .card-title {
         font-family: 'Barlow Condensed', sans-serif;
-        font-size: 13px;
+        font-size: 17px;
         font-weight: 700;
         letter-spacing: 1.5px;
         text-transform: uppercase;
-        color: var(--muted2);
+        color: var(--text);
+        border-inline-start: 4px solid var(--accent);
+        padding-inline-start: 10px;
+        line-height: 1.2;
         margin-bottom: 16px;
         display: flex;
         align-items: center;
         gap: 8px;
       }
-      .card-title::after {
-        content: '';
-        flex: 1;
-        height: 1px;
-        background: var(--border);
+      html[dir='rtl'] .card-title {
+        letter-spacing: 0.3px;
       }
       .form-grid {
         display: grid;
