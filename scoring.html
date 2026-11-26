@@ -2355,9 +2355,9 @@
           '</td>'
         );
       }
-      // Field / 3D scorecard: rows in target order (T1, T2 …), units of 12,
-      // 6s/5s (Field) or 11s/10s (3D). ends[] is in shooting order, so each row
-      // looks up the end shot on that target.
+      // Field / 3D scorecard: rows in shooting order starting from the archer's
+      // target (like the printed card, e.g. T7 … T24, T1 … T6), units of 12,
+      // 6s/5s (Field) or 11s/10s (3D).
       function scUnitsHtml(ends, curEnd, readOnly) {
         const cfg = getConfig(),
           n = cfg.arrows,
@@ -2382,7 +2382,8 @@
             uHi = 0,
             uLo = 0;
           for (let st = from; st < to; st++) {
-            const e = (st - start + N) % N;
+            const e = st,
+              stn = ((start + st) % N) + 1;
             const ea = ends[e] || [];
             const isActive = !readOnly && e === curEnd && editingEnd === null;
             const isEditing = !readOnly && editingEnd !== null && editingEnd.endIdx === e;
@@ -2407,7 +2408,7 @@
               (readOnly ? '' : ' onclick="editEnd(' + e + ')"') +
               '>' +
               rowLbl +
-              (st + 1) +
+              stn +
               (isActive ? ' ▶' : isEditing ? ' ✏' : '') +
               '</td>' +
               cells +
@@ -2453,9 +2454,9 @@
             ' (' +
             cfg.label +
             's ' +
-            (from + 1) +
+            (((start + from) % N) + 1) +
             '–' +
-            to +
+            (((start + to - 1) % N) + 1) +
             ')</div><div>' +
             hi +
             's</div><div>' +
