@@ -5278,7 +5278,23 @@
           toast('Save failed', 'error');
         }
       };
+      // totals can be typed in Live Results only when there are no arrows from a phone
+      // (paper-only scoring) — otherwise arrows are fixed in Scorecards → ✏️ EDIT. Custom: always.
+      function totalsEditable(archerId) {
+        if (currentDiscipline === 'Custom') return true;
+        const ends = getArcherEnds(archerId);
+        return !ends || !ends.some((e) => e && e.length);
+      }
       window.openScoreEdit = (archerId) => {
+        if (!totalsEditable(archerId)) {
+          toast(
+            currentLang === 'he'
+              ? 'החצים הוזנו בטלפון — מתקנים אותם בכרטיסי ניקוד ← ✏️ עריכה'
+              : 'Arrows came from a phone — fix them in Scorecards → ✏️ EDIT',
+            'error',
+          );
+          return;
+        }
         const archer = archers.find((a) => a.id === archerId);
         if (!archer) return;
         const s = getScore(archerId);
@@ -5422,7 +5438,7 @@
           const places = qualPlaces(ranked, currentDiscipline);
           const color = BOW_COLORS[cat.bow] || '#555';
           const gLabel = cat.gender === 'M' ? t('men') : t('women');
-          catCards += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;break-inside:avoid;margin-bottom:14px;"><div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${color}22;border-bottom:1px solid ${color}44;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:1px;color:${color};">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</span><span style="font-size:11px;color:var(--muted2);margin-left:auto;">${ranked.length} ${t('archers_count')}</span></div><div class="table-wrap"><table><thead><tr><th style="width:36px;text-align:center;"></th><th>${t('name')}</th><th style="text-align:center;">${t('score')}</th>${showHalves ? '<th style="text-align:center;">H1</th><th style="text-align:center;">H2</th>' : ''}<th style="text-align:center;">${isCustomDisc ? 'Kills' : labels.g1}</th><th style="text-align:center;">${isCustomDisc ? '11s' : labels.g2}</th>${isCustomDisc ? '<th style="text-align:center;">6s</th>' : ''}</tr></thead><tbody>${ranked.map((a, i) => `<tr style="${i === 0 ? 'background:#fffde7;' : i === 1 ? 'background:#f9f9f9;' : i === 2 ? 'background:#fff8f0;' : ''}"><td style="text-align:center;font-size:16px;padding:8px 4px;">${medal(places[i])}</td><td style="color:#111;font-weight:${i < 3 ? '700' : '600'};font-size:${i === 0 ? '14px' : '13px'};">${a.name}</td><td style="font-weight:900;font-size:${i === 0 ? '16px' : '14px'};color:${i === 0 ? '#c62828' : i === 1 ? '#37474f' : i === 2 ? '#bf360c' : '#111'};text-align:center;cursor:pointer;" onclick="openScoreEdit('${a.id}')" title="Edit score">${a.total} <span style='font-size:9px;opacity:0.4;'>✏️</span></td>${showHalves ? `<td style="color:#555;text-align:center;font-size:12px;">${a.h1 || '—'}</td><td style="color:#555;text-align:center;font-size:12px;">${a.h2 || '—'}</td>` : ''}<td style="color:#111;text-align:center;font-size:12px;">${isCustomDisc ? a.kills || 0 : a.g1 || '—'}</td><td style="color:#111;text-align:center;font-size:12px;">${isCustomDisc ? a.elevens || 0 : a.g2 || '—'}</td>${isCustomDisc ? `<td style="color:#111;text-align:center;font-size:12px;">${a.sixes || 0}</td>` : ''}</tr>`).join('')}</tbody></table></div></div>`;
+          catCards += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;break-inside:avoid;margin-bottom:14px;"><div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${color}22;border-bottom:1px solid ${color}44;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;letter-spacing:1px;color:${color};">${cat.bow.toUpperCase()} · ${cat.age} · ${gLabel}</span><span style="font-size:11px;color:var(--muted2);margin-left:auto;">${ranked.length} ${t('archers_count')}</span></div><div class="table-wrap"><table><thead><tr><th style="width:36px;text-align:center;"></th><th>${t('name')}</th><th style="text-align:center;">${t('score')}</th>${showHalves ? '<th style="text-align:center;">H1</th><th style="text-align:center;">H2</th>' : ''}<th style="text-align:center;">${isCustomDisc ? 'Kills' : labels.g1}</th><th style="text-align:center;">${isCustomDisc ? '11s' : labels.g2}</th>${isCustomDisc ? '<th style="text-align:center;">6s</th>' : ''}</tr></thead><tbody>${ranked.map((a, i) => `<tr style="${i === 0 ? 'background:#fffde7;' : i === 1 ? 'background:#f9f9f9;' : i === 2 ? 'background:#fff8f0;' : ''}"><td style="text-align:center;font-size:16px;padding:8px 4px;">${medal(places[i])}</td><td style="color:#111;font-weight:${i < 3 ? '700' : '600'};font-size:${i === 0 ? '14px' : '13px'};">${a.name}</td><td style="font-weight:900;font-size:${i === 0 ? '16px' : '14px'};color:${i === 0 ? '#c62828' : i === 1 ? '#37474f' : i === 2 ? '#bf360c' : '#111'};text-align:center;${totalsEditable(a.id) ? 'cursor:pointer;' : ''}" ${totalsEditable(a.id) ? `onclick="openScoreEdit('${a.id}')" title="Edit score"` : ''}>${a.total}${totalsEditable(a.id) ? " <span style='font-size:9px;opacity:0.4;'>✏️</span>" : ''}</td>${showHalves ? `<td style="color:#555;text-align:center;font-size:12px;">${a.h1 || '—'}</td><td style="color:#555;text-align:center;font-size:12px;">${a.h2 || '—'}</td>` : ''}<td style="color:#111;text-align:center;font-size:12px;">${isCustomDisc ? a.kills || 0 : a.g1 || '—'}</td><td style="color:#111;text-align:center;font-size:12px;">${isCustomDisc ? a.elevens || 0 : a.g2 || '—'}</td>${isCustomDisc ? `<td style="color:#111;text-align:center;font-size:12px;">${a.sixes || 0}</td>` : ''}</tr>`).join('')}</tbody></table></div></div>`;
         });
         const n = sortedCats.length;
         const numCols = n <= 1 ? 1 : n === 2 ? 2 : n <= 6 ? 3 : 4;
