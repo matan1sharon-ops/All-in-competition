@@ -5143,6 +5143,16 @@
         fields += '</div>';
         document.getElementById('score-edit-body').innerHTML = fields;
         document.getElementById('score-edit-body').dataset.archerId = archerId;
+        if (showHalves) {
+          // total = H1 + H2: changing a half updates the total
+          const sync = () => {
+            const h1 = parseInt(document.getElementById('se-h1').value) || 0;
+            const h2 = parseInt(document.getElementById('se-h2').value) || 0;
+            document.getElementById('se-total').value = h1 + h2;
+          };
+          document.getElementById('se-h1').addEventListener('input', sync);
+          document.getElementById('se-h2').addEventListener('input', sync);
+        }
         openModal('modal-score-edit');
         setTimeout(() => document.getElementById('se-total')?.focus(), 100);
       };
@@ -5158,6 +5168,15 @@
         const g3 = parseInt(document.getElementById('se-g3')?.value) || 0;
         const h1 = showHalves ? parseInt(document.getElementById('se-h1')?.value) || 0 : 0;
         const h2 = showHalves ? parseInt(document.getElementById('se-h2')?.value) || 0 : 0;
+        if (showHalves && (h1 || h2) && h1 + h2 !== total) {
+          toast(
+            currentLang === 'he'
+              ? `הסכום לא תואם: H1 + H2 = ${h1 + h2}, סה״כ = ${total}`
+              : `Total does not match: H1 + H2 = ${h1 + h2}, total = ${total}`,
+            'error',
+          );
+          return;
+        }
         const key = String(archerId).replace(/\./g, '_');
         const existing = getScore(archerId);
         let updated = { ...existing, total };
