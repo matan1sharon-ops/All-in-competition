@@ -1,7 +1,7 @@
 // Keeps the scoring app working offline.
 // Network first (always the newest version when online), stored copy when offline.
 // Bump the version to make phones drop old stored copies.
-const CACHE_NAME = 'allin-scoring-v3';
+const CACHE_NAME = 'allin-scoring-v4';
 const ASSETS = [
   './scoring.html',
   './he-text.js',
